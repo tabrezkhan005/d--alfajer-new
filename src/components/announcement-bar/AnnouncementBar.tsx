@@ -105,7 +105,9 @@ export const AnnouncementBar = ({
       return;
     }
 
-    document.body.style.paddingTop = "36px";
+    // Mobile: 32px (h-8), Tablet/Desktop: 36px (h-9)
+    const paddingTop = window.innerWidth < 640 ? "32px" : "36px";
+    document.body.style.paddingTop = paddingTop;
     return () => {
       document.body.style.paddingTop = "0px";
     };
@@ -118,7 +120,7 @@ export const AnnouncementBar = ({
     return (
       <div
         ref={barRef}
-        className="fixed top-0 left-0 right-0 z-50 h-8 sm:h-9 w-full overflow-x-hidden"
+        className="fixed top-0 left-0 right-0 z-30 h-8 sm:h-9 w-full overflow-x-hidden"
         style={{
           backgroundColor: "#2E763B",
           color: "#FEFEFE",
@@ -129,7 +131,7 @@ export const AnnouncementBar = ({
       >
         <div className="mx-auto flex h-full w-full max-w-[1920px] items-center justify-center px-2 sm:px-3 md:px-4 lg:px-8">
           {/* Message Section - Centered */}
-          <div className="flex flex-1 items-center justify-center min-w-0">
+          <div className="flex flex-1 items-center justify-center min-w-0 max-w-[calc(100%-80px)] sm:max-w-none pr-2 sm:pr-0">
             <div
               ref={messageRef}
               className="flex items-center gap-1 sm:gap-2 text-center text-[10px] sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
@@ -143,7 +145,7 @@ export const AnnouncementBar = ({
           </div>
 
           {/* Controls Section */}
-          <div className="absolute right-2 sm:right-3 md:right-4 lg:right-8 flex items-center gap-0.5 sm:gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1 ml-auto flex-shrink-0">
             <div className="flex items-center gap-0.5 sm:gap-1">
               <LanguageSelector
                 language={language}
