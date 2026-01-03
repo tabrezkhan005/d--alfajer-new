@@ -185,10 +185,9 @@ export default function DashboardPage() {
             data={recentOrders}
             columns={orderColumns}
             searchKey="customerName"
-            onRowClick={(row) => {
-              // Navigate to order detail
-              console.log("Navigate to order:", row.id);
-            }}
+              onRowClick={(row) => {
+                // Navigate to order detail
+              }}
           />
         </CardContent>
       </Card>

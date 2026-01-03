@@ -269,12 +269,10 @@ export function Header() {
             >
               <form
                 className="relative w-full flex items-center"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const query = formData.get("search") as string;
-                  console.log("Search submitted:", query);
-                }}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    // Search logic here
+                  }}
               >
                 <Input
                   type="search"
