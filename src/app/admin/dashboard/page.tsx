@@ -105,16 +105,16 @@ export default function DashboardPage() {
   const lowStockCount = lowStockProducts.length;
 
   return (
-    <div className="space-y-6">
-      <div ref={headerRef}>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
+    <div className="space-y-4 sm:space-y-6 w-full">
+      <div ref={headerRef} className="w-full">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
           Overview of your store performance and recent activity
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div ref={kpiCardsRef} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div ref={kpiCardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KPICard
           title="Total Revenue"
           value={formatCurrency(totalRevenue)}
@@ -148,25 +148,25 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts and Tables */}
-      <div ref={chartsRef} className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      <div ref={chartsRef} className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-7">
+        <Card className="lg:col-span-4">
           <SalesChart data={mockSalesData} />
         </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common admin tasks</CardDescription>
+        <Card className="lg:col-span-3">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Common admin tasks</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Button className="w-full justify-start" variant="outline">
+          <CardContent className="space-y-2 p-4 sm:p-6 pt-0">
+            <Button className="w-full justify-start text-sm sm:text-base h-10 sm:h-11" variant="outline">
               <ShoppingCart className="mr-2 h-4 w-4" />
               Create New Order
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start text-sm sm:text-base h-10 sm:h-11" variant="outline">
               <TrendingUp className="mr-2 h-4 w-4" />
               View Analytics
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start text-sm sm:text-base h-10 sm:h-11" variant="outline">
               <AlertTriangle className="mr-2 h-4 w-4" />
               Manage Inventory
             </Button>
@@ -176,11 +176,11 @@ export default function DashboardPage() {
 
       {/* Recent Orders */}
       <Card ref={tablesRef}>
-        <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-          <CardDescription>Latest customer orders</CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">Recent Orders</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Latest customer orders</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0">
           <DataTable
             data={recentOrders}
             columns={orderColumns}
@@ -196,14 +196,14 @@ export default function DashboardPage() {
       {/* Low Stock Alerts */}
       {lowStockProducts.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-[#AB1F23]" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-[#AB1F23]" />
               Low Stock Alerts
             </CardTitle>
-            <CardDescription>Products that need immediate attention</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Products that need immediate attention</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             <DataTable data={lowStockProducts} columns={productColumns} searchKey="name" />
           </CardContent>
         </Card>

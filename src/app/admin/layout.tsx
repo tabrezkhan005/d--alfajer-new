@@ -17,29 +17,32 @@ export default function AdminLayout({
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
-
-      {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
-          onClick={toggleMobileMenu}
-        />
-      )}
+    <div className="flex h-screen overflow-hidden relative">
+      <Sidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggle={toggleSidebar}
+        isMobileOpen={isMobileMenuOpen}
+        onMobileClose={closeMobileMenu}
+      />
 
       <div
-        className={`flex flex-1 flex-col transition-all duration-300 ${
+        className={`flex flex-1 flex-col transition-all duration-300 min-w-0 w-full relative z-10 ${
           isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-        }`}
+        } ml-0`}
       >
         <Navbar onMenuClick={toggleMobileMenu} />
-        <main className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-6 lg:p-8">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-muted/30 p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-full">
+          <div className="w-full max-w-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>

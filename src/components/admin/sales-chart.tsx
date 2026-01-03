@@ -56,15 +56,15 @@ export const SalesChart = ({ data }: SalesChartProps) => {
         <CardTitle>Sales Overview</CardTitle>
         <CardDescription>Monthly sales performance</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div ref={chartRef}>
-          <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <CardContent className="p-4 sm:p-6">
+        <div ref={chartRef} className="overflow-x-auto">
+          <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full min-w-[400px] sm:min-w-0">
             <AreaChart
               data={chartData}
               margin={{
                 top: 10,
                 right: 10,
-                left: 10,
+                left: 0,
                 bottom: 10,
               }}
             >
@@ -89,12 +89,15 @@ export const SalesChart = ({ data }: SalesChartProps) => {
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(value) => value}
+                tick={{ fontSize: 12 }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
+                tick={{ fontSize: 12 }}
+                width={50}
               />
               <ChartTooltip
                 cursor={false}

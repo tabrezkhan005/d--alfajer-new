@@ -10,6 +10,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/src/components/ui/sheet";
 import { cn } from "@/src/lib/utils";
 import { ProductModal } from "./ProductModal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,8 @@ interface Product {
   id: string;
   name: string;
   image: string;
+  images?: string[];
+  videos?: string[];
   price: number;
   originalPrice?: number;
   discount?: number;
@@ -29,338 +32,116 @@ interface Product {
   inStock: boolean;
   onSale: boolean;
   badge?: "SALE" | "HOT" | "NEW";
+  description?: string;
 }
 
-// Mock products data
+// Products data from images folder
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Premium Kashmiri Almonds (Mamra)",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
+    name: "Premium Chilli Powder",
+    image: "/images/products/chillipowder/chillipowder_main.jpeg",
+    images: [
+      "/images/products/chillipowder/chillipowder_main.jpeg",
+      "/images/products/chillipowder/chillipowder_1.jpeg",
+      "/images/products/chillipowder/chillipowder_2.jpeg",
+      "/images/products/chillipowder/chillipowder_3.jpeg",
+      "/images/products/chillipowder/chillipowder4.jpeg",
+      "/images/products/chillipowder/chillipowder5.jpeg",
+      "/images/products/chillipowder/chillipowder6.jpeg",
+      "/images/products/chillipowder/chillipowder7.jpeg",
+    ],
+    price: 24.99,
+    originalPrice: 29.99,
+    discount: 17,
+    rating: 4.8,
+    reviews: 156,
+    packageSize: "250g",
+    origin: "India",
+    certifications: ["Organic", "Non-GMO", "Gluten-Free"],
+    inStock: true,
+    onSale: true,
+    badge: "SALE",
+    description: "Premium quality chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives.",
+  },
+  {
+    id: "2",
+    name: "Pure Natural Honey",
+    image: "/images/products/honey/honey_main.jpeg",
+    images: [
+      "/images/products/honey/honey_main.jpeg",
+      "/images/products/honey/honey1.jpeg",
+      "/images/products/honey/honey2.jpeg",
+      "/images/products/honey/honey3.jpeg",
+      "/images/products/honey/honey5.jpeg",
+    ],
+    videos: [
+      "/images/products/honey/honey4.mp4",
+    ],
     price: 89.99,
     originalPrice: 109.99,
     discount: 18,
     rating: 4.9,
-    reviews: 342,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO", "Raw and unprocessed"],
-    inStock: true,
-    onSale: true,
-    badge: "SALE",
-  },
-  {
-    id: "2",
-    name: "California Almonds (Regular)",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 34.99,
-    rating: 4.8,
     reviews: 289,
     packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
+    origin: "UAE",
+    certifications: ["Organic", "Raw and unprocessed", "Pure"],
     inStock: true,
-    onSale: false,
+    onSale: true,
+    badge: "HOT",
+    description: "100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste.",
   },
   {
     id: "3",
-    name: "Roasted & Salted Almonds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 42.99,
+    name: "Kashmiri Tea (Premium)",
+    image: "/images/products/kashmir tea/kashmir_main.jpeg",
+    images: [
+      "/images/products/kashmir tea/kashmir_main.jpeg",
+      "/images/products/kashmir tea/kashmir1.jpeg",
+      "/images/products/kashmir tea/kashmir2.jpeg",
+      "/images/products/kashmir tea/kashmir3.jpeg",
+      "/images/products/kashmir tea/kashmir4.jpeg",
+      "/images/products/kashmir tea/kashmir5.jpeg",
+      "/images/products/kashmir tea/kashmir6.jpeg",
+      "/images/products/kashmir tea/kashmir7.jpeg",
+    ],
+    videos: [
+      "/images/products/kashmir tea/kashmir3.5.mp4",
+    ],
+    price: 45.99,
     rating: 4.7,
     reviews: 198,
-    packageSize: "400g",
-    origin: "Turkey",
-    certifications: ["Gluten-Free", "Vegan"],
+    packageSize: "250g",
+    origin: "Kashmir, India",
+    certifications: ["Organic", "Premium Grade", "Traditional"],
     inStock: true,
     onSale: false,
-    badge: "HOT",
+    badge: "NEW",
+    description: "Authentic Kashmiri tea made from the finest tea leaves grown in the pristine valleys of Kashmir. Known for its rich aroma, smooth flavor, and traditional brewing method. A perfect blend of tradition and quality.",
   },
   {
     id: "4",
-    name: "Premium Walnuts (Kashmiri)",
-    image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=400&fit=crop",
-    price: 95.99,
-    originalPrice: 120.99,
-    discount: 21,
+    name: "Shilajit (Premium Resin)",
+    image: "/images/products/shirajit/shilajit_main.jpeg",
+    images: [
+      "/images/products/shirajit/shilajit_main.jpeg",
+      "/images/products/shirajit/shilajit1.jpeg",
+      "/images/products/shirajit/shilajit2.jpeg",
+      "/images/products/shirajit/shilajit3.jpeg",
+      "/images/products/shirajit/shilajit4.jpeg",
+    ],
+    price: 149.99,
+    originalPrice: 179.99,
+    discount: 17,
     rating: 4.9,
-    reviews: 256,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Raw and unprocessed"],
-    inStock: true,
-    onSale: true,
-    badge: "SALE",
-  },
-  {
-    id: "5",
-    name: "Organic Cashews (Whole)",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 125.99,
-    rating: 4.8,
-    reviews: 312,
-    packageSize: "500g",
-    origin: "India",
-    certifications: ["Organic", "Non-GMO", "Vegan"],
-    inStock: true,
-    onSale: false,
-    badge: "NEW",
-  },
-  {
-    id: "6",
-    name: "Chilean Hazelnuts",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 78.99,
-    rating: 4.6,
-    reviews: 145,
-    packageSize: "1kg",
-    origin: "Chile",
-    certifications: ["Organic", "Gluten-Free"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "7",
-    name: "Turkish Pistachios",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 89.99,
-    originalPrice: 110.99,
-    discount: 19,
-    rating: 4.7,
-    reviews: 201,
-    packageSize: "500g",
-    origin: "Turkey",
-    certifications: ["Non-GMO", "Vegan"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "8",
-    name: "California Walnuts",
-    image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=400&fit=crop",
-    price: 65.99,
-    rating: 4.8,
-    reviews: 278,
-    packageSize: "1kg",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO", "Gluten-Free"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "9",
-    name: "Kashmiri Saffron (Premium)",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 299.99,
-    rating: 5.0,
-    reviews: 456,
-    packageSize: "2g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Raw and unprocessed"],
-    inStock: true,
-    onSale: false,
-    badge: "NEW",
-  },
-  {
-    id: "10",
-    name: "Organic Raisins (Seedless)",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 45.99,
-    originalPrice: 55.99,
-    discount: 18,
-    rating: 4.6,
-    reviews: 189,
-    packageSize: "500g",
-    origin: "Turkey",
-    certifications: ["Organic", "Vegan", "Gluten-Free"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "11",
-    name: "California Dates (Medjool)",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 89.99,
-    rating: 4.9,
-    reviews: 334,
-    packageSize: "1kg",
-    origin: "California, USA",
-    certifications: ["Organic", "Vegan", "Raw and unprocessed"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "12",
-    name: "Chilean Macadamia Nuts",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 155.99,
-    rating: 4.7,
-    reviews: 167,
-    packageSize: "500g",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "13",
-    name: "Premium Mixed Nuts",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 79.99,
-    rating: 4.7,
     reviews: 234,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
+    packageSize: "50g",
+    origin: "Himalayas",
+    certifications: ["Organic", "Pure", "Authentic"],
     inStock: true,
     onSale: true,
-    badge: "NEW" as const,
-  },
-  {
-    id: "14",
-    name: "Premium Brazil Nuts",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 95.99,
-    rating: 4.6,
-    reviews: 189,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "15",
-    name: "Honey Roasted Almonds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 52.99,
-    rating: 4.8,
-    reviews: 267,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "16",
-    name: "Premium Pine Nuts",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 185.99,
-    rating: 4.9,
-    reviews: 156,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "NEW" as const,
-  },
-  {
-    id: "17",
-    name: "Salted Cashews",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 68.99,
-    rating: 4.5,
-    reviews: 298,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "18",
-    name: "Raw Peanuts",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 32.99,
-    rating: 4.6,
-    reviews: 345,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "19",
-    name: "Premium Pecans",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 115.99,
-    rating: 4.7,
-    reviews: 178,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "20",
-    name: "Organic Sunflower Seeds",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 28.99,
-    rating: 4.5,
-    reviews: 412,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-    badge: "NEW" as const,
-  },
-  {
-    id: "21",
-    name: "Dried Apricots",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 48.99,
-    rating: 4.8,
-    reviews: 223,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "22",
-    name: "Dried Figs",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 56.99,
-    rating: 4.6,
-    reviews: 187,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "23",
-    name: "Pumpkin Seeds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 35.99,
-    rating: 4.7,
-    reviews: 289,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "24",
-    name: "Chia Seeds",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 42.99,
-    rating: 4.9,
-    reviews: 367,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "NEW" as const,
+    badge: "HOT",
+    description: "Premium quality Shilajit resin sourced from the pristine Himalayan mountains. Pure, authentic, and rich in fulvic acid and essential minerals. Known for its traditional health benefits and natural energy support.",
   },
 ];
 
@@ -375,7 +156,7 @@ interface FilterState {
 
 export function ProductListing() {
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 400],
+    priceRange: [0, 200],
     packageSizes: [],
     origins: [],
     certifications: [],
@@ -383,10 +164,11 @@ export function ProductListing() {
     onSaleOnly: false,
   });
 
-  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 400]);
+  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 200]);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -459,25 +241,225 @@ export function ProductListing() {
 
   const resetFilters = () => {
     setFilters({
-      priceRange: [0, 400],
+      priceRange: [0, 200],
       packageSizes: [],
       origins: [],
       certifications: [],
       inStockOnly: false,
       onSaleOnly: false,
     });
-    setPriceInputs([0, 400]);
+    setPriceInputs([0, 200]);
+    setIsFilterOpen(false);
   };
 
-  const packageSizes = ["250g", "500g", "1kg", "2kg"];
-  const origins = ["Kashmir, India", "California, USA", "Turkey", "Chile"];
+  const packageSizes = ["50g", "250g", "500g"];
+  const origins = ["India", "UAE", "Kashmir, India", "Himalayas"];
   const certifications = [
     "Organic",
     "Non-GMO",
     "Gluten-Free",
-    "Vegan",
+    "Pure",
     "Raw and unprocessed",
+    "Premium Grade",
+    "Traditional",
+    "Authentic",
   ];
+
+  const renderFilterContent = () => (
+    <>
+      {/* Filter Header */}
+      <div className="flex items-center justify-between pb-5 border-b border-gray-100">
+        <div className="flex items-center gap-2.5">
+          <Filter className="h-5 w-5 text-[#009744] flex-shrink-0" />
+          <h3 className="text-lg font-bold text-gray-900 font-poppins">Filters</h3>
+        </div>
+        <button
+          onClick={resetFilters}
+          className="text-sm text-[#009744] hover:text-[#2E763B] transition-colors font-semibold font-poppins whitespace-nowrap"
+          aria-label="Clear all filters"
+        >
+          Clear all
+        </button>
+      </div>
+
+      {/* Price Range */}
+      <div className="space-y-4">
+        <Label className="text-base font-bold text-gray-900 font-poppins">
+          Price Range
+        </Label>
+        <div className="space-y-4">
+          <Slider
+            value={filters.priceRange}
+            onValueChange={handlePriceRangeChange}
+            min={0}
+            max={200}
+            step={5}
+            className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
+          />
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Min</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
+                        <Input
+                          type="number"
+                          value={priceInputs[0]}
+                          onChange={(e) => handlePriceInputChange(0, e.target.value)}
+                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                          min={0}
+                          max={200}
+                        />
+              </div>
+            </div>
+            <div className="flex-1">
+              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Max</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
+                        <Input
+                          type="number"
+                          value={priceInputs[1]}
+                          onChange={(e) => handlePriceInputChange(1, e.target.value)}
+                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                          min={0}
+                          max={200}
+                        />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Package Size */}
+      <div className="space-y-3">
+        <Label className="text-base font-bold text-gray-900 font-poppins">
+          Package Size
+        </Label>
+        <div className="space-y-2.5">
+          {packageSizes.map((size) => {
+            const count = mockProducts.filter((p) => p.packageSize === size).length;
+            return (
+              <div key={size} className="flex items-center space-x-3 group/item">
+                <Checkbox
+                  id={`size-${size}`}
+                  checked={filters.packageSizes.includes(size)}
+                  onCheckedChange={() => toggleFilter("packageSizes", size)}
+                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                />
+                <Label
+                  htmlFor={`size-${size}`}
+                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                >
+                  <span className="font-medium">{size}</span>
+                  <span className="text-gray-400 text-xs font-normal">({count})</span>
+                </Label>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Origin */}
+      <div className="space-y-3">
+        <Label className="text-base font-bold text-gray-900 font-poppins">
+          Origin
+        </Label>
+        <div className="space-y-2.5">
+          {origins.map((origin) => {
+            const count = mockProducts.filter((p) => p.origin === origin).length;
+            return (
+              <div key={origin} className="flex items-center space-x-3 group/item">
+                <Checkbox
+                  id={`origin-${origin}`}
+                  checked={filters.origins.includes(origin)}
+                  onCheckedChange={() => toggleFilter("origins", origin)}
+                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                />
+                <Label
+                  htmlFor={`origin-${origin}`}
+                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                >
+                  <span className="font-medium">{origin}</span>
+                  <span className="text-gray-400 text-xs font-normal">({count})</span>
+                </Label>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Certifications */}
+      <div className="space-y-3">
+        <Label className="text-base font-bold text-gray-900 font-poppins">
+          Certifications
+        </Label>
+        <div className="space-y-2.5">
+          {certifications.map((cert) => {
+            const count = mockProducts.filter((p) =>
+              p.certifications.includes(cert)
+            ).length;
+            return (
+              <div key={cert} className="flex items-center space-x-3 group/item">
+                <Checkbox
+                  id={`cert-${cert}`}
+                  checked={filters.certifications.includes(cert)}
+                  onCheckedChange={() => toggleFilter("certifications", cert)}
+                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                />
+                <Label
+                  htmlFor={`cert-${cert}`}
+                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                >
+                  <span className="font-medium">{cert}</span>
+                  <span className="text-gray-400 text-xs font-normal">({count})</span>
+                </Label>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Availability */}
+      <div className="space-y-3">
+        <Label className="text-base font-bold text-gray-900 font-poppins">
+          Availability
+        </Label>
+        <div className="space-y-2.5">
+          <div className="flex items-center space-x-3 group/item">
+            <Checkbox
+              id="in-stock"
+              checked={filters.inStockOnly}
+              onCheckedChange={(checked) =>
+                setFilters((prev) => ({ ...prev, inStockOnly: !!checked }))
+              }
+              className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+            />
+            <Label
+              htmlFor="in-stock"
+              className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
+            >
+              In stock only
+            </Label>
+          </div>
+          <div className="flex items-center space-x-3 group/item">
+            <Checkbox
+              id="on-sale"
+              checked={filters.onSaleOnly}
+              onCheckedChange={(checked) =>
+                setFilters((prev) => ({ ...prev, onSaleOnly: !!checked }))
+              }
+              className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+            />
+            <Label
+              htmlFor="on-sale"
+              className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
+            >
+              On sale
+            </Label>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden">
@@ -496,223 +478,82 @@ export function ProductListing() {
               </p>
             </div>
                 <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
-                  <span className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
-                  <div className="relative group w-full sm:w-auto">
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="appearance-none px-3 sm:px-8 py-2 sm:py-3.5 pr-8 sm:pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md w-full sm:min-w-[180px]"
-                    >
-                    <option value="featured">Featured</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
-                    <option value="newest">Newest</option>
-                  </select>
-                  <div className="absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
-                    <svg className="w-3 sm:w-4 h-3 sm:h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
+                  {/* Mobile: Sort by and Filters side by side */}
+                  <div className="flex items-center gap-2 w-full sm:w-auto lg:hidden">
+                    <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
+                    <div className="relative group flex-1">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="appearance-none px-3 py-2 pr-8 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md w-full"
+                      >
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest</option>
+                      </select>
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
+                        <svg className="w-3 h-3 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </div>
+                    </div>
+                    <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                      <SheetTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-[#009744] hover:bg-[#009744] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md font-semibold font-poppins text-xs sm:text-sm"
+                          aria-label="Open filters"
+                        >
+                          <Filter className="h-4 w-4" />
+                          Filters
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="w-full sm:w-[90vw] sm:max-w-md overflow-y-auto bg-white [&>button]:text-gray-900 [&>button]:hover:text-gray-700">
+                        <SheetHeader>
+                          <SheetTitle className="text-left flex items-center gap-2 text-gray-900">
+                            <Filter className="h-5 w-5 text-[#009744]" />
+                            Filters
+                          </SheetTitle>
+                        </SheetHeader>
+                        <div className="mt-6 space-y-6">
+                          {renderFilterContent()}
+                        </div>
+                      </SheetContent>
+                    </Sheet>
                   </div>
-                </div>
+                  {/* Desktop: Sort by only */}
+                  <div className="hidden lg:flex items-center gap-4">
+                    <span className="text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
+                    <div className="relative group">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="appearance-none px-8 py-3.5 pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[180px]"
+                      >
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest</option>
+                      </select>
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
+                        <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
               </div>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
-          {/* Filter Sidebar - Collapsible on mobile */}
-          <aside className="w-full lg:w-72 lg:flex-shrink-0">
-            <div className="lg:sticky lg:top-24 bg-white rounded-lg sm:rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 space-y-4 sm:space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
-            {/* Filter Header */}
-            <div className="flex items-center justify-between pb-4 sm:pb-5 border-b border-gray-100">
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <Filter className="h-4 sm:h-5 w-4 sm:w-5 text-[#009744] flex-shrink-0" />
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 font-poppins">Filters</h3>
-              </div>
-              <button
-                onClick={resetFilters}
-                className="text-xs sm:text-sm text-[#009744] hover:text-[#2E763B] transition-colors font-semibold font-poppins whitespace-nowrap"
-              >
-                Clear all
-              </button>
-            </div>
-
-            {/* Price Range */}
-            <div className="space-y-3 sm:space-y-4">
-              <Label className="text-sm sm:text-base font-bold text-gray-900 font-poppins">
-                Price Range
-              </Label>
-                <div className="space-y-3 sm:space-y-4">
-                  <Slider
-                    value={filters.priceRange}
-                    onValueChange={handlePriceRangeChange}
-                    min={0}
-                    max={400}
-                    step={10}
-                    className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
-                  />
-                  <div className="flex gap-2 sm:gap-3">
-                    <div className="flex-1">
-                      <Label className="text-[10px] sm:text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Min</Label>
-                      <div className="relative">
-                        <span className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
-                        <Input
-                          type="number"
-                          value={priceInputs[0]}
-                          onChange={(e) => handlePriceInputChange(0, e.target.value)}
-                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-9 sm:pl-12 text-xs sm:text-sm"
-                          min={0}
-                          max={400}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <Label className="text-[10px] sm:text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Max</Label>
-                      <div className="relative">
-                        <span className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
-                        <Input
-                          type="number"
-                          value={priceInputs[1]}
-                          onChange={(e) => handlePriceInputChange(1, e.target.value)}
-                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-9 sm:pl-12 text-xs sm:text-sm"
-                          min={0}
-                          max={400}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            {/* Package Size */}
-            <div className="space-y-2.5 sm:space-y-3">
-              <Label className="text-sm sm:text-base font-bold text-gray-900 font-poppins">
-                Package Size
-              </Label>
-              <div className="space-y-2 sm:space-y-2.5">
-                {packageSizes.map((size) => {
-                  const count = mockProducts.filter((p) => p.packageSize === size).length;
-                  return (
-                    <div key={size} className="flex items-center space-x-2 sm:space-x-3 group/item">
-                      <Checkbox
-                        id={`size-${size}`}
-                        checked={filters.packageSizes.includes(size)}
-                        onCheckedChange={() => toggleFilter("packageSizes", size)}
-                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                      />
-                      <Label
-                        htmlFor={`size-${size}`}
-                        className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                      >
-                        <span className="font-medium">{size}</span>
-                        <span className="text-gray-400 text-[10px] sm:text-xs font-normal">({count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Origin */}
-            <div className="space-y-2.5 sm:space-y-3">
-              <Label className="text-sm sm:text-base font-bold text-gray-900 font-poppins">
-                Origin
-              </Label>
-              <div className="space-y-2 sm:space-y-2.5">
-                {origins.map((origin) => {
-                  const count = mockProducts.filter((p) => p.origin === origin).length;
-                  return (
-                    <div key={origin} className="flex items-center space-x-2 sm:space-x-3 group/item">
-                      <Checkbox
-                        id={`origin-${origin}`}
-                        checked={filters.origins.includes(origin)}
-                        onCheckedChange={() => toggleFilter("origins", origin)}
-                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                      />
-                      <Label
-                        htmlFor={`origin-${origin}`}
-                        className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                      >
-                        <span className="font-medium">{origin}</span>
-                        <span className="text-gray-400 text-[10px] sm:text-xs font-normal">({count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Certifications */}
-            <div className="space-y-2.5 sm:space-y-3">
-              <Label className="text-sm sm:text-base font-bold text-gray-900 font-poppins">
-                Certifications
-              </Label>
-              <div className="space-y-2 sm:space-y-2.5">
-                {certifications.map((cert) => {
-                  const count = mockProducts.filter((p) =>
-                    p.certifications.includes(cert)
-                  ).length;
-                  return (
-                    <div key={cert} className="flex items-center space-x-2 sm:space-x-3 group/item">
-                      <Checkbox
-                        id={`cert-${cert}`}
-                        checked={filters.certifications.includes(cert)}
-                        onCheckedChange={() => toggleFilter("certifications", cert)}
-                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                      />
-                      <Label
-                        htmlFor={`cert-${cert}`}
-                        className="text-xs sm:text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                      >
-                        <span className="font-medium">{cert}</span>
-                        <span className="text-gray-400 text-[10px] sm:text-xs font-normal">({count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Availability */}
-            <div className="space-y-2.5 sm:space-y-3">
-              <Label className="text-sm sm:text-base font-bold text-gray-900 font-poppins">
-                Availability
-              </Label>
-              <div className="space-y-2 sm:space-y-2.5">
-                <div className="flex items-center space-x-2 sm:space-x-3 group/item">
-                  <Checkbox
-                    id="in-stock"
-                    checked={filters.inStockOnly}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({ ...prev, inStockOnly: !!checked }))
-                    }
-                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                  />
-                  <Label
-                    htmlFor="in-stock"
-                    className="text-xs sm:text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
-                  >
-                    In stock only
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 sm:space-x-3 group/item">
-                  <Checkbox
-                    id="on-sale"
-                    checked={filters.onSaleOnly}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({ ...prev, onSaleOnly: !!checked }))
-                    }
-                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                  />
-                  <Label
-                    htmlFor="on-sale"
-                    className="text-xs sm:text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
-                  >
-                    On sale
-                  </Label>
-                </div>
-              </div>
-            </div>
+          {/* Filter Sidebar - Hidden on mobile, visible on desktop */}
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <div className="sticky top-24 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
+              {renderFilterContent()}
             </div>
           </aside>
 
@@ -807,11 +648,11 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
   return (
     <Card
-      className="group overflow-hidden bg-white border-0 transition-all duration-300 shadow-sm hover:shadow-xl rounded-3xl cursor-pointer"
+      className="group overflow-hidden bg-white border-0 transition-all duration-300 shadow-sm hover:shadow-xl rounded-3xl cursor-pointer flex flex-col h-full"
       onClick={() => onProductClick(product)}
     >
       {/* Image Container */}
-      <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+      <div className="relative w-full aspect-square bg-gray-50 overflow-hidden flex-shrink-0">
         <img
           src={product.image}
           alt={product.name}
@@ -889,7 +730,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         </div>
       </div>
 
-      <CardContent className="p-5 space-y-3">
+      <CardContent className="p-5 space-y-3 flex-1 flex flex-col">
         {/* Rating */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-0.5">
@@ -937,10 +778,12 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         </div>
       </CardContent>
 
-<CardFooter className="p-5 pt-0">
+<CardFooter className="p-5 pt-0 mt-auto flex-shrink-0">
           <Button
             className={cn(
-              "w-full font-bold h-12 rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
+              "w-full font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
+              "h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-6",
+              "flex items-center justify-center gap-1.5 sm:gap-2",
               isInCart || isAdding
                 ? "bg-[#009744] hover:bg-[#2E763B] text-white"
                 : "bg-[#009744] hover:bg-[#2E763B] text-white"
@@ -949,18 +792,18 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
           >
             {isAdding ? (
               <>
-                <Check className="h-5 w-5 mr-2 animate-bounce" />
-                Added!
+                <Check className="h-3.5 w-3.5 sm:h-5 sm:w-5 animate-bounce shrink-0" />
+                <span className="whitespace-nowrap">Added!</span>
               </>
             ) : isInCart ? (
               <>
-                <Plus className="h-5 w-5 mr-2 group-hover/btn:rotate-90 transition-transform" />
-                Add More
+                <Plus className="h-3.5 w-3.5 sm:h-5 sm:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap">Add More</span>
               </>
             ) : (
               <>
-                <Plus className="h-5 w-5 mr-2 group-hover/btn:rotate-90 transition-transform" />
-                Add to Cart
+                <Plus className="h-3.5 w-3.5 sm:h-5 sm:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap">Add to Cart</span>
               </>
             )}
           </Button>

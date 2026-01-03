@@ -196,6 +196,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-1 justify-end">
+            {/* Desktop: Full actions */}
             <div
               ref={fullActionsRef}
               className="hidden lg:flex items-center gap-3 lg:gap-4"
@@ -233,6 +234,7 @@ export function Header() {
               </DropdownMenu>
             </div>
 
+            {/* Desktop: Compact actions (when scrolled) */}
             <div
               ref={compactActionsRef}
               className="hidden lg:flex items-center gap-2 md:gap-3"
@@ -271,6 +273,47 @@ export function Header() {
                 </DropdownMenu>
             </div>
 
+            {/* Mobile: Hamburger menu with dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden h-9 w-9 md:h-10 md:w-10 shrink-0"
+                  aria-label="Menu"
+                >
+                  <Menu className="h-4 md:h-5 w-4 md:w-5 text-gray-900" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+                <DropdownMenuLabel className="text-gray-900">Account</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
+                  <User className="h-4 w-4 text-gray-600" />
+                  <span>Sign In</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
+                  <User className="h-4 w-4 text-gray-600" />
+                  <span>Create Account</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
+                  <Heart className="h-4 w-4 text-gray-600" />
+                  <span>Wishlist</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
+                  <ShoppingBag className="h-4 w-4 text-gray-600" />
+                  <span>Orders</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
+                  <Headphones className="h-4 w-4 text-gray-600" />
+                  <span>Support</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Cart button */}
             <button
               onClick={openCart}
               className="relative flex items-center gap-1 sm:gap-2 cursor-pointer hover:opacity-80 transition-opacity shrink-0"
@@ -304,16 +347,6 @@ export function Header() {
                 </div>
               )}
             </button>
-
-            {!isScrolled && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden h-9 w-9 md:h-10 md:w-10 shrink-0"
-              >
-                <Menu className="h-4 md:h-5 w-4 md:w-5" />
-              </Button>
-            )}
           </div>
         </div>
       </header>

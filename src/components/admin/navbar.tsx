@@ -53,13 +53,16 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   return (
     <header
       ref={navbarRef}
-      className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6 lg:px-8"
+      className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6 lg:px-8"
     >
       {onMenuClick && (
         <Button
           variant="ghost"
           size="icon"
-          onClick={onMenuClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenuClick();
+          }}
           className="lg:hidden"
           aria-label="Toggle menu"
         >
@@ -67,48 +70,49 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
         </Button>
       )}
 
-      <div className="flex flex-1 items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex flex-1 items-center gap-2 sm:gap-4 min-w-0">
+        <div className="relative flex-1 max-w-full sm:max-w-md w-full">
+          <Search className="absolute left-2 sm:left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             type="search"
-            placeholder="Search products, orders, customers..."
-            className="pl-9"
+            placeholder="Search..."
+            className="pl-8 sm:pl-9 text-sm sm:text-base h-9 sm:h-10 w-full"
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        {/* Theme Toggle */}
+      <div className="hidden lg:flex items-center gap-1 sm:gap-2">
+        {/* Theme Toggle - Hidden on mobile, shown in sidebar */}
         <Button
           variant="ghost"
           size="icon"
           onClick={handleThemeToggle}
           aria-label="Toggle theme"
+          className="h-9 w-9 sm:h-10 sm:w-10"
         >
           {mounted && theme === "dark" ? (
-            <Sun className="h-5 w-5" />
+            <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
           ) : (
-            <Moon className="h-5 w-5" />
+            <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
           )}
         </Button>
 
-        {/* Notifications */}
+        {/* Notifications - Hidden on mobile, shown in sidebar */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-              <Bell className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 sm:h-10 sm:w-10" aria-label="Notifications">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
               {notifications > 0 && (
                 <Badge
                   variant="destructive"
-                  className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  className="absolute -right-0.5 -top-0.5 sm:-right-1 sm:-top-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-[10px] sm:text-xs"
                 >
                   {notifications}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] sm:w-80">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-96 overflow-y-auto">
@@ -135,12 +139,12 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Profile Dropdown */}
+        {/* Profile Dropdown - Hidden on mobile, shown in sidebar */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full" aria-label="User menu">
-              <Avatar>
-                <AvatarFallback>AD</AvatarFallback>
+            <Button variant="ghost" className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full" aria-label="User menu">
+              <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
+                <AvatarFallback className="text-xs sm:text-sm">AD</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>

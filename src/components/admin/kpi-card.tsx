@@ -42,19 +42,19 @@ export const KPICard = ({
   }, []);
 
   return (
-    <Card ref={cardRef}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+    <Card ref={cardRef} className="w-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground truncate pr-2">
           {title}
         </CardTitle>
-        <Icon className={cn("h-4 w-4", iconColor)} />
+        <Icon className={cn("h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0", iconColor)} />
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="p-4 sm:p-6 pt-0">
+        <div className="text-xl sm:text-2xl font-bold truncate">{value}</div>
         {change && (
           <p
             className={cn(
-              "text-xs mt-1",
+              "text-[10px] sm:text-xs mt-1 line-clamp-2",
               changeType === "positive" && "text-[#009744] dark:text-[#2E763B]",
               changeType === "negative" && "text-[#AB1F23] dark:text-[#AB1F23]",
               changeType === "neutral" && "text-muted-foreground"
