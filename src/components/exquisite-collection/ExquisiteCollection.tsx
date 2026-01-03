@@ -99,10 +99,10 @@ export function ExquisiteCollection({
   };
 
   return (
-    <section className="w-full py-20 md:py-28 bg-white">
+    <section className="w-full py-12 md:py-28 bg-white">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         {/* Header */}
-            <div className="text-center mb-14 md:mb-20 space-y-6">
+            <div className="text-center mb-10 md:mb-20 space-y-4 md:space-y-6">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
                 <span className="text-[#AB1F23]">Explore Our</span>{" "}
                 <span className="text-[#009744]">Exquisite Collection</span>

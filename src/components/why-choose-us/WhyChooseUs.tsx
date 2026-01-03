@@ -40,17 +40,17 @@ const features = [
 
 export function WhyChooseUs() {
   return (
-    <section className="py-32 bg-[#FAFAFA] relative overflow-hidden">
+    <section className="py-16 md:py-32 bg-[#FAFAFA] relative overflow-hidden">
       {/* Decorative background elements - very subtle */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white to-transparent pointer-events-none" />
       
       <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-4xl mb-24">
+        <div className="max-w-4xl mb-12 md:mb-24 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center gap-4 mb-6"
+            className="flex items-center justify-center md:justify-start gap-4 mb-6"
           >
             <span className="w-12 h-[1px] bg-primary" />
             <span className="text-primary font-medium tracking-[0.3em] uppercase text-[10px]">The Al Fajr Difference</span>
@@ -61,7 +61,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl md:text-7xl font-heading font-light text-slate-900 leading-[1.1] mb-8"
+            className="text-4xl sm:text-5xl md:text-7xl font-heading font-light text-slate-900 leading-[1.1] mb-8"
           >
             Crafting Excellence <br />
             <span className="italic font-serif text-primary">In Every Detail.</span>
