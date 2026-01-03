@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Filter, X, Eye, Plus, Heart, Star, Check } from "lucide-react";
-import { useCartStore } from "@/src/lib/cart-store.tsx";
+import { useCartStore } from "@/src/lib/cart-store";
 import { Button } from "@/src/components/ui/button";
 import { Checkbox } from "@/src/components/ui/checkbox";
 import { Slider } from "@/src/components/ui/slider";
@@ -13,14 +13,6 @@ import { Card, CardContent, CardFooter } from "@/src/components/ui/card";
 import { cn } from "@/src/lib/utils";
 import { ProductModal } from "./ProductModal";
 import { motion, AnimatePresence } from "framer-motion";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/src/components/ui/sheet";
 
 interface Product {
   id: string;
@@ -487,243 +479,30 @@ export function ProductListing() {
     "Raw and unprocessed",
   ];
 
-  const FilterContent = ({ className = "" }: { className?: string }) => (
-    <div className={cn("space-y-6", className)}>
-      {/* Filter Header - Only for mobile sheet */}
-      <div className="flex items-center justify-between pb-5 border-b border-gray-100 lg:hidden">
-        <div className="flex items-center gap-2.5">
-          <Filter className="h-5 w-5 text-[#009744]" />
-          <h3 className="text-lg font-bold text-gray-900 font-poppins">Filters</h3>
-        </div>
-        <button
-          onClick={resetFilters}
-          className="text-sm text-[#009744] hover:text-[#2E763B] transition-colors font-semibold font-poppins"
-        >
-          Clear all
-        </button>
-      </div>
-
-      {/* Price Range */}
-      <div className="space-y-4">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          Price Range
-        </Label>
-        <div className="space-y-4">
-          <Slider
-            value={filters.priceRange}
-            onValueChange={handlePriceRangeChange}
-            min={0}
-            max={400}
-            step={10}
-            className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
-          />
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Min</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">AED</span>
-                <Input
-                  type="number"
-                  value={priceInputs[0]}
-                  onChange={(e) => handlePriceInputChange(0, e.target.value)}
-                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12"
-                  min={0}
-                  max={400}
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Max</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">AED</span>
-                <Input
-                  type="number"
-                  value={priceInputs[1]}
-                  onChange={(e) => handlePriceInputChange(1, e.target.value)}
-                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12"
-                  min={0}
-                  max={400}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Package Size */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          Package Size
-        </Label>
-        <div className="space-y-2.5">
-          {packageSizes.map((size) => {
-            const count = mockProducts.filter((p) => p.packageSize === size).length;
-            return (
-              <div key={size} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`size-${size}`}
-                  checked={filters.packageSizes.includes(size)}
-                  onCheckedChange={() => toggleFilter("packageSizes", size)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
-                />
-                <Label
-                  htmlFor={`size-${size}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{size}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Origin */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          Origin
-        </Label>
-        <div className="space-y-2.5">
-          {origins.map((origin) => {
-            const count = mockProducts.filter((p) => p.origin === origin).length;
-            return (
-              <div key={origin} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`origin-${origin}`}
-                  checked={filters.origins.includes(origin)}
-                  onCheckedChange={() => toggleFilter("origins", origin)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
-                />
-                <Label
-                  htmlFor={`origin-${origin}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{origin}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Certifications */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          Certifications
-        </Label>
-        <div className="space-y-2.5">
-          {certifications.map((cert) => {
-            const count = mockProducts.filter((p) =>
-              p.certifications.includes(cert)
-            ).length;
-            return (
-              <div key={cert} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`cert-${cert}`}
-                  checked={filters.certifications.includes(cert)}
-                  onCheckedChange={() => toggleFilter("certifications", cert)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
-                />
-                <Label
-                  htmlFor={`cert-${cert}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{cert}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Availability */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          Availability
-        </Label>
-        <div className="space-y-2.5">
-          <div className="flex items-center space-x-3 group/item">
-            <Checkbox
-              id="in-stock"
-              checked={filters.inStockOnly}
-              onCheckedChange={(checked) =>
-                setFilters((prev) => ({ ...prev, inStockOnly: !!checked }))
-              }
-              className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
-            />
-            <Label
-              htmlFor="in-stock"
-              className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
-            >
-              In stock only
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3 group/item">
-            <Checkbox
-              id="on-sale"
-              checked={filters.onSaleOnly}
-              onCheckedChange={(checked) =>
-                setFilters((prev) => ({ ...prev, onSaleOnly: !!checked }))
-              }
-              className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
-            />
-            <Label
-              htmlFor="on-sale"
-              className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
-            >
-              On sale
-            </Label>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <section className="w-full py-12 md:py-28 bg-gray-50">
+    <section className="w-full py-20 md:py-28 bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-10 md:mb-14">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-5 font-heading text-center lg:text-left">
+        <div className="mb-14">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-5 font-heading">
             <span className="text-[#AB1F23]">Our Premium</span>{" "}
             <span className="text-[#009744]">Products</span>
           </h2>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden lg:block" />
-              <p className="text-sm md:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide text-center lg:text-left">
+              <div className="h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden sm:block" />
+              <p className="text-base md:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                 Handpicked, organic, and packed with goodness — find your favorite natural delights here.
               </p>
             </div>
-            
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              {/* Mobile Filter Trigger */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="lg:hidden flex items-center gap-2 rounded-full h-12 px-6 border-gray-300">
-                    <Filter className="h-4 w-4" />
-                    Filters
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[300px] overflow-y-auto">
-                  <SheetHeader className="text-left mb-6">
-                    <SheetTitle>Filters</SheetTitle>
-                  </SheetHeader>
-                  <FilterContent />
-                </SheetContent>
-              </Sheet>
-
-              <div className="flex items-center gap-4 flex-1 sm:flex-none">
-                <span className="text-sm md:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
-                <div className="relative group flex-1 sm:flex-none">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="appearance-none w-full sm:w-auto px-6 md:px-8 py-3 md:py-3.5 pr-12 md:pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[140px] md:min-w-[180px]"
-                  >
+                <div className="flex items-center gap-4">
+                  <span className="text-base md:text-lg text-gray-900 font-semibold font-body">Sort by:</span>
+                  <div className="relative group">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="appearance-none px-8 py-3.5 pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[180px]"
+                    >
                     <option value="featured">Featured</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
@@ -737,27 +516,203 @@ export function ProductListing() {
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Filter Sidebar - Desktop Only */}
-          <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
-              <div className="flex items-center justify-between pb-5 border-b border-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <Filter className="h-5 w-5 text-[#009744]" />
-                  <h3 className="text-lg font-bold text-gray-900 font-poppins">Filters</h3>
-                </div>
-                <button
-                  onClick={resetFilters}
-                  className="text-sm text-[#009744] hover:text-[#2E763B] transition-colors font-semibold font-poppins"
-                >
-                  Clear all
-                </button>
+          {/* Filter Sidebar - Sticky */}
+          <aside className="lg:w-72 lg:flex-shrink-0">
+            <div className="lg:sticky lg:top-24 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
+            {/* Filter Header */}
+            <div className="flex items-center justify-between pb-5 border-b border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <Filter className="h-5 w-5 text-[#009744]" />
+                <h3 className="text-lg font-bold text-gray-900 font-poppins">Filters</h3>
               </div>
-              <FilterContent />
+              <button
+                onClick={resetFilters}
+                className="text-sm text-[#009744] hover:text-[#2E763B] transition-colors font-semibold font-poppins"
+              >
+                Clear all
+              </button>
+            </div>
+
+            {/* Price Range */}
+            <div className="space-y-4">
+              <Label className="text-base font-bold text-gray-900 font-poppins">
+                Price Range
+              </Label>
+                <div className="space-y-4">
+                  <Slider
+                    value={filters.priceRange}
+                    onValueChange={handlePriceRangeChange}
+                    min={0}
+                    max={400}
+                    step={10}
+                    className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
+                  />
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Min</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">AED</span>
+                        <Input
+                          type="number"
+                          value={priceInputs[0]}
+                          onChange={(e) => handlePriceInputChange(0, e.target.value)}
+                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12"
+                          min={0}
+                          max={400}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Max</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">AED</span>
+                        <Input
+                          type="number"
+                          value={priceInputs[1]}
+                          onChange={(e) => handlePriceInputChange(1, e.target.value)}
+                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12"
+                          min={0}
+                          max={400}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            {/* Package Size */}
+            <div className="space-y-3">
+              <Label className="text-base font-bold text-gray-900 font-poppins">
+                Package Size
+              </Label>
+              <div className="space-y-2.5">
+                {packageSizes.map((size) => {
+                  const count = mockProducts.filter((p) => p.packageSize === size).length;
+                  return (
+                    <div key={size} className="flex items-center space-x-3 group/item">
+                      <Checkbox
+                        id={`size-${size}`}
+                        checked={filters.packageSizes.includes(size)}
+                        onCheckedChange={() => toggleFilter("packageSizes", size)}
+                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
+                      />
+                      <Label
+                        htmlFor={`size-${size}`}
+                        className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                      >
+                        <span className="font-medium">{size}</span>
+                        <span className="text-gray-400 text-xs font-normal">({count})</span>
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Origin */}
+            <div className="space-y-3">
+              <Label className="text-base font-bold text-gray-900 font-poppins">
+                Origin
+              </Label>
+              <div className="space-y-2.5">
+                {origins.map((origin) => {
+                  const count = mockProducts.filter((p) => p.origin === origin).length;
+                  return (
+                    <div key={origin} className="flex items-center space-x-3 group/item">
+                      <Checkbox
+                        id={`origin-${origin}`}
+                        checked={filters.origins.includes(origin)}
+                        onCheckedChange={() => toggleFilter("origins", origin)}
+                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
+                      />
+                      <Label
+                        htmlFor={`origin-${origin}`}
+                        className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                      >
+                        <span className="font-medium">{origin}</span>
+                        <span className="text-gray-400 text-xs font-normal">({count})</span>
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Certifications */}
+            <div className="space-y-3">
+              <Label className="text-base font-bold text-gray-900 font-poppins">
+                Certifications
+              </Label>
+              <div className="space-y-2.5">
+                {certifications.map((cert) => {
+                  const count = mockProducts.filter((p) =>
+                    p.certifications.includes(cert)
+                  ).length;
+                  return (
+                    <div key={cert} className="flex items-center space-x-3 group/item">
+                      <Checkbox
+                        id={`cert-${cert}`}
+                        checked={filters.certifications.includes(cert)}
+                        onCheckedChange={() => toggleFilter("certifications", cert)}
+                        className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
+                      />
+                      <Label
+                        htmlFor={`cert-${cert}`}
+                        className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                      >
+                        <span className="font-medium">{cert}</span>
+                        <span className="text-gray-400 text-xs font-normal">({count})</span>
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div className="space-y-3">
+              <Label className="text-base font-bold text-gray-900 font-poppins">
+                Availability
+              </Label>
+              <div className="space-y-2.5">
+                <div className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id="in-stock"
+                    checked={filters.inStockOnly}
+                    onCheckedChange={(checked) =>
+                      setFilters((prev) => ({ ...prev, inStockOnly: !!checked }))
+                    }
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
+                  />
+                  <Label
+                    htmlFor="in-stock"
+                    className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    In stock only
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id="on-sale"
+                    checked={filters.onSaleOnly}
+                    onCheckedChange={(checked) =>
+                      setFilters((prev) => ({ ...prev, onSaleOnly: !!checked }))
+                    }
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
+                  />
+                  <Label
+                    htmlFor="on-sale"
+                    className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    On sale
+                  </Label>
+                </div>
+              </div>
+            </div>
             </div>
           </aside>
 
@@ -778,10 +733,10 @@ export function ProductListing() {
               </div>
 
               {/* Product Modal */}
-              <ProductModal 
-                product={selectedProduct} 
-                open={isModalOpen} 
-                onOpenChange={setIsModalOpen} 
+              <ProductModal
+                product={selectedProduct}
+                open={isModalOpen}
+                onOpenChange={setIsModalOpen}
               />
 
             {/* View All Products Button */}
@@ -851,7 +806,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
   };
 
   return (
-    <Card 
+    <Card
       className="group overflow-hidden bg-white border-0 transition-all duration-300 shadow-sm hover:shadow-xl rounded-3xl cursor-pointer"
       onClick={() => onProductClick(product)}
     >

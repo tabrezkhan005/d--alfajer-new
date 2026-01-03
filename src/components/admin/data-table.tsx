@@ -124,7 +124,8 @@ export const DataTable = <T extends { id: string }>({
                     onCheckedChange={handleSelectAll}
                     ref={(el) => {
                       if (el) {
-                        el.indeterminate = isIndeterminate;
+                        // Type assertion for indeterminate state on Radix UI checkbox
+                        (el as any).indeterminate = isIndeterminate;
                       }
                     }}
                     aria-label="Select all"

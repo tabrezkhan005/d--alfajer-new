@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 
 export interface CartItem {
   id: string;
@@ -30,7 +30,7 @@ const CartContext = createContext<CartContextType | null>(null);
 
 const STORAGE_KEY = 'al-fajr-cart';
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -116,7 +116,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       {children}
     </CartContext.Provider>
   );
-}
+};
 
 export function useCartStore() {
   const context = useContext(CartContext);

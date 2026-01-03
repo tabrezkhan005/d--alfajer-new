@@ -167,7 +167,7 @@ export default function ProductsPage() {
         searchKey="name"
         selectable
         onSelectionChange={(selected) => {
-          // Handle bulk actions
+          console.log("Selected products:", selected);
         }}
       />
 

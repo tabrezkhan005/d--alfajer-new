@@ -13,7 +13,7 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/src/components/ui/sheet";
-import { useCartStore, CartItem } from "@/src/lib/cart-store.tsx";
+import { useCartStore, CartItem } from "@/src/lib/cart-store";
 import { cn } from "@/src/lib/utils";
 
 export function CartSheet() {

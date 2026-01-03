@@ -7,31 +7,8 @@ import { DynamicFavicon } from "@/src/components/header/DynamicFavicon";
 import { Footer } from "@/src/components/ui/large-name-footer";
 
 export const metadata: Metadata = {
-  title: "Al Fajer - Premium Dry Fruits & Spices",
-  description: "Experience the finest quality dry fruits, nuts, and exotic spices. 100% authentic premium products delivered worldwide.",
-  keywords: ["dry fruits", "spices", "nuts", "premium food", "authentic spices"],
-  authors: [{ name: "Al Fajer" }],
-  openGraph: {
-    title: "Al Fajer - Premium Dry Fruits & Spices",
-    description: "Experience the finest quality dry fruits, nuts, and exotic spices.",
-    url: "https://alfajer.com",
-    siteName: "Al Fajer",
-    images: [
-      {
-        url: "/images/logo/nifajer-logo.png",
-        width: 800,
-        height: 600,
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Al Fajer - Premium Dry Fruits & Spices",
-    description: "Experience the finest quality dry fruits, nuts, and exotic spices.",
-    images: ["/images/logo/nifajer-logo.png"],
-  },
+  title: "Premium Dry Fruits & Spices",
+  description: "100% authentic premium dry fruits and spices delivered worldwide",
   icons: {
     icon: "/images/logo/nifajer-logo.png",
   },
@@ -53,7 +30,7 @@ export default function RootLayout({
           <AnnouncementBar />
           <Header />
           <main className="mt-0 pt-0">
-            {children}
+        {children}
           </main>
           <Footer />
           </Providers>

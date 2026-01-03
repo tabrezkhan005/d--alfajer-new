@@ -91,7 +91,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -101,7 +101,7 @@ const cardVariants = {
     opacity: 1,
     scale: 1,
     x: 0,
-    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -209,7 +209,7 @@ export function HeroSection() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
-                <motion.div 
+                <motion.div
                   key="slide-0"
                   variants={containerVariants}
                   initial="hidden"
@@ -224,64 +224,63 @@ export function HeroSection() {
                     </span>
                   </motion.div>
 
-                    <div className="text-center mb-6 sm:mb-10">
-                      <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] font-heading mb-2 drop-shadow-2xl">
-                        {slide.title}
-                      </motion.h1>
-                      <motion.h1 variants={itemVariants} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#FFD700] leading-[1.1] font-heading mb-4 sm:mb-8 drop-shadow-2xl">
-                        {slide.subtitle}
-                      </motion.h1>
-                      <motion.p variants={itemVariants} className="text-base sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-6 sm:mb-10">
-                        {slide.description}
-                      </motion.p>
-                    </div>
+                  <div className="text-center mb-10">
+                    <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] font-heading mb-4 drop-shadow-2xl">
+                      {slide.title}
+                    </motion.h1>
+                    <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#FFD700] leading-[1.05] font-heading mb-8 drop-shadow-2xl">
+                      {slide.subtitle}
+                    </motion.h1>
+                    <motion.p variants={itemVariants} className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-10">
+                      {slide.description}
+                    </motion.p>
+                  </div>
 
-                    <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10">
-                      {[
-                        { icon: "🌿", label: "Farm Fresh", desc: "Direct from source", color: "#009744" },
-                        { icon: <Truck className="h-5 w-5 sm:h-6 sm:w-6" />, label: "Express", desc: "Free on ₹99+", color: "#FFD700" },
-                        { icon: <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />, label: "Organic", desc: "Premium Quality", color: "#009744" },
-                        { icon: <Star className="h-5 w-5 sm:h-6 sm:w-6" fill="currentColor" />, label: "Top Rated", desc: "Trusted Brand", color: "#AB1F23" }
-                      ].map((feat, idx) => (
-                        <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-500 cursor-default">
-                          <div className="flex justify-center mb-2 sm:mb-3">
-                            <div 
-                              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
-                              style={{ backgroundColor: `${feat.color}20`, color: feat.color }}
-                            >
-                              <span className="text-xl sm:text-2xl">{feat.icon}</span>
-                            </div>
+                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+                    {[
+                      { icon: "🌿", label: "Farm Fresh", desc: "Direct from source", color: "#009744" },
+                      { icon: <Truck className="h-6 w-6" />, label: "Express", desc: "Free on ₹99+", color: "#FFD700" },
+                      { icon: <CheckCircle2 className="h-6 w-6" />, label: "Organic", desc: "Premium Quality", color: "#009744" },
+                      { icon: <Star className="h-6 w-6" fill="currentColor" />, label: "Top Rated", desc: "Trusted Brand", color: "#AB1F23" }
+                    ].map((feat, idx) => (
+                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-2xl p-4 transition-all duration-500 cursor-default">
+                        <div className="flex justify-center mb-3">
+                          <div
+                            className="h-12 w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
+                            style={{ backgroundColor: `${feat.color}20`, color: feat.color }}
+                          >
+                            <span className="text-2xl">{feat.icon}</span>
                           </div>
-                          <div className="text-xs sm:text-base text-white font-bold font-poppins mb-0.5">{feat.label}</div>
-                          <div className="text-white/60 text-[10px] sm:text-xs font-body tracking-tight">{feat.desc}</div>
                         </div>
-                      ))}
-                    </motion.div>
+                        <div className="text-sm sm:text-base text-white font-bold font-poppins mb-0.5">{feat.label}</div>
+                        <div className="text-white/60 text-xs font-body tracking-tight">{feat.desc}</div>
+                      </div>
+                    ))}
+                  </motion.div>
 
-                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
-                      <Button
-                        size="lg"
-                        className="w-full sm:w-auto group relative bg-[#009744] hover:bg-[#00803a] text-white px-8 sm:px-10 py-6 sm:py-8 text-base sm:text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden"
-                      >
-                        <span className="relative z-10 flex items-center justify-center gap-3">
-                          EXPLORE PRODUCTS
-                          <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="w-full sm:w-auto border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-8 sm:px-10 py-6 sm:py-8 text-base sm:text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center justify-center gap-3"
-                      >
-                        OUR STORY
-                        <Play className="h-5 w-5 fill-white" />
-                      </Button>
-                    </motion.div>
-
+                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-5">
+                    <Button
+                      size="lg"
+                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-10 py-8 text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden"
+                    >
+                      <span className="relative z-10 flex items-center gap-3">
+                        EXPLORE PRODUCTS
+                        <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-10 py-8 text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-3"
+                    >
+                      OUR STORY
+                      <Play className="h-5 w-5 fill-white" />
+                    </Button>
+                  </motion.div>
                 </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key={`slide-${current}`}
                 variants={containerVariants}
                 initial="hidden"
@@ -341,12 +340,12 @@ export function HeroSection() {
                     </motion.div>
                   </div>
 
-                  <motion.div 
+                  <motion.div
                     variants={cardVariants}
                     className="relative group hidden lg:block"
                   >
                     <div className="absolute -inset-4 bg-gradient-to-tr from-[#009744]/20 to-[#AB1F23]/20 rounded-[40px] blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500" />
-                    
+
                     <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl overflow-hidden p-4">
                       {/* Product Image Container */}
                       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 shadow-inner">
@@ -358,7 +357,7 @@ export function HeroSection() {
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
+
                         <div className="absolute top-4 right-4 bg-[#AB1F23] text-white px-4 py-2 rounded-xl shadow-lg transform rotate-2">
                           <span className="text-xs font-black font-poppins tracking-tighter">OFF 20%</span>
                         </div>
@@ -415,7 +414,7 @@ export function HeroSection() {
               aria-label={`Go to slide ${i + 1}`}
             >
               {i === current && (
-                <motion.div 
+                <motion.div
                   initial={{ x: "-100%" }}
                   animate={{ x: "0%" }}
                   transition={{ duration: 8, ease: "linear" }}
@@ -425,7 +424,7 @@ export function HeroSection() {
             </button>
           ))}
         </div>
-        
+
         <div className="hidden sm:flex items-center gap-2 text-white/30 text-[10px] font-black tracking-[0.2em] uppercase">
           <span className="text-white/80">{String(current + 1).padStart(2, '0')}</span>
           <div className="h-px w-8 bg-white/20" />

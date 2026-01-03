@@ -1,17 +1,17 @@
 "use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { type ThemeProviderProps } from "next-themes/dist/types";
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes";
 import { Toaster } from "@/src/components/ui/sonner";
-import { CartProvider } from "@/src/lib/cart-store.tsx";
+import { CartProvider } from "@/src/lib/cart-store";
 
 export const Providers = ({ children, ...props }: ThemeProviderProps) => {
+  const CartProviderComponent = CartProvider as React.ComponentType<{ children: React.ReactNode }>;
   return (
     <NextThemesProvider {...props}>
-      <CartProvider>
+      <CartProviderComponent>
         {children}
         <Toaster />
-      </CartProvider>
+      </CartProviderComponent>
     </NextThemesProvider>
   );
 };
