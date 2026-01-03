@@ -118,7 +118,7 @@ export const AnnouncementBar = ({
     return (
       <div
         ref={barRef}
-        className="fixed top-0 left-0 right-0 z-50 h-9"
+        className="fixed top-0 left-0 right-0 z-50 h-8 sm:h-9 w-full overflow-x-hidden"
         style={{
           backgroundColor: "#2E763B",
           color: "#FEFEFE",
@@ -127,15 +127,15 @@ export const AnnouncementBar = ({
         role="banner"
         aria-label="Announcement"
       >
-        <div className="mx-auto flex h-full max-w-[1920px] items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-full w-full max-w-[1920px] items-center justify-center px-2 sm:px-3 md:px-4 lg:px-8">
           {/* Message Section - Centered */}
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 items-center justify-center min-w-0">
             <div
               ref={messageRef}
-              className="flex items-center gap-2 text-center text-xs font-medium sm:text-sm font-body"
+              className="flex items-center gap-1 sm:gap-2 text-center text-[10px] sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
               key={currentMessageIndex}
             >
-              <span className="hidden sm:inline" aria-hidden="true">
+              <span className="hidden sm:inline text-lg" aria-hidden="true">
                 📢
               </span>
               <span>{currentMessage}</span>
@@ -143,8 +143,8 @@ export const AnnouncementBar = ({
           </div>
 
           {/* Controls Section */}
-          <div className="absolute right-4 flex items-center gap-1 sm:right-6 lg:right-8">
-            <div className="flex items-center gap-1">
+          <div className="absolute right-2 sm:right-3 md:right-4 lg:right-8 flex items-center gap-0.5 sm:gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <LanguageSelector
                 language={language}
                 onLanguageChange={setLanguage}

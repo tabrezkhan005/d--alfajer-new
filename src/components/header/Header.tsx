@@ -106,8 +106,8 @@ export function Header() {
 
     if (searchRef.current) {
       gsap.to(searchRef.current, {
-        maxWidth: isScrolled ? 500 : 600,
-        width: isScrolled ? 500 : 600,
+        maxWidth: isScrolled ? 300 : 400,
+        width: isScrolled ? 300 : 400,
         duration: 0.3,
         ease: "power2.out",
       });
@@ -131,22 +131,22 @@ export function Header() {
           height: isScrolled ? 56 : 80,
         }}
       >
-        <div className="relative mx-auto flex w-full max-w-[1920px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto flex w-full max-w-[1920px] items-center justify-between px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex-[0.3] hidden lg:block" />
 
-          <div className="flex items-center gap-4 flex-1 justify-start">
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-start min-w-0">
             <Link href="/" aria-label="Home" className="shrink-0">
               <div ref={logoRef} className="flex items-center transition-transform">
                 <Image
                   src="/images/logo/nifajer-logo.png"
                   alt="Al Fajer Mart"
-                  width={isScrolled ? 120 : 150}
-                  height={isScrolled ? 40 : 50}
+                  width={isScrolled ? 90 : 120}
+                  height={isScrolled ? 30 : 40}
                   className="object-contain"
                   style={{
-                    width: isScrolled ? "120px" : "150px",
+                    width: isScrolled ? "90px" : "120px",
                     height: "auto",
-                    maxHeight: isScrolled ? "40px" : "50px",
+                    maxHeight: isScrolled ? "30px" : "40px",
                   }}
                   priority
                 />
@@ -157,8 +157,8 @@ export function Header() {
               ref={searchRef}
               className="hidden md:flex items-center"
               style={{
-                maxWidth: isScrolled ? 500 : 600,
-                width: isScrolled ? "500px" : "600px",
+                maxWidth: isScrolled ? 300 : 400,
+                width: isScrolled ? "300px" : "400px",
               }}
             >
               <form
@@ -195,29 +195,29 @@ export function Header() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 lg:gap-4 flex-1 justify-end">
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-1 justify-end">
             <div
               ref={fullActionsRef}
-              className="hidden lg:flex items-center gap-4"
+              className="hidden lg:flex items-center gap-3 lg:gap-4"
             >
               <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                 <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
-                  <Headphones className="h-5 w-6 text-white" />
+                  <Headphones className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-sm text-gray-700 font-medium whitespace-nowrap">Support</span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">Support</span>
               </div>
 
               <div className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
-                <Heart className="h-6 w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
-                <span className="text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">Wishlist</span>
+                <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
+                <span className="text-xs md:text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">Wishlist</span>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-                    <User className="h-6 w-6 text-gray-600" />
+                    <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     <div className="flex flex-col items-start">
-                      <span className="text-sm text-gray-900 font-medium">Sign In</span>
+                      <span className="text-xs md:text-sm text-gray-900 font-medium">Sign In</span>
                     </div>
                   </div>
                 </DropdownMenuTrigger>
@@ -235,28 +235,28 @@ export function Header() {
 
             <div
               ref={compactActionsRef}
-              className="hidden lg:flex items-center gap-3"
+              className="hidden lg:flex items-center gap-2 md:gap-3"
               style={{ opacity: isScrolled ? 1 : 0, pointerEvents: isScrolled ? "auto" : "none" }}
             >
                 <button
-                  className="h-10 w-10 rounded-full bg-[#009744] flex items-center justify-center hover:opacity-80 transition-opacity"
+                  className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-[#009744] flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
                   aria-label="Support"
                 >
-                  <Headphones className="h-5 w-6 text-white" />
+                  <Headphones className="h-4 md:h-5 w-4 md:w-5 text-white" />
                 </button>
                 <button
-                  className="flex items-center justify-center hover:text-pink-500 transition-colors"
+                  className="flex items-center justify-center hover:text-pink-500 transition-colors shrink-0"
                   aria-label="Wishlist"
                 >
-                  <Heart className="h-6 w-8 text-gray-600" />
+                  <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                 </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="flex items-center justify-center hover:opacity-80 transition-opacity"
+                      className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
                       aria-label="Account"
                     >
-                      <User className="h-6 w-8 text-gray-600" />
+                      <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52">
@@ -273,29 +273,29 @@ export function Header() {
 
             <button
               onClick={openCart}
-              className="relative flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+              className="relative flex items-center gap-1 sm:gap-2 cursor-pointer hover:opacity-80 transition-opacity shrink-0"
               aria-label="Shopping cart"
             >
               {!isScrolled ? (
                 <>
                   <div className="relative">
-                    <ShoppingCart className="h-6 w-8 text-[#009744]" />
+                    <ShoppingCart className="h-5 md:h-6 w-5 md:w-6 text-[#009744]" />
                     {cartCount > 0 && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#AB1F23] flex items-center justify-center">
                         <span className="text-[9px] font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium text-gray-700 uppercase leading-tight">My Cart</span>
-                    <span className="text-sm font-semibold text-gray-900 leading-tight">
+                  <div className="hidden sm:flex flex-col items-start">
+                    <span className="text-xs font-medium text-gray-700 uppercase leading-tight">My Cart</span>
+                    <span className="text-xs font-semibold text-gray-900 leading-tight">
                       {cartTotal > 0 ? `AED ${cartTotal.toFixed(2)}` : "AED 0.00"}
                     </span>
                   </div>
                 </>
               ) : (
                 <div className="relative">
-                  <ShoppingCart className="h-6 w-6 text-[#009744]" />
+                  <ShoppingCart className="h-5 md:h-6 w-5 md:w-6 text-[#009744]" />
                   {cartCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#AB1F23] flex items-center justify-center">
                       <span className="text-[9px] font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
@@ -309,9 +309,9 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden h-9 w-9 md:h-10 md:w-10 shrink-0"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-4 md:h-5 w-4 md:w-5" />
               </Button>
             )}
           </div>

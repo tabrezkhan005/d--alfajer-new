@@ -40,20 +40,20 @@ const features = [
 
 export function WhyChooseUs() {
   return (
-    <section className="py-16 md:py-32 bg-[#FAFAFA] relative overflow-hidden">
+    <section className="py-8 sm:py-12 md:py-16 lg:py-20 xl:py-32 bg-[#FAFAFA] relative overflow-hidden">
       {/* Decorative background elements - very subtle */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white to-transparent pointer-events-none" />
       
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-4xl mb-12 md:mb-24 text-center md:text-left">
+      <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 relative z-10">
+        <div className="max-w-4xl mb-6 sm:mb-10 md:mb-16 lg:mb-24 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center md:justify-start gap-4 mb-6"
+            className="flex items-center justify-center md:justify-start gap-2 md:gap-3 mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
           >
-            <span className="w-12 h-[1px] bg-primary" />
-            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[10px]">The Al Fajr Difference</span>
+            <span className="w-4 sm:w-6 md:w-12 h-[1px] bg-primary" />
+            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">The Al Fajr Difference</span>
           </motion.div>
           
           <motion.h2 
@@ -61,7 +61,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl sm:text-5xl md:text-7xl font-heading font-light text-slate-900 leading-[1.1] mb-8"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-heading font-light text-slate-900 leading-[1.1] mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0"
           >
             Crafting Excellence <br />
             <span className="italic font-serif text-primary">In Every Detail.</span>
@@ -72,14 +72,14 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-slate-500 text-xl font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-8 ml-1"
+            className="text-slate-500 text-[10px] sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-2 sm:pl-4 md:pl-8 ml-0 md:ml-1 px-2 sm:px-0"
           >
             We are committed to providing the most exquisite dates and nuts, 
             combining traditional heritage with modern excellence.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-slate-200">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -87,25 +87,25 @@ export function WhyChooseUs() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.8 }}
-              className={`pt-12 pb-16 px-0 md:px-8 group transition-colors duration-500 hover:bg-white
+              className={`pt-3 sm:pt-6 md:pt-8 lg:pt-12 pb-4 sm:pb-6 md:pb-10 lg:pb-16 px-2 sm:px-3 md:px-6 lg:px-8 group transition-colors duration-500 hover:bg-white
                 ${index % 3 !== 0 ? 'lg:border-l lg:border-slate-100' : ''}
                 ${index >= 3 ? 'border-t border-slate-100' : ''}
-                ${index % 2 !== 0 ? 'md:border-l md:border-slate-100 lg:border-l-0' : ''}
+                ${index % 2 !== 0 ? 'sm:border-l sm:border-slate-100 lg:border-l-0' : ''}
               `}
             >
               <div className="relative">
-                <span className="text-[10px] font-bold tracking-widest text-primary/40 block mb-6 transition-transform duration-500 group-hover:translate-x-1">
+                <span className="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] font-bold tracking-widest text-primary/40 block mb-1.5 sm:mb-2 md:mb-3 lg:mb-6 transition-transform duration-500 group-hover:translate-x-1">
                   {feature.number}
                 </span>
-                <h3 className="text-2xl font-heading font-medium text-slate-900 mb-4 tracking-tight">
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-heading font-medium text-slate-900 mb-1.5 sm:mb-2 md:mb-3 lg:mb-4 tracking-tight">
                   {feature.title}
                 </h3>
-                <p className="text-slate-500 leading-relaxed font-body text-sm max-w-[280px]">
+                <p className="text-slate-500 leading-relaxed font-body text-[10px] sm:text-[11px] md:text-xs lg:text-sm xl:text-base max-w-[280px]">
                   {feature.description}
                 </p>
                 
                 {/* Subtle underline animation */}
-                <div className="absolute -bottom-4 left-0 w-0 h-[1px] bg-primary/20 transition-all duration-700 group-hover:w-full" />
+                <div className="absolute -bottom-3 sm:-bottom-4 left-0 w-0 h-[1px] bg-primary/20 transition-all duration-700 group-hover:w-full" />
               </div>
             </motion.div>
           ))}
@@ -116,21 +116,21 @@ export function WhyChooseUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-24 flex items-center justify-between border-t border-slate-200 pt-12"
+          className="mt-6 sm:mt-8 md:mt-12 lg:mt-16 xl:mt-24 flex flex-col md:flex-row items-center justify-between border-t border-slate-200 pt-4 sm:pt-6 md:pt-8 lg:pt-12 gap-3 sm:gap-4 md:gap-0 px-2 sm:px-0"
         >
           <div className="hidden md:block">
-            <p className="text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">
+            <p className="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[9px] xl:text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">
               ESTABLISHED TRADITION — MODERN QUALITY
             </p>
           </div>
           
           <Button
             variant="link"
-            className="group p-0 h-auto text-slate-900 hover:no-underline font-bold tracking-widest text-xs flex items-center gap-4"
+            className="group p-0 h-auto text-slate-900 hover:no-underline font-bold tracking-widest text-[7px] sm:text-[8px] md:text-[9px] lg:text-xs flex items-center gap-2 md:gap-3 lg:gap-4 w-full md:w-auto justify-center md:justify-start px-2 sm:px-0"
           >
             <span>DISCOVER OUR STORY</span>
-            <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center transition-all duration-500 group-hover:bg-primary group-hover:border-primary group-hover:text-white">
-              <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
+            <div className="w-6 sm:w-7 md:w-8 md:h-10 lg:w-12 lg:h-12 rounded-full border border-slate-200 flex items-center justify-center transition-all duration-500 group-hover:bg-primary group-hover:border-primary group-hover:text-white flex-shrink-0 h-6 sm:h-7">
+              <ArrowRight className="w-2 sm:w-2.5 md:w-3 h-2 sm:h-2.5 md:h-3 lg:w-4 lg:h-4 transition-transform duration-500 group-hover:translate-x-1" />
             </div>
           </Button>
         </motion.div>

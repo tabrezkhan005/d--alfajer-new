@@ -12,6 +12,12 @@ export const metadata: Metadata = {
   icons: {
     icon: "/images/logo/nifajer-logo.png",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 export default function RootLayout({
@@ -24,12 +30,12 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/logo/nifajer-logo.png" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased overflow-x-hidden w-full">
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <DynamicFavicon />
           <AnnouncementBar />
           <Header />
-          <main className="mt-0 pt-0">
+          <main className="mt-0 pt-0 w-full overflow-x-hidden">
         {children}
           </main>
           <Footer />

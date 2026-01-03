@@ -99,21 +99,21 @@ export function ExquisiteCollection({
   };
 
   return (
-    <section className="w-full py-20 md:py-28 bg-white">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-white overflow-x-hidden">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
-            <div className="text-center mb-14 md:mb-20 space-y-6">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
+            <div className="text-center mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-4 sm:space-y-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
                 <span className="text-[#AB1F23]">Explore Our</span>{" "}
                 <span className="text-[#009744]">Exquisite Collection</span>
               </h2>
               {subtitle && (
-                <div className="flex items-center justify-center gap-3">
-                  <div className="hidden sm:block h-[1px] w-8 bg-[#AB1F23]/20" />
-                  <p className="text-base md:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2">
+                  <div className="hidden sm:block h-[1px] w-6 sm:w-8 bg-[#AB1F23]/20" />
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                     {subtitle}
                   </p>
-                  <div className="hidden sm:block h-[1px] w-8 bg-[#009744]/20" />
+                  <div className="hidden sm:block h-[1px] w-6 sm:w-8 bg-[#009744]/20" />
                 </div>
               )}
             </div>
@@ -125,7 +125,7 @@ export function ExquisiteCollection({
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             className={cn(
-              "hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
+              "hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 md:w-12 h-10 md:h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
               canScrollLeft
                 ? "opacity-0 group-hover:opacity-100 hover:scale-110 hover:shadow-xl hover:border-[#009744] hover:bg-[#009744]/5"
                 : "opacity-0 cursor-not-allowed",
@@ -133,7 +133,7 @@ export function ExquisiteCollection({
             )}
             aria-label="Scroll left"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
+            <ChevronLeft className="w-4 md:w-5 h-4 md:h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
           </button>
 
           {/* Right Arrow - Desktop Only */}
@@ -141,7 +141,7 @@ export function ExquisiteCollection({
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             className={cn(
-              "hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
+              "hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 md:w-12 h-10 md:h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
               canScrollRight
                 ? "opacity-0 group-hover:opacity-100 hover:scale-110 hover:shadow-xl hover:border-[#009744] hover:bg-[#009744]/5"
                 : "opacity-0 cursor-not-allowed",
@@ -149,14 +149,14 @@ export function ExquisiteCollection({
             )}
             aria-label="Scroll right"
           >
-            <ChevronRight className="w-5 h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
+            <ChevronRight className="w-4 md:w-5 h-4 md:h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
           </button>
 
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
             onScroll={checkScrollability}
-            className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4"
+            className="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-3 sm:pb-4"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
@@ -166,14 +166,14 @@ export function ExquisiteCollection({
             {categories.map((category) => (
               <motion.div
                 key={category.id}
-                className="flex-shrink-0 w-[300px] md:w-[340px] snap-start"
+                className="flex-shrink-0 w-[calc(100%-16px)] sm:w-[280px] md:w-[300px] lg:w-[340px] snap-start"
                 onMouseEnter={() => setHoveredCard(category.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 whileHover={{ y: -8 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 <div
-                  className="relative h-[400px] md:h-[450px] rounded-3xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
+                  className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
                   role="button"
                   tabIndex={0}
                   aria-label={`View ${category.name}`}
@@ -194,10 +194,10 @@ export function ExquisiteCollection({
                   </div>
 
                   {/* Content */}
-                  <div className="absolute inset-0 flex items-end p-7">
+                  <div className="absolute inset-0 flex items-end p-4 sm:p-5 md:p-7">
                     <div className="w-full">
                       <motion.h3
-                        className="text-white text-xl md:text-2xl font-bold tracking-tight font-heading"
+                        className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight font-heading"
                         animate={{
                           y: hoveredCard === category.id ? -4 : 0,
                         }}
@@ -213,11 +213,11 @@ export function ExquisiteCollection({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             transition={{ duration: 0.2 }}
-                            className="mt-4"
+                            className="mt-3 md:mt-4"
                           >
-                            <span className="inline-flex items-center text-[#009744] text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-4 py-2 rounded-full">
+                            <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
                               Explore Collection
-                              <ChevronRight className="ml-1 w-4 h-4" />
+                              <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
                             </span>
                           </motion.div>
                         )}

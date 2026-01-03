@@ -134,7 +134,7 @@ export function HeroSection() {
   const slide = heroSlides[current];
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-black">
+    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100vh" }}>
       {/* ---------------- BACKGROUND CAROUSEL ---------------- */}
       <div className="absolute inset-0 z-0 h-full w-full">
         <Carousel
@@ -205,8 +205,8 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="absolute inset-0 z-20 flex items-center w-full">
+        <div className="container mx-auto w-full px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
                 <motion.div
@@ -215,67 +215,67 @@ export function HeroSection() {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="w-full max-w-6xl mx-auto px-4"
+                  className="w-full max-w-6xl mx-auto px-2 sm:px-4"
                 >
-                  <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-6">
-                    <span className="bg-[#AB1F23]/20 backdrop-blur-md border border-[#AB1F23]/30 px-4 py-1.5 rounded-full flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-[#AB1F23]" fill="#AB1F23" />
-                      <span className="text-white text-xs sm:text-sm font-semibold tracking-widest uppercase">Real Customers, Real Joy</span>
+                  <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
+                    <span className="bg-[#AB1F23]/20 backdrop-blur-md border border-[#AB1F23]/30 px-3 sm:px-4 py-1.5 rounded-full flex items-center gap-2">
+                      <Heart className="h-3 sm:h-4 w-3 sm:w-4 text-[#AB1F23]" fill="#AB1F23" />
+                      <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase">Real Customers, Real Joy</span>
                     </span>
                   </motion.div>
 
-                  <div className="text-center mb-10">
-                    <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] font-heading mb-4 drop-shadow-2xl">
+                  <div className="text-center mb-6 sm:mb-10">
+                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] font-heading mb-2 sm:mb-4 drop-shadow-2xl px-2">
                       {slide.title}
                     </motion.h1>
-                    <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#FFD700] leading-[1.05] font-heading mb-8 drop-shadow-2xl">
+                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-[#FFD700] leading-[1.05] font-heading mb-4 sm:mb-8 drop-shadow-2xl px-2">
                       {slide.subtitle}
                     </motion.h1>
-                    <motion.p variants={itemVariants} className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-10">
+                    <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-6 sm:mb-10 px-3 sm:px-4">
                       {slide.description}
                     </motion.p>
                   </div>
 
-                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-10 px-2 sm:px-4">
                     {[
                       { icon: "🌿", label: "Farm Fresh", desc: "Direct from source", color: "#009744" },
-                      { icon: <Truck className="h-6 w-6" />, label: "Express", desc: "Free on ₹99+", color: "#FFD700" },
-                      { icon: <CheckCircle2 className="h-6 w-6" />, label: "Organic", desc: "Premium Quality", color: "#009744" },
-                      { icon: <Star className="h-6 w-6" fill="currentColor" />, label: "Top Rated", desc: "Trusted Brand", color: "#AB1F23" }
+                      { icon: <Truck className="h-4 sm:h-6 w-4 sm:w-6" />, label: "Express", desc: "Free on ₹99+", color: "#FFD700" },
+                      { icon: <CheckCircle2 className="h-4 sm:h-6 w-4 sm:w-6" />, label: "Organic", desc: "Premium Quality", color: "#009744" },
+                      { icon: <Star className="h-4 sm:h-6 w-4 sm:w-6" fill="currentColor" />, label: "Top Rated", desc: "Trusted Brand", color: "#AB1F23" }
                     ].map((feat, idx) => (
-                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-2xl p-4 transition-all duration-500 cursor-default">
-                        <div className="flex justify-center mb-3">
+                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-xl sm:rounded-2xl p-2 sm:p-4 transition-all duration-500 cursor-default">
+                        <div className="flex justify-center mb-2 sm:mb-3">
                           <div
-                            className="h-12 w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
+                            className="h-8 sm:h-12 w-8 sm:w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
                             style={{ backgroundColor: `${feat.color}20`, color: feat.color }}
                           >
-                            <span className="text-2xl">{feat.icon}</span>
+                            <span className="text-lg sm:text-2xl">{feat.icon}</span>
                           </div>
                         </div>
-                        <div className="text-sm sm:text-base text-white font-bold font-poppins mb-0.5">{feat.label}</div>
-                        <div className="text-white/60 text-xs font-body tracking-tight">{feat.desc}</div>
+                        <div className="text-[10px] sm:text-sm md:text-base text-white font-bold font-poppins mb-0.5">{feat.label}</div>
+                        <div className="text-white/60 text-[8px] sm:text-xs font-body tracking-tight">{feat.desc}</div>
                       </div>
                     ))}
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-5">
+                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 px-2 sm:px-4">
                     <Button
                       size="lg"
-                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-10 py-8 text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden"
+                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
                     >
-                      <span className="relative z-10 flex items-center gap-3">
+                      <span className="relative z-10 flex items-center gap-2 sm:gap-3 justify-center">
                         EXPLORE PRODUCTS
-                        <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                        <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-10 py-8 text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-3"
+                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-3 justify-center w-full sm:w-auto"
                     >
                       OUR STORY
-                      <Play className="h-5 w-5 fill-white" />
+                      <Play className="h-4 sm:h-5 w-4 sm:w-5 fill-white" />
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -286,54 +286,54 @@ export function HeroSection() {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+                className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                  <div className="text-left space-y-8">
-                    <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-[#009744]/90 backdrop-blur-sm text-white px-6 py-3 rounded-full shadow-lg border border-[#009744]/20">
-                      <Sparkles className="h-4 w-4 text-[#FFD700]" />
-                      <span className="text-xs sm:text-sm font-bold font-poppins tracking-widest uppercase">Al Fajer Signature</span>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:gap-20 items-center">
+                  <div className="text-left space-y-4 sm:space-y-6 lg:space-y-8 px-2 sm:px-0">
+                    <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-[#009744]/90 backdrop-blur-sm text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg border border-[#009744]/20">
+                      <Sparkles className="h-3 sm:h-4 w-3 sm:w-4 text-[#FFD700]" />
+                      <span className="text-[8px] sm:text-xs md:text-sm font-bold font-poppins tracking-widest uppercase">Al Fajer Signature</span>
                     </motion.div>
 
-                    <motion.h1 variants={itemVariants} className="text-6xl sm:text-7xl md:text-8xl font-bold text-white leading-[1] font-heading tracking-tight">
+                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1] font-heading tracking-tight">
                       {slide.title}
                       <br />
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#009744] to-[#00b350] drop-shadow-sm">{slide.subtitle}</span>
                     </motion.h1>
 
-                    <motion.p variants={itemVariants} className="text-xl sm:text-2xl text-white/80 max-w-lg font-body font-light leading-relaxed">
+                    <motion.p variants={itemVariants} className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white/80 max-w-lg font-body font-light leading-relaxed">
                       {slide.description}
                     </motion.p>
 
-                    <motion.div variants={itemVariants} className="flex flex-wrap gap-8">
+                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-8">
                       {[
-                        { icon: <Check className="h-5 w-5" />, label: "100% Organic" },
-                        { icon: <Leaf className="h-5 w-5" />, label: "No Additives" },
-                        { icon: <Award className="h-5 w-5" />, label: "Premium Selection" }
+                        { icon: <Check className="h-4 sm:h-5 w-4 sm:w-5" />, label: "100% Organic" },
+                        { icon: <Leaf className="h-4 sm:h-5 w-4 sm:w-5" />, label: "No Additives" },
+                        { icon: <Award className="h-4 sm:h-5 w-4 sm:w-5" />, label: "Premium Selection" }
                       ].map((f, i) => (
-                        <div key={i} className="flex items-center gap-3 group">
-                          <div className="h-8 w-8 rounded-full bg-[#009744]/20 flex items-center justify-center text-[#009744] transition-transform group-hover:scale-110">
+                        <div key={i} className="flex items-center gap-2 sm:gap-3 group">
+                          <div className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[#009744]/20 flex items-center justify-center text-[#009744] transition-transform group-hover:scale-110">
                             {f.icon}
                           </div>
-                          <span className="text-white font-medium font-body text-lg">{f.label}</span>
+                          <span className="text-white font-medium font-body text-sm sm:text-base md:text-lg">{f.label}</span>
                         </div>
                       ))}
                     </motion.div>
 
-                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-5 pt-6">
+                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 sm:gap-5 pt-4 sm:pt-6">
                       <Button
                         size="lg"
-                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-10 py-8 text-xl font-bold shadow-2xl rounded-full transition-all duration-500"
+                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-full transition-all duration-500 w-full sm:w-auto"
                       >
-                        <span className="flex items-center gap-3">
+                        <span className="flex items-center gap-2 sm:gap-3 justify-center">
                           SHOP NOW
-                          <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                          <ArrowRight className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 transition-transform group-hover:translate-x-1" />
                         </span>
                       </Button>
                       <Button
                         size="lg"
                         variant="outline"
-                        className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-10 py-8 text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md"
+                        className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md w-full sm:w-auto"
                       >
                         VIEW ALL
                       </Button>
@@ -402,14 +402,14 @@ export function HeroSection() {
       </div>
 
       {/* ---------------- NAVIGATION ---------------- */}
-      <div className="absolute bottom-10 left-1/2 z-30 flex -translate-x-1/2 items-center gap-6">
-        <div className="flex gap-3">
+      <div className="absolute bottom-6 sm:bottom-10 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4 sm:gap-6 px-4">
+        <div className="flex gap-2 sm:gap-3">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => api?.scrollTo(i)}
               className={`group relative h-1 rounded-full transition-all duration-500 overflow-hidden ${
-                i === current ? "w-12 bg-white/20" : "w-4 bg-white/30 hover:bg-white/50"
+                i === current ? "w-8 sm:w-12 bg-white/20" : "w-3 sm:w-4 bg-white/30 hover:bg-white/50"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             >
@@ -425,17 +425,17 @@ export function HeroSection() {
           ))}
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 text-white/30 text-[10px] font-black tracking-[0.2em] uppercase">
+        <div className="hidden sm:flex items-center gap-2 text-white/30 text-[9px] sm:text-[10px] font-black tracking-[0.2em] uppercase">
           <span className="text-white/80">{String(current + 1).padStart(2, '0')}</span>
-          <div className="h-px w-8 bg-white/20" />
+          <div className="h-px w-6 sm:w-8 bg-white/20" />
           <span>{String(heroSlides.length).padStart(2, '0')}</span>
         </div>
       </div>
 
-      {/* ---------------- SIDEBAR DECOR (Professional Touch) ---------------- */}
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 z-30 hidden xl:flex flex-col gap-12 items-center">
+      {/* ---------------- SIDEBAR DECOR (Professional Touch) - HIDDEN ON MOBILE/TABLET-------- */}
+      <div className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden xl:flex flex-col gap-12 items-center">
         <div className="h-20 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-        <span className="rotate-90 text-[10px] text-white/20 font-bold tracking-[0.5em] uppercase whitespace-nowrap">Scroll for Wellness</span>
+        <span className="rotate-90 text-[9px] sm:text-[10px] text-white/20 font-bold tracking-[0.5em] uppercase whitespace-nowrap">Scroll for Wellness</span>
         <div className="h-20 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
       </div>
     </section>
