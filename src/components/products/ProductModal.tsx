@@ -1,0 +1,770 @@
+"use client";
+
+import { useState } from "react";
+import { 
+  Dialog, 
+  DialogContent,
+  DialogTitle,
+} from "@/src/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { 
+  Star, 
+  Heart, 
+  Minus, 
+  Plus, 
+  ShoppingCart, 
+  Truck, 
+  Shield, 
+  Award,
+  Check,
+  ChevronDown,
+  User,
+  ThumbsUp,
+  AlertTriangle,
+  Leaf,
+  Package,
+  Building2
+} from "lucide-react";
+import { cn } from "@/src/lib/utils";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Product {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  rating: number;
+  reviews: number;
+  packageSize: string;
+  origin: string;
+  certifications: string[];
+  inStock: boolean;
+  onSale: boolean;
+  badge?: "SALE" | "HOT" | "NEW";
+}
+
+interface Review {
+  id: string;
+  user: string;
+  avatar?: string;
+  rating: number;
+  date: string;
+  title: string;
+  comment: string;
+  helpful: number;
+  verified: boolean;
+}
+
+const mockReviews: Review[] = [
+  {
+    id: "1",
+    user: "Sarah M.",
+    rating: 5,
+    date: "2024-01-15",
+    title: "Absolutely fresh and delicious!",
+    comment: "These are the best almonds I've ever tasted. You can tell they're truly premium quality. The packaging was excellent and they arrived fresh.",
+    helpful: 24,
+    verified: true,
+  },
+  {
+    id: "2",
+    user: "Ahmed K.",
+    rating: 5,
+    date: "2024-01-10",
+    title: "Perfect for my family",
+    comment: "We've been ordering from Al Fajer for months now. The quality is consistently excellent and the delivery is always on time.",
+    helpful: 18,
+    verified: true,
+  },
+  {
+    id: "3",
+    user: "Priya S.",
+    rating: 4,
+    date: "2024-01-05",
+    title: "Great quality, slightly pricey",
+    comment: "The product quality is outstanding. A bit expensive but you get what you pay for. Will definitely order again.",
+    helpful: 12,
+    verified: true,
+  },
+  {
+    id: "4",
+    user: "Mohammed R.",
+    rating: 5,
+    date: "2023-12-28",
+    title: "Best in UAE!",
+    comment: "I've tried many brands but Al Fajer is by far the best. The taste and freshness are unmatched. Highly recommend!",
+    helpful: 31,
+    verified: true,
+  },
+  {
+    id: "5",
+    user: "Lisa T.",
+    rating: 3,
+    date: "2023-12-20",
+    title: "Good but expected more",
+    comment: "The almonds are good quality but I expected them to be a bit larger given the premium price. Still tasty though.",
+    helpful: 8,
+    verified: false,
+  },
+];
+
+const nutritionData = {
+  servingSize: "30g (about 23 almonds)",
+  calories: 164,
+  nutrients: [
+    { name: "Total Fat", value: "14g", daily: "18%" },
+    { name: "Saturated Fat", value: "1.1g", daily: "5%" },
+    { name: "Cholesterol", value: "0mg", daily: "0%" },
+    { name: "Sodium", value: "0mg", daily: "0%" },
+    { name: "Total Carbohydrates", value: "6g", daily: "2%" },
+    { name: "Dietary Fiber", value: "3.5g", daily: "13%" },
+    { name: "Sugars", value: "1g", daily: "-" },
+    { name: "Protein", value: "6g", daily: "12%" },
+    { name: "Vitamin E", value: "7.3mg", daily: "49%" },
+    { name: "Magnesium", value: "76mg", daily: "18%" },
+  ],
+};
+
+const allergenInfo = {
+  contains: ["Tree Nuts (Almonds)"],
+  mayContain: ["Other Tree Nuts", "Peanuts"],
+  freeFrom: ["Gluten", "Dairy", "Soy", "Eggs"],
+};
+
+const wholesaleInfo = {
+  minOrder: "10 kg",
+  bulkDiscount: "15-25%",
+  leadTime: "3-5 business days",
+  contact: "wholesale@alfajer.ae",
+};
+
+interface ProductModalProps {
+  product: Product | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ProductModal({ product, open, onOpenChange }: ProductModalProps) {
+  const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
+  const [reviewFilter, setReviewFilter] = useState<"all" | number>("all");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ rating: 5, title: "", comment: "" });
+
+  if (!product) return null;
+
+  const filteredReviews = reviewFilter === "all" 
+    ? mockReviews 
+    : mockReviews.filter(r => r.rating === reviewFilter);
+
+  const ratingCounts = [5, 4, 3, 2, 1].map(star => ({
+    star,
+    count: mockReviews.filter(r => r.rating === star).length,
+    percentage: (mockReviews.filter(r => r.rating === star).length / mockReviews.length) * 100,
+  }));
+
+  const handleSubmitReview = () => {
+    setShowReviewForm(false);
+    setNewReview({ rating: 5, title: "", comment: "" });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-3xl border-0 shadow-2xl">
+        <VisuallyHidden>
+          <DialogTitle>{product.name}</DialogTitle>
+        </VisuallyHidden>
+        
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            {/* Left: Product Image */}
+            <div className="relative bg-[#FBFBFC] p-8 lg:p-12 flex items-center justify-center min-h-[400px] lg:min-h-[500px]">
+              {product.badge && (
+                <Badge
+                  className={cn(
+                    "absolute top-6 left-6 z-10 px-5 py-2.5 rounded-full text-xs font-bold text-white shadow-lg uppercase tracking-wider font-poppins",
+                    product.badge === "SALE" && "bg-[#AB1F23]",
+                    product.badge === "HOT" && "bg-orange-500",
+                    product.badge === "NEW" && "bg-[#009744]"
+                  )}
+                >
+                  {product.badge}
+                </Badge>
+              )}
+              {product.discount && !product.badge && (
+                <Badge className="absolute top-6 left-6 z-10 bg-[#AB1F23] text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-lg font-poppins tracking-wider">
+                  -{product.discount}% OFF
+                </Badge>
+              )}
+              <motion.img
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                src={product.image}
+                alt={product.name}
+                className="w-full max-w-md h-auto object-contain drop-shadow-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-black/[0.02] to-transparent pointer-events-none" />
+            </div>
+
+            {/* Right: Product Info */}
+            <div className="p-8 lg:p-12 space-y-8 bg-white">
+              {/* Rating */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn(
+                        "h-4 w-4",
+                        i < Math.floor(product.rating)
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-gray-200 fill-gray-200"
+                      )}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-bold text-gray-900">{product.rating}</span>
+                  <span className="text-sm text-gray-400 font-medium">({product.reviews} verified reviews)</span>
+                </div>
+              </div>
+
+              {/* Title */}
+              <div className="space-y-3">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 font-heading leading-tight tracking-tight">
+                  {product.name}
+                </h2>
+                <div className="flex items-center gap-3 text-sm font-medium">
+                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">Origin: {product.origin}</span>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">{product.packageSize}</span>
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-center gap-4">
+                <span className="text-4xl lg:text-5xl font-black text-[#009744] font-heading tracking-tight">
+                  AED {product.price.toFixed(2)}
+                </span>
+                {product.originalPrice && (
+                  <span className="text-xl text-gray-400 line-through font-body decoration-gray-300">
+                    AED {product.originalPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-500 text-lg leading-relaxed font-body">
+                Premium quality {product.name.toLowerCase()} sourced directly from {product.origin}. 
+                Perfectly processed and packed to preserve natural flavor and nutrients.
+              </p>
+
+            {/* Certifications */}
+            <div className="flex flex-wrap gap-2">
+              {product.certifications.map((cert) => (
+                <Badge 
+                  key={cert} 
+                  variant="outline" 
+                  className="bg-green-50 text-[#009744] border-[#009744]/20 font-medium px-3 py-1"
+                >
+                  <Check className="h-3 w-3 mr-1" />
+                  {cert}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Quantity Selector */}
+            <div className="flex items-center gap-6">
+              <Label className="text-sm font-semibold text-gray-700 font-poppins">Quantity:</Label>
+              <div className="flex items-center border border-gray-200 rounded-full overflow-hidden">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="h-12 w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                >
+                  <Minus className="h-4 w-4 text-gray-600" />
+                </button>
+                <span className="w-16 text-center font-bold text-lg font-poppins">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="h-12 w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                >
+                  <Plus className="h-4 w-4 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-4">
+                <Button
+                  size="lg"
+                  className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-base active:scale-[0.98]"
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Add to Cart
+                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className={cn(
+                      "h-14 w-14 rounded-full border-2 transition-all bg-white",
+                      isWishlisted 
+                        ? "bg-pink-50 border-pink-200 text-pink-500 shadow-[0_4px_14px_0_rgba(255,182,193,0.39)]" 
+                        : "border-gray-200 text-gray-600 hover:border-pink-200 hover:text-pink-500 hover:bg-pink-50/50 shadow-sm"
+                    )}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={isWishlisted ? "wishlisted" : "not-wishlisted"}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Heart className={cn("h-6 w-6 transition-all", isWishlisted && "fill-current scale-110")} />
+                      </motion.div>
+                    </AnimatePresence>
+                  </Button>
+                </motion.div>
+              </div>
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Truck className="h-5 w-5 text-[#009744]" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Free Shipping</span>
+              </div>
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-[#009744]" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Quality Assured</span>
+              </div>
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Award className="h-5 w-5 text-[#009744]" />
+                </div>
+                <span className="text-xs text-gray-600 font-medium">Premium Grade</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div className="border-t border-gray-100 p-6 lg:p-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full justify-start bg-gray-100 p-1 rounded-full h-auto flex-wrap gap-1">
+              <TabsTrigger 
+                value="details" 
+                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Details
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nutrition"
+                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+              >
+                <Leaf className="h-4 w-4 mr-2" />
+                Nutrition
+              </TabsTrigger>
+              <TabsTrigger 
+                value="allergens"
+                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Allergens
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reviews"
+                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+              >
+                <Star className="h-4 w-4 mr-2" />
+                Reviews ({mockReviews.length})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="wholesale"
+                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+              >
+                <Building2 className="h-4 w-4 mr-2" />
+                Wholesale
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Details Tab */}
+            <TabsContent value="details" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h4 className="font-bold text-gray-900 font-poppins text-lg">Product Specifications</h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: "Product Name", value: product.name },
+                      { label: "Package Size", value: product.packageSize },
+                      { label: "Origin", value: product.origin },
+                      { label: "Shelf Life", value: "12 months from packaging" },
+                      { label: "Storage", value: "Cool, dry place away from sunlight" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-500 font-body">{item.label}</span>
+                        <span className="font-semibold text-gray-900 font-body">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h4 className="font-bold text-gray-900 font-poppins text-lg">Why Choose This Product?</h4>
+                  <ul className="space-y-3">
+                    {[
+                      "Handpicked from premium farms",
+                      "No artificial preservatives or additives",
+                      "Vacuum-sealed for maximum freshness",
+                      "Rich in essential nutrients and antioxidants",
+                      "Perfect for health-conscious families",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="h-3 w-3 text-[#009744]" />
+                        </div>
+                        <span className="text-gray-600 font-body">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Nutrition Tab */}
+            <TabsContent value="nutrition" className="mt-6">
+              <div className="max-w-xl">
+                <div className="bg-gray-50 rounded-2xl p-6">
+                  <h4 className="font-bold text-gray-900 font-poppins text-lg mb-1">Nutrition Facts</h4>
+                  <p className="text-sm text-gray-500 mb-4 font-body">Serving Size: {nutritionData.servingSize}</p>
+                  <div className="border-t-8 border-gray-900 pt-2">
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="font-bold text-gray-900">Calories</span>
+                      <span className="font-bold text-gray-900">{nutritionData.calories}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 text-right py-1">% Daily Value*</p>
+                    {nutritionData.nutrients.map((nutrient) => (
+                      <div key={nutrient.name} className="flex justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-700 font-body">{nutrient.name} <span className="font-semibold">{nutrient.value}</span></span>
+                        <span className="font-semibold text-gray-900">{nutrient.daily}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-4 font-body">
+                    *Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Allergens Tab */}
+            <TabsContent value="allergens" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-red-50 rounded-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                    <h4 className="font-bold text-red-700 font-poppins">Contains</h4>
+                  </div>
+                  <ul className="space-y-2">
+                    {allergenInfo.contains.map((item) => (
+                      <li key={item} className="text-red-600 font-semibold font-body">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-amber-50 rounded-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    <h4 className="font-bold text-amber-700 font-poppins">May Contain</h4>
+                  </div>
+                  <ul className="space-y-2">
+                    {allergenInfo.mayContain.map((item) => (
+                      <li key={item} className="text-amber-600 font-medium font-body">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-green-50 rounded-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Check className="h-5 w-5 text-green-500" />
+                    <h4 className="font-bold text-green-700 font-poppins">Free From</h4>
+                  </div>
+                  <ul className="space-y-2">
+                    {allergenInfo.freeFrom.map((item) => (
+                      <li key={item} className="text-green-600 font-medium font-body">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="mt-6">
+              <div className="space-y-8">
+                {/* Rating Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="text-center">
+                      <div className="text-5xl font-bold text-gray-900 font-heading">{product.rating}</div>
+                      <div className="flex items-center gap-1 mt-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={cn(
+                              "h-5 w-5",
+                              i < Math.floor(product.rating)
+                                ? "text-amber-400 fill-amber-400"
+                                : "text-gray-200 fill-gray-200"
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1 font-body">{mockReviews.length} reviews</p>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      {ratingCounts.map(({ star, count, percentage }) => (
+                        <div key={star} className="flex items-center gap-3">
+                          <span className="text-sm text-gray-600 w-8 font-body">{star} ★</span>
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-amber-400 rounded-full transition-all"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-gray-500 w-8 font-body">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Filter & Write Review */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <span className="text-sm font-semibold text-gray-700 font-poppins">Filter:</span>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant={reviewFilter === "all" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setReviewFilter("all")}
+                          className={cn(
+                            "rounded-full font-medium",
+                            reviewFilter === "all" && "bg-[#009744] hover:bg-[#00803a]"
+                          )}
+                        >
+                          All Reviews
+                        </Button>
+                        {[5, 4, 3, 2, 1].map((star) => (
+                          <Button
+                            key={star}
+                            variant={reviewFilter === star ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setReviewFilter(star)}
+                            className={cn(
+                              "rounded-full font-medium",
+                              reviewFilter === star && "bg-[#009744] hover:bg-[#00803a]"
+                            )}
+                          >
+                            {star} ★
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      className="bg-[#AB1F23] hover:bg-[#8B1A1D] text-white font-semibold rounded-full font-poppins"
+                    >
+                      Write a Review
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Write Review Form */}
+                {showReviewForm && (
+                  <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                    <h4 className="font-bold text-gray-900 font-poppins">Write Your Review</h4>
+                    <div className="space-y-2">
+                      <Label className="font-medium font-poppins">Your Rating</Label>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setNewReview({ ...newReview, rating: star })}
+                            className="p-1"
+                          >
+                            <Star
+                              className={cn(
+                                "h-8 w-8 transition-colors",
+                                star <= newReview.rating
+                                  ? "text-amber-400 fill-amber-400"
+                                  : "text-gray-300"
+                              )}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-medium font-poppins">Review Title</Label>
+                      <Input
+                        placeholder="Summarize your experience"
+                        value={newReview.title}
+                        onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-medium font-poppins">Your Review</Label>
+                      <Textarea
+                        placeholder="Share your thoughts about this product..."
+                        value={newReview.comment}
+                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                        className="rounded-xl min-h-[120px]"
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={handleSubmitReview}
+                        className="bg-[#009744] hover:bg-[#00803a] text-white font-semibold rounded-full font-poppins"
+                      >
+                        Submit Review
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowReviewForm(false)}
+                        className="rounded-full font-poppins"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Reviews List */}
+                <div className="space-y-6">
+                  {filteredReviews.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 font-body">No reviews found for this filter.</p>
+                    </div>
+                  ) : (
+                    filteredReviews.map((review) => (
+                      <div key={review.id} className="border-b border-gray-100 pb-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                              <User className="h-6 w-6 text-gray-400" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-gray-900 font-poppins">{review.user}</span>
+                                {review.verified && (
+                                  <Badge className="bg-green-100 text-green-700 text-xs font-medium">
+                                    <Check className="h-3 w-3 mr-1" />
+                                    Verified
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="flex">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={cn(
+                                        "h-4 w-4",
+                                        i < review.rating
+                                          ? "text-amber-400 fill-amber-400"
+                                          : "text-gray-200 fill-gray-200"
+                                      )}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-sm text-gray-400">•</span>
+                                <span className="text-sm text-gray-500 font-body">
+                                  {new Date(review.date).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 ml-16">
+                          <h5 className="font-semibold text-gray-900 font-poppins">{review.title}</h5>
+                          <p className="text-gray-600 mt-2 font-body leading-relaxed">{review.comment}</p>
+                          <button className="flex items-center gap-2 mt-4 text-sm text-gray-500 hover:text-[#009744] transition-colors font-medium">
+                            <ThumbsUp className="h-4 w-4" />
+                            Helpful ({review.helpful})
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Wholesale Tab */}
+            <TabsContent value="wholesale" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="font-bold text-gray-900 font-poppins text-lg mb-4">Bulk Order Information</h4>
+                    <div className="space-y-4">
+                      {[
+                        { label: "Minimum Order", value: wholesaleInfo.minOrder, icon: Package },
+                        { label: "Bulk Discount", value: wholesaleInfo.bulkDiscount, icon: Award },
+                        { label: "Lead Time", value: wholesaleInfo.leadTime, icon: Truck },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                          <div className="h-12 w-12 rounded-full bg-[#009744]/10 flex items-center justify-center">
+                            <item.icon className="h-6 w-6 text-[#009744]" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 font-body">{item.label}</p>
+                            <p className="font-bold text-gray-900 font-poppins">{item.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-[#009744] to-[#00803a] rounded-2xl p-8 text-white">
+                  <Building2 className="h-12 w-12 mb-4 opacity-80" />
+                  <h4 className="font-bold text-xl font-poppins mb-2">Interested in Wholesale?</h4>
+                  <p className="text-white/80 font-body mb-6">
+                    Get special pricing for bulk orders. Perfect for restaurants, hotels, retailers, and businesses.
+                  </p>
+                  <div className="space-y-4">
+                    <Button
+                      className="w-full bg-white text-[#009744] hover:bg-gray-100 font-bold rounded-full font-poppins"
+                    >
+                      Request Quote
+                    </Button>
+                    <p className="text-sm text-white/70 text-center font-body">
+                      Or email us at <a href={`mailto:${wholesaleInfo.contact}`} className="underline font-semibold">{wholesaleInfo.contact}</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
