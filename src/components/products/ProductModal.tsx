@@ -179,14 +179,14 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-3xl border-0 shadow-2xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-lg sm:rounded-2xl lg:rounded-3xl border-0 shadow-2xl mx-4 sm:mx-0">
         <VisuallyHidden>
           <DialogTitle>{product.name}</DialogTitle>
         </VisuallyHidden>
         
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
             {/* Left: Product Image */}
-            <div className="relative bg-[#FBFBFC] p-8 lg:p-12 flex items-center justify-center min-h-[400px] lg:min-h-[500px]">
+            <div className="relative bg-[#FBFBFC] p-4 sm:p-8 lg:p-12 flex items-center justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
               {product.badge && (
                 <Badge
                   className={cn(
@@ -216,15 +216,15 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </div>
 
             {/* Right: Product Info */}
-            <div className="p-8 lg:p-12 space-y-8 bg-white">
+            <div className="p-4 sm:p-8 lg:p-12 space-y-6 sm:space-y-8 bg-white">
               {/* Rating */}
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={cn(
-                        "h-4 w-4",
+                        "h-3 w-3 sm:h-4 sm:w-4",
                         i < Math.floor(product.rating)
                           ? "text-amber-400 fill-amber-400"
                           : "text-gray-200 fill-gray-200"
@@ -233,36 +233,36 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-bold text-gray-900">{product.rating}</span>
-                  <span className="text-sm text-gray-400 font-medium">({product.reviews} verified reviews)</span>
+                  <span className="text-sm sm:text-base font-bold text-gray-900">{product.rating}</span>
+                  <span className="text-xs sm:text-sm text-gray-400 font-medium">({product.reviews} verified reviews)</span>
                 </div>
               </div>
 
               {/* Title */}
               <div className="space-y-3">
-                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 font-heading leading-tight tracking-tight">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 font-heading leading-tight tracking-tight">
                   {product.name}
                 </h2>
-                <div className="flex items-center gap-3 text-sm font-medium">
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">Origin: {product.origin}</span>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">{product.packageSize}</span>
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 text-xs sm:text-sm font-medium">
+                  <span className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">Origin: {product.origin}</span>
+                  <span className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">{product.packageSize}</span>
                 </div>
               </div>
 
               {/* Price */}
-              <div className="flex items-center gap-4">
-                <span className="text-4xl lg:text-5xl font-black text-[#009744] font-heading tracking-tight">
+              <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#009744] font-heading tracking-tight">
                   AED {product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-xl text-gray-400 line-through font-body decoration-gray-300">
+                  <span className="text-lg sm:text-xl text-gray-400 line-through font-body decoration-gray-300">
                     AED {product.originalPrice.toFixed(2)}
                   </span>
                 )}
               </div>
 
               {/* Description */}
-              <p className="text-gray-500 text-lg leading-relaxed font-body">
+              <p className="text-gray-500 text-sm sm:text-base lg:text-lg leading-relaxed font-body">
                 Premium quality {product.name.toLowerCase()} sourced directly from {product.origin}. 
                 Perfectly processed and packed to preserve natural flavor and nutrients.
               </p>
@@ -282,32 +282,32 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </div>
 
             {/* Quantity Selector */}
-            <div className="flex items-center gap-6">
-              <Label className="text-sm font-semibold text-gray-700 font-poppins">Quantity:</Label>
-              <div className="flex items-center border border-gray-200 rounded-full overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+              <Label className="text-xs sm:text-sm font-semibold text-gray-700 font-poppins">Quantity:</Label>
+              <div className="flex items-center border border-gray-200 rounded-full overflow-hidden w-fit">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="h-12 w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
-                  <Minus className="h-4 w-4 text-gray-600" />
+                  <Minus className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                 </button>
-                <span className="w-16 text-center font-bold text-lg font-poppins">{quantity}</span>
+                <span className="w-12 sm:w-16 text-center font-bold text-base sm:text-lg font-poppins">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="h-12 w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
-                  <Plus className="h-4 w-4 text-gray-600" />
+                  <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
                 </button>
               </div>
             </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-2 sm:gap-4 pt-4 flex-col sm:flex-row">
                 <Button
                   size="lg"
-                  className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-base active:scale-[0.98]"
+                  className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-12 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-sm sm:text-base active:scale-[0.98]"
                 >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Add to Cart
                 </Button>
                 <motion.div
@@ -319,7 +319,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                     variant="outline"
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={cn(
-                      "h-14 w-14 rounded-full border-2 transition-all bg-white",
+                      "h-12 sm:h-14 w-12 sm:w-14 rounded-full border-2 transition-all bg-white",
                       isWishlisted 
                         ? "bg-pink-50 border-pink-200 text-pink-500 shadow-[0_4px_14px_0_rgba(255,182,193,0.39)]" 
                         : "border-gray-200 text-gray-600 hover:border-pink-200 hover:text-pink-500 hover:bg-pink-50/50 shadow-sm"
@@ -333,7 +333,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <Heart className={cn("h-6 w-6 transition-all", isWishlisted && "fill-current scale-110")} />
+                        <Heart className={cn("h-5 w-5 sm:h-6 sm:w-6 transition-all", isWishlisted && "fill-current scale-110")} />
                       </motion.div>
                     </AnimatePresence>
                   </Button>
@@ -341,22 +341,22 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
-                  <Truck className="h-5 w-5 text-[#009744]" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-gray-100">
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="h-8 sm:h-10 w-8 sm:w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-[#009744]" />
                 </div>
                 <span className="text-xs text-gray-600 font-medium">Free Shipping</span>
               </div>
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-[#009744]" />
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="h-8 sm:h-10 w-8 sm:w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-[#009744]" />
                 </div>
                 <span className="text-xs text-gray-600 font-medium">Quality Assured</span>
               </div>
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
-                  <Award className="h-5 w-5 text-[#009744]" />
+              <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                <div className="h-8 sm:h-10 w-8 sm:w-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Award className="h-4 w-4 sm:h-5 sm:w-5 text-[#009744]" />
                 </div>
                 <span className="text-xs text-gray-600 font-medium">Premium Grade</span>
               </div>
@@ -365,51 +365,56 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
         </div>
 
         {/* Tabs Section */}
-        <div className="border-t border-gray-100 p-6 lg:p-8">
+        <div className="border-t border-gray-100 p-4 sm:p-6 lg:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full justify-start bg-gray-100 p-1 rounded-full h-auto flex-wrap gap-1">
               <TabsTrigger 
                 value="details" 
-                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+                className="rounded-full px-3 sm:px-6 py-2 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
               >
-                <Package className="h-4 w-4 mr-2" />
-                Details
+                <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Details</span>
+                <span className="sm:hidden">Details</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="nutrition"
-                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+                className="rounded-full px-3 sm:px-6 py-2 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
               >
-                <Leaf className="h-4 w-4 mr-2" />
-                Nutrition
+                <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Nutrition</span>
+                <span className="sm:hidden">Nutrition</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="allergens"
-                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+                className="rounded-full px-3 sm:px-6 py-2 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
               >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Allergens
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Allergens</span>
+                <span className="sm:hidden">Allergens</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="reviews"
-                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+                className="rounded-full px-3 sm:px-6 py-2 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
               >
-                <Star className="h-4 w-4 mr-2" />
-                Reviews ({mockReviews.length})
+                <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Reviews ({mockReviews.length})</span>
+                <span className="sm:hidden">Reviews</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="wholesale"
-                className="rounded-full px-6 py-3 font-semibold font-poppins data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
+                className="rounded-full px-3 sm:px-6 py-2 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm"
               >
-                <Building2 className="h-4 w-4 mr-2" />
-                Wholesale
+                <Building2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Wholesale</span>
+                <span className="sm:hidden">Wholesale</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Details Tab */}
-            <TabsContent value="details" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <TabsContent value="details" className="mt-4 sm:mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-4">
-                  <h4 className="font-bold text-gray-900 font-poppins text-lg">Product Specifications</h4>
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg">Product Specifications</h4>
                   <div className="space-y-3">
                     {[
                       { label: "Product Name", value: product.name },
@@ -419,14 +424,14 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                       { label: "Storage", value: "Cool, dry place away from sunlight" },
                     ].map((item) => (
                       <div key={item.label} className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-gray-500 font-body">{item.label}</span>
-                        <span className="font-semibold text-gray-900 font-body">{item.value}</span>
+                        <span className="text-xs sm:text-sm text-gray-500 font-body">{item.label}</span>
+                        <span className="font-semibold text-xs sm:text-sm text-gray-900 font-body">{item.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h4 className="font-bold text-gray-900 font-poppins text-lg">Why Choose This Product?</h4>
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg">Why Choose This Product?</h4>
                   <ul className="space-y-3">
                     {[
                       "Handpicked from premium farms",
@@ -439,7 +444,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                         <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                           <Check className="h-3 w-3 text-[#009744]" />
                         </div>
-                        <span className="text-gray-600 font-body">{item}</span>
+                        <span className="text-xs sm:text-sm text-gray-600 font-body">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -448,19 +453,19 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Nutrition Tab */}
-            <TabsContent value="nutrition" className="mt-6">
+            <TabsContent value="nutrition" className="mt-4 sm:mt-6">
               <div className="max-w-xl">
-                <div className="bg-gray-50 rounded-2xl p-6">
-                  <h4 className="font-bold text-gray-900 font-poppins text-lg mb-1">Nutrition Facts</h4>
-                  <p className="text-sm text-gray-500 mb-4 font-body">Serving Size: {nutritionData.servingSize}</p>
+                <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg mb-1">Nutrition Facts</h4>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-4 font-body">Serving Size: {nutritionData.servingSize}</p>
                   <div className="border-t-8 border-gray-900 pt-2">
                     <div className="flex justify-between py-2 border-b border-gray-200">
-                      <span className="font-bold text-gray-900">Calories</span>
-                      <span className="font-bold text-gray-900">{nutritionData.calories}</span>
+                      <span className="font-bold text-sm sm:text-base text-gray-900">Calories</span>
+                      <span className="font-bold text-sm sm:text-base text-gray-900">{nutritionData.calories}</span>
                     </div>
                     <p className="text-xs text-gray-500 text-right py-1">% Daily Value*</p>
                     {nutritionData.nutrients.map((nutrient) => (
-                      <div key={nutrient.name} className="flex justify-between py-2 border-b border-gray-100">
+                      <div key={nutrient.name} className="flex justify-between py-2 border-b border-gray-100 text-xs sm:text-sm">
                         <span className="text-gray-700 font-body">{nutrient.name} <span className="font-semibold">{nutrient.value}</span></span>
                         <span className="font-semibold text-gray-900">{nutrient.daily}</span>
                       </div>
@@ -474,38 +479,38 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Allergens Tab */}
-            <TabsContent value="allergens" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-red-50 rounded-2xl p-6">
+            <TabsContent value="allergens" className="mt-4 sm:mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <div className="bg-red-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                    <h4 className="font-bold text-red-700 font-poppins">Contains</h4>
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
+                    <h4 className="font-bold text-red-700 font-poppins text-sm sm:text-base">Contains</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.contains.map((item) => (
-                      <li key={item} className="text-red-600 font-semibold font-body">{item}</li>
+                      <li key={item} className="text-red-600 font-semibold font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-amber-50 rounded-2xl p-6">
+                <div className="bg-amber-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
-                    <h4 className="font-bold text-amber-700 font-poppins">May Contain</h4>
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
+                    <h4 className="font-bold text-amber-700 font-poppins text-sm sm:text-base">May Contain</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.mayContain.map((item) => (
-                      <li key={item} className="text-amber-600 font-medium font-body">{item}</li>
+                      <li key={item} className="text-amber-600 font-medium font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-green-50 rounded-2xl p-6">
+                <div className="bg-green-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <h4 className="font-bold text-green-700 font-poppins">Free From</h4>
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                    <h4 className="font-bold text-green-700 font-poppins text-sm sm:text-base">Free From</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.freeFrom.map((item) => (
-                      <li key={item} className="text-green-600 font-medium font-body">{item}</li>
+                      <li key={item} className="text-green-600 font-medium font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
@@ -513,19 +518,19 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Reviews Tab */}
-            <TabsContent value="reviews" className="mt-6">
-              <div className="space-y-8">
+            <TabsContent value="reviews" className="mt-4 sm:mt-6">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Rating Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="flex items-center gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                     <div className="text-center">
-                      <div className="text-5xl font-bold text-gray-900 font-heading">{product.rating}</div>
-                      <div className="flex items-center gap-1 mt-2">
+                      <div className="text-4xl sm:text-5xl font-bold text-gray-900 font-heading">{product.rating}</div>
+                      <div className="flex items-center gap-1 mt-2 justify-center">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
                             className={cn(
-                              "h-5 w-5",
+                              "h-4 w-4 sm:h-5 sm:w-5",
                               i < Math.floor(product.rating)
                                 ? "text-amber-400 fill-amber-400"
                                 : "text-gray-200 fill-gray-200"
@@ -533,19 +538,19 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                           />
                         ))}
                       </div>
-                      <p className="text-sm text-gray-500 mt-1 font-body">{mockReviews.length} reviews</p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1 font-body">{mockReviews.length} reviews</p>
                     </div>
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-2 w-full sm:w-auto">
                       {ratingCounts.map(({ star, count, percentage }) => (
                         <div key={star} className="flex items-center gap-3">
-                          <span className="text-sm text-gray-600 w-8 font-body">{star} ★</span>
+                          <span className="text-xs sm:text-sm text-gray-600 w-8 font-body">{star} ★</span>
                           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-amber-400 rounded-full transition-all"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
-                          <span className="text-sm text-gray-500 w-8 font-body">{count}</span>
+                          <span className="text-xs sm:text-sm text-gray-500 w-8 font-body">{count}</span>
                         </div>
                       ))}
                     </div>
@@ -553,15 +558,15 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
                   {/* Filter & Write Review */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <span className="text-sm font-semibold text-gray-700 font-poppins">Filter:</span>
+                    <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                      <span className="text-xs sm:text-sm font-semibold text-gray-700 font-poppins">Filter:</span>
                       <div className="flex flex-wrap gap-2">
                         <Button
                           variant={reviewFilter === "all" ? "default" : "outline"}
                           size="sm"
                           onClick={() => setReviewFilter("all")}
                           className={cn(
-                            "rounded-full font-medium",
+                            "rounded-full font-medium text-xs sm:text-sm",
                             reviewFilter === "all" && "bg-[#009744] hover:bg-[#00803a]"
                           )}
                         >
@@ -574,7 +579,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                             size="sm"
                             onClick={() => setReviewFilter(star)}
                             className={cn(
-                              "rounded-full font-medium",
+                              "rounded-full font-medium text-xs sm:text-sm",
                               reviewFilter === star && "bg-[#009744] hover:bg-[#00803a]"
                             )}
                           >
@@ -585,7 +590,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                     </div>
                     <Button
                       onClick={() => setShowReviewForm(!showReviewForm)}
-                      className="bg-[#AB1F23] hover:bg-[#8B1A1D] text-white font-semibold rounded-full font-poppins"
+                      className="bg-[#AB1F23] hover:bg-[#8B1A1D] text-white font-semibold rounded-full font-poppins w-full sm:w-auto text-sm sm:text-base"
                     >
                       Write a Review
                     </Button>
@@ -594,10 +599,10 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
                 {/* Write Review Form */}
                 {showReviewForm && (
-                  <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-                    <h4 className="font-bold text-gray-900 font-poppins">Write Your Review</h4>
+                  <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4">
+                    <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg">Write Your Review</h4>
                     <div className="space-y-2">
-                      <Label className="font-medium font-poppins">Your Rating</Label>
+                      <Label className="font-medium font-poppins text-sm">Your Rating</Label>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -607,7 +612,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                           >
                             <Star
                               className={cn(
-                                "h-8 w-8 transition-colors",
+                                "h-6 w-6 sm:h-8 sm:w-8 transition-colors",
                                 star <= newReview.rating
                                   ? "text-amber-400 fill-amber-400"
                                   : "text-gray-300"
@@ -618,34 +623,34 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="font-medium font-poppins">Review Title</Label>
+                      <Label className="font-medium font-poppins text-sm">Review Title</Label>
                       <Input
                         placeholder="Summarize your experience"
                         value={newReview.title}
                         onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
-                        className="rounded-xl"
+                        className="rounded-lg sm:rounded-xl text-sm"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="font-medium font-poppins">Your Review</Label>
+                      <Label className="font-medium font-poppins text-sm">Your Review</Label>
                       <Textarea
                         placeholder="Share your thoughts about this product..."
                         value={newReview.comment}
                         onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                        className="rounded-xl min-h-[120px]"
+                        className="rounded-lg sm:rounded-xl min-h-[100px] sm:min-h-[120px] text-sm"
                       />
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row">
                       <Button
                         onClick={handleSubmitReview}
-                        className="bg-[#009744] hover:bg-[#00803a] text-white font-semibold rounded-full font-poppins"
+                        className="bg-[#009744] hover:bg-[#00803a] text-white font-semibold rounded-full font-poppins text-sm sm:text-base"
                       >
                         Submit Review
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setShowReviewForm(false)}
-                        className="rounded-full font-poppins"
+                        className="rounded-full font-poppins text-sm sm:text-base"
                       >
                         Cancel
                       </Button>
@@ -657,19 +662,19 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 <div className="space-y-6">
                   {filteredReviews.length === 0 ? (
                     <div className="text-center py-12">
-                      <p className="text-gray-500 font-body">No reviews found for this filter.</p>
+                      <p className="text-gray-500 font-body text-sm">No reviews found for this filter.</p>
                     </div>
                   ) : (
                     filteredReviews.map((review) => (
                       <div key={review.id} className="border-b border-gray-100 pb-6">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-start gap-4">
-                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                              <User className="h-6 w-6 text-gray-400" />
+                        <div className="flex items-start justify-between gap-3 sm:gap-4 flex-col sm:flex-row">
+                          <div className="flex items-start gap-3 sm:gap-4 flex-1">
+                            <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <User className="h-4 w-4 sm:h-6 sm:w-6 text-gray-400" />
                             </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-gray-900 font-poppins">{review.user}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-gray-900 font-poppins text-sm sm:text-base">{review.user}</span>
                                 {review.verified && (
                                   <Badge className="bg-green-100 text-green-700 text-xs font-medium">
                                     <Check className="h-3 w-3 mr-1" />
@@ -677,13 +682,13 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                                   </Badge>
                                 )}
                               </div>
-                              <div className="flex items-center gap-2 mt-1">
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <div className="flex">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
                                       className={cn(
-                                        "h-4 w-4",
+                                        "h-3 w-3 sm:h-4 sm:w-4",
                                         i < review.rating
                                           ? "text-amber-400 fill-amber-400"
                                           : "text-gray-200 fill-gray-200"
@@ -692,7 +697,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                                   ))}
                                 </div>
                                 <span className="text-sm text-gray-400">•</span>
-                                <span className="text-sm text-gray-500 font-body">
+                                <span className="text-xs sm:text-sm text-gray-500 font-body">
                                   {new Date(review.date).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "short",
@@ -703,11 +708,11 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                             </div>
                           </div>
                         </div>
-                        <div className="mt-4 ml-16">
-                          <h5 className="font-semibold text-gray-900 font-poppins">{review.title}</h5>
-                          <p className="text-gray-600 mt-2 font-body leading-relaxed">{review.comment}</p>
-                          <button className="flex items-center gap-2 mt-4 text-sm text-gray-500 hover:text-[#009744] transition-colors font-medium">
-                            <ThumbsUp className="h-4 w-4" />
+                        <div className="mt-3 sm:mt-4 sm:ml-16">
+                          <h5 className="font-semibold text-gray-900 font-poppins text-sm sm:text-base">{review.title}</h5>
+                          <p className="text-gray-600 mt-2 font-body leading-relaxed text-sm">{review.comment}</p>
+                          <button className="flex items-center gap-2 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 hover:text-[#009744] transition-colors font-medium">
+                            <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4" />
                             Helpful ({review.helpful})
                           </button>
                         </div>
@@ -719,43 +724,43 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Wholesale Tab */}
-            <TabsContent value="wholesale" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <TabsContent value="wholesale" className="mt-4 sm:mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-6">
                   <div>
-                    <h4 className="font-bold text-gray-900 font-poppins text-lg mb-4">Bulk Order Information</h4>
+                    <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg mb-4">Bulk Order Information</h4>
                     <div className="space-y-4">
                       {[
                         { label: "Minimum Order", value: wholesaleInfo.minOrder, icon: Package },
                         { label: "Bulk Discount", value: wholesaleInfo.bulkDiscount, icon: Award },
                         { label: "Lead Time", value: wholesaleInfo.leadTime, icon: Truck },
                       ].map((item) => (
-                        <div key={item.label} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                          <div className="h-12 w-12 rounded-full bg-[#009744]/10 flex items-center justify-center">
-                            <item.icon className="h-6 w-6 text-[#009744]" />
+                        <div key={item.label} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl">
+                          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#009744]/10 flex items-center justify-center flex-shrink-0">
+                            <item.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#009744]" />
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 font-body">{item.label}</p>
-                            <p className="font-bold text-gray-900 font-poppins">{item.value}</p>
+                            <p className="text-xs sm:text-sm text-gray-500 font-body">{item.label}</p>
+                            <p className="font-bold text-sm sm:text-base text-gray-900 font-poppins">{item.value}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-[#009744] to-[#00803a] rounded-2xl p-8 text-white">
-                  <Building2 className="h-12 w-12 mb-4 opacity-80" />
-                  <h4 className="font-bold text-xl font-poppins mb-2">Interested in Wholesale?</h4>
-                  <p className="text-white/80 font-body mb-6">
+                <div className="bg-gradient-to-br from-[#009744] to-[#00803a] rounded-lg sm:rounded-2xl p-6 sm:p-8 text-white">
+                  <Building2 className="h-10 w-10 sm:h-12 sm:w-12 mb-4 opacity-80" />
+                  <h4 className="font-bold text-lg sm:text-xl font-poppins mb-2">Interested in Wholesale?</h4>
+                  <p className="text-white/80 font-body mb-6 text-sm sm:text-base">
                     Get special pricing for bulk orders. Perfect for restaurants, hotels, retailers, and businesses.
                   </p>
                   <div className="space-y-4">
                     <Button
-                      className="w-full bg-white text-[#009744] hover:bg-gray-100 font-bold rounded-full font-poppins"
+                      className="w-full bg-white text-[#009744] hover:bg-gray-100 font-bold rounded-full font-poppins text-sm sm:text-base"
                     >
                       Request Quote
                     </Button>
-                    <p className="text-sm text-white/70 text-center font-body">
+                    <p className="text-xs sm:text-sm text-white/70 text-center font-body">
                       Or email us at <a href={`mailto:${wholesaleInfo.contact}`} className="underline font-semibold">{wholesaleInfo.contact}</a>
                     </p>
                   </div>

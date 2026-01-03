@@ -33,16 +33,16 @@ export function CartSheet() {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
-      <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col bg-white">
-        <SheetHeader className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-[#009744]/5 to-transparent">
+      <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col bg-white z-[9999] max-h-screen overflow-y-auto">
+        <SheetHeader className="px-3 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-gradient-to-r from-[#009744]/5 to-transparent flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#009744] flex items-center justify-center">
-                <ShoppingBag className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="h-8 sm:h-10 w-8 sm:w-10 rounded-full bg-[#009744] flex items-center justify-center flex-shrink-0">
+                <ShoppingBag className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
               </div>
-              <div>
-                <SheetTitle className="text-xl font-bold text-gray-900 font-heading">Your Cart</SheetTitle>
-                <p className="text-sm text-gray-500 font-body">
+              <div className="min-w-0">
+                <SheetTitle className="text-base sm:text-xl font-bold text-gray-900 font-heading truncate">Your Cart</SheetTitle>
+                <p className="text-xs sm:text-sm text-gray-500 font-body">
                   {totalItems} {totalItems === 1 ? "item" : "items"}
                 </p>
               </div>
