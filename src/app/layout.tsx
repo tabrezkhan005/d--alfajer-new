@@ -4,7 +4,7 @@ import { Providers } from "@/src/components/providers";
 import { AnnouncementBar } from "@/src/components/announcement-bar/AnnouncementBar";
 import { Header } from "@/src/components/header/Header";
 import { DynamicFavicon } from "@/src/components/header/DynamicFavicon";
-import { Footer } from "@/src/components/ui/large-name-footer";
+import { AdminFooterWrapper } from "@/src/components/admin/admin-footer-wrapper";
 
 export const metadata: Metadata = {
   title: "Premium Dry Fruits & Spices",
@@ -35,10 +35,11 @@ export default function RootLayout({
           <DynamicFavicon />
           <AnnouncementBar />
           <Header />
-          <main className="mt-0 pt-0 w-full overflow-x-hidden">
-        {children}
-          </main>
-          <Footer />
+          <AdminFooterWrapper>
+            <main className="mt-0 pt-0 w-full overflow-x-hidden">
+              {children}
+            </main>
+          </AdminFooterWrapper>
           </Providers>
       </body>
     </html>

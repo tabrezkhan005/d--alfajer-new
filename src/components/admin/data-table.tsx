@@ -88,33 +88,34 @@ export const DataTable = <T extends { id: string }>({
   const isIndeterminate = selectedRows.length > 0 && selectedRows.length < filteredData.length;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         {searchKey && (
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-2 sm:left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
+              className="pl-8 sm:pl-9 h-9 sm:h-10 text-sm sm:text-base"
             />
           </div>
         )}
         {selectable && selectedRows.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground">
               {selectedRows.length} selected
             </span>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               Bulk Actions
             </Button>
           </div>
         )}
       </div>
 
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader>
             <TableRow>
               {selectable && (
@@ -177,6 +178,7 @@ export const DataTable = <T extends { id: string }>({
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
     </div>
   );
