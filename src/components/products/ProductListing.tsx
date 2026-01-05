@@ -33,7 +33,6 @@ interface Product {
   inStock: boolean;
   onSale: boolean;
   badge?: "SALE" | "HOT" | "NEW";
-  description?: string;
 }
 
 // Products data from images folder
