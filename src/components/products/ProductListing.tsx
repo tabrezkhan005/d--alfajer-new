@@ -18,6 +18,7 @@ interface Product {
   id: string;
   name: string;
   image: string;
+  images: string[];
   price: number;
   originalPrice?: number;
   discount?: number;
@@ -25,6 +26,7 @@ interface Product {
   reviews: number;
   packageSize: string;
   origin: string;
+  description: string;
   certifications: string[];
   inStock: boolean;
   onSale: boolean;
@@ -35,332 +37,105 @@ interface Product {
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Premium Kashmiri Almonds (Mamra)",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 89.99,
-    originalPrice: 109.99,
-    discount: 18,
+    name: "Premium Chilli Powder",
+    image: "/images/products/chillipowder/chillipowder_main.jpeg",
+    images: [
+      "/images/products/chillipowder/chillipowder_main.jpeg",
+      "/images/products/chillipowder/chillipowder_1.jpeg",
+      "/images/products/chillipowder/chillipowder_2.jpeg",
+      "/images/products/chillipowder/chillipowder_3.jpeg",
+      "/images/products/chillipowder/chillipowder4.jpeg",
+      "/images/products/chillipowder/chillipowder5.jpeg",
+      "/images/products/chillipowder/chillipowder6.jpeg",
+      "/images/products/chillipowder/chillipowder7.jpeg",
+    ],
+    price: 249.99,
+    originalPrice: 299.99,
+    discount: 17,
     rating: 4.9,
-    reviews: 342,
+    reviews: 456,
     packageSize: "250g",
     origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO", "Raw and unprocessed"],
+    description: "Premium Grade Red Chilli Powder sourced from the finest chillies of Kashmir. Rich in flavor and vibrant red color, perfect for adding authentic heat and taste to your curries and traditional dishes. Handpicked and freshly ground to preserve maximum aroma and potency.",
+    certifications: ["Organic", "Natural", "No Additives", "Freshly Ground"],
     inStock: true,
     onSale: true,
     badge: "SALE",
   },
   {
     id: "2",
-    name: "California Almonds (Regular)",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 34.99,
-    rating: 4.8,
-    reviews: 289,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "3",
-    name: "Roasted & Salted Almonds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 42.99,
-    rating: 4.7,
-    reviews: 198,
-    packageSize: "400g",
-    origin: "Turkey",
-    certifications: ["Gluten-Free", "Vegan"],
-    inStock: true,
-    onSale: false,
-    badge: "HOT",
-  },
-  {
-    id: "4",
-    name: "Premium Walnuts (Kashmiri)",
-    image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=400&fit=crop",
-    price: 95.99,
-    originalPrice: 120.99,
-    discount: 21,
-    rating: 4.9,
-    reviews: 256,
-    packageSize: "250g",
+    name: "Pure Kashmiri Honey",
+    image: "/images/products/honey/honey_main.jpeg",
+    images: [
+      "/images/products/honey/honey_main.jpeg",
+      "/images/products/honey/honey1.jpeg",
+      "/images/products/honey/honey2.jpeg",
+      "/images/products/honey/honey3.jpeg",
+      "/images/products/honey/honey5.jpeg",
+    ],
+    price: 399.99,
+    originalPrice: 499.99,
+    discount: 20,
+    rating: 5.0,
+    reviews: 523,
+    packageSize: "500ml",
     origin: "Kashmir, India",
-    certifications: ["Organic", "Raw and unprocessed"],
+    description: "100% Pure, Raw and Unfiltered Kashmiri Honey harvested from the pristine wildflower meadows of Kashmir. Rich amber color with unique floral notes. Contains natural enzymes and pollen. Perfect for immune boost, energy, and overall wellness. Never heated or processed.",
+    certifications: ["Organic", "Raw", "Unfiltered", "Natural"],
     inStock: true,
     onSale: true,
     badge: "SALE",
   },
   {
-    id: "5",
-    name: "Organic Cashews (Whole)",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 125.99,
+    id: "3",
+    name: "Traditional Kashmir Green Tea",
+    image: "/images/products/kashmir tea/kashmir_main.jpeg",
+    images: [
+      "/images/products/kashmir tea/kashmir_main.jpeg",
+      "/images/products/kashmir tea/kashmir1.jpeg",
+      "/images/products/kashmir tea/kashmir2.jpeg",
+      "/images/products/kashmir tea/kashmir3.jpeg",
+      "/images/products/kashmir tea/kashmir4.jpeg",
+      "/images/products/kashmir tea/kashmir5.jpeg",
+      "/images/products/kashmir tea/kashmir6.jpeg",
+      "/images/products/kashmir tea/kashmir7.jpeg",
+    ],
+    price: 349.99,
+    originalPrice: 399.99,
+    discount: 12,
     rating: 4.8,
-    reviews: 312,
-    packageSize: "500g",
-    origin: "India",
-    certifications: ["Organic", "Non-GMO", "Vegan"],
+    reviews: 387,
+    packageSize: "100g (40 cups)",
+    origin: "Kashmir, India",
+    description: "Authentic Kashmiri Green Tea infused with saffron and cardamom. A blend that has been cherished for centuries in Kashmiri households. Smooth, aromatic, and full-bodied with natural green tea goodness. Rich in antioxidants and perfect for wellness rituals. Premium grade loose leaf tea.",
+    certifications: ["Organic", "Natural Flavors", "Antioxidant Rich", "Premium Grade"],
     inStock: true,
-    onSale: false,
+    onSale: true,
+    badge: "HOT",
+  },
+  {
+    id: "4",
+    name: "Pure Shilajit Extract",
+    image: "/images/products/shirajit/shilajit_main.jpeg",
+    images: [
+      "/images/products/shirajit/shilajit_main.jpeg",
+      "/images/products/shirajit/shilajit1.jpeg",
+      "/images/products/shirajit/shilajit2.jpeg",
+      "/images/products/shirajit/shilajit3.jpeg",
+      "/images/products/shirajit/shilajit4.jpeg",
+    ],
+    price: 599.99,
+    originalPrice: 799.99,
+    discount: 25,
+    rating: 4.9,
+    reviews: 612,
+    packageSize: "20g",
+    origin: "Himalayan Peaks, Kashmir",
+    description: "Premium Himalayan Shilajit Extract sourced from the pristine mountain peaks above 18,000 feet. Pure, tested for heavy metals and contaminants. Rich in fulvic acid and 80+ minerals. Known as 'Destroyer of Weakness' in Ayurvedic tradition. Supports energy, stamina, vitality and overall wellness. Laboratory tested and certified pure.",
+    certifications: ["Organic", "Lab Tested", "Pure Extract", "Heavy Metal Free", "Ayurvedic Grade"],
+    inStock: true,
+    onSale: true,
     badge: "NEW",
-  },
-  {
-    id: "6",
-    name: "Chilean Hazelnuts",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 78.99,
-    rating: 4.6,
-    reviews: 145,
-    packageSize: "1kg",
-    origin: "Chile",
-    certifications: ["Organic", "Gluten-Free"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "7",
-    name: "Turkish Pistachios",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 89.99,
-    originalPrice: 110.99,
-    discount: 19,
-    rating: 4.7,
-    reviews: 201,
-    packageSize: "500g",
-    origin: "Turkey",
-    certifications: ["Non-GMO", "Vegan"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "8",
-    name: "California Walnuts",
-    image: "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400&h=400&fit=crop",
-    price: 65.99,
-    rating: 4.8,
-    reviews: 278,
-    packageSize: "1kg",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO", "Gluten-Free"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "9",
-    name: "Kashmiri Saffron (Premium)",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 299.99,
-    rating: 5.0,
-    reviews: 456,
-    packageSize: "2g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Raw and unprocessed"],
-    inStock: true,
-    onSale: false,
-    badge: "NEW",
-  },
-  {
-    id: "10",
-    name: "Organic Raisins (Seedless)",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 45.99,
-    originalPrice: 55.99,
-    discount: 18,
-    rating: 4.6,
-    reviews: 189,
-    packageSize: "500g",
-    origin: "Turkey",
-    certifications: ["Organic", "Vegan", "Gluten-Free"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "11",
-    name: "California Dates (Medjool)",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 89.99,
-    rating: 4.9,
-    reviews: 334,
-    packageSize: "1kg",
-    origin: "California, USA",
-    certifications: ["Organic", "Vegan", "Raw and unprocessed"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "12",
-    name: "Chilean Macadamia Nuts",
-    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400&h=400&fit=crop",
-    price: 155.99,
-    rating: 4.7,
-    reviews: 167,
-    packageSize: "500g",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "13",
-    name: "Premium Mixed Nuts",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 79.99,
-    rating: 4.7,
-    reviews: 234,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "NEW" as const,
-  },
-  {
-    id: "14",
-    name: "Premium Brazil Nuts",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 95.99,
-    rating: 4.6,
-    reviews: 189,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "15",
-    name: "Honey Roasted Almonds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 52.99,
-    rating: 4.8,
-    reviews: 267,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "16",
-    name: "Premium Pine Nuts",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 185.99,
-    rating: 4.9,
-    reviews: 156,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "NEW" as const,
-  },
-  {
-    id: "17",
-    name: "Salted Cashews",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 68.99,
-    rating: 4.5,
-    reviews: 298,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "18",
-    name: "Raw Peanuts",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 32.99,
-    rating: 4.6,
-    reviews: 345,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "19",
-    name: "Premium Pecans",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 115.99,
-    rating: 4.7,
-    reviews: 178,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "20",
-    name: "Organic Sunflower Seeds",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 28.99,
-    rating: 4.5,
-    reviews: 412,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-    badge: "NEW" as const,
-  },
-  {
-    id: "21",
-    name: "Dried Apricots",
-    image: "https://images.unsplash.com/photo-1508736793122-f516e3ba5569?w=400&h=400&fit=crop",
-    price: 48.99,
-    rating: 4.8,
-    reviews: 223,
-    packageSize: "250g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-  },
-  {
-    id: "22",
-    name: "Dried Figs",
-    image: "https://images.unsplash.com/photo-1590434144548-16c4a9b5c365?w=400&h=400&fit=crop",
-    price: 56.99,
-    rating: 4.6,
-    reviews: 187,
-    packageSize: "500g",
-    origin: "California, USA",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "23",
-    name: "Pumpkin Seeds",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&h=400&fit=crop",
-    price: 35.99,
-    rating: 4.7,
-    reviews: 289,
-    packageSize: "1kg",
-    origin: "Turkey",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: false,
-  },
-  {
-    id: "24",
-    name: "Chia Seeds",
-    image: "https://images.unsplash.com/photo-1585705722479-48c8f6027270?w=400&h=400&fit=crop",
-    price: 42.99,
-    rating: 4.9,
-    reviews: 367,
-    packageSize: "2kg",
-    origin: "Chile",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "NEW" as const,
   },
 ];
 
@@ -375,7 +150,7 @@ interface FilterState {
 
 export function ProductListing() {
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 400],
+    priceRange: [0, 1000],
     packageSizes: [],
     origins: [],
     certifications: [],
@@ -383,7 +158,7 @@ export function ProductListing() {
     onSaleOnly: false,
   });
 
-  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 400]);
+  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -459,24 +234,32 @@ export function ProductListing() {
 
   const resetFilters = () => {
     setFilters({
-      priceRange: [0, 400],
+      priceRange: [0, 1000],
       packageSizes: [],
       origins: [],
       certifications: [],
       inStockOnly: false,
       onSaleOnly: false,
     });
-    setPriceInputs([0, 400]);
+    setPriceInputs([0, 1000]);
   };
 
-  const packageSizes = ["250g", "500g", "1kg", "2kg"];
-  const origins = ["Kashmir, India", "California, USA", "Turkey", "Chile"];
+  const packageSizes = ["250g", "500ml", "100g (40 cups)", "20g"];
+  const origins = ["Kashmir, India", "Himalayan Peaks, Kashmir"];
   const certifications = [
     "Organic",
-    "Non-GMO",
-    "Gluten-Free",
-    "Vegan",
-    "Raw and unprocessed",
+    "Natural",
+    "Raw",
+    "Unfiltered",
+    "Lab Tested",
+    "Ayurvedic Grade",
+    "No Additives",
+    "Freshly Ground",
+    "Pure Extract",
+    "Heavy Metal Free",
+    "Natural Flavors",
+    "Antioxidant Rich",
+    "Premium Grade",
   ];
 
   return (
@@ -547,8 +330,8 @@ export function ProductListing() {
                     value={filters.priceRange}
                     onValueChange={handlePriceRangeChange}
                     min={0}
-                    max={400}
-                    step={10}
+                    max={1000}
+                    step={50}
                     className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
                   />
                   <div className="flex gap-2 sm:gap-3">
@@ -562,7 +345,7 @@ export function ProductListing() {
                           onChange={(e) => handlePriceInputChange(0, e.target.value)}
                           className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-9 sm:pl-12 text-xs sm:text-sm"
                           min={0}
-                          max={400}
+                          max={1000}
                         />
                       </div>
                     </div>
@@ -576,7 +359,7 @@ export function ProductListing() {
                           onChange={(e) => handlePriceInputChange(1, e.target.value)}
                           className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-9 sm:pl-12 text-xs sm:text-sm"
                           min={0}
-                          max={400}
+                          max={1000}
                         />
                       </div>
                     </div>
