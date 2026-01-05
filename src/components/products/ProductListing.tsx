@@ -39,7 +39,7 @@ interface Product {
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Premium Chilli Powder",
+    name: "Kashmiri Red Chilli Powder",
     image: "/images/products/chillipowder/chillipowder_main.jpeg",
     images: [
       "/images/products/chillipowder/chillipowder_main.jpeg",
@@ -62,11 +62,11 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "SALE",
-    description: "Premium quality chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives.",
+    description: "Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives.",
   },
   {
     id: "2",
-    name: "Pure Natural Honey",
+    name: "Kashmiri Pure White Honey",
     image: "/images/products/honey/honey_main.jpeg",
     images: [
       "/images/products/honey/honey_main.jpeg",
@@ -93,7 +93,7 @@ const mockProducts: Product[] = [
   },
   {
     id: "3",
-    name: "Kashmiri Tea (Premium)",
+    name: "Kashmiri Kahwa Tea",
     image: "/images/products/kashmir tea/kashmir_main.jpeg",
     images: [
       "/images/products/kashmir tea/kashmir_main.jpeg",
@@ -121,7 +121,7 @@ const mockProducts: Product[] = [
   },
   {
     id: "4",
-    name: "Shilajit (Premium Resin)",
+    name: "Pure Himalayan Shilajit",
     image: "/images/products/shirajit/shilajit_main.jpeg",
     images: [
       "/images/products/shirajit/shilajit_main.jpeg",
