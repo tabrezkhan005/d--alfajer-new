@@ -92,19 +92,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
   const handleBuyNow = () => {
     if (selectedVariant) {
-      // Add item to cart
-      for (let i = 0; i < quantity; i++) {
-        addItem({
-          id: `${product.id}-${selectedVariant.id}-${Date.now()}-${i}`,
-          name: `${product.name} - ${selectedVariant.size}`,
-          image: product.image,
-          price: selectedVariant.price,
-          originalPrice: selectedVariant.originalPrice,
-          packageSize: selectedVariant.size,
-        });
-      }
-      // Navigate to checkout
-      router.push("/checkout");
+      // Navigate to checkout with product ID (without adding to cart)
+      router.push(`/checkout?product=${product.id}`);
     }
   };
 
