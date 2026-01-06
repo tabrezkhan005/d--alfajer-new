@@ -248,12 +248,12 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-lg sm:rounded-2xl lg:rounded-3xl border-0 shadow-2xl left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[calc(100vw-2rem)] sm:w-full sm:max-w-5xl mx-0">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-lg sm:rounded-2xl lg:rounded-3xl border-0 shadow-2xl left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[calc(100vw-2rem)] sm:w-full sm:max-w-5xl mx-0 text-gray-900">
         <VisuallyHidden>
           <DialogTitle>{product.name}</DialogTitle>
         </VisuallyHidden>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 text-gray-900">
             {/* Left: Product Image Gallery */}
             <div className="relative bg-[#FBFBFC] p-3 sm:p-4 lg:p-6 flex flex-col min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
               {product.badge && (
@@ -446,15 +446,15 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               <div className="flex items-center border-2 border-gray-300 rounded-full overflow-hidden w-fit bg-white">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="h-11 sm:h-12 w-11 sm:w-12 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 transition-colors border-r border-gray-300"
+                  className="h-11 sm:h-12 w-11 sm:w-12 flex items-center justify-center hover:bg-white active:bg-gray-100 transition-colors border-r border-gray-300"
                   aria-label="Decrease quantity"
                 >
                   <Minus className="h-4 w-4 sm:h-5 sm:w-5 text-gray-900" />
                 </button>
-                <span className="w-14 sm:w-16 text-center font-bold text-lg sm:text-xl font-poppins text-gray-900 bg-gray-50 py-2">{quantity}</span>
+                <span className="w-14 sm:w-16 text-center font-bold text-lg sm:text-xl font-poppins text-gray-900 bg-white py-2">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="h-11 sm:h-12 w-11 sm:w-12 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 transition-colors border-l border-gray-300"
+                  className="h-11 sm:h-12 w-11 sm:w-12 flex items-center justify-center hover:bg-white active:bg-gray-100 transition-colors border-l border-gray-300"
                   aria-label="Increase quantity"
                 >
                   <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-gray-900" />
@@ -537,8 +537,8 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
         </div>
 
         {/* Tabs Section */}
-        <div className="border-t border-gray-100 p-4 sm:p-6 lg:p-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="border-t border-gray-100 p-4 sm:p-6 lg:p-8 text-gray-900">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full text-gray-900">
             <TabsList className="w-full bg-gray-100 p-1.5 sm:p-2 rounded-full h-auto grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-2 sm:justify-center">
               <TabsTrigger
                 value="details"

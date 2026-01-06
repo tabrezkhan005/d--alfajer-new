@@ -152,10 +152,10 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
         </div>
 
         {/* Product Info */}
-        <div className="space-y-6">
+        <div className="space-y-6 text-gray-900">
           {/* Title & Rating */}
           <div>
-            <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+            <h1 className="text-3xl font-bold mb-4 text-gray-900">{product.name}</h1>
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -170,7 +170,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-700">
                 {product.rating} ({product.reviews} {t("product.reviews")})
               </span>
             </div>
@@ -179,7 +179,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           {/* Price */}
           <div className="space-y-2">
             <div className="flex items-baseline gap-4">
-              <span className="text-3xl font-bold">
+              <span className="text-3xl font-bold text-gray-900">
                 {formatCurrency(displayPrice)}
               </span>
               {displayOriginalPrice && (
@@ -216,7 +216,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
           {/* Variant Selection */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold">
+            <label className="block text-sm font-semibold text-gray-900">
               {t("product.selectVariant")}
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -224,7 +224,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 <button
                   key={variant.id}
                   onClick={() => setSelectedVariantId(variant.id)}
-                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all text-gray-900 ${
                     selectedVariantId === variant.id
                       ? "border-amber-600 bg-amber-50"
                       : "border-gray-200 hover:border-gray-300"
@@ -242,19 +242,21 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
           {/* Quantity */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold">Quantity</label>
+            <label className="block text-sm font-semibold text-gray-900">Quantity</label>
             <div className="flex items-center gap-4 w-fit">
               <Button
                 variant="outline"
                 size="sm"
+                className="hover:bg-white bg-white"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
               >
                 <Minus size={16} />
               </Button>
-              <span className="w-8 text-center font-semibold">{quantity}</span>
+              <span className="w-8 text-center font-semibold text-gray-900">{quantity}</span>
               <Button
                 variant="outline"
                 size="sm"
+                className="hover:bg-white bg-white"
                 onClick={() => setQuantity(quantity + 1)}
               >
                 <Plus size={16} />
@@ -290,7 +292,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
             <Button
               variant="outline"
               size="lg"
-              className="w-full"
+              className="w-full text-gray-900 hover:bg-white bg-white"
               onClick={() => setIsWishlisted(!isWishlisted)}
             >
               <Heart
@@ -304,7 +306,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           {/* Share */}
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full text-gray-900 hover:bg-white bg-white"
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
@@ -323,20 +325,20 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
             <div className="text-center">
               <div className="text-2xl mb-1">🚚</div>
-              <p className="text-sm font-medium">Free Shipping</p>
-              <p className="text-xs text-gray-600">On orders above $50</p>
+              <p className="text-sm font-medium text-gray-900">Free Shipping</p>
+              <p className="text-xs text-gray-700">On orders above $50</p>
             </div>
             <div className="text-center">
               <div className="text-2xl mb-1">🔒</div>
-              <p className="text-sm font-medium">Secure Payment</p>
-              <p className="text-xs text-gray-600">256-bit SSL encryption</p>
+              <p className="text-sm font-medium text-gray-900">Secure Payment</p>
+              <p className="text-xs text-gray-700">256-bit SSL encryption</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="description" className="mt-12">
+      <Tabs defaultValue="description" className="mt-12 text-gray-900">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="description">Description</TabsTrigger>
           <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
@@ -344,20 +346,20 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           <TabsTrigger value="shipping">Shipping</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="description" className="space-y-4">
-          <h3 className="text-xl font-bold">About this product</h3>
+        <TabsContent value="description" className="space-y-4 text-gray-900">
+          <h3 className="text-xl font-bold text-gray-900">About this product</h3>
           <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2">Origin</h4>
-              <p>{product.origin}</p>
+              <h4 className="font-semibold mb-2 text-gray-900">Origin</h4>
+              <p className="text-gray-800">{product.origin}</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Certifications</h4>
+              <h4 className="font-semibold mb-2 text-gray-900">Certifications</h4>
               <div className="flex flex-wrap gap-2">
                 {product.certifications.map((cert) => (
-                  <Badge key={cert} variant="outline">
+                  <Badge key={cert} variant="outline" className="text-gray-900 border-gray-900">
                     {cert}
                   </Badge>
                 ))}
@@ -367,10 +369,10 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
           {product.ingredients.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-2">Ingredients</h4>
+              <h4 className="font-semibold mb-2 text-gray-900">Ingredients</h4>
               <ul className="space-y-1">
                 {product.ingredients.map((ing, idx) => (
-                  <li key={idx} className="text-sm">
+                  <li key={idx} className="text-sm text-gray-800">
                     • {ing}
                   </li>
                 ))}
@@ -379,8 +381,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           )}
         </TabsContent>
 
-        <TabsContent value="nutrition" className="space-y-4">
-          <h3 className="text-xl font-bold">Nutrition Information</h3>
+        <TabsContent value="nutrition" className="space-y-4 text-gray-900">
+          <h3 className="text-xl font-bold text-gray-900">Nutrition Information</h3>
           <p className="text-sm text-gray-600">
             Per serving: {product.nutritionFacts.servingSize}
           </p>
@@ -422,14 +424,14 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="reviews" className="space-y-4">
-          <h3 className="text-xl font-bold mb-4">Customer Reviews</h3>
+        <TabsContent value="reviews" className="space-y-4 text-gray-900">
+          <h3 className="text-xl font-bold mb-4 text-gray-900">Customer Reviews</h3>
           
           {/* Rating Summary */}
           <div className="grid grid-cols-3 gap-4">
             <Card>
               <CardContent className="pt-6 text-center">
-                <div className="text-4xl font-bold mb-2">{product.rating}</div>
+                <div className="text-4xl font-bold mb-2 text-gray-900">{product.rating}</div>
                 <div className="flex justify-center mb-2 gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -443,7 +445,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                     />
                   ))}
                 </div>
-                <p className="text-sm text-gray-600">{product.reviews} reviews</p>
+                <p className="text-sm text-gray-700">{product.reviews} reviews</p>
               </CardContent>
             </Card>
           </div>
@@ -470,10 +472,10 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                         />
                       ))}
                     </div>
-                    <span className="font-semibold">{review.title}</span>
+                    <span className="font-semibold text-gray-900">{review.title}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{review.author}</p>
-                  <p className="text-gray-700">{review.comment}</p>
+                  <p className="text-sm text-gray-700 mb-2">{review.author}</p>
+                  <p className="text-gray-800">{review.comment}</p>
                   <Button variant="outline" size="sm" className="mt-2 gap-2">
                     <ThumbsUp size={14} />
                     Helpful
@@ -488,12 +490,12 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </Button>
         </TabsContent>
 
-        <TabsContent value="shipping" className="space-y-4">
-          <h3 className="text-xl font-bold">Shipping Information</h3>
-          <div className="space-y-3">
-            <p><strong>Standard Shipping:</strong> 5-7 business days - Free</p>
-            <p><strong>Express Shipping:</strong> 2-3 business days - $10</p>
-            <p><strong>Overnight Shipping:</strong> Next business day - $25</p>
+        <TabsContent value="shipping" className="space-y-4 text-gray-900">
+          <h3 className="text-xl font-bold text-gray-900">Shipping Information</h3>
+          <div className="space-y-3 text-gray-800">
+            <p><strong className="text-gray-900">Standard Shipping:</strong> 5-7 business days - Free</p>
+            <p><strong className="text-gray-900">Express Shipping:</strong> 2-3 business days - $10</p>
+            <p><strong className="text-gray-900">Overnight Shipping:</strong> Next business day - $25</p>
           </div>
         </TabsContent>
       </Tabs>

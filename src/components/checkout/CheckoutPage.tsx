@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, AlertCircle, Check } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -43,8 +44,29 @@ export function CheckoutPage() {
 }
 
 function CheckoutPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { t, formatCurrency } = useI18n();
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice, clearCart, addItem } = useCartStore();
+
+  // Handle product from Buy Now button
+  useEffect(() => {
+    const productId = searchParams.get('product');
+    if (productId && items.length === 0) {
+      // Get product details and add to cart
+      const mockProducts = [
+        { id: "1", name: "Organic Honey 500g", price: 24.99, image: "/images/products/honey/honey.png", packageSize: "500g" },
+        { id: "2", name: "Premium Almonds 250g", price: 32.50, image: "/images/products/chillipowder/chillipowder.png", packageSize: "250g" },
+        { id: "3", name: "Kashmir Tea 100g", price: 18.99, image: "/images/products/kashmir tea/kashmir-tea.png", packageSize: "100g" },
+        { id: "4", name: "Shirajit 50g", price: 45.00, image: "/images/products/shirajit/shirajit.png", packageSize: "50g" },
+      ];
+      
+      const product = mockProducts.find(p => p.id === productId);
+      if (product) {
+        addItem({ id: product.id, name: product.name, price: product.price, image: product.image, packageSize: product.packageSize });
+      }
+    }
+  }, [searchParams, items.length, addItem]);
 
   // Checkout State
   const [step, setStep] = useState<'shipping' | 'payment' | 'review'>('shipping');
@@ -63,6 +85,7 @@ function CheckoutPageContent() {
   const [giftMessage, setGiftMessage] = useState('');
   const [subscribe, setSubscribe] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   // Get selected shipping method
   const selectedShippingMethod = shippingMethods.find(
@@ -136,10 +159,9 @@ function CheckoutPageContent() {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      alert(`Order placed successfully! Order #${orderNumber}`);
+      const newOrderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      setOrderNumber(newOrderNumber);
       clearCart();
-      // TODO: Redirect to order confirmation
     } finally {
       setIsProcessing(false);
     }
@@ -151,17 +173,55 @@ function CheckoutPageContent() {
         <Card className="w-full max-w-md bg-white dark:bg-white border-gray-200">
           <CardContent className="pt-6 text-center bg-white dark:bg-white">
             <p className="text-lg font-semibold mb-4">{t('cart.empty')}</p>
-            <Button className="w-full">Continue Shopping</Button>
+            <Button className="w-full" onClick={() => router.push('/')}>Continue Shopping</Button>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  // Order Confirmation Screen
+  if (orderNumber) {
+    return (
+      <div className="min-h-screen bg-white py-12 px-4 dark:bg-white text-gray-900">
+        <div className="max-w-md mx-auto text-center">
+          <div className="mb-6">
+            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <Check className="w-8 h-8 text-[#009744]" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
+          <p className="text-gray-700 mb-6">Thank you for your order.</p>
+          
+          <Card className="bg-gray-50 border-gray-200 mb-6">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-sm text-gray-700 mb-2">Order Number</p>
+                <p className="text-2xl font-bold text-[#009744]">{orderNumber}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <p className="text-sm text-gray-700 mb-6">
+            A confirmation email has been sent to your inbox. You can track your order status there.
+          </p>
+
+          <Button 
+            size="lg"
+            className="w-full bg-[#009744] hover:bg-[#00803a] text-white font-bold rounded-full mb-3"
+            onClick={() => router.push('/')}
+          >
+            Continue Shopping
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white py-8 dark:bg-white">
+    <div className="min-h-screen bg-white py-8 dark:bg-white text-gray-900">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <h1 className="col-span-full text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3">
+        <h1 className="col-span-full text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3 text-gray-900">
           <span className="text-[#009744]">Secure</span> <span className="text-[#AB1F23]">Checkout</span>
           <div className="flex-1 h-[2px] bg-gradient-to-r from-[#009744] to-[#AB1F23] ml-4"></div>
         </h1>
@@ -181,7 +241,7 @@ function CheckoutPageContent() {
             </TabsList>
 
             {/* Shipping Tab */}
-            <TabsContent value="shipping" className="space-y-6">
+            <TabsContent value="shipping" className="space-y-6 text-gray-900">
               <Card className="bg-white dark:bg-white border-gray-200">
                 <CardHeader className="bg-white dark:bg-white border-b border-gray-200">
                   <CardTitle className="text-gray-800">{t('checkout.shippingAddress')}</CardTitle>
@@ -384,7 +444,7 @@ function CheckoutPageContent() {
             </TabsContent>
 
             {/* Payment Tab */}
-            <TabsContent value="payment" className="space-y-6">
+            <TabsContent value="payment" className="space-y-6 text-gray-900">
               <Card className="bg-white dark:bg-white border-gray-200">
                 <CardHeader className="bg-white dark:bg-white border-b border-gray-200">
                   <CardTitle className="text-gray-800">{t('checkout.paymentMethod')}</CardTitle>
@@ -419,11 +479,11 @@ function CheckoutPageContent() {
                     <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Check size={20} className="text-green-600" />
-                        <p className="font-semibold">{appliedPromo.code}</p>
+                        <p className="font-semibold text-gray-900">{appliedPromo.code}</p>
                       </div>
                       <button
                         onClick={() => setAppliedPromo(null)}
-                        className="text-sm text-green-600 hover:text-green-700"
+                        className="text-sm text-gray-900 hover:text-gray-700 font-medium"
                       >
                         Remove
                       </button>
@@ -450,7 +510,7 @@ function CheckoutPageContent() {
                     </div>
                   )}
                   {promoError && (
-                    <p className="text-sm text-red-600 flex items-center gap-2">
+                    <p className="text-sm text-gray-700 flex items-center gap-2">
                       <AlertCircle size={16} />
                       {promoError}
                     </p>
@@ -500,7 +560,7 @@ function CheckoutPageContent() {
             </TabsContent>
 
             {/* Review Tab */}
-            <TabsContent value="review" className="space-y-6">
+            <TabsContent value="review" className="space-y-6 text-gray-900">
               <Card className="border border-gray-200 bg-white dark:bg-white">
                 <CardHeader className="bg-gray-50 dark:bg-gray-50 border-b border-gray-200">
                   <CardTitle className="text-gray-800">Order Summary</CardTitle>
@@ -551,17 +611,17 @@ function CheckoutPageContent() {
             </CardHeader>
             <CardContent className="space-y-4 bg-white dark:bg-white">
               {/* Items */}
-              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto text-gray-900">
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex justify-between text-sm pb-2 border-b"
+                    className="flex justify-between text-sm pb-2 border-b text-gray-900"
                   >
                     <div>
-                      <p className="font-medium text-gray-800">{item.name}</p>
-                      <p className="text-gray-600">Qty: {item.quantity}</p>
+                      <p className="font-medium text-gray-900">{item.name}</p>
+                      <p className="text-gray-700">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-semibold">
+                    <p className="font-semibold text-gray-900">
                       {formatCurrency(item.price * item.quantity)}
                     </p>
                   </div>
@@ -569,10 +629,10 @@ function CheckoutPageContent() {
               </div>
 
               {/* Totals */}
-              <div className="space-y-2 border-t pt-4">
-                <div className="flex justify-between text-gray-700">
-                  <span>Subtotal</span>
-                  <span className="font-semibold">{formatCurrency(subtotal)}</span>
+              <div className="space-y-2 border-t pt-4 text-gray-900">
+                <div className="flex justify-between text-gray-900">
+                  <span className="text-gray-900">Subtotal</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
 
                 {appliedPromo && (
@@ -583,9 +643,9 @@ function CheckoutPageContent() {
                 )}
 
                 {selectedShippingMethod && (
-                  <div className="flex justify-between text-gray-700">
-                    <span>{t('cart.shipping')}</span>
-                    <span className="font-semibold">
+                  <div className="flex justify-between text-gray-900">
+                    <span className="text-gray-900">{t('cart.shipping')}</span>
+                    <span className="font-semibold text-gray-900">
                       {selectedShippingMethod.price === 0
                         ? 'Free'
                         : formatCurrency(selectedShippingMethod.price)}
@@ -593,14 +653,14 @@ function CheckoutPageContent() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-gray-700">
-                  <span>{t('cart.tax')}</span>
-                  <span className="font-semibold">{formatCurrency(tax)}</span>
+                <div className="flex justify-between text-gray-900">
+                  <span className="text-gray-900">{t('cart.tax')}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(tax)}</span>
                 </div>
 
-                <div className="flex justify-between text-lg font-bold border-t pt-2 text-[#009744]">
-                  <span>{t('cart.total')}</span>
-                  <span>{formatCurrency(total)}</span>
+                <div className="flex justify-between text-lg font-bold border-t pt-2 text-gray-900">
+                  <span className="text-gray-900">{t('cart.total')}</span>
+                  <span className="text-[#009744] font-bold">{formatCurrency(total)}</span>
                 </div>
               </div>
             </CardContent>
