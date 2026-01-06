@@ -63,7 +63,8 @@ function CheckoutPageContent() {
       
       const product = mockProducts.find(p => p.id === productId);
       if (product) {
-        addItem({ id: product.id, name: product.name, price: product.price, image: product.image, packageSize: product.packageSize });
+        // Add item without opening cart (false parameter)
+        addItem({ id: product.id, name: product.name, price: product.price, image: product.image, packageSize: product.packageSize }, false);
       }
     }
   }, [searchParams, items.length, addItem]);

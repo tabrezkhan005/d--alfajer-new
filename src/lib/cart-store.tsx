@@ -15,7 +15,7 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
+  addItem: (item: Omit<CartItem, 'quantity'>, openCart?: boolean) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -54,7 +54,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [items, isHydrated]);
 
-  const addItem = useCallback((item: Omit<CartItem, 'quantity'>) => {
+  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, shouldOpenCart = true) => {
     setItems((current) => {
       const existingItem = current.find((i) => i.id === item.id);
       if (existingItem) {
@@ -64,7 +64,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       return [...current, { ...item, quantity: 1 }];
     });
-    setIsOpen(true);
+    if (shouldOpenCart) {
+      setIsOpen(true);
+    }
   }, []);
 
   const removeItem = useCallback((id: string) => {
