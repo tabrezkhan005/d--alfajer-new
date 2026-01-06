@@ -2,6 +2,11 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { Language, Currency, LANGUAGES, CURRENCIES, t, formatCurrency, convertCurrency } from '@/src/lib/i18n';
+import {
+  detectUserGeolocation,
+  cacheGeolocationData,
+  getCachedGeolocationData,
+} from '@/src/lib/geolocation';
 
 interface I18nContextType {
   language: Language;
@@ -12,6 +17,7 @@ interface I18nContextType {
   formatCurrency: (amount: number) => string;
   convertCurrency: (amount: number, fromCurrency?: Currency) => number;
   direction: 'ltr' | 'rtl';
+  isLoading: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | null>(null);
@@ -23,65 +29,98 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [language, setLanguageState] = useState<Language>('en');
   const [currency, setCurrencyState] = useState<Currency>('INR');
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage and detect locale
+  // Initialize from localStorage and geolocation
   useEffect(() => {
-    const storedLang = localStorage.getItem(STORAGE_KEY_LANG) as Language | null;
-    const storedCurr = localStorage.getItem(STORAGE_KEY_CURR) as Currency | null;
+    let isMounted = true;
 
-    if (storedLang && Object.keys(LANGUAGES).includes(storedLang)) {
-      setLanguageState(storedLang);
-    }
-    if (storedCurr && Object.keys(CURRENCIES).includes(storedCurr)) {
-      setCurrencyState(storedCurr);
-    }
+    const initializeI18n = async () => {
+      try {
+        // Check if user has custom preferences saved
+        const storedLang = localStorage.getItem(STORAGE_KEY_LANG) as Language | null;
+        const storedCurr = localStorage.getItem(STORAGE_KEY_CURR) as Currency | null;
 
-    // Auto-detect currency and language from browser locale
-    if (!storedCurr || !storedLang) {
-      const locale = navigator.language || 'en-US';
-      
-      const currencyMap: Record<string, Currency> = {
-        'en-IN': 'INR',
-        'hi-IN': 'INR',
-        'ar-AE': 'AED',
-        'ar-SA': 'AED',
-        'en-AE': 'AED',
-        'en-US': 'USD',
-        'en-GB': 'GBP',
-        'fr-FR': 'EUR',
-        'de-DE': 'EUR',
-        'es-ES': 'EUR',
-      };
-      
-      const langMap: Record<string, Language> = {
-        'ar': 'ar',
-        'hi': 'hi',
-        'en': 'en',
-      };
+        if (storedLang && storedCurr) {
+          // Use stored preferences
+          if (isMounted) {
+            setLanguageState(storedLang);
+            setCurrencyState(storedCurr);
+            setIsHydrated(true);
+            setIsLoading(false);
+          }
+          return;
+        }
 
-      if (!storedCurr) {
-        const detectedCurr = currencyMap[locale] || 'INR';
-        setCurrencyState(detectedCurr);
+        // Try cached geolocation data
+        const cachedGeo = getCachedGeolocationData();
+        if (cachedGeo && isMounted) {
+          const detectedLang = (cachedGeo.language.toLowerCase() as Language) || 'en';
+          const detectedCurr = (cachedGeo.currency.toUpperCase() as Currency) || 'INR';
+          
+          setLanguageState(detectedLang);
+          setCurrencyState(detectedCurr);
+          setIsHydrated(true);
+          setIsLoading(false);
+          return;
+        }
+
+        // Detect geolocation
+        const geoData = await detectUserGeolocation();
+
+        if (isMounted) {
+          const detectedLang = (geoData.language.toLowerCase() as Language) || 'en';
+          const detectedCurr = (geoData.currency.toUpperCase() as Currency) || 'INR';
+
+          setLanguageState(detectedLang);
+          setCurrencyState(detectedCurr);
+
+          // Cache the geolocation data
+          cacheGeolocationData(geoData);
+
+          setIsHydrated(true);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.debug('I18n initialization error:', error);
+        if (isMounted) {
+          setIsHydrated(true);
+          setIsLoading(false);
+        }
       }
-      
-      if (!storedLang) {
-        const langCode = locale.split('-')[0];
-        const detectedLang = langMap[langCode] || 'en';
-        setLanguageState(detectedLang as Language);
-      }
-    }
+    };
 
-    setIsHydrated(true);
+    initializeI18n();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem(STORAGE_KEY_LANG, lang);
+    // Update cached geolocation
+    const cached = getCachedGeolocationData();
+    if (cached) {
+      cacheGeolocationData({
+        ...cached,
+        language: lang,
+      });
+    }
   }, []);
 
   const setCurrency = useCallback((curr: Currency) => {
     setCurrencyState(curr);
     localStorage.setItem(STORAGE_KEY_CURR, curr);
+    // Update cached geolocation
+    const cached = getCachedGeolocationData();
+    if (cached) {
+      cacheGeolocationData({
+        ...cached,
+        currency: curr,
+      });
+    }
   }, []);
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
@@ -96,6 +135,7 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     convertCurrency: (amount: number, fromCurrency: Currency = 'INR') =>
       convertCurrency(amount, fromCurrency, currency),
     direction,
+    isLoading,
   };
 
   if (!isHydrated) {

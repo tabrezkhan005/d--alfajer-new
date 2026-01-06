@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  detectUserGeolocation,
+  cacheGeolocationData,
+  getCachedGeolocationData,
+} from "@/src/lib/geolocation";
 
 interface UseAnnouncementBarProps {
   messages: string[];
@@ -17,44 +22,51 @@ export const useAnnouncementBar = ({
   const [currency, setCurrency] = useState(defaultCurrency);
   const [language, setLanguage] = useState(defaultLanguage);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Always show the bar (no dismiss functionality)
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Auto-detect currency and language
+  // Auto-detect currency and language from geolocation
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Detect currency from locale
-      const locale = navigator.language || "en-US";
-      const currencyMap: Record<string, string> = {
-        "en-IN": "INR",
-        "hi-IN": "INR",
-        "ar-AE": "AED",
-        "ar-SA": "AED",
-        "en-AE": "AED",
-        "en-US": "USD",
-        "en-GB": "GBP",
-        "fr-FR": "EUR",
-        "de-DE": "EUR",
-        "es-ES": "EUR",
-      };
+    let isMounted = true;
 
-      const detectedCurrency =
-        currencyMap[locale] ||
-        (locale.includes("IN") ? "INR" : locale.includes("AE") ? "AED" : "USD");
-      setCurrency(detectedCurrency);
+    const initializeGeolocation = async () => {
+      try {
+        // Try to get cached data first
+        const cachedData = getCachedGeolocationData();
+        if (cachedData && isMounted) {
+          setCurrency(cachedData.currency);
+          setLanguage(cachedData.language);
+          setIsLoading(false);
+          return;
+        }
 
-      // Detect language
-      const langMap: Record<string, string> = {
-        "ar": "AR",
-        "hi": "HI",
-        "en": "EN",
-      };
-      const detectedLang = langMap[locale.split("-")[0]] || "EN";
-      setLanguage(detectedLang);
-    }
+        // Detect geolocation
+        const geoData = await detectUserGeolocation();
+
+        if (isMounted) {
+          setCurrency(geoData.currency);
+          setLanguage(geoData.language);
+          // Cache the data
+          cacheGeolocationData(geoData);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.debug("Geolocation detection failed, using defaults:", error);
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializeGeolocation();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Rotate messages
@@ -70,13 +82,42 @@ export const useAnnouncementBar = ({
 
   const currentMessage = messages[currentMessageIndex] || messages[0];
 
+  const handleCurrencyChange = (newCurrency: string) => {
+    setCurrency(newCurrency);
+    // Persist to localStorage
+    if (typeof window !== "undefined") {
+      const cached = getCachedGeolocationData();
+      if (cached) {
+        cacheGeolocationData({
+          ...cached,
+          currency: newCurrency,
+        });
+      }
+    }
+  };
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    // Persist to localStorage
+    if (typeof window !== "undefined") {
+      const cached = getCachedGeolocationData();
+      if (cached) {
+        cacheGeolocationData({
+          ...cached,
+          language: newLanguage,
+        });
+      }
+    }
+  };
+
   return {
     isVisible,
     currentMessage,
     currency,
     language,
-    setCurrency,
-    setLanguage,
+    setCurrency: handleCurrencyChange,
+    setLanguage: handleLanguageChange,
     currentMessageIndex,
+    isLoading,
   };
 };
