@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/src/components/providers";
 import { AnnouncementBar } from "@/src/components/announcement-bar/AnnouncementBar";
@@ -12,12 +12,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/images/logo/nifajer-logo.png",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

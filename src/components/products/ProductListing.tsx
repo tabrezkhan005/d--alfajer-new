@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Filter, X, Eye, Plus, Heart, Star, Check } from "lucide-react";
 import { useCartStore } from "@/src/lib/cart-store";
 import { Button } from "@/src/components/ui/button";
@@ -626,6 +628,7 @@ export function ProductListing() {
 }
 
 function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
+  const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, items } = useCartStore();
@@ -644,6 +647,19 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       packageSize: product.packageSize,
     });
     setTimeout(() => setIsAdding(false), 1000);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addItem({
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      packageSize: product.packageSize,
+    });
+    router.push("/checkout");
   };
 
   return (
@@ -719,14 +735,12 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
         {/* Quick View - Shows on hover */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pt-20 pb-5 px-5">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold shadow-lg rounded-full h-11 font-poppins"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            Quick View
-          </Button>
+          <Link href={`/products/${product.id}`}>
+            <div className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold shadow-lg rounded-full h-11 font-poppins flex items-center justify-center cursor-pointer transition-colors">
+              <Eye className="h-4 w-4 mr-2" />
+              Quick View
+            </div>
+          </Link>
         </div>
       </div>
 
@@ -778,15 +792,14 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         </div>
       </CardContent>
 
-<CardFooter className="p-5 pt-0 mt-auto flex-shrink-0">
+
+<CardFooter className="p-5 pt-0 mt-auto flex-shrink-0 flex gap-2">
           <Button
             className={cn(
-              "w-full font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
-              "h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-6",
+              "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
+              "h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-4",
               "flex items-center justify-center gap-1.5 sm:gap-2",
-              isInCart || isAdding
-                ? "bg-[#009744] hover:bg-[#2E763B] text-white"
-                : "bg-[#009744] hover:bg-[#2E763B] text-white"
+              "bg-[#009744] hover:bg-[#2E763B] text-white"
             )}
             onClick={handleAddToCart}
           >
@@ -806,6 +819,12 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
                 <span className="whitespace-nowrap">Add to Cart</span>
               </>
             )}
+          </Button>
+          <Button
+            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
+            onClick={handleBuyNow}
+          >
+            <span className="whitespace-nowrap">Buy Now</span>
           </Button>
         </CardFooter>
     </Card>

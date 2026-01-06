@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Minus, Plus, X, Trash2, ArrowRight, ShoppingCart } from "lucide-react";
@@ -17,6 +18,7 @@ import { useCartStore, CartItem } from "@/src/lib/cart-store";
 import { cn } from "@/src/lib/utils";
 
 export function CartSheet() {
+  const router = useRouter();
   const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, getTotalPrice, getTotalItems } = useCartStore();
   const [mounted, setMounted] = useState(false);
 
@@ -126,6 +128,10 @@ export function CartSheet() {
 
               <div className="px-6 py-5 space-y-3">
                 <Button
+                  onClick={() => {
+                    closeCart();
+                    router.push("/checkout");
+                  }}
                   className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold h-14 rounded-full shadow-lg hover:shadow-xl transition-all"
                 >
                   <span className="flex items-center gap-2">

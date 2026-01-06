@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -164,20 +165,20 @@ export function ExquisiteCollection({
             }}
           >
             {categories.map((category) => (
-              <motion.div
-                key={category.id}
-                className="flex-shrink-0 w-[calc(100%-16px)] sm:w-[280px] md:w-[300px] lg:w-[340px] snap-start"
-                onMouseEnter={() => setHoveredCard(category.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                <div
-                  className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`View ${category.name}`}
+              <Link key={category.id} href={`/search?q=${encodeURIComponent(category.name)}`}>
+                <motion.div
+                  className="flex-shrink-0 w-[calc(100%-16px)] sm:w-[280px] md:w-[300px] lg:w-[340px] snap-start"
+                  onMouseEnter={() => setHoveredCard(category.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
+                  <div
+                    className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View ${category.name}`}
+                  >
                   {/* Image */}
                   <div className="absolute inset-0 overflow-hidden">
                     <motion.img
@@ -226,6 +227,7 @@ export function ExquisiteCollection({
                   </div>
                 </div>
               </motion.div>
+            </Link>
             ))}
           </div>
         </div>
