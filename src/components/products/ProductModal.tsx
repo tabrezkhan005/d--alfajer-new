@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +31,8 @@ import {
   Package,
   Building2,
   Play,
-  Pause
+  Pause,
+  Zap
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -158,6 +160,7 @@ interface ProductModalProps {
 }
 
 export function ProductModal({ product, open, onOpenChange }: ProductModalProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
@@ -467,6 +470,17 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 >
                   <ShoppingCart className="h-5 w-5 sm:h-5 sm:w-5" />
                   <span>Add to Cart</span>
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    router.push(`/checkout?product=${product.id}`);
+                    onOpenChange(false);
+                  }}
+                  className="flex-1 bg-[#AB1F23] hover:bg-[#8B1819] text-white font-bold h-14 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(171,31,35,0.39)] hover:shadow-[0_6px_20px_rgba(171,31,35,0.23)] transition-all duration-300 font-poppins text-base sm:text-base active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-2 w-full sm:w-auto"
+                >
+                  <Zap className="h-5 w-5 sm:h-5 sm:w-5" />
+                  <span>Buy Now</span>
                 </Button>
                 <motion.div
                   whileHover={{ scale: 1.1 }}

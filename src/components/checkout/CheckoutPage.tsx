@@ -321,7 +321,6 @@ function CheckoutPageContent() {
                     <div>
                       <Label className="text-gray-800 font-semibold">Country</Label>
                       <select
-                        placeholder="Select your country"
                         value={shippingAddress.country || ''}
                         onChange={(e) =>
                           setShippingAddress({
