@@ -328,14 +328,14 @@ function CheckoutPageContent() {
                             country: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744]"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium"
                       >
-                        <option value="">Select Country</option>
-                        <option value="IN">India</option>
-                        <option value="US">United States</option>
-                        <option value="GB">United Kingdom</option>
-                        <option value="AE">UAE</option>
-                        <option value="EU">Europe</option>
+                        <option value="" className="bg-white text-gray-800">Select Country</option>
+                        <option value="IN" className="bg-white text-gray-800">India</option>
+                        <option value="US" className="bg-white text-gray-800">United States</option>
+                        <option value="GB" className="bg-white text-gray-800">United Kingdom</option>
+                        <option value="AE" className="bg-white text-gray-800">UAE</option>
+                        <option value="EU" className="bg-white text-gray-800">Europe</option>
                       </select>
                     </div>
                   </div>
