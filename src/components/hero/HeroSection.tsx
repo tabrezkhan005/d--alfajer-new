@@ -134,7 +134,7 @@ export function HeroSection() {
   const slide = heroSlides[current];
 
   return (
-    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100vh" }}>
+    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100dvh" }}>
       {/* ---------------- BACKGROUND CAROUSEL ---------------- */}
       <div className="absolute inset-0 z-0 h-full w-full">
         <Carousel
@@ -145,7 +145,7 @@ export function HeroSection() {
           <CarouselContent className="h-full -ml-0">
             {heroSlides.map((s, i) => (
               <CarouselItem key={i} className="relative h-full w-full pl-0 basis-full min-w-full">
-                <div className="relative h-full w-full overflow-hidden" style={{ minHeight: "100vh" }}>
+                <div className="relative h-full w-full overflow-hidden" style={{ minHeight: "100dvh" }}>
                   {s.type === "video" ? (
                     <video
                       autoPlay
@@ -176,7 +176,7 @@ export function HeroSection() {
                         <img
                           src={s.src}
                           alt={s.title}
-                          className="h-full w-full object-cover object-center blur-sm"
+                          className="h-full w-full object-cover object-center"
                           loading={i === 0 ? "eager" : "lazy"}
                         />
                       </motion.div>
@@ -205,8 +205,8 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center w-full">
-        <div className="container mx-auto w-full px-3 sm:px-4 md:px-6 lg:px-8">
+      <div className="absolute inset-0 z-20 flex items-center justify-center w-full">
+        <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
                 <motion.div

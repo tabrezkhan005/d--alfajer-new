@@ -75,7 +75,7 @@ export function WhyChooseUs() {
   const renderFeature = (feature: typeof features[0], index: number, isMobile = false) => (
     <div
       key={index}
-      className={`pt-3 sm:pt-6 md:pt-8 lg:pt-12 pb-4 sm:pb-6 md:pb-10 lg:pb-16 px-2 sm:px-3 md:px-6 lg:px-8 group transition-colors duration-500 hover:bg-white
+      className={`pt-2 xs:pt-3 sm:pt-6 md:pt-8 lg:pt-12 pb-2.5 xs:pb-3 sm:pb-6 md:pb-10 lg:pb-16 px-1.5 xs:px-2.5 sm:px-3 md:px-6 lg:px-8 group transition-colors duration-500 hover:bg-white
         ${!isMobile && index % 3 !== 0 ? 'lg:border-l lg:border-slate-100' : ''}
         ${!isMobile && index >= 3 ? 'border-t border-slate-100' : ''}
         ${!isMobile && index % 2 !== 0 ? 'sm:border-l sm:border-slate-100 lg:border-l-0' : ''}
@@ -83,37 +83,37 @@ export function WhyChooseUs() {
       `}
     >
       <div className="relative">
-        <span className="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] font-bold tracking-widest text-primary/40 block mb-1.5 sm:mb-2 md:mb-3 lg:mb-6 transition-transform duration-500 group-hover:translate-x-1">
+        <span className="text-[5px] xs:text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] font-bold tracking-widest text-primary/40 block mb-1 xs:mb-1.5 sm:mb-2 md:mb-3 lg:mb-6 transition-transform duration-500 group-hover:translate-x-1">
           {feature.number}
         </span>
-        <h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-heading font-medium text-slate-900 mb-1.5 sm:mb-2 md:mb-3 lg:mb-4 tracking-tight">
+        <h3 className="text-[10px] xs:text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-heading font-medium text-slate-900 mb-1 xs:mb-1.5 sm:mb-2 md:mb-3 lg:mb-4 tracking-tight">
           {feature.title}
         </h3>
-        <p className="text-slate-500 leading-relaxed font-body text-[10px] sm:text-[11px] md:text-xs lg:text-sm xl:text-base max-w-[280px]">
+        <p className="text-slate-500 leading-relaxed font-body text-[8px] xs:text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base max-w-[280px]">
           {feature.description}
         </p>
 
         {/* Subtle underline animation */}
-        <div className="absolute -bottom-3 sm:-bottom-4 left-0 w-0 h-[1px] bg-primary/20 transition-all duration-700 group-hover:w-full" />
+        <div className="absolute -bottom-2 xs:-bottom-2.5 sm:-bottom-4 left-0 w-0 h-[1px] bg-primary/20 transition-all duration-700 group-hover:w-full" />
       </div>
     </div>
   );
 
   return (
-    <section className="py-8 sm:py-12 md:py-16 lg:py-20 xl:py-32 bg-[#FAFAFA] relative overflow-hidden">
+    <section className="py-6 xs:py-8 sm:py-12 md:py-16 lg:py-20 xl:py-32 bg-[#FAFAFA] relative overflow-hidden">
       {/* Decorative background elements - very subtle */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 relative z-10">
-        <div className="max-w-4xl mb-6 sm:mb-10 md:mb-16 lg:mb-24 text-center md:text-left">
+      <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
+        <div className="max-w-4xl mb-4 xs:mb-6 sm:mb-10 md:mb-16 lg:mb-24 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center md:justify-start gap-2 md:gap-3 mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
+            className="flex items-center justify-center md:justify-start gap-1.5 xs:gap-2 md:gap-3 mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
           >
-            <span className="w-4 sm:w-6 md:w-12 h-[1px] bg-primary" />
-            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">The Al Fajr Difference</span>
+            <span className="w-2 xs:w-3 sm:w-6 md:w-12 h-[1px] bg-primary" />
+            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">The Al Fajr Difference</span>
           </motion.div>
 
           <motion.h2
@@ -121,7 +121,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-heading font-light text-slate-900 leading-[1.1] mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0"
+            className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-heading font-light text-slate-900 leading-[1.15] mb-1.5 xs:mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0"
           >
             Crafting Excellence <br />
             <span className="italic font-serif text-primary">In Every Detail.</span>
@@ -132,7 +132,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-slate-500 text-[10px] sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-2 sm:pl-4 md:pl-8 ml-0 md:ml-1 px-2 sm:px-0"
+            className="text-slate-500 text-[8px] xs:text-[9px] sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-1.5 xs:pl-2 sm:pl-4 md:pl-8 ml-0 md:ml-1 px-2 sm:px-0"
           >
             We are committed to providing the most exquisite dates and nuts,
             combining traditional heritage with modern excellence.

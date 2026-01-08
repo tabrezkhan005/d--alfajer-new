@@ -569,7 +569,7 @@ export function ProductListing() {
               </p>
             </div>
 
-<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 xs:gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
                 ))}
@@ -744,9 +744,9 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         </div>
       </div>
 
-      <CardContent className="p-5 space-y-3 flex-1 flex flex-col">
+      <CardContent className="p-3 xs:p-4 sm:p-5 space-y-2 xs:space-y-2.5 sm:space-y-3 flex-1 flex flex-col">
         {/* Rating */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 xs:gap-2">
           <div className="flex items-center gap-0.5">
             {[...Array(5)].map((_, i) => {
               const isFilled = i < Math.floor(product.rating);
@@ -755,7 +755,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
                 <Star
                   key={i}
                   className={cn(
-                    "h-4 w-4",
+                    "h-3 xs:h-3.5 sm:h-4 w-3 xs:w-3.5 sm:w-4",
                     isFilled || isHalfFilled
                       ? "text-amber-400 fill-amber-400"
                       : "text-gray-200 fill-gray-200"
@@ -764,28 +764,28 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
               );
             })}
           </div>
-          <span className="text-sm text-gray-500 font-body">
+          <span className="text-[10px] xs:text-xs sm:text-sm text-gray-500 font-body">
             ({product.reviews})
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-base font-semibold text-gray-900 line-clamp-2 min-h-[3rem] leading-snug font-poppins">
+        <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
           {product.name}
         </h3>
 
         {/* Package Size */}
-        <p className="text-sm text-gray-500 font-body">
+        <p className="text-[10px] xs:text-xs sm:text-sm text-gray-500 font-body">
           {product.packageSize}
         </p>
 
         {/* Price */}
-        <div className="flex items-center gap-3 pt-1">
-          <span className="text-2xl font-bold text-gray-900 font-heading">
+        <div className="flex items-center gap-2 xs:gap-3 pt-0.5 xs:pt-1">
+          <span className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 font-heading">
             AED {product.price.toFixed(2)}
           </span>
           {product.originalPrice && (
-            <span className="text-sm text-gray-400 line-through font-body">
+            <span className="text-[10px] xs:text-xs sm:text-sm text-gray-400 line-through font-body">
               AED {product.originalPrice.toFixed(2)}
             </span>
           )}
@@ -793,35 +793,37 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       </CardContent>
 
 
-<CardFooter className="p-5 pt-0 mt-auto flex-shrink-0 flex gap-2">
+<CardFooter className="p-3 xs:p-3.5 sm:p-4 md:p-5 pt-1 xs:pt-2 sm:pt-0 sm:mt-auto flex-shrink-0 flex gap-1.5 xs:gap-2 sm:gap-2">
           <Button
             className={cn(
               "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
-              "h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-4",
-              "flex items-center justify-center gap-1.5 sm:gap-2",
+              "h-8 xs:h-9 sm:h-10 md:h-12 text-[10px] xs:text-xs sm:text-sm px-2 xs:px-3 sm:px-4",
+              "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
               "bg-[#009744] hover:bg-[#2E763B] text-white"
             )}
             onClick={handleAddToCart}
           >
             {isAdding ? (
               <>
-                <Check className="h-3.5 w-3.5 sm:h-5 sm:w-5 animate-bounce shrink-0" />
+                <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
                 <span className="whitespace-nowrap">Added!</span>
               </>
             ) : isInCart ? (
               <>
-                <Plus className="h-3.5 w-3.5 sm:h-5 sm:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap">Add More</span>
+                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap hidden xs:inline">Add More</span>
+                <span className="whitespace-nowrap xs:hidden">More</span>
               </>
             ) : (
               <>
-                <Plus className="h-3.5 w-3.5 sm:h-5 sm:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap">Add to Cart</span>
+                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap hidden xs:inline">Add to Cart</span>
+                <span className="whitespace-nowrap xs:hidden">Add</span>
               </>
             )}
           </Button>
           <Button
-            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-10 sm:h-12 text-xs sm:text-sm px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
+            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-8 xs:h-9 sm:h-10 md:h-12 text-[10px] xs:text-xs sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
             onClick={handleBuyNow}
           >
             <span className="whitespace-nowrap">Buy Now</span>

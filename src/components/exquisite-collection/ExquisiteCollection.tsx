@@ -100,21 +100,21 @@ export function ExquisiteCollection({
   };
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-white overflow-x-hidden">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+    <section className="w-full py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 xl:py-28 bg-white overflow-x-hidden">
+      <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
-            <div className="text-center mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-4 sm:space-y-6">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
+            <div className="text-center mb-6 xs:mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-2.5 xs:space-y-3 sm:space-y-6">
+              <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
                 <span className="text-[#AB1F23]">Explore Our</span>{" "}
                 <span className="text-[#009744]">Exquisite Collection</span>
               </h2>
               {subtitle && (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2">
-                  <div className="hidden sm:block h-[1px] w-6 sm:w-8 bg-[#AB1F23]/20" />
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
+                <div className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-3 px-2 xs:px-3 sm:px-0">
+                  <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
+                  <p className="text-[8px] xs:text-[9px] sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                     {subtitle}
                   </p>
-                  <div className="hidden sm:block h-[1px] w-6 sm:w-8 bg-[#009744]/20" />
+                  <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
                 </div>
               )}
             </div>
@@ -167,7 +167,7 @@ export function ExquisiteCollection({
             {categories.map((category) => (
               <Link key={category.id} href={`/search?q=${encodeURIComponent(category.name)}`}>
                 <motion.div
-                  className="flex-shrink-0 w-[calc(100%-16px)] sm:w-[280px] md:w-[300px] lg:w-[340px] snap-start"
+                  className="flex-shrink-0 w-[90vw] sm:w-[calc(50vw-20px)] md:w-[calc(33.333vw-16px)] lg:w-[340px] snap-start"
                   onMouseEnter={() => setHoveredCard(category.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   whileHover={{ y: -8 }}

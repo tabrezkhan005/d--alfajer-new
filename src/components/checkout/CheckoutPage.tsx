@@ -170,11 +170,11 @@ function CheckoutPageContent() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-white dark:bg-white">
-        <Card className="w-full max-w-md bg-white dark:bg-white border-gray-200">
+      <div className="min-h-screen flex items-center justify-center px-2 xs:px-3 sm:px-4 bg-white dark:bg-white">
+        <Card className="w-full max-w-sm bg-white dark:bg-white border-gray-200">
           <CardContent className="pt-6 text-center bg-white dark:bg-white">
-            <p className="text-lg font-semibold mb-4">{t('cart.empty')}</p>
-            <Button className="w-full" onClick={() => router.push('/')}>Continue Shopping</Button>
+            <p className="text-base xs:text-lg sm:text-xl font-semibold mb-4 text-gray-900">{t('cart.empty')}</p>
+            <Button className="w-full bg-[#009744] hover:bg-[#2E763B] text-white" onClick={() => router.push('/')}>Continue Shopping</Button>
           </CardContent>
         </Card>
       </div>
@@ -184,32 +184,32 @@ function CheckoutPageContent() {
   // Order Confirmation Screen
   if (orderNumber) {
     return (
-      <div className="min-h-screen bg-white py-12 px-4 dark:bg-white text-gray-900">
+      <div className="min-h-screen bg-white py-8 xs:py-10 sm:py-12 md:py-16 px-2 xs:px-3 sm:px-4 dark:bg-white text-gray-900">
         <div className="max-w-md mx-auto text-center">
-          <div className="mb-6">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-[#009744]" />
+          <div className="mb-4 xs:mb-5 sm:mb-6">
+            <div className="mx-auto w-12 xs:w-14 sm:w-16 h-12 xs:h-14 sm:h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <Check className="w-6 xs:w-7 sm:w-8 h-6 xs:h-7 sm:h-8 text-[#009744]" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
-          <p className="text-gray-700 mb-6">Thank you for your order.</p>
+          <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 sm:mb-2">Order Placed Successfully!</h1>
+          <p className="text-sm xs:text-base sm:text-lg text-gray-700 mb-4 xs:mb-5 sm:mb-6">Thank you for your order.</p>
           
-          <Card className="bg-gray-50 border-gray-200 mb-6">
-            <CardContent className="pt-6">
+          <Card className="bg-gray-50 border-gray-200 mb-4 xs:mb-5 sm:mb-6">
+            <CardContent className="pt-4 xs:pt-5 sm:pt-6">
               <div className="text-center">
-                <p className="text-sm text-gray-700 mb-2">Order Number</p>
-                <p className="text-2xl font-bold text-[#009744]">{orderNumber}</p>
+                <p className="text-xs xs:text-sm text-gray-700 mb-1.5 xs:mb-2">Order Number</p>
+                <p className="text-xl xs:text-2xl sm:text-3xl font-bold text-[#009744]">{orderNumber}</p>
               </div>
             </CardContent>
           </Card>
 
-          <p className="text-sm text-gray-700 mb-6">
+          <p className="text-xs xs:text-sm text-gray-700 mb-4 xs:mb-5 sm:mb-6">
             A confirmation email has been sent to your inbox. You can track your order status there.
           </p>
 
           <Button 
             size="lg"
-            className="w-full bg-[#009744] hover:bg-[#00803a] text-white font-bold rounded-full mb-3"
+            className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
             onClick={() => router.push('/')}
           >
             Continue Shopping
@@ -220,40 +220,40 @@ function CheckoutPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-8 dark:bg-white text-gray-900">
-      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <h1 className="col-span-full text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3 text-gray-900">
+    <div className="min-h-screen bg-white py-6 xs:py-7 sm:py-8 md:py-10 dark:bg-white text-gray-900">
+      <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-4 xs:gap-5 sm:gap-6 md:gap-8">
+        <h1 className="col-span-full text-2xl xs:text-3xl sm:text-4xl font-bold mb-3 xs:mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-gray-900">
           <span className="text-[#009744]">Secure</span> <span className="text-[#AB1F23]">Checkout</span>
-          <div className="flex-1 h-[2px] bg-gradient-to-r from-[#009744] to-[#AB1F23] ml-4"></div>
+          <div className="flex-1 h-[2px] bg-gradient-to-r from-[#009744] to-[#AB1F23] w-full sm:ml-4 sm:w-auto"></div>
         </h1>
         {/* Main Checkout Form */}
         <div className="lg:col-span-2">
-          <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
-              <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+          <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="space-y-4 xs:space-y-5 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-0.5 xs:p-1 rounded-lg">
+              <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Shipping
               </TabsTrigger>
-              <TabsTrigger value="payment" disabled={step === 'shipping'} className="data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+              <TabsTrigger value="payment" disabled={step === 'shipping'} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Payment
               </TabsTrigger>
-              <TabsTrigger value="review" disabled={step !== 'review'} className="data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+              <TabsTrigger value="review" disabled={step !== 'review'} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Review
               </TabsTrigger>
             </TabsList>
 
             {/* Shipping Tab */}
-            <TabsContent value="shipping" className="space-y-6 text-gray-900">
+            <TabsContent value="shipping" className="space-y-4 xs:space-y-5 sm:space-y-6 text-gray-900">
               <Card className="bg-white dark:bg-white border-gray-200">
-                <CardHeader className="bg-white dark:bg-white border-b border-gray-200">
-                  <CardTitle className="text-gray-800">{t('checkout.shippingAddress')}</CardTitle>
+                <CardHeader className="bg-white dark:bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-5">
+                  <CardTitle className="text-sm xs:text-base sm:text-lg text-gray-800">{t('checkout.shippingAddress')}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 bg-white dark:bg-white">
-                  <div className="grid grid-cols-2 gap-4">
+                <CardContent className="space-y-3 xs:space-y-3.5 sm:space-y-4 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
+                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold">First Name</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">First Name</Label>
                       <Input
-                        placeholder="Enter your first name"
-                        className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        placeholder="First name"
+                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                         value={shippingAddress.firstName || ''}
                         onChange={(e) =>
                           setShippingAddress({
@@ -264,10 +264,10 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold">Last Name</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Last Name</Label>
                       <Input
-                        placeholder="Enter your last name"
-                        className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        placeholder="Last name"
+                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -279,10 +279,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold">Email</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Email</Label>
                     <Input
-                      placeholder="Enter your email address"
-                      className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      placeholder="email@example.com"
+                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                       type="email"
                       value={shippingAddress.email || ''}
                       onChange={(e) =>
@@ -295,10 +295,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold">Phone</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Phone</Label>
                     <Input
-                      placeholder="Enter your phone number"
-                      className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      placeholder="+1 (555) 000-0000"
+                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -309,10 +309,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold">Street Address</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Street Address</Label>
                     <Input
-                      placeholder="Enter your street address"
-                      className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      placeholder="Street address"
+                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -323,10 +323,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold">Apartment, suite, etc. (optional)</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Apartment (optional)</Label>
                     <Input
-                      placeholder="Apartment, suite, etc. (optional)"
-                      className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      placeholder="Apartment, suite, etc."
+                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -336,12 +336,12 @@ function CheckoutPageContent() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold">City</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">City</Label>
                       <Input
-                        placeholder="Enter your city"
-                        className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        placeholder="City"
+                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -351,10 +351,10 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold">State/Province</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">State</Label>
                       <Input
-                        placeholder="Enter your state/province"
-                        className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        placeholder="State/Province"
+                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -365,12 +365,12 @@ function CheckoutPageContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold">Postal Code</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Postal Code</Label>
                       <Input
-                        placeholder="Enter your postal code"
-                        className="border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        placeholder="Postal code"
+                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -380,7 +380,7 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold">Country</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Country</Label>
                       <select
                         value={shippingAddress.country || ''}
                         onChange={(e) =>
@@ -389,7 +389,7 @@ function CheckoutPageContent() {
                             country: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium"
+                        className="w-full px-2 xs:px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-sm"
                       >
                         <option value="" className="bg-white text-gray-800">Select Country</option>
                         <option value="IN" className="bg-white text-gray-800">India</option>
@@ -405,14 +405,14 @@ function CheckoutPageContent() {
 
               {/* Shipping Method */}
               <Card className="bg-white dark:bg-white border-gray-200">
-                <CardHeader className="bg-white dark:bg-white border-b border-gray-200">
-                  <CardTitle className="text-gray-800">{t('checkout.shippingMethod')}</CardTitle>
+                <CardHeader className="bg-white dark:bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-5">
+                  <CardTitle className="text-sm xs:text-base sm:text-lg text-gray-800">{t('checkout.shippingMethod')}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 bg-white dark:bg-white">
+                <CardContent className="space-y-2 xs:space-y-2.5 sm:space-y-3 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
                   {shippingMethods.map((method) => (
                     <label
                       key={method.id}
-                      className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-[#009744]"
+                      className="flex items-center p-2 xs:p-3 sm:p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-[#009744]"
                     >
                       <input
                         type="radio"
@@ -420,13 +420,13 @@ function CheckoutPageContent() {
                         value={method.id}
                         checked={shippingMethodId === method.id}
                         onChange={(e) => setShippingMethodId(e.target.value)}
-                        className="mr-3 accent-[#009744]"
+                        className="mr-2 xs:mr-3 accent-[#009744]"
                       />
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{method.name}</p>
-                        <p className="text-sm text-gray-600">{method.description}</p>
+                        <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base">{method.name}</p>
+                        <p className="text-xs xs:text-sm text-gray-600">{method.description}</p>
                       </div>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">
                         {method.price === 0 ? 'Free' : formatCurrency(method.price)}
                       </p>
                     </label>
@@ -436,7 +436,7 @@ function CheckoutPageContent() {
 
               <Button
                 size="lg"
-                className="w-full bg-[#009744] hover:bg-[#2E763B] text-white"
+                className="w-full bg-[#009744] hover:bg-[#2E763B] text-white text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
                 onClick={() => setStep('payment')}
                 disabled={!isShippingAddressValid}
               >

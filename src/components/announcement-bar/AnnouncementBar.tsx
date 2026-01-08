@@ -105,8 +105,17 @@ export const AnnouncementBar = ({
       return;
     }
 
-    // Mobile: 32px (h-8), Tablet/Desktop: 36px (h-9)
-    const paddingTop = window.innerWidth < 640 ? "32px" : "36px";
+    // Mobile: 24px (h-6), XS: 28px (h-7), SM: 32px (h-8), MD: 36px (h-9)
+    let paddingTop = "24px";
+    if (window.innerWidth >= 375) {
+      paddingTop = "28px";
+    }
+    if (window.innerWidth >= 640) {
+      paddingTop = "32px";
+    }
+    if (window.innerWidth >= 768) {
+      paddingTop = "36px";
+    }
     document.body.style.paddingTop = paddingTop;
     return () => {
       document.body.style.paddingTop = "0px";
@@ -120,7 +129,7 @@ export const AnnouncementBar = ({
     return (
       <div
         ref={barRef}
-        className="fixed top-0 left-0 right-0 z-30 h-8 sm:h-9 w-full overflow-x-hidden"
+        className="fixed top-0 left-0 right-0 z-30 h-6 xs:h-7 sm:h-8 md:h-9 w-full overflow-x-auto overflow-y-hidden"
         style={{
           backgroundColor: "#2E763B",
           color: "#FEFEFE",
@@ -129,15 +138,15 @@ export const AnnouncementBar = ({
         role="banner"
         aria-label="Announcement"
       >
-        <div className="mx-auto flex h-full w-full max-w-[1920px] items-center justify-center px-2 sm:px-3 md:px-4 lg:px-8">
+        <div className="mx-auto flex h-full w-full max-w-full lg:max-w-[1920px] items-center justify-between px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-8 gap-1 xs:gap-1.5 sm:gap-3">
           {/* Message Section - Centered */}
-          <div className="flex flex-1 items-center justify-center min-w-0 max-w-[calc(100%-80px)] sm:max-w-none pr-2 sm:pr-0">
+          <div className="flex-1 flex items-center justify-center min-w-0">
             <div
               ref={messageRef}
-              className="flex items-center gap-1 sm:gap-2 text-center text-[10px] sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
+              className="flex items-center gap-0.5 xs:gap-1 sm:gap-2 text-center text-[7px] xs:text-[8px] sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
               key={currentMessageIndex}
             >
-              <span className="hidden sm:inline text-lg" aria-hidden="true">
+              <span className="hidden sm:inline text-base" aria-hidden="true">
                 📢
               </span>
               <span>{currentMessage}</span>
@@ -145,13 +154,13 @@ export const AnnouncementBar = ({
           </div>
 
           {/* Controls Section */}
-          <div className="flex items-center gap-0.5 sm:gap-1 ml-auto flex-shrink-0">
-            <div className="flex items-center gap-0.5 sm:gap-1">
+          <div className="flex items-center gap-0 xs:gap-0.5 sm:gap-1 flex-shrink-0">
+            <div className="flex items-center gap-0 xs:gap-0.5 sm:gap-1">
               <LanguageSelector
                 language={language}
                 onLanguageChange={setLanguage}
               />
-              <Separator orientation="vertical" className="hidden h-4 bg-[#FEFEFE]/20 sm:block" />
+              <Separator orientation="vertical" className="hidden h-3 xs:h-4 sm:h-5 bg-[#FEFEFE]/20 sm:block" />
               <CurrencySelector
                 currency={currency}
                 onCurrencyChange={setCurrency}

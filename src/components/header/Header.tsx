@@ -106,8 +106,8 @@ export function Header() {
 
     if (searchRef.current) {
       gsap.to(searchRef.current, {
-        maxWidth: isScrolled ? 300 : 400,
-        width: isScrolled ? 300 : 400,
+        maxWidth: isScrolled ? "clamp(200px, 40vw, 300px)" : "clamp(250px, 45vw, 400px)",
+        width: isScrolled ? "clamp(200px, 40vw, 300px)" : "clamp(250px, 45vw, 400px)",
         duration: 0.3,
         ease: "power2.out",
       });
@@ -121,32 +121,32 @@ export function Header() {
     <>
       <header
         ref={headerRef}
-        className={`fixed top-9 left-0 right-0 z-40 flex items-center
+        className={`fixed top-8 sm:top-9 left-0 right-0 z-40 flex items-center
           transition-all duration-300
           ${isScrolled ? "backdrop-blur-md border-b" : ""}
         `}
         style={{
           backgroundColor: "#FFFFFF",
           borderColor: "#E5E7EB",
-          height: isScrolled ? 56 : 80,
+          height: isScrolled ? "clamp(44px, 10vw, 56px)" : "clamp(60px, 12vw, 80px)",
         }}
       >
-        <div className="relative mx-auto flex w-full max-w-[1920px] items-center justify-between px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="relative mx-auto flex w-full max-w-[1920px] items-center justify-between px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex-[0.3] hidden lg:block" />
 
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-start min-w-0">
+          <div className="flex items-center gap-1 xs:gap-2 sm:gap-4 flex-1 justify-start min-w-0">
             <Link href="/" aria-label="Home" className="shrink-0">
               <div ref={logoRef} className="flex items-center transition-transform">
                 <Image
                   src="/images/logo/nifajer-logo.png"
                   alt="Al Fajer Mart"
-                  width={isScrolled ? 90 : 120}
-                  height={isScrolled ? 30 : 40}
+                  width={isScrolled ? 80 : 110}
+                  height={isScrolled ? 25 : 35}
                   className="object-contain"
                   style={{
-                    width: isScrolled ? "90px" : "120px",
+                    width: isScrolled ? "clamp(70px, 15vw, 90px)" : "clamp(90px, 18vw, 120px)",
                     height: "auto",
-                    maxHeight: isScrolled ? "30px" : "40px",
+                    maxHeight: isScrolled ? "clamp(24px, 6vw, 30px)" : "clamp(32px, 8vw, 40px)",
                   }}
                   priority
                 />
