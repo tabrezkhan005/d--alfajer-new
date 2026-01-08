@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from "@/src/components/ui/button";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 import {
   Carousel,
   CarouselContent,
@@ -11,42 +12,43 @@ import {
   type CarouselApi,
 } from "@/src/components/ui/carousel";
 
-const features = [
-  {
-    number: "01",
-    title: "Premium Quality",
-    description: "We source only the finest hand-picked dates and premium nuts from the most fertile regions, ensuring unparalleled quality."
-  },
-  {
-    number: "02",
-    title: "100% Natural",
-    description: "Our products are free from artificial preservatives or additives. Enjoy the pure, authentic taste of nature's bounty."
-  },
-  {
-    number: "03",
-    title: "Nutrient Rich",
-    description: "Packed with essential vitamins, minerals, and natural energy, our dates are the perfect addition to a healthy lifestyle."
-  },
-  {
-    number: "04",
-    title: "Exquisite Packaging",
-    description: "Our elegant packaging makes Al Fajr products the ideal choice for corporate gifts, weddings, and special occasions."
-  },
-  {
-    number: "05",
-    title: "Heritage & Tradition",
-    description: "We honor centuries-old traditions while embracing modern standards, bringing you the authentic taste of the Orient."
-  },
-  {
-    number: "06",
-    title: "Fast & Fresh Delivery",
-    description: "We ensure our products reach you in their freshest state through our optimized supply chain and fresh storage."
-  }
-];
-
 export function WhyChooseUs() {
+  const { t } = useI18n();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+
+  const features = [
+    {
+      number: "01",
+      title: t('whychoose.feature1Title'),
+      description: t('whychoose.feature1Desc')
+    },
+    {
+      number: "02",
+      title: t('whychoose.feature2Title'),
+      description: t('whychoose.feature2Desc')
+    },
+    {
+      number: "03",
+      title: t('whychoose.feature3Title'),
+      description: t('whychoose.feature3Desc')
+    },
+    {
+      number: "04",
+      title: t('whychoose.feature4Title'),
+      description: t('whychoose.feature4Desc')
+    },
+    {
+      number: "05",
+      title: t('whychoose.feature5Title'),
+      description: t('whychoose.feature5Desc')
+    },
+    {
+      number: "06",
+      title: t('whychoose.feature6Title'),
+      description: t('whychoose.feature6Desc')
+    }
+  ];
 
   useEffect(() => {
     if (!api) return;
@@ -105,7 +107,6 @@ export function WhyChooseUs() {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white to-transparent pointer-events-none" />
 
       <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
-        <div className="max-w-4xl mb-4 xs:mb-6 sm:mb-10 md:mb-16 lg:mb-24 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -113,7 +114,7 @@ export function WhyChooseUs() {
             className="flex items-center justify-center md:justify-start gap-1.5 xs:gap-2 md:gap-3 mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
           >
             <span className="w-2 xs:w-3 sm:w-6 md:w-12 h-[1px] bg-primary" />
-            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">The Al Fajr Difference</span>
+            <span className="text-primary font-medium tracking-[0.3em] uppercase text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">{t('whychoose.difference')}</span>
           </motion.div>
 
           <motion.h2
@@ -123,8 +124,8 @@ export function WhyChooseUs() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-heading font-light text-slate-900 leading-[1.15] mb-1.5 xs:mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0"
           >
-            Crafting Excellence <br />
-            <span className="italic font-serif text-primary">In Every Detail.</span>
+            {t('whychoose.title')} <br />
+            <span className="italic font-serif text-primary">{t('whychoose.subtitle')}</span>
           </motion.h2>
 
           <motion.p
@@ -134,10 +135,8 @@ export function WhyChooseUs() {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-slate-500 text-[8px] xs:text-[9px] sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-1.5 xs:pl-2 sm:pl-4 md:pl-8 ml-0 md:ml-1 px-2 sm:px-0"
           >
-            We are committed to providing the most exquisite dates and nuts,
-            combining traditional heritage with modern excellence.
+            {t('whychoose.description')}
           </motion.p>
-        </div>
 
         {/* Mobile Carousel View */}
         <div className="lg:hidden border-t border-slate-200">

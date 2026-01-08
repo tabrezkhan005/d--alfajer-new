@@ -240,10 +240,10 @@ export function HeroSection() {
 
                   <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-10 px-2 sm:px-4">
                     {[
-                      { icon: "/images/icons/fresh_6643364.png", label: "Farm Fresh", desc: "Direct from source", color: "#009744" },
-                      { icon: "/images/icons/green-logistics_9402143.png", label: "Express", desc: "Free on ₹99+", color: "#FFD700" },
-                      { icon: "/images/icons/organic_4497598.png", label: "Organic", desc: "Premium Quality", color: "#009744" },
-                      { icon: "/images/icons/Rating-Five-Star--Streamline-Ultimate.png", label: "Top Rated", desc: "Trusted Brand", color: "#AB1F23" }
+                      { icon: "/images/icons/fresh_6643364.png", labelKey: "hero.box1Label", descKey: "hero.box1Desc", color: "#009744" },
+                      { icon: "/images/icons/green-logistics_9402143.png", labelKey: "hero.box2Label", descKey: "hero.box2Desc", color: "#FFD700" },
+                      { icon: "/images/icons/organic_4497598.png", labelKey: "hero.box3Label", descKey: "hero.box3Desc", color: "#009744" },
+                      { icon: "/images/icons/Rating-Five-Star--Streamline-Ultimate.png", labelKey: "hero.box4Label", descKey: "hero.box4Desc", color: "#AB1F23" }
                     ].map((feat, idx) => (
                       <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-xl sm:rounded-2xl p-2 sm:p-4 transition-all duration-500 cursor-default">
                         <div className="flex justify-center mb-2 sm:mb-3">
@@ -253,15 +253,15 @@ export function HeroSection() {
                           >
                             <Image
                               src={feat.icon}
-                              alt={feat.label}
+                              alt={t(feat.labelKey)}
                               width={32}
                               height={32}
                               className="h-6 w-6 sm:h-8 sm:w-8 object-contain"
                             />
                           </div>
                         </div>
-                        <div className="text-[10px] sm:text-sm md:text-base text-white font-bold font-poppins mb-0.5">{feat.label}</div>
-                        <div className="text-white/60 text-[8px] sm:text-xs font-body tracking-tight">{feat.desc}</div>
+                        <div className="text-[10px] sm:text-sm md:text-base text-white font-bold font-poppins mb-0.5">{t(feat.labelKey)}</div>
+                        <div className="text-white/60 text-[8px] sm:text-xs font-body tracking-tight">{t(feat.descKey)}</div>
                       </div>
                     ))}
                   </motion.div>

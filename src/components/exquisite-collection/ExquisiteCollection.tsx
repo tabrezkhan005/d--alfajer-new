@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/src/lib/utils";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 
 interface Category {
   id: string;
@@ -57,6 +58,7 @@ export function ExquisiteCollection({
   subtitle = "Carefully curated premium dry fruits, nuts & spices",
   categories = defaultCategories,
 }: ExquisiteCollectionProps) {
+  const { t } = useI18n();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -105,14 +107,14 @@ export function ExquisiteCollection({
         {/* Header */}
             <div className="text-center mb-6 xs:mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-2.5 xs:space-y-3 sm:space-y-6">
               <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
-                <span className="text-[#AB1F23]">Explore Our</span>{" "}
-                <span className="text-[#009744]">Exquisite Collection</span>
+                <span className="text-[#AB1F23]">{t('collection.exploreOur')}</span>{" "}
+                <span className="text-[#009744]">{t('collection.exquisiteTitle')}</span>
               </h2>
               {subtitle && (
                 <div className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-3 px-2 xs:px-3 sm:px-0">
                   <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
                   <p className="text-[8px] xs:text-[9px] sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
-                    {subtitle}
+                    {t('collection.subtitle')}
                   </p>
                   <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
                 </div>
@@ -217,7 +219,7 @@ export function ExquisiteCollection({
                             className="mt-3 md:mt-4"
                           >
                             <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
-                              Explore Collection
+                              {t('collection.exploreCollection')}
                               <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
                             </span>
                           </motion.div>

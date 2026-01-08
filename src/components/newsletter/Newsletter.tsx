@@ -5,8 +5,10 @@ import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
+import { useI18n } from '@/src/components/providers/i18n-provider';
 
 export function Newsletter() {
+  const { t } = useI18n();
   return (
     <section className="w-full py-6 xs:py-8 sm:py-10 md:py-14 lg:py-20 xl:py-24 bg-[#FAFAFA] border-t border-b border-black/5 overflow-x-hidden">
       <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
@@ -19,14 +21,13 @@ export function Newsletter() {
             className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8 lg:mb-10 xl:mb-12"
           >
             <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] font-semibold tracking-[0.3em] uppercase text-primary mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 lg:mb-4 block">
-              The Al Fajr Journal
+              {t('newsletter.journal')}
             </span>
             <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-heading text-[#1A1A1A] mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 tracking-tight px-2 sm:px-0">
-              Curated Wisdom, Delivered.
+              {t('newsletter.title')}
             </h2>
             <p className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-black/50 max-w-lg mx-auto leading-relaxed font-body px-2 sm:px-0">
-              Join our community for exclusive harvest updates, seasonal collections, 
-              and the philosophy of premium dates.
+              {t('newsletter.subtitle')}
             </p>
           </motion.div>
 
@@ -44,7 +45,7 @@ export function Newsletter() {
                 <div className="relative flex-grow">
                   <Input 
                     type="email" 
-                    placeholder="your@email.com" 
+                    placeholder={t('newsletter.placeholder')}
                     className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 bg-white border-black/10 focus:border-success/30 rounded-none px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 text-[8px] xs:text-[9px] sm:text-xs md:text-sm lg:text-base font-body transition-all duration-300 placeholder:text-black/20 focus-visible:ring-0 focus-visible:ring-offset-0 w-full"
                     required
                   />
@@ -55,7 +56,7 @@ export function Newsletter() {
                   className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 bg-primary hover:bg-primary/90 text-white rounded-none text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.15em] md:tracking-[0.2em] transition-all duration-500 group overflow-hidden relative whitespace-nowrap flex-shrink-0 w-full sm:w-auto"
                 >
                   <span className="relative z-10 flex items-center gap-0.5 sm:gap-0.75 md:gap-1 lg:gap-2 justify-center">
-                    Subscribe
+                    {t('newsletter.subscribe')}
                     <Send className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5 lg:w-3 lg:h-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                   </span>
                   <motion.div 
@@ -64,7 +65,7 @@ export function Newsletter() {
                 </Button>
               </div>
               <p className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] text-center text-black/30 mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 lg:mt-6 tracking-widest uppercase font-medium">
-                Privileged access to our finest harvests.
+                {t('newsletter.benefit')}
               </p>
             </form>
           </motion.div>
