@@ -108,6 +108,7 @@ const cardVariants = {
 export function HeroSection() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const { t } = require('@/src/components/providers/i18n-provider').useI18n();
 
   useEffect(() => {
     if (!api) return;
@@ -226,14 +227,14 @@ export function HeroSection() {
 
                   <div className="text-center mb-6 sm:mb-10">
                     <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] font-heading mb-2 sm:mb-4 drop-shadow-2xl px-2">
-                      {slide.title}
+                      {t('hero.mainTitle')}
                     </motion.h1>
                     <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] font-heading mb-4 sm:mb-8 drop-shadow-2xl px-2">
                       <span className="text-white">to Every </span>
-                      <span className="text-[#AB1F22]">Home</span>
+                      <span className="text-[#AB1F22]">{t('hero.mainSubtitle')}</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-6 sm:mb-10 px-3 sm:px-4">
-                      {slide.description}
+                      {t('hero.mainDescription')}
                     </motion.p>
                   </div>
 
@@ -271,7 +272,7 @@ export function HeroSection() {
                       className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
                     >
                       <span className="relative z-10 flex items-center gap-2 sm:gap-3 justify-center">
-                        EXPLORE PRODUCTS
+                        {t('hero.cta')}
                         <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -281,7 +282,7 @@ export function HeroSection() {
                       variant="outline"
                       className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-3 justify-center w-full sm:w-auto"
                     >
-                      OUR STORY
+                      {t('hero.story')}
                       <Play className="h-4 sm:h-5 w-4 sm:w-5 fill-white" />
                     </Button>
                   </motion.div>
@@ -299,7 +300,7 @@ export function HeroSection() {
                   <div className="text-left space-y-4 sm:space-y-6 lg:space-y-8 px-2 sm:px-0">
                     <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-[#009744]/90 backdrop-blur-sm text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg border border-[#009744]/20">
                       <Sparkles className="h-3 sm:h-4 w-3 sm:w-4 text-[#FFD700]" />
-                      <span className="text-[8px] sm:text-xs md:text-sm font-bold font-poppins tracking-widest uppercase">Al Fajer Signature</span>
+                      <span className="text-[8px] sm:text-xs md:text-sm font-bold font-poppins tracking-widest uppercase">{t('hero.signature')}</span>
                     </motion.div>
 
                     <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1] font-heading tracking-tight">
@@ -314,15 +315,15 @@ export function HeroSection() {
 
                     <motion.div variants={itemVariants} className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-8">
                       {[
-                        { icon: <Check className="h-4 sm:h-5 w-4 sm:w-5" />, label: "100% Organic" },
-                        { icon: <Leaf className="h-4 sm:h-5 w-4 sm:w-5" />, label: "No Additives" },
-                        { icon: <Award className="h-4 sm:h-5 w-4 sm:w-5" />, label: "Premium Selection" }
+                        { icon: <Check className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature1' },
+                        { icon: <Leaf className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature2' },
+                        { icon: <Award className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature3' }
                       ].map((f, i) => (
                         <div key={i} className="flex items-center gap-2 sm:gap-3 group">
                           <div className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[#009744]/20 flex items-center justify-center text-[#009744] transition-transform group-hover:scale-110">
                             {f.icon}
                           </div>
-                          <span className="text-white font-medium font-body text-sm sm:text-base md:text-lg">{f.label}</span>
+                          <span className="text-white font-medium font-body text-sm sm:text-base md:text-lg">{t(f.labelKey)}</span>
                         </div>
                       ))}
                     </motion.div>
@@ -333,7 +334,7 @@ export function HeroSection() {
                         className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-full transition-all duration-500 w-full sm:w-auto"
                       >
                         <span className="flex items-center gap-2 sm:gap-3 justify-center">
-                          SHOP NOW
+                          {t('hero.cta')}
                           <ArrowRight className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 transition-transform group-hover:translate-x-1" />
                         </span>
                       </Button>
@@ -342,7 +343,7 @@ export function HeroSection() {
                         variant="outline"
                         className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md w-full sm:w-auto"
                       >
-                        VIEW ALL
+                        {t('hero.story')}
                       </Button>
                     </motion.div>
                   </div>

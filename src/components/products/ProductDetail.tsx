@@ -274,7 +274,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                   disabled={!selectedVariant || selectedVariant.stock === 0}
                 >
                   <Zap size={18} className="mr-2" />
-                  Buy Now
+                  {t("product.buyNow")}
                 </Button>
               </motion.div>
             </div>
@@ -288,7 +288,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 size={20}
                 className={isWishlisted ? "fill-red-500 text-red-500" : ""}
               />
-              {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+              {isWishlisted ? t("product.removeWishlist") : t("product.wishlist")}
             </Button>
           </div>
 

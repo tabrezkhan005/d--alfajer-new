@@ -96,6 +96,7 @@ function SearchPageContentInner() {
               categories={allCategories}
               origins={allOrigins}
               certifications={allCertifications}
+              t={t}
             />
           </div>
 
@@ -118,6 +119,7 @@ function SearchPageContentInner() {
                   categories={allCategories}
                   origins={allOrigins}
                   certifications={allCertifications}
+                  t={t}
                 />
               </SheetContent>
             </Sheet>
@@ -222,7 +224,7 @@ function SearchPageContentInner() {
                         }}
                         disabled={!product.inStock}
                       >
-                        {product.inStock ? "Add to Cart" : "Out of Stock"}
+                        {product.inStock ? t("product.addToCart") : t("product.outOfStock")}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -242,6 +244,7 @@ interface FilterSidebarProps {
   categories: string[];
   origins: string[];
   certifications: string[];
+  t: (key: string) => string;
 }
 
 function FilterSidebar({
@@ -250,12 +253,13 @@ function FilterSidebar({
   categories,
   origins,
   certifications,
+  t,
 }: FilterSidebarProps) {
   return (
     <div className="space-y-6">
       {/* Price Filter */}
       <div>
-        <h3 className="font-bold mb-4">Price Range</h3>
+        <h3 className="font-bold mb-4">{t("filter.priceRange")}</h3>
         <Slider
           value={filters.priceRange || [0, 1000]}
           onValueChange={(value) =>
@@ -362,7 +366,7 @@ function FilterSidebar({
               onFiltersChange({ ...filters, inStockOnly: checked as boolean })
             }
           />
-          <span className="text-sm font-medium">In Stock Only</span>
+          <span className="text-sm font-medium">{t("filter.inStockOnly")}</span>
         </label>
       </div>
 

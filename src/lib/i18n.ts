@@ -20,11 +20,16 @@ export const CURRENCIES = {
 export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Announcement Bar
-    'announcement.shipping': 'Free shipping on orders above ₹999',
+    'announcement.shipping': 'Free shipping on orders above 999',
     'announcement.quality': 'Premium quality dry fruits & spices',
     'announcement.worldwide': 'Delivering worldwide',
-    'announcement.authentic': '100% authentic products guaranteed',
-    
+    'announcement.authentic': '100% authentic products guaranteed',    
+    // Currencies for display
+    'currency.inr': 'INR',
+    'currency.usd': 'USD',
+    'currency.aed': 'AED',
+    'currency.eur': 'EUR',
+    'currency.gbp': 'GBP',    
     // Navigation
     'nav.home': 'Home',
     'nav.categories': 'Categories',
@@ -145,6 +150,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.title': 'Premium Dry Fruits & Spices',
     'hero.subtitle': 'Handpicked, organic, and packed with goodness',
     'hero.cta': 'Shop Now',
+    'hero.feature1': '100% Organic',
+    'hero.feature2': 'No Additives',
+    'hero.feature3': 'Premium Selection',
+    'hero.story': 'Our Story',
+    'hero.signature': 'Al Fajer Signature',
+    'hero.mainTitle': 'Bringing Healthy Smiles',
+    'hero.mainSubtitle': 'to Every Home',
+    'hero.mainDescription': 'Experience the joy of premium organic products delivered fresh to your door. From handpicked almonds to pure honey - bringing health and happiness to families across the UAE.',
     
     // Collections
     'collection.exquisite': 'Exquisite Collection',
@@ -195,6 +208,22 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email': 'Email',
     'footer.phone': 'Phone',
     'footer.hours': 'Business Hours',
+    'footer.tagline': 'Your trusted source for premium organic products and natural goods. Quality you can trust, delivered fresh to your door.',
+    'footer.quickLinks': 'Quick Links',
+    'footer.customerService': 'Customer Service',
+    'footer.contactInfo': 'Contact Info',
+    'footer.products': 'Products',
+    'footer.collections': 'Collections',
+    'footer.shop': 'Shop',
+    'footer.contactUs': 'Contact Us',
+    'footer.returnRefunds': 'Returns & Refunds',
+    'footer.shippingPolicy': 'Shipping Policy',
+    'footer.faqs': 'FAQs',
+    'footer.location': 'Mumbai, India',
+    'footer.phone_text': '+91 98765 43210',
+    'footer.email_text': 'info@alfajermart.com',
+    'footer.brand': 'Al Fajer Mart',
+    'footer.termsOfService': 'Terms of Service',
     
     // Cart Page
     'cart.addToCart': 'Add to Cart',
@@ -219,11 +248,16 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   ar: {
     // Announcement Bar
-    'announcement.shipping': 'شحن مجاني للطلبات فوق 999 روبية',
+    'announcement.shipping': 'شحن مجاني للطلبات فوق 999',
     'announcement.quality': 'الفواكه الجافة والتوابل عالية الجودة',
     'announcement.worldwide': 'التسليم في جميع أنحاء العالم',
-    'announcement.authentic': '100٪ منتجات أصلية مضمونة',
-    
+    'announcement.authentic': '100٪ منتجات أصلية مضمونة',    
+    // Currencies for display
+    'currency.inr': 'روبية',
+    'currency.usd': 'دولار',
+    'currency.aed': 'درهم',
+    'currency.eur': 'يورو',
+    'currency.gbp': 'باوند',    
     // Navigation
     'nav.home': 'الرئيسية',
     'nav.categories': 'الفئات',
@@ -344,6 +378,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.title': 'الفواكه الجافة والتوابل الممتازة',
     'hero.subtitle': 'مختار بعناية وعضوي وممتلئ بالصحة',
     'hero.cta': 'تسوق الآن',
+    'hero.feature1': '100% عضوي',
+    'hero.feature2': 'بدون إضافات',
+    'hero.feature3': 'اختيار ممتاز',
+    'hero.story': 'قصتنا',
+    'hero.signature': 'توقيع ألفاجر',
+    'hero.mainTitle': 'نحضر الابتسامات الصحية',
+    'hero.mainSubtitle': 'إلى كل منزل',
+    'hero.mainDescription': 'استمتع بمتعة المنتجات العضوية الممتازة الطازجة المسلمة إلى باب منزلك. من اللوز المختار بعناية إلى العسل النقي - نحضر الصحة والسعادة للعائلات في جميع أنحاء الإمارات.',
     
     // Collections
     'collection.exquisite': 'المجموعة الرائعة',
@@ -394,6 +436,22 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email': 'البريد الإلكتروني',
     'footer.phone': 'الهاتف',
     'footer.hours': 'ساعات العمل',
+    'footer.tagline': 'مصدرك الموثوق للمنتجات العضوية الممتازة والبضائع الطبيعية. جودة يمكنك الوثوق بها، يتم تسليمها طازجة إلى باب منزلك.',
+    'footer.quickLinks': 'الروابط السريعة',
+    'footer.customerService': 'خدمة العملاء',
+    'footer.contactInfo': 'معلومات الاتصال',
+    'footer.products': 'المنتجات',
+    'footer.collections': 'المجموعات',
+    'footer.shop': 'متجر',
+    'footer.contactUs': 'تواصل معنا',
+    'footer.returnRefunds': 'الإرجاع واسترجاع الأموال',
+    'footer.shippingPolicy': 'سياسة الشحن',
+    'footer.faqs': 'أسئلة شائعة',
+    'footer.location': 'مومباي، الهند',
+    'footer.phone_text': '+91 98765 43210',
+    'footer.email_text': 'info@alfajermart.com',
+    'footer.brand': 'ألفاجر مارت',
+    'footer.termsOfService': 'شروط الخدمة',
     
     // Cart Page
     'cart.addToCart': 'أضف إلى السلة',
@@ -418,11 +476,16 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   hi: {
     // Announcement Bar
-    'announcement.shipping': '999 रुपये से ऊपर के ऑर्डर पर निःशुल्क शिपिंग',
+    'announcement.shipping': '999 से ऊपर के ऑर्डर पर निःशुल्क शिपिंग',
     'announcement.quality': 'प्रीमियम गुणवत्ता सूखे फल और मसाले',
     'announcement.worldwide': 'दुनिया भर में डिलीवरी',
-    'announcement.authentic': '100% प्रामाणिक उत्पाद गारंटीकृत',
-    
+    'announcement.authentic': '100% प्रामाणिक उत्पाद गारंटीकृत',    
+    // Currencies for display
+    'currency.inr': 'रुपया',
+    'currency.usd': 'डॉलर',
+    'currency.aed': 'दिरहम',
+    'currency.eur': 'यूरो',
+    'currency.gbp': 'पाउंड',    
     // Navigation
     'nav.home': 'होम',
     'nav.categories': 'श्रेणियां',
@@ -543,6 +606,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.title': 'प्रीमियम सूखे फल और मसाले',
     'hero.subtitle': 'हाथ से चुने हुए, जैविक और स्वास्थ्य से भरे',
     'hero.cta': 'अभी खरीदें',
+    'hero.feature1': '100% जैविक',
+    'hero.feature2': 'कोई योजक नहीं',
+    'hero.feature3': 'प्रीमियम चयन',
+    'hero.story': 'हमारी कहानी',
+    'hero.signature': 'अल फाजर हस्ताक्षर',
+    'hero.mainTitle': 'स्वस्थ मुस्कान लाना',
+    'hero.mainSubtitle': 'हर घर को',
+    'hero.mainDescription': 'प्रीमियम जैविक उत्पादों के आनंद का अनुभव करें जो ताजी आपके दरवाजे तक पहुंचाए जाते हैं। हाथ से चुने हुए बादाम से लेकर शुद्ध शहद तक - संपूर्ण यूएई में परिवारों को स्वास्थ्य और खुशी लाना।',
     
     // Collections
     'collection.exquisite': 'विशिष्ट संग्रह',
@@ -593,6 +664,22 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email': 'ईमेल',
     'footer.phone': 'फोन',
     'footer.hours': 'व्यावसायिक घंटे',
+    'footer.tagline': 'प्रीमियम जैविक उत्पादों और प्राकृतिक वस्तुओं के लिए आपका विश्वसनीय स्रोत। गुणवत्ता जिस पर आप विश्वास कर सकते हैं, आपके दरवाजे पर ताजी डिलीवरी।',
+    'footer.quickLinks': 'त्वरित लिंक',
+    'footer.customerService': 'ग्राहक सेवा',
+    'footer.contactInfo': 'संपर्क जानकारी',
+    'footer.products': 'उत्पाद',
+    'footer.collections': 'संग्रह',
+    'footer.shop': 'दुकान',
+    'footer.contactUs': 'संपर्क करें',
+    'footer.returnRefunds': 'रिटर्न और धनवापसी',
+    'footer.shippingPolicy': 'शिपिंग नीति',
+    'footer.faqs': 'अक्सर पूछे जाने वाले प्रश्न',
+    'footer.location': 'मुंबई, भारत',
+    'footer.phone_text': '+91 98765 43210',
+    'footer.email_text': 'info@alfajermart.com',
+    'footer.brand': 'अल फाजर मार्ट',
+    'footer.termsOfService': 'सेवा की शर्तें',
     
     // Cart Page
     'cart.addToCart': 'कार्ट में जोड़ें',

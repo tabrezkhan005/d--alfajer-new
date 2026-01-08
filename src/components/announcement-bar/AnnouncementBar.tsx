@@ -131,6 +131,7 @@ const AnnouncementBarContent = ({
 
   const currentMessageKey = messageKeys[currentMessageIndex] || messageKeys[0];
   const currentMessage = t(currentMessageKey);
+  const currencySymbol = CURRENCIES[currency]?.symbol || '₹';
 
     return (
       <div
@@ -155,7 +156,7 @@ const AnnouncementBarContent = ({
               <span className="hidden sm:inline text-base" aria-hidden="true">
                 📢
               </span>
-              <span>{currentMessage}</span>
+              <span>{currentMessage.includes('999') ? currentMessage.replace('999', `${currencySymbol}999`) : currentMessage}</span>
             </div>
           </div>
 

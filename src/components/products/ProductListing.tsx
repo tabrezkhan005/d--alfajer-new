@@ -631,7 +631,7 @@ export function ProductListing() {
 
 function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
   const router = useRouter();
-  const { formatCurrency, convertCurrency } = useI18n();
+  const { formatCurrency, convertCurrency, currency } = useI18n();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, clearCart, items } = useCartStore();
@@ -788,11 +788,11 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         {/* Price */}
         <div className="flex items-center gap-2 xs:gap-3 pt-0.5 xs:pt-1">
           <span className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 font-heading">
-            {formatCurrency(convertCurrency(product.price))}
+            {formatCurrency(convertCurrency(product.price, 'INR'))}
           </span>
           {product.originalPrice && (
             <span className="text-[10px] xs:text-xs sm:text-sm text-gray-400 line-through font-body">
-              {formatCurrency(convertCurrency(product.originalPrice))}
+              {formatCurrency(convertCurrency(product.originalPrice, 'INR'))}
             </span>
           )}
         </div>

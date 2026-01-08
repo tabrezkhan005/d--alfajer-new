@@ -334,7 +334,7 @@ export function Header() {
                   <div className="hidden sm:flex flex-col items-start">
                     <span className="text-xs font-medium text-gray-700 uppercase leading-tight">{t('nav.cart')}</span>
                     <span className="text-xs font-semibold text-gray-900 leading-tight">
-                      {cartTotal > 0 ? formatCurrency(convertCurrency(cartTotal)) : formatCurrency(0)}
+                      {cartTotal > 0 ? formatCurrency(convertCurrency(cartTotal, 'AED')) : formatCurrency(0)}
                     </span>
                   </div>
                 </>

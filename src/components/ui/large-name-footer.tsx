@@ -5,8 +5,10 @@ import { Facebook, Instagram, Twitter, MapPin, Phone, Mail } from "lucide-react"
 
 import { Icons } from "@/src/components/ui/icons";
 import { Button } from "@/src/components/ui/button";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 
 function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="w-full bg-gray-50 border-t border-gray-200 overflow-x-hidden">
       <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
@@ -24,8 +26,7 @@ function Footer() {
               />
             </Link>
             <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 leading-relaxed max-w-md">
-              Your trusted source for premium organic products and natural goods.
-              Quality you can trust, delivered fresh to your door.
+              {t('footer.tagline')}
             </p>
 
             {/* Social Media Icons */}
@@ -57,7 +58,7 @@ function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
-              Quick Links
+              {t('footer.quickLinks')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
@@ -65,7 +66,7 @@ function Footer() {
                   href="/products"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Products
+                  {t('footer.products')}
                 </Link>
               </li>
               <li>
@@ -73,7 +74,7 @@ function Footer() {
                   href="/collections"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Collections
+                  {t('footer.collections')}
                 </Link>
               </li>
               <li>
@@ -81,7 +82,7 @@ function Footer() {
                   href="/shop"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Shop
+                  {t('footer.shop')}
                 </Link>
               </li>
               <li>
@@ -89,7 +90,7 @@ function Footer() {
                   href="/about"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  About Us
+                  {t('footer.about')}
                 </Link>
               </li>
               <li>
@@ -97,7 +98,7 @@ function Footer() {
                   href="/contact"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Contact
+                  {t('footer.contactUs')}
                 </Link>
               </li>
             </ul>
@@ -106,7 +107,7 @@ function Footer() {
           {/* Customer Service */}
           <div>
             <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
-              Customer Service
+              {t('footer.customerService')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
@@ -114,7 +115,7 @@ function Footer() {
                   href="/contact"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Contact Us
+                  {t('footer.contactUs')}
                 </Link>
               </li>
               <li>
@@ -122,7 +123,7 @@ function Footer() {
                   href="/returns"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Returns & Refunds
+                  {t('footer.returnRefunds')}
                 </Link>
               </li>
               <li>
@@ -130,7 +131,7 @@ function Footer() {
                   href="/shipping"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  Shipping Policy
+                  {t('footer.shippingPolicy')}
                 </Link>
               </li>
               <li>
@@ -138,7 +139,7 @@ function Footer() {
                   href="/faqs"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  FAQs
+                  {t('footer.faqs')}
                 </Link>
               </li>
             </ul>
@@ -147,12 +148,12 @@ function Footer() {
           {/* Contact Info */}
           <div className="sm:col-span-2 md:col-span-1">
             <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
-              Contact Us
+              {t('footer.contactInfo')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li className="flex items-start gap-1.5 sm:gap-2">
                 <MapPin className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] mt-0.5 shrink-0" />
-                <span className="text-[9px] sm:text-xs md:text-sm text-gray-600">Mumbai, India</span>
+                <span className="text-[9px] sm:text-xs md:text-sm text-gray-600">{t('footer.location')}</span>
               </li>
               <li className="flex items-center gap-1.5 sm:gap-2">
                 <Phone className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] shrink-0" />
@@ -160,7 +161,7 @@ function Footer() {
                   href="tel:+919876543210"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
-                  +91 98765 43210
+                  {t('footer.phone_text')}
                 </a>
               </li>
               <li className="flex items-center gap-1.5 sm:gap-2">
@@ -169,7 +170,7 @@ function Footer() {
                   href="mailto:info@alfajermart.com"
                   className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors break-all"
                 >
-                  info@alfajermart.com
+                  {t('footer.email_text')}
                 </a>
               </li>
             </ul>
@@ -182,7 +183,7 @@ function Footer() {
             <h1
               className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold select-none font-secondary tracking-tight leading-tight sm:leading-none bg-gradient-to-b from-[#009744] via-[#099042] via-[#128A40] via-[#1C833F] via-[#257D3D] to-[#2E763B] text-transparent bg-clip-text"
             >
-              Al Fajer Mart.
+              {t('footer.brand')}.
             </h1>
           </div>
         </div>
@@ -191,20 +192,20 @@ function Footer() {
         <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 pt-4 sm:pt-6 md:pt-8 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 px-2">
             <p className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 text-center sm:text-left">
-              © {new Date().getFullYear()} Al Fajer Mart. All rights reserved.
+              {t('footer.copyright')}
             </p>
             <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
               <Link
                 href="/privacy-policy"
                 className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
               >
-                Privacy Policy
+                {t('footer.privacy')}
               </Link>
               <Link
                 href="/terms"
                 className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
               >
-                Terms of Service
+                {t('footer.termsOfService')}
               </Link>
             </div>
           </div>

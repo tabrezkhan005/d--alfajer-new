@@ -106,7 +106,7 @@ export function CartSheet() {
               <div className="px-6 py-5 space-y-4 bg-gray-50/50">
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.subtotal')}</span>
-                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice))}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice, 'AED'))}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.shipping')}</span>
@@ -114,17 +114,17 @@ export function CartSheet() {
                     "font-medium",
                     shipping === 0 ? "text-[#009744]" : "text-gray-900"
                   )}>
-                    {shipping === 0 ? "FREE" : formatCurrency(convertCurrency(shipping))}
+                    {shipping === 0 ? "FREE" : formatCurrency(convertCurrency(shipping, 'AED'))}
                   </span>
                 </div>
                 {shipping > 0 && (
                   <div className="bg-[#009744]/10 rounded-lg p-3 text-sm text-[#009744] font-body">
-                    Add <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice))}</span> more for free shipping!
+                    Add <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'AED'))}</span> more for free shipping!
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
                   <span>{t('cart.total')}</span>
-                  <span>{formatCurrency(convertCurrency(finalTotal))}</span>
+                  <span>{formatCurrency(convertCurrency(finalTotal, 'AED'))}</span>
                 </div>
               </div>
 
