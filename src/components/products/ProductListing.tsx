@@ -651,6 +651,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // Pass false to prevent cart from opening when going directly to checkout
     addItem({
       id: product.id,
       name: product.name,
@@ -658,7 +659,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       price: product.price,
       originalPrice: product.originalPrice,
       packageSize: product.packageSize,
-    });
+    }, false);
     router.push("/checkout");
   };
 

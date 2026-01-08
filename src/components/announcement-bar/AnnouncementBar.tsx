@@ -105,16 +105,12 @@ export const AnnouncementBar = ({
       return;
     }
 
-    // Mobile: 24px (h-6), XS: 28px (h-7), SM: 32px (h-8), MD: 36px (h-9)
-    let paddingTop = "24px";
-    if (window.innerWidth >= 375) {
-      paddingTop = "28px";
-    }
-    if (window.innerWidth >= 640) {
-      paddingTop = "32px";
-    }
-    if (window.innerWidth >= 768) {
-      paddingTop = "36px";
+    // Only add minimal padding on mobile to account for fixed bar height
+    // Don't add extra padding - let header handle its own positioning
+    let paddingTop = "0px";
+    if (window.innerWidth < 640) {
+      // Mobile: just account for bar height
+      paddingTop = "24px"; // h-6 height
     }
     document.body.style.paddingTop = paddingTop;
     return () => {
