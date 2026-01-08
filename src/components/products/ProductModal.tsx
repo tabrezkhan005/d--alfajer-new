@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 import {
   Dialog,
   DialogContent,
@@ -161,6 +162,7 @@ interface ProductModalProps {
 
 export function ProductModal({ product, open, onOpenChange }: ProductModalProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
@@ -539,50 +541,57 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
         {/* Tabs Section */}
         <div className="border-t border-gray-100 p-4 sm:p-6 lg:p-8 text-gray-900">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full text-gray-900">
-            <TabsList className="w-full bg-gray-100 p-1.5 sm:p-2 rounded-full h-auto grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-2 sm:justify-center">
+            <TabsList className="w-full bg-white border border-gray-200 p-1.5 sm:p-2 rounded-full h-auto grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-2 sm:justify-center">
               <TabsTrigger
                 value="details"
-                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 text-gray-700 transition-all duration-200"
               >
                 <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Details</span>
+                <span>{t('product.details')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="nutrition"
-                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 text-gray-700 transition-all duration-200"
               >
                 <Leaf className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Nutrition</span>
+                <span>{t('product.nutrition')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="allergens"
-                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 text-gray-700 transition-all duration-200"
               >
                 <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Allergens</span>
+                <span>{t('product.allergens')}</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="shipping"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 text-gray-700 transition-all duration-200"
+              >
+                <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>{t('product.shipping')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
-                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 text-gray-700 transition-all duration-200"
               >
                 <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Reviews ({mockReviews.length})</span>
-                <span className="sm:hidden">Reviews</span>
+                <span className="hidden sm:inline">{t('product.customerReviews')} ({mockReviews.length})</span>
+                <span className="sm:hidden">{t('product.customerReviews')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="wholesale"
-                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-semibold font-poppins text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-[#009744] data-[state=active]:shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 col-span-2 sm:col-span-1 mx-auto sm:mx-0"
+                className="rounded-full px-3 sm:px-6 py-2.5 sm:py-3 font-bold font-poppins text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0 col-span-2 sm:col-span-1 mx-auto sm:mx-0 text-gray-700 transition-all duration-200"
               >
                 <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Wholesale</span>
+                <span>{t('product.wholesale')}</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Details Tab */}
-            <TabsContent value="details" className="mt-4 sm:mt-6">
+            <TabsContent value="details" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-4">
-                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg">Product Specifications</h4>
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg border-b-3 border-[#009744] pb-2">{t('product.productSpecifications')}</h4>
                   <div className="space-y-3">
                     {[
                       { label: "Product Name", value: product.name },
@@ -592,27 +601,27 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                       { label: "Storage", value: "Cool, dry place away from sunlight" },
                     ].map((item) => (
                       <div key={item.label} className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-xs sm:text-sm text-gray-500 font-body">{item.label}</span>
-                        <span className="font-semibold text-xs sm:text-sm text-gray-900 font-body">{item.value}</span>
+                        <span className="text-xs sm:text-sm text-gray-600 font-body font-semibold">{item.label}</span>
+                        <span className="font-bold text-xs sm:text-sm text-[#009744] font-body">{item.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg">Why Choose This Product?</h4>
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg border-b-3 border-[#AB1F22] pb-2">{t('product.whyChooseThis')}</h4>
                   <ul className="space-y-3">
                     {[
-                      "Handpicked from premium farms",
-                      "No artificial preservatives or additives",
-                      "Vacuum-sealed for maximum freshness",
-                      "Rich in essential nutrients and antioxidants",
-                      "Perfect for health-conscious families",
+                      t('product.handpicked'),
+                      t('product.noPreservatives'),
+                      t('product.vacuumSealed'),
+                      t('product.richinNutrients'),
+                      t('product.perfectForHealth'),
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="h-3 w-3 text-[#009744]" />
+                        <div className="h-5 w-5 rounded-full bg-[#009744]/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[#009744]">
+                          <Check className="h-3 w-3 text-[#009744] font-bold" />
                         </div>
-                        <span className="text-xs sm:text-sm text-gray-600 font-body">{item}</span>
+                        <span className="text-xs sm:text-sm text-gray-700 font-body">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -621,25 +630,25 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Nutrition Tab */}
-            <TabsContent value="nutrition" className="mt-4 sm:mt-6">
+            <TabsContent value="nutrition" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
               <div className="max-w-xl">
-                <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg mb-1">Nutrition Facts</h4>
-                  <p className="text-xs sm:text-sm text-gray-500 mb-4 font-body">Serving Size: {nutritionData.servingSize}</p>
-                  <div className="border-t-8 border-gray-900 pt-2">
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                      <span className="font-bold text-sm sm:text-base text-gray-900">Calories</span>
-                      <span className="font-bold text-sm sm:text-base text-gray-900">{nutritionData.calories}</span>
+                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-[#009744]">
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg mb-1 text-[#009744] border-b-2 border-[#009744] pb-2">{t('product.nutritionFacts')}</h4>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-4 font-body font-semibold">{t('product.servingSize')}: {nutritionData.servingSize}</p>
+                  <div className="border-t-4 border-[#009744] pt-3">
+                    <div className="flex justify-between py-2 border-b-2 border-[#009744]">
+                      <span className="font-bold text-sm sm:text-base text-gray-900">{t('product.calories')}</span>
+                      <span className="font-bold text-sm sm:text-base text-[#009744]">{nutritionData.calories}</span>
                     </div>
-                    <p className="text-xs text-gray-500 text-right py-1">% Daily Value*</p>
+                    <p className="text-xs text-gray-600 text-right py-1 font-semibold">% Daily Value*</p>
                     {nutritionData.nutrients.map((nutrient) => (
-                      <div key={nutrient.name} className="flex justify-between py-2 border-b border-gray-100 text-xs sm:text-sm">
-                        <span className="text-gray-700 font-body">{nutrient.name} <span className="font-semibold">{nutrient.value}</span></span>
-                        <span className="font-semibold text-gray-900">{nutrient.daily}</span>
+                      <div key={nutrient.name} className="flex justify-between py-2 border-b border-gray-200 text-xs sm:text-sm">
+                        <span className="text-gray-700 font-body font-semibold">{nutrient.name} <span className="font-bold text-[#009744]">{nutrient.value}</span></span>
+                        <span className="font-bold text-[#009744]">{nutrient.daily}</span>
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-4 font-body">
+                  <p className="text-xs text-gray-600 mt-4 font-body">
                     *Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.
                   </p>
                 </div>
@@ -647,78 +656,228 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </TabsContent>
 
             {/* Allergens Tab */}
-            <TabsContent value="allergens" className="mt-4 sm:mt-6">
+            <TabsContent value="allergens" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                <div className="bg-red-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                <div className="bg-red-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-red-500">
                   <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
-                    <h4 className="font-bold text-red-700 font-poppins text-sm sm:text-base">Contains</h4>
+                    <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 font-bold" />
+                    <h4 className="font-bold text-red-700 font-poppins text-sm sm:text-base">{t('product.contains')}</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.contains.map((item) => (
-                      <li key={item} className="text-red-600 font-semibold font-body text-xs sm:text-sm">{item}</li>
+                      <li key={item} className="text-red-700 font-bold font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-amber-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                <div className="bg-amber-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-amber-500">
                   <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
-                    <h4 className="font-bold text-amber-700 font-poppins text-sm sm:text-base">May Contain</h4>
+                    <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 font-bold" />
+                    <h4 className="font-bold text-amber-700 font-poppins text-sm sm:text-base">{t('product.mayContain')}</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.mayContain.map((item) => (
-                      <li key={item} className="text-amber-600 font-medium font-body text-xs sm:text-sm">{item}</li>
+                      <li key={item} className="text-amber-700 font-bold font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-green-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                <div className="bg-green-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-[#009744]">
                   <div className="flex items-center gap-2 mb-4">
-                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
-                    <h4 className="font-bold text-green-700 font-poppins text-sm sm:text-base">Free From</h4>
+                    <Check className="h-5 w-5 sm:h-6 sm:w-6 text-[#009744] font-bold" />
+                    <h4 className="font-bold text-[#009744] font-poppins text-sm sm:text-base">{t('product.freeFrom')}</h4>
                   </div>
                   <ul className="space-y-2">
                     {allergenInfo.freeFrom.map((item) => (
-                      <li key={item} className="text-green-600 font-medium font-body text-xs sm:text-sm">{item}</li>
+                      <li key={item} className="text-[#009744] font-bold font-body text-xs sm:text-sm">{item}</li>
                     ))}
                   </ul>
                 </div>
               </div>
             </TabsContent>
 
+            {/* Shipping Tab */}
+            <TabsContent value="shipping" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
+              <div className="space-y-6">
+                {/* Shipping Options */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[
+                    {
+                      title: t('product.standardShipping'),
+                      time: '3-5 business days',
+                      cost: t('product.freeShipping'),
+                      icon: Truck,
+                      description: t('product.standardShippingDesc'),
+                      color: 'blue'
+                    },
+                    {
+                      title: t('product.expressShipping'),
+                      time: '1-2 business days',
+                      cost: 'AED 35',
+                      icon: Zap,
+                      description: t('product.expressShippingDesc'),
+                      color: 'amber'
+                    },
+                    {
+                      title: t('product.overnightShipping'),
+                      time: 'Next Business Day',
+                      cost: 'AED 75',
+                      icon: Award,
+                      description: t('product.overnightShippingDesc'),
+                      color: 'red'
+                    },
+                    {
+                      title: t('product.localPickup'),
+                      time: 'Available Now',
+                      cost: t('product.freePickup'),
+                      icon: Building2,
+                      description: t('product.localPickupDesc'),
+                      color: 'green'
+                    },
+                  ].map((option, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        'rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 transition-all hover:shadow-lg',
+                        option.color === 'blue' && 'bg-blue-50 border-blue-500',
+                        option.color === 'amber' && 'bg-amber-50 border-amber-500',
+                        option.color === 'red' && 'bg-red-50 border-red-500',
+                        option.color === 'green' && 'bg-green-50 border-[#009744]'
+                      )}
+                    >
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div
+                          className={cn(
+                            'h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center flex-shrink-0',
+                            option.color === 'blue' && 'bg-blue-500/10',
+                            option.color === 'amber' && 'bg-amber-500/10',
+                            option.color === 'red' && 'bg-red-500/10',
+                            option.color === 'green' && 'bg-[#009744]/10'
+                          )}
+                        >
+                          <option.icon
+                            className={cn(
+                              'h-5 w-5 sm:h-6 sm:w-6 font-bold',
+                              option.color === 'blue' && 'text-blue-600',
+                              option.color === 'amber' && 'text-amber-600',
+                              option.color === 'red' && 'text-red-600',
+                              option.color === 'green' && 'text-[#009744]'
+                            )}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className={cn(
+                            'font-bold font-poppins text-sm sm:text-base mb-1',
+                            option.color === 'blue' && 'text-blue-700',
+                            option.color === 'amber' && 'text-amber-700',
+                            option.color === 'red' && 'text-red-700',
+                            option.color === 'green' && 'text-[#009744]'
+                          )}>
+                            {option.title}
+                          </h4>
+                          <p className="text-xs sm:text-sm text-gray-600 font-body mb-2">{option.description}</p>
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="text-xs sm:text-sm font-bold text-gray-700 bg-white/60 px-2 py-1 rounded">{option.time}</span>
+                            <span className={cn(
+                              'text-xs sm:text-sm font-bold',
+                              option.color === 'blue' && 'text-blue-600',
+                              option.color === 'amber' && 'text-amber-600',
+                              option.color === 'red' && 'text-red-600',
+                              option.color === 'green' && 'text-[#009744]'
+                            )}>
+                              {option.cost}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Important Shipping Info */}
+                <div className="bg-gradient-to-r from-[#009744]/5 to-amber-50/5 border-l-4 border-[#009744] rounded-lg p-4 sm:p-6">
+                  <div className="flex gap-3 sm:gap-4">
+                    <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-[#009744] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-gray-900 font-poppins text-sm sm:text-base mb-2">{t('product.shippingGuarantee')}</h4>
+                      <ul className="space-y-2 text-xs sm:text-sm text-gray-700 font-body">
+                        <li className="flex gap-2">
+                          <Check className="h-4 w-4 text-[#009744] flex-shrink-0 mt-0.5" />
+                          <span>{t('product.guaranteeItem1')}</span>
+                        </li>
+                        <li className="flex gap-2">
+                          <Check className="h-4 w-4 text-[#009744] flex-shrink-0 mt-0.5" />
+                          <span>{t('product.guaranteeItem2')}</span>
+                        </li>
+                        <li className="flex gap-2">
+                          <Check className="h-4 w-4 text-[#009744] flex-shrink-0 mt-0.5" />
+                          <span>{t('product.guaranteeItem3')}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shipping FAQs */}
+                <div>
+                  <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg mb-4 border-b-2 border-[#009744] pb-2">{t('product.shippingFaqs')}</h4>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        q: t('product.faqQuestion1'),
+                        a: t('product.faqAnswer1'),
+                      },
+                      {
+                        q: t('product.faqQuestion2'),
+                        a: t('product.faqAnswer2'),
+                      },
+                      {
+                        q: t('product.faqQuestion3'),
+                        a: t('product.faqAnswer3'),
+                      },
+                    ].map((faq, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-lg p-3 sm:p-4">
+                        <h5 className="font-bold text-sm text-gray-900 mb-2">{faq.q}</h5>
+                        <p className="text-xs sm:text-sm text-gray-700 font-body">{faq.a}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
             {/* Reviews Tab */}
-            <TabsContent value="reviews" className="mt-4 sm:mt-6">
+            <TabsContent value="reviews" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
               <div className="space-y-6 sm:space-y-8">
                 {/* Rating Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 bg-gradient-to-br from-amber-50 to-orange-50 p-4 sm:p-6 rounded-lg border-2 border-amber-200">
                     <div className="text-center">
-                      <div className="text-4xl sm:text-5xl font-bold text-gray-900 font-heading">{product.rating}</div>
+                      <div className="text-5xl sm:text-6xl font-bold text-[#009744] font-heading">{product.rating}</div>
                       <div className="flex items-center gap-1 mt-2 justify-center">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
                             className={cn(
-                              "h-4 w-4 sm:h-5 sm:w-5",
+                              "h-5 w-5 sm:h-6 sm:w-6",
                               i < Math.floor(product.rating)
-                                ? "text-amber-400 fill-amber-400"
-                                : "text-gray-200 fill-gray-200"
+                                ? "text-amber-500 fill-amber-500"
+                                : "text-gray-300 fill-gray-300"
                             )}
                           />
                         ))}
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1 font-body">{mockReviews.length} reviews</p>
+                      <p className="text-xs sm:text-sm text-gray-700 mt-2 font-body font-bold">{mockReviews.length} {t('product.reviews')}</p>
                     </div>
                     <div className="flex-1 space-y-2 w-full sm:w-auto">
                       {ratingCounts.map(({ star, count, percentage }) => (
                         <div key={star} className="flex items-center gap-3">
-                          <span className="text-xs sm:text-sm text-gray-600 w-8 font-body">{star} ★</span>
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <span className="text-xs sm:text-sm text-[#009744] w-8 font-body font-bold">{star} ★</span>
+                          <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-amber-400 rounded-full transition-all"
+                              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
-                          <span className="text-xs sm:text-sm text-gray-500 w-8 font-body">{count}</span>
+                          <span className="text-xs sm:text-sm text-gray-700 w-8 font-body font-bold">{count}</span>
                         </div>
                       ))}
                     </div>
@@ -727,18 +886,18 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   {/* Filter & Write Review */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-                      <span className="text-xs sm:text-sm font-semibold text-gray-700 font-poppins">Filter:</span>
+                      <span className="text-xs sm:text-sm font-bold text-gray-900 font-poppins">{t('product.filter')}:</span>
                       <div className="flex flex-wrap gap-2">
                         <Button
                           variant={reviewFilter === "all" ? "default" : "outline"}
                           size="sm"
                           onClick={() => setReviewFilter("all")}
                           className={cn(
-                            "rounded-full font-medium text-xs sm:text-sm",
-                            reviewFilter === "all" && "bg-[#009744] hover:bg-[#00803a]"
+                            "rounded-full font-bold text-xs sm:text-sm",
+                            reviewFilter === "all" && "bg-[#009744] hover:bg-[#00803a] text-white"
                           )}
                         >
-                          All Reviews
+                          {t('product.allReviews')}
                         </Button>
                         {[5, 4, 3, 2, 1].map((star) => (
                           <Button
@@ -747,8 +906,8 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                             size="sm"
                             onClick={() => setReviewFilter(star)}
                             className={cn(
-                              "rounded-full font-medium text-xs sm:text-sm",
-                              reviewFilter === star && "bg-[#009744] hover:bg-[#00803a]"
+                              "rounded-full font-bold text-xs sm:text-sm",
+                              reviewFilter === star && "bg-[#009744] hover:bg-[#00803a] text-white"
                             )}
                           >
                             {star} ★
@@ -758,9 +917,9 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                     </div>
                     <Button
                       onClick={() => setShowReviewForm(!showReviewForm)}
-                      className="bg-[#AB1F23] hover:bg-[#8B1A1D] text-white font-semibold rounded-full font-poppins w-full sm:w-auto text-sm sm:text-base"
+                      className="bg-[#AB1F23] hover:bg-[#8B1A1D] text-white font-bold rounded-full font-poppins w-full sm:w-auto text-sm sm:text-base"
                     >
-                      Write a Review
+                      {t('product.writeReview')}
                     </Button>
                   </div>
                 </div>
@@ -830,21 +989,21 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 <div className="space-y-6">
                   {filteredReviews.length === 0 ? (
                     <div className="text-center py-12">
-                      <p className="text-gray-500 font-body text-sm">No reviews found for this filter.</p>
+                      <p className="text-gray-600 font-body text-sm font-semibold">No reviews found for this filter.</p>
                     </div>
                   ) : (
                     filteredReviews.map((review) => (
-                      <div key={review.id} className="border-b border-gray-100 pb-6">
+                      <div key={review.id} className="border-l-4 border-[#009744] bg-gradient-to-r from-green-50 to-white p-4 sm:p-6 rounded-lg">
                         <div className="flex items-start justify-between gap-3 sm:gap-4 flex-col sm:flex-row">
                           <div className="flex items-start gap-3 sm:gap-4 flex-1">
-                            <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                              <User className="h-4 w-4 sm:h-6 sm:w-6 text-gray-400" />
+                            <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-[#009744] flex items-center justify-center flex-shrink-0">
+                              <User className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-semibold text-gray-900 font-poppins text-sm sm:text-base">{review.user}</span>
+                                <span className="font-bold text-gray-900 font-poppins text-sm sm:text-base">{review.user}</span>
                                 {review.verified && (
-                                  <Badge className="bg-green-100 text-green-700 text-xs font-medium">
+                                  <Badge className="bg-[#009744] text-white text-xs font-bold">
                                     <Check className="h-3 w-3 mr-1" />
                                     Verified
                                   </Badge>
@@ -856,16 +1015,16 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                                     <Star
                                       key={i}
                                       className={cn(
-                                        "h-3 w-3 sm:h-4 sm:w-4",
+                                        "h-4 w-4 sm:h-5 sm:w-5",
                                         i < review.rating
-                                          ? "text-amber-400 fill-amber-400"
-                                          : "text-gray-200 fill-gray-200"
+                                          ? "text-amber-500 fill-amber-500"
+                                          : "text-gray-300 fill-gray-300"
                                       )}
                                     />
                                   ))}
                                 </div>
                                 <span className="text-sm text-gray-400">•</span>
-                                <span className="text-xs sm:text-sm text-gray-500 font-body">
+                                <span className="text-xs sm:text-sm text-gray-600 font-body font-semibold">
                                   {new Date(review.date).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "short",
@@ -877,11 +1036,11 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                           </div>
                         </div>
                         <div className="mt-3 sm:mt-4 sm:ml-16">
-                          <h5 className="font-semibold text-gray-900 font-poppins text-sm sm:text-base">{review.title}</h5>
-                          <p className="text-gray-600 mt-2 font-body leading-relaxed text-sm">{review.comment}</p>
-                          <button className="flex items-center gap-2 mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500 hover:text-[#009744] transition-colors font-medium">
-                            <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4" />
-                            Helpful ({review.helpful})
+                          <h5 className="font-bold text-gray-900 font-poppins text-sm sm:text-base">{review.title}</h5>
+                          <p className="text-gray-700 mt-2 font-body leading-relaxed text-sm">{review.comment}</p>
+                          <button className="flex items-center gap-2 mt-3 sm:mt-4 text-xs sm:text-sm text-[#009744] hover:text-[#00803a] transition-colors font-bold">
+                            <ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5 text-[#009744]" />
+                            {t('product.helpful')} ({review.helpful})
                           </button>
                         </div>
                       </div>
@@ -890,9 +1049,8 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 </div>
               </div>
             </TabsContent>
-
             {/* Wholesale Tab */}
-            <TabsContent value="wholesale" className="mt-4 sm:mt-6">
+            <TabsContent value="wholesale" className="mt-4 sm:mt-6 bg-white border border-gray-200 rounded-lg p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-6">
                   <div>

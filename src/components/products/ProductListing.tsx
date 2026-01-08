@@ -18,6 +18,12 @@ import { cn } from "@/src/lib/utils";
 import { ProductModal } from "./ProductModal";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Product name translation mapping
+const productNameMap: Record<string, string> = {
+  "1": "productName.kashmirilRedChilliPowder",
+  "2": "productName.kashmirilPureWhiteHoney",
+};
+
 interface Product {
   id: string;
   name: string;
@@ -795,7 +801,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
         {/* Title */}
         <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
-          {product.name}
+          {t(productNameMap[product.id] || 'product.name') || product.name}
         </h3>
 
         {/* Package Size */}

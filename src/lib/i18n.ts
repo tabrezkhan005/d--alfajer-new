@@ -60,7 +60,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.removeWishlist': 'Remove from Wishlist',
     'product.notFound': 'Product not found',
     'product.share': 'Share',
-    'product.freeShipping': 'Free Shipping',
     'product.onOrders': 'On orders above $50',
     'product.securePayment': 'Secure Payment',
     'product.ssl': '256-bit SSL encryption',
@@ -69,10 +68,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.perServing': 'Per serving: 1 tbsp (21g)',
     'product.customerReviews': 'Customer Reviews',
     'product.writeReview': 'Write a Review',
-    'product.shippingInfo': 'Shipping Information',
-    'product.standardShipping': 'Standard Shipping: 5-7 business days - Free',
-    'product.expressShipping': 'Express Shipping: 2-3 business days - $10',
-    'product.overnightShipping': 'Overnight Shipping: Next business day - $25',
     
     // Cart
     'cart.empty': 'Your cart is empty',
@@ -201,6 +196,90 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.originalPrice': 'Original Price',
     'product.viewDetails': 'View Details',
     
+    // Product Details - Tabs & Sections
+    'product.details': 'Details',
+    'product.nutrition': 'Nutrition',
+    'product.allergens': 'Allergens',
+    'product.wholesale': 'Wholesale',
+    'product.productSpecifications': 'Product Specifications',
+    'product.whyChooseThis': 'Why Choose This Product?',
+    'product.handpicked': 'Handpicked from premium farms',
+    'product.noPreservatives': 'No artificial preservatives or additives',
+    'product.vacuumSealed': 'Vacuum-sealed for maximum freshness',
+    'product.richinNutrients': 'Rich in essential nutrients and antioxidants',
+    'product.perfectForHealth': 'Perfect for health-conscious families',
+    'product.contains': 'Contains',
+    'product.mayContain': 'May Contain',
+    'product.freeFrom': 'Free From',
+    'product.ratingSummary': 'Rating Summary',
+    'product.filter': 'Filter',
+    'product.allReviews': 'All Reviews',
+    'product.verifiedPurchase': 'Verified Purchase',
+    'product.helpful': 'Helpful',
+    'product.reviewTitle': 'Review Title',
+    'product.yourRating': 'Your Rating',
+    'product.reviewPlaceholder': 'Share your detailed experience...',
+    'product.submitReview': 'Submit Review',
+    
+    // Shipping Tab
+    'product.shipping': 'Shipping',
+    'product.standardShipping': 'Standard Shipping',
+    'product.expressShipping': 'Express Shipping',
+    'product.overnightShipping': 'Overnight Shipping',
+    'product.localPickup': 'Local Pickup',
+    'product.freeShipping': 'Free',
+    'product.freePickup': 'Free',
+    'product.standardShippingDesc': 'Standard delivery to your doorstep',
+    'product.expressShippingDesc': 'Faster delivery option available',
+    'product.overnightShippingDesc': 'Premium next-day delivery service',
+    'product.localPickupDesc': 'Pick up from nearest location',
+    'product.shippingGuarantee': 'Our Shipping Guarantee',
+    'product.guaranteeItem1': 'Your order arrives safe and fresh',
+    'product.guaranteeItem2': 'Real-time tracking available',
+    'product.guaranteeItem3': 'Full refund if damaged on arrival',
+    'product.shippingFaqs': 'Shipping FAQs',
+    'product.faqQuestion1': 'What is the delivery timeframe for my order?',
+    'product.faqAnswer1': 'Standard delivery takes 3-5 business days. Express delivery is 1-2 days, and overnight delivery is next business day. Local pickup is available immediately.',
+    'product.faqQuestion2': 'How can I track my order?',
+    'product.faqAnswer2': 'You will receive a tracking number via email after your order ships. You can track it in real-time on our website or the courier\'s app.',
+    'product.faqQuestion3': 'What if my package arrives damaged?',
+    'product.faqAnswer3': 'We guarantee fresh, intact products. If your package arrives damaged, contact us immediately with photos for a full refund or replacement at no extra cost.',
+    
+    // Product Descriptions
+    'product.kashmiChilliDesc': 'Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives. Sourced directly from Kashmiri farmers.',
+    'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. No added sugars or preservatives. Rich in antioxidants and natural enzymes for optimal health benefits.',
+    'product.almondDesc': 'Premium California almonds, carefully selected and roasted to perfection. Rich in protein and healthy fats. Perfect for snacking or adding to your favorite recipes.',
+    
+    // Origins & Locations
+    'origin.kashmir': 'Kashmir, India',
+    'origin.california': 'California, USA',
+    'origin.india': 'India',
+    'origin.middleEast': 'Middle East',
+    
+    // Certifications
+    'cert.organic': 'Organic',
+    'cert.nonGMO': 'Non-GMO',
+    'cert.glutenFree': 'Gluten-Free',
+    'cert.vegan': 'Vegan',
+    'cert.fairtrade': 'Fair Trade',
+    'cert.noPreservatives': 'No Preservatives',
+    
+    // Review Content
+    'review.excellentQuality': 'Excellent quality!',
+    'review.johnDoe': 'John Doe',
+    'review.greatColor': 'Great color and flavor.',
+    'review.janeSmith': 'Jane Smith',
+    'review.goodProductQuality': 'Good product quality.',
+    'review.absolutelyFresh': 'Absolutely fresh and delicious!',
+    'review.bestAlmonds': 'These are the best almonds I\'ve ever tasted. You can tell they\'re truly premium quality. The packaging was excellent and they arrived fresh.',
+    'review.sarahM': 'Sarah M.',
+    'review.perfectForFamily': 'Perfect for my family',
+    'review.familyOrdering': 'We\'ve been ordering from Al Fajer for months now. The quality is consistently excellent and the delivery is always on time.',
+    'review.ahmedK': 'Ahmed K.',
+    'review.greatQualityPricey': 'Great quality, slightly pricey',
+    'review.priceQuality': 'The product quality is outstanding. A bit expensive but you get what you pay for. Will definitely order again.',
+    'review.priyaS': 'Priya S.',
+    
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': 'Farm Fresh',
     'hero.box1Desc': 'Direct from source',
@@ -264,6 +343,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'No products found',
     'productCategory.tryAdjusting': 'Try adjusting your filters to find what you\'re looking for.',
     'productCategory.clearAllFilters': 'Clear All Filters',
+    
+    // Product Names
+    'productName.kashmirilRedChilliPowder': 'Kashmiri Red Chilli Powder',
+    'productName.kashmirilPureWhiteHoney': 'Kashmiri Pure White Honey',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'SALE',
@@ -387,7 +470,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.removeWishlist': 'إزالة من قائمة الرغبات',
     'product.notFound': 'لم يتم العثور على المنتج',
     'product.share': 'شارك',
-    'product.freeShipping': 'شحن مجاني',
     'product.onOrders': 'للطلبات فوق 50 دولار',
     'product.securePayment': 'دفع آمن',
     'product.ssl': 'تشفير SSL بـ 256 بت',
@@ -396,10 +478,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.perServing': 'لكل حصة: 1 ملعقة كبيرة (21 غرام)',
     'product.customerReviews': 'تقييمات العملاء',
     'product.writeReview': 'كتابة تقييم',
-    'product.shippingInfo': 'معلومات الشحن',
-    'product.standardShipping': 'الشحن العادي: 5-7 أيام عمل - مجاني',
-    'product.expressShipping': 'الشحن السريع: 2-3 أيام عمل - 10 دولار',
-    'product.overnightShipping': 'الشحن الفوري: يوم العمل التالي - 25 دولار',
     
     // Cart
     'cart.empty': 'سلتك فارغة',
@@ -528,6 +606,88 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.originalPrice': 'السعر الأصلي',
     'product.viewDetails': 'عرض التفاصيل',
     
+    // Product Details - Tabs & Sections
+    'product.details': 'التفاصيل',
+    'product.nutrition': 'التغذية',
+    'product.allergens': 'مسببات الحساسية',
+    'product.wholesale': 'بالجملة',
+    'product.productSpecifications': 'مواصفات المنتج',
+    'product.whyChooseThis': 'لماذا تختار هذا المنتج؟',
+    'product.handpicked': 'مختار باليد من المزارع الممتازة',
+    'product.noPreservatives': 'بدون مواد حافظة أو مضافات صناعية',
+    'product.vacuumSealed': 'مختم بالفراغ للحفاظ على الطازة القصوى',
+    'product.richinNutrients': 'غني بالفيتامينات والمعادن الأساسية ومضادات الأكسدة',
+    'product.perfectForHealth': 'مثالي للعائلات الصحية الواعية',
+    'product.contains': 'يحتوي على',
+    'product.mayContain': 'قد يحتوي على',
+    'product.freeFrom': 'خالي من',
+    'product.ratingSummary': 'ملخص التقييم',
+    'product.filter': 'عامل التصفية',
+    'product.allReviews': 'جميع التقييمات',
+    'product.verifiedPurchase': 'شراء موثق',
+    'product.helpful': 'مفيد',
+    'product.reviewTitle': 'عنوان المراجعة',
+    'product.yourRating': 'تقييمك',
+    'product.reviewPlaceholder': 'شارك تجربتك المفصلة...',
+    'product.submitReview': 'إرسال المراجعة',
+    
+    // Shipping Tab - Arabic
+    'product.shipping': 'الشحن',
+    'product.standardShipping': 'الشحن العادي',
+    'product.expressShipping': 'الشحن السريع',
+    'product.overnightShipping': 'الشحن الليلي',
+    'product.localPickup': 'الاستلام المحلي',
+    'product.standardShippingDesc': 'توصيل عادي إلى باب منزلك',
+    'product.expressShippingDesc': 'خيار توصيل أسرع متاح',
+    'product.overnightShippingDesc': 'خدمة توصيل في اليوم التالي',
+    'product.localPickupDesc': 'الاستلام من أقرب موقع',
+    'product.shippingGuarantee': 'ضمان الشحن لدينا',
+    'product.guaranteeItem1': 'يصل طلبك آمنًا وطازًا',
+    'product.guaranteeItem2': 'تتبع فوري متاح',
+    'product.guaranteeItem3': 'استرجاع كامل إذا تضرر عند الوصول',
+    'product.shippingFaqs': 'أسئلة الشحن الشائعة',
+    'product.faqQuestion1': 'ما هو الإطار الزمني للتسليم؟',
+    'product.faqAnswer1': 'يستغرق التسليم العادي 3-5 أيام عمل. التسليم السريع 1-2 يوم، والتسليم الليلي في اليوم التالي. يتوفر الاستلام المحلي على الفور.',
+    'product.faqQuestion2': 'كيف يمكنني تتبع طلبي؟',
+    'product.faqAnswer2': 'ستتلقى رقم تتبع عبر البريد الإلكتروني بعد شحن طلبك. يمكنك تتبعه في الوقت الفعلي على موقعنا أو تطبيق الناقل.',
+    'product.faqQuestion3': 'ماذا لو وصلت الحزمة تالفة؟',
+    'product.faqAnswer3': 'نضمن منتجات طازة وسليمة. إذا وصلت الحزمة تالفة، اتصل بنا على الفور مع صور للحصول على استرجاع كامل أو استبدال بدون تكلفة إضافية.',
+    
+    // Product Descriptions
+    'product.kashmiChilliDesc': 'مسحوق الفلفل الحار الكشميري الأحمر المصنوع من الفلفل الحار الأحمر المختار بعناية. غني بالنكهة ومستوى الحرارة المثالي لجميع احتياجاتك الطهي. معالج بشكل طبيعي بدون مضافات أو مواد حافظة. مشترى مباشرة من المزارعين الكشميريين.',
+    'product.honeyDesc': 'عسل طبيعي نقي 100% مصدره المباشر من مربي النحل المحليين. بدون سكريات مضافة أو مواد حافظة. غني بمضادات الأكسدة والإنزيمات الطبيعية لفوائد صحية مثالية.',
+    'product.almondDesc': 'لوز كاليفورنيا الممتاز، مختار بعناية وحمصه بشكل مثالي. غني بالبروتين والدهون الصحية. مثالي للوجبات الخفيفة أو إضافة إلى وصفاتك المفضلة.',
+    
+    // Origins & Locations
+    'origin.kashmir': 'كشمير، الهند',
+    'origin.california': 'كاليفورنيا، الولايات المتحدة',
+    'origin.india': 'الهند',
+    'origin.middleEast': 'الشرق الأوسط',
+    
+    // Certifications
+    'cert.organic': 'عضوي',
+    'cert.nonGMO': 'غير معدل وراثياً',
+    'cert.glutenFree': 'خالي من الغلوتين',
+    'cert.vegan': 'نباتي',
+    'cert.fairtrade': 'تجارة عادلة',
+    'cert.noPreservatives': 'بدون مواد حافظة',
+    
+    // Review Content
+    'review.excellentQuality': 'جودة ممتازة!',
+    'review.johnDoe': 'جون دو',
+    'review.greatColor': 'لون وطعم رائعين.',
+    'review.janeSmith': 'جين سميث',
+    'review.goodProductQuality': 'جودة منتج جيدة.',
+    'review.absolutelyFresh': 'طازج وشهي تماماً!',
+    'review.bestAlmonds': 'هذا أفضل لوز قد أتذوقه. يمكنك أن ترى أنها جودة ممتازة حقاً. التغليف كان ممتازاً ووصلت طازجة.',
+    'review.sarahM': 'سارة م.',
+    'review.perfectForFamily': 'مثالي لعائلتي',
+    'review.familyOrdering': 'لقد كنا نطلب من الفاجر لأشهر الآن. الجودة ممتازة بشكل مستمر والتسليم دائماً في الوقت المناسب.',
+    'review.ahmedK': 'أحمد ك.',
+    'review.greatQualityPricey': 'جودة ممتازة، غالية الثمن قليلاً',
+    'review.priceQuality': 'جودة المنتج استثنائية. سعر مرتفع قليلاً لكنك تحصل على ما تدفع مقابله. سأطلب مرة أخرى بالتأكيد.',
+    'review.priyaS': 'بريا س.',
+    
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': '100% عضوي',
     'hero.box1Desc': 'مباشرة من المصدر',
@@ -591,6 +751,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'لم يتم العثور على منتجات',
     'productCategory.tryAdjusting': 'حاول ضبط مرشحاتك للعثور على ما تبحث عنه.',
     'productCategory.clearAllFilters': 'مسح جميع الفلاتر',
+    
+    // Product Names
+    'productName.kashmirilRedChilliPowder': 'مسحوق الفلفل الحار الأحمر الكشميري',
+    'productName.kashmirilPureWhiteHoney': 'عسل أبيض نقي كشميري',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'عرض خاص',
@@ -714,7 +878,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.removeWishlist': 'विशलिस्ट से हटाएं',
     'product.notFound': 'उत्पाद नहीं मिला',
     'product.share': 'साझा करें',
-    'product.freeShipping': 'मुफ्त शिपिंग',
     'product.onOrders': '$50 से ऊपर के ऑर्डर पर',
     'product.securePayment': 'सुरक्षित भुगतान',
     'product.ssl': '256-बिट SSL एन्क्रिप्शन',
@@ -723,10 +886,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.perServing': 'प्रति सेवारत: 1 बड़ा चम्मच (21 ग्राम)',
     'product.customerReviews': 'ग्राहक समीक्षाएं',
     'product.writeReview': 'समीक्षा लिखें',
-    'product.shippingInfo': 'शिपिंग जानकारी',
-    'product.standardShipping': 'मानक शिपिंग: 5-7 कार्य दिवस - मुफ्त',
-    'product.expressShipping': 'एक्सप्रेस शिपिंग: 2-3 कार्य दिवस - $10',
-    'product.overnightShipping': 'रातोंरात शिपिंग: अगले कार्य दिवस - $25',
     
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',
@@ -855,6 +1014,88 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.originalPrice': 'मूल मूल्य',
     'product.viewDetails': 'विवरण देखें',
     
+    // Product Details - Tabs & Sections
+    'product.details': 'विवरण',
+    'product.nutrition': 'पोषण',
+    'product.allergens': 'एलर्जी',
+    'product.wholesale': 'थोक',
+    'product.productSpecifications': 'उत्पाद विनिर्देश',
+    'product.whyChooseThis': 'इस उत्पाद को क्यों चुनें?',
+    'product.handpicked': 'प्रीमियम खेतों से हाथ से चुना हुआ',
+    'product.noPreservatives': 'कोई कृत्रिम संरक्षक या योजक नहीं',
+    'product.vacuumSealed': 'अधिकतम ताजगी के लिए वैक्यूम-सीलबंद',
+    'product.richinNutrients': 'आवश्यक विटामिन, खनिज और एंटीऑक्सिडेंट में समृद्ध',
+    'product.perfectForHealth': 'स्वास्थ्य-सचेत परिवारों के लिए बिल्कुल सही',
+    'product.contains': 'इसमें शामिल है',
+    'product.mayContain': 'इसमें शामिल हो सकता है',
+    'product.freeFrom': 'से मुक्त',
+    'product.ratingSummary': 'रेटिंग सारांश',
+    'product.filter': 'फिल्टर',
+    'product.allReviews': 'सभी समीक्षाएं',
+    'product.verifiedPurchase': 'सत्यापित खरीद',
+    'product.helpful': 'मददगार',
+    'product.reviewTitle': 'समीक्षा शीर्षक',
+    'product.yourRating': 'आपकी रेटिंग',
+    'product.reviewPlaceholder': 'अपना विस्तृत अनुभव साझा करें...',
+    'product.submitReview': 'समीक्षा सबमिट करें',
+    
+    // Shipping Tab - Hindi
+    'product.shipping': 'शिपिंग',
+    'product.standardShipping': 'मानक शिपिंग',
+    'product.expressShipping': 'एक्सप्रेस शिपिंग',
+    'product.overnightShipping': 'रातोंरात शिपिंग',
+    'product.localPickup': 'स्थानीय पिकअप',
+    'product.standardShippingDesc': 'आपके घर की दहलीज पर मानक डिलीवरी',
+    'product.expressShippingDesc': 'तेजी से डिलीवरी विकल्प उपलब्ध',
+    'product.overnightShippingDesc': 'प्रीमियम अगले दिन डिलीवरी सेवा',
+    'product.localPickupDesc': 'निकटतम स्थान से पिकअप करें',
+    'product.shippingGuarantee': 'हमारी शिपिंग गारंटी',
+    'product.guaranteeItem1': 'आपका ऑर्डर सुरक्षित और ताजा पहुंचता है',
+    'product.guaranteeItem2': 'रीयल-टाइम ट्रैकिंग उपलब्ध',
+    'product.guaranteeItem3': 'आने पर क्षतिग्रस्त होने पर पूर्ण धनवापसी',
+    'product.shippingFaqs': 'शिपिंग अक्सर पूछे जाने वाले प्रश्न',
+    'product.faqQuestion1': 'मेरे ऑर्डर के लिए डिलीवरी समय सीमा क्या है?',
+    'product.faqAnswer1': 'मानक डिलीवरी 3-5 व्यावसायिक दिन लेती है। एक्सप्रेस डिलीवरी 1-2 दिन है, और रातोंरात डिलीवरी अगले व्यावसायिक दिन है। स्थानीय पिकअप तुरंत उपलब्ध है।',
+    'product.faqQuestion2': 'मैं अपने ऑर्डर को कैसे ट्रैक कर सकता हूं?',
+    'product.faqAnswer2': 'आपके ऑर्डर के शिप होने के बाद आपको ईमेल के माध्यम से एक ट्रैकिंग नंबर मिलेगा। आप इसे हमारी वेबसाइट या कूरियर के ऐप पर रीयल-टाइम में ट्रैक कर सकते हैं।',
+    'product.faqQuestion3': 'यदि मेरा पैकेज क्षतिग्रस्त आता है तो क्या होगा?',
+    'product.faqAnswer3': 'हम ताजा, बरकरार उत्पादों की गारंटी देते हैं। यदि पैकेज क्षतिग्रस्त आता है, तो तुरंत फोटो के साथ हमसे संपर्क करें पूर्ण धनवापसी या बिना किसी अतिरिक्त लागत के प्रतिस्थापन के लिए।',
+    
+    // Product Descriptions
+    'product.kashmiChilliDesc': 'कश्मीरी लाल मिर्च पाउडर सावधानी से चुनी गई लाल मिर्च से बना है। स्वाद में समृद्ध और आपकी सभी पाक जरूरतों के लिए परिपूर्ण गर्मी स्तर। बिना किसी योजक या संरक्षक के प्राकृतिक रूप से संसाधित। कश्मीरी किसानों से सीधे प्राप्त।',
+    'product.honeyDesc': '100% शुद्ध प्राकृतिक शहद जो स्थानीय मधुमक्खी पालकों से सीधे प्राप्त है। कोई अतिरिक्त चीनी या संरक्षक नहीं। एंटीऑक्सिडेंट और प्राकृतिक एंजाइम में समृद्ध सर्वोत्तम स्वास्थ्य लाभ के लिए।',
+    'product.almondDesc': 'प्रीमियम कैलिफोर्निया बादाम, सावधानी से चुने और सही तरीके से भुने। प्रोटीन और स्वस्थ वसा में समृद्ध। नाश्ते के लिए या आपकी पसंदीदा रेसिपी में जोड़ने के लिए बिल्कुल सही।',
+    
+    // Origins & Locations
+    'origin.kashmir': 'कश्मीर, भारत',
+    'origin.california': 'कैलिफोर्निया, यूएसए',
+    'origin.india': 'भारत',
+    'origin.middleEast': 'मध्य पूर्व',
+    
+    // Certifications
+    'cert.organic': 'जैविक',
+    'cert.nonGMO': 'गैर-जीएमओ',
+    'cert.glutenFree': 'लस मुक्त',
+    'cert.vegan': 'शाकाहारी',
+    'cert.fairtrade': 'न्यायसंगत व्यापार',
+    'cert.noPreservatives': 'कोई संरक्षक नहीं',
+    
+    // Review Content
+    'review.excellentQuality': 'उत्कृष्ट गुणवत्ता!',
+    'review.johnDoe': 'जॉन डो',
+    'review.greatColor': 'बहुत अच्छा रंग और स्वाद।',
+    'review.janeSmith': 'जेन स्मिथ',
+    'review.goodProductQuality': 'अच्छी उत्पाद गुणवत्ता।',
+    'review.absolutelyFresh': 'बिल्कुल ताजा और स्वादिष्ट!',
+    'review.bestAlmonds': 'ये सबसे अच्छे बादाम हैं जो मैंने कभी चखे हैं। आप बता सकते हैं कि वे वास्तव में प्रीमियम गुणवत्ता के हैं। पैकेजिंग शानदार थी और वह ताजा पहुंचे।',
+    'review.sarahM': 'सारा एम।',
+    'review.perfectForFamily': 'मेरे परिवार के लिए बिल्कुल सही',
+    'review.familyOrdering': 'हम कई महीने से अल फाजर से ऑर्डर कर रहे हैं। गुणवत्ता लगातार उत्कृष्ट है और डिलीवरी हमेशा समय पर होती है।',
+    'review.ahmedK': 'अहमद के।',
+    'review.greatQualityPricey': 'बहुत अच्छी गुणवत्ता, थोड़ी महंगी',
+    'review.priceQuality': 'उत्पाद की गुणवत्ता असाधारण है। कीमत थोड़ी अधिक है लेकिन आपको अपने पैसे का मूल्य मिलता है। निश्चित रूप से फिर से ऑर्डर करूंगा।',
+    'review.priyaS': 'प्रिया एस।',
+    
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': '100% जैविक',
     'hero.box1Desc': 'सीधे स्रोत से',
@@ -918,6 +1159,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'कोई उत्पाद नहीं मिला',
     'productCategory.tryAdjusting': 'आप जो खोज रहे हैं उसे खोजने के लिए अपने फ़िल्टर को समायोजित करने का प्रयास करें।',
     'productCategory.clearAllFilters': 'सभी फ़िल्टर साफ़ करें',
+    
+    // Product Names
+    'productName.kashmirilRedChilliPowder': 'कश्मीरी लाल मिर्च पाउडर',
+    'productName.kashmirilPureWhiteHoney': 'कश्मीरी शुद्ध सफेद शहद',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'बिक्रय',
