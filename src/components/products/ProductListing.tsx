@@ -48,7 +48,7 @@ interface Product {
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Kashmiri Red Chilli Powder",
+    name: "productName.kashmirilRedChilliPowder",
     image: "/images/products/chillipowder/chillipowder_main.jpeg",
     images: [
       "/images/products/chillipowder/chillipowder_main.jpeg",
@@ -75,7 +75,7 @@ const mockProducts: Product[] = [
   },
   {
     id: "2",
-    name: "Kashmiri Pure White Honey",
+    name: "productName.kashmirilPureWhiteHoney",
     image: "/images/products/honey/honey_main.jpeg",
     images: [
       "/images/products/honey/honey_main.jpeg",

@@ -113,6 +113,7 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Filters
     'filter.priceRange': 'Price Range',
+    'filter.category': 'Category',
     'filter.packageSize': 'Package Size',
     'filter.origin': 'Origin',
     'filter.certification': 'Certification',
@@ -148,7 +149,17 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.view': 'View',
     'common.showing': 'Showing',
     'common.of': 'of',
+    'common.product': 'product',
     'common.products': 'products',
+    'common.reset': 'Reset',
+    'common.allProducts': 'All Products',
+    
+    // Search Page
+    'search.resultsFor': 'Search Results for',
+    'search.showing': 'Showing',
+    'search.noProducts': 'No products found',
+    'search.tryAdjusting': 'Try adjusting your filters or search terms',
+    'search.browseAll': 'Browse All Products',
     
     // Header
     'header.logo': 'Alfajer',
@@ -523,6 +534,7 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Filters
     'filter.priceRange': 'نطاق السعر',
+    'filter.category': 'الفئة',
     'filter.packageSize': 'حجم الحزمة',
     'filter.origin': 'الأصل',
     'filter.certification': 'الشهادة',
@@ -558,7 +570,17 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.view': 'عرض',
     'common.showing': 'عرض',
     'common.of': 'من',
+    'common.product': 'منتج',
     'common.products': 'منتجات',
+    'common.reset': 'إعادة تعيين',
+    'common.allProducts': 'جميع المنتجات',
+    
+    // Search Page
+    'search.resultsFor': 'نتائج البحث عن',
+    'search.showing': 'عرض',
+    'search.noProducts': 'لم يتم العثور على منتجات',
+    'search.tryAdjusting': 'حاول تعديل الفلاتر أو مصطلحات البحث',
+    'search.browseAll': 'استعرض جميع المنتجات',
     
     // Header
     'header.logo': 'ألفاجر',
@@ -931,6 +953,7 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Filters
     'filter.priceRange': 'मूल्य श्रेणी',
+    'filter.category': 'श्रेणी',
     'filter.packageSize': 'पैकेज आकार',
     'filter.origin': 'मूल',
     'filter.certification': 'प्रमाणन',
@@ -966,7 +989,17 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.view': 'दृश्य',
     'common.showing': 'दिखा रहा है',
     'common.of': 'का',
+    'common.product': 'उत्पाद',
     'common.products': 'उत्पाद',
+    'common.reset': 'रीसेट करें',
+    'common.allProducts': 'सभी उत्पाद',
+    
+    // Search Page
+    'search.resultsFor': 'के लिए खोज परिणाम',
+    'search.showing': 'दिखा रहा है',
+    'search.noProducts': 'कोई उत्पाद नहीं मिला',
+    'search.tryAdjusting': 'अपने फिल्टर या खोज शर्तों को समायोजित करने का प्रयास करें',
+    'search.browseAll': 'सभी उत्पाद ब्राउज़ करें',
     
     // Header
     'header.logo': 'अलफाजर',

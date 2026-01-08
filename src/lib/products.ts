@@ -82,7 +82,7 @@ export interface SearchFilters {
 export const mockProductsWithVariants: Product[] = [
   {
     id: '1',
-    name: 'Kashmiri Red Chilli Powder',
+    name: 'productName.kashmirilRedChilliPowder',
     shortDescription: 'Premium grade Kashmiri red chilli powder with perfect color and heat.',
     longDescription: 'Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives. Sourced directly from Kashmiri farmers.',
     category: 'Spices',
@@ -146,7 +146,7 @@ export const mockProductsWithVariants: Product[] = [
   },
   {
     id: '2',
-    name: 'Kashmiri Pure White Honey',
+    name: 'productName.kashmirilPureWhiteHoney',
     shortDescription: '100% pure natural honey sourced directly from local beekeepers.',
     longDescription: '100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste. No added sugars or preservatives.',
     category: 'Honey & Spreads',
