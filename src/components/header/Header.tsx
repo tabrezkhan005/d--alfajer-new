@@ -28,12 +28,14 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { useCartStore } from "@/src/lib/cart-store";
 import { CartSheet } from "@/src/components/cart";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 
 export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { items, openCart, getTotalItems, getTotalPrice } = useCartStore();
+  const { t, formatCurrency, convertCurrency, currency } = useI18n();
 
   const headerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
@@ -173,7 +175,7 @@ export function Header() {
                 <Input
                   type="search"
                   name="search"
-                  placeholder="Search for organic products, dry fruits, honey..."
+                  placeholder={t('common.search') + " for organic products, dry fruits, honey..."}
                   className="
                     h-12 pl-6 pr-24 rounded-full
                     bg-white border-2 border-gray-200
@@ -205,12 +207,12 @@ export function Header() {
                 <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
                   <Headphones className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">Support</span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">{t('header.support')}</span>
               </div>
 
               <div className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
                 <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
-                <span className="text-xs md:text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">Wishlist</span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">{t('product.reviews')}</span>
               </div>
 
               <DropdownMenu>
@@ -218,18 +220,18 @@ export function Header() {
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                     <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     <div className="flex flex-col items-start">
-                      <span className="text-xs md:text-sm text-gray-900 font-medium">Sign In</span>
+                      <span className="text-xs md:text-sm text-gray-900 font-medium">{t('nav.account')}</span>
                     </div>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('header.account')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Sign In</DropdownMenuItem>
+                  <DropdownMenuItem>{t('nav.account')}</DropdownMenuItem>
                   <DropdownMenuItem>Create Account</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Orders</DropdownMenuItem>
-                  <DropdownMenuItem>Wishlist</DropdownMenuItem>
+                  <DropdownMenuItem>{t('product.reviews')}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -256,19 +258,19 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <button
                       className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                      aria-label="Account"
+                      aria-label={t('header.account')}
                     >
                       <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52">
-                    <DropdownMenuLabel>Account</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('header.account')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Sign In</DropdownMenuItem>
+                    <DropdownMenuItem>{t('nav.account')}</DropdownMenuItem>
                     <DropdownMenuItem>Create Account</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Orders</DropdownMenuItem>
-                    <DropdownMenuItem>Wishlist</DropdownMenuItem>
+                    <DropdownMenuItem>{t('product.reviews')}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -286,11 +288,11 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
-                <DropdownMenuLabel className="text-gray-900">Account</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-gray-900">{t('header.account')}</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <User className="h-4 w-4 text-gray-600" />
-                  <span>Sign In</span>
+                  <span>{t('nav.account')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <User className="h-4 w-4 text-gray-600" />
@@ -299,7 +301,7 @@ export function Header() {
                 <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <Heart className="h-4 w-4 text-gray-600" />
-                  <span>Wishlist</span>
+                  <span>{t('product.reviews')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <ShoppingBag className="h-4 w-4 text-gray-600" />
@@ -308,7 +310,7 @@ export function Header() {
                 <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <Headphones className="h-4 w-4 text-gray-600" />
-                  <span>Support</span>
+                  <span>{t('header.support')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -330,9 +332,9 @@ export function Header() {
                     )}
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
-                    <span className="text-xs font-medium text-gray-700 uppercase leading-tight">My Cart</span>
+                    <span className="text-xs font-medium text-gray-700 uppercase leading-tight">{t('nav.cart')}</span>
                     <span className="text-xs font-semibold text-gray-900 leading-tight">
-                      {cartTotal > 0 ? `AED ${cartTotal.toFixed(2)}` : "AED 0.00"}
+                      {cartTotal > 0 ? formatCurrency(convertCurrency(cartTotal)) : formatCurrency(0)}
                     </span>
                   </div>
                 </>

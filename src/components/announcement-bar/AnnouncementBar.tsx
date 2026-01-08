@@ -13,15 +13,16 @@ interface AnnouncementBarProps {
   messages?: string[];
 }
 
-const defaultMessages = [
-  "Free shipping on orders above ₹999",
-  "Premium quality dry fruits & spices",
-  "Delivering worldwide",
-  "100% authentic products guaranteed",
+// Announcement message keys that will be translated
+const announcementMessageKeys = [
+  'announcement.shipping',
+  'announcement.quality',
+  'announcement.worldwide',
+  'announcement.authentic',
 ];
 
 export const AnnouncementBar = ({
-  messages = defaultMessages,
+  messages = announcementMessageKeys,
 }: AnnouncementBarProps) => {
   const pathname = usePathname();
   
@@ -33,15 +34,15 @@ export const AnnouncementBar = ({
     return null;
   }
   
-  return <AnnouncementBarContent messages={messages} />;
+  return <AnnouncementBarContent messageKeys={messages as string[]} />;
 };
 
 const AnnouncementBarContent = ({
-  messages = defaultMessages,
-}: AnnouncementBarProps) => {
+  messageKeys = announcementMessageKeys,
+}: { messageKeys: string[] }) => {
   const barRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const { language, currency, setLanguage, setCurrency, isLoading } = useI18n();
+  const { language, currency, setLanguage, setCurrency, isLoading, t } = useI18n();
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -76,7 +77,7 @@ const AnnouncementBarContent = ({
 
   // Message rotation animation
   useEffect(() => {
-    if (!messageRef.current || messages.length <= 1) {
+    if (!messageRef.current || messageKeys.length <= 1) {
       return;
     }
 
@@ -98,18 +99,18 @@ const AnnouncementBarContent = ({
         ease: "power2.out",
       }
     );
-  }, [currentMessageIndex, messages.length]);
+  }, [currentMessageIndex, messageKeys.length]);
 
   // Rotate messages
   useEffect(() => {
-    if (messages.length <= 1) return;
+    if (messageKeys.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+      setCurrentMessageIndex((prev) => (prev + 1) % messageKeys.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messageKeys.length]);
 
   // Update body padding when bar is visible
   useEffect(() => {
@@ -128,9 +129,8 @@ const AnnouncementBarContent = ({
     return null;
   }
 
-  const currentMessage = messages[currentMessageIndex] || messages[0];
-  const currentLanguageName = LANGUAGES[language as keyof typeof LANGUAGES]?.nativeName || language;
-  const currentCurrency = CURRENCIES[currency as keyof typeof CURRENCIES];
+  const currentMessageKey = messageKeys[currentMessageIndex] || messageKeys[0];
+  const currentMessage = t(currentMessageKey);
 
     return (
       <div

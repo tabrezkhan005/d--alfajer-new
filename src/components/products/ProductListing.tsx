@@ -289,7 +289,7 @@ export function ProductListing() {
       {/* Price Range */}
       <div className="space-y-4">
         <Label className="text-base font-bold text-gray-900 font-poppins">
-          Price Range
+          {t('filter.priceRange')}
         </Label>
         <div className="space-y-4">
           <Slider
@@ -302,7 +302,7 @@ export function ProductListing() {
           />
           <div className="flex gap-3">
             <div className="flex-1">
-              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Min</Label>
+              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.min')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
                         <Input
@@ -316,7 +316,7 @@ export function ProductListing() {
               </div>
             </div>
             <div className="flex-1">
-              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">Max</Label>
+              <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.max')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
                         <Input
@@ -336,7 +336,7 @@ export function ProductListing() {
       {/* Package Size */}
       <div className="space-y-3">
         <Label className="text-base font-bold text-gray-900 font-poppins">
-          Package Size
+          {t('filter.packageSize')}
         </Label>
         <div className="space-y-2.5">
           {packageSizes.map((size) => {
@@ -365,7 +365,7 @@ export function ProductListing() {
       {/* Origin */}
       <div className="space-y-3">
         <Label className="text-base font-bold text-gray-900 font-poppins">
-          Origin
+          {t('filter.origin')}
         </Label>
         <div className="space-y-2.5">
           {origins.map((origin) => {
@@ -394,7 +394,7 @@ export function ProductListing() {
       {/* Certifications */}
       <div className="space-y-3">
         <Label className="text-base font-bold text-gray-900 font-poppins">
-          Certifications
+          {t('filter.certification')}
         </Label>
         <div className="space-y-2.5">
           {certifications.map((cert) => {
@@ -425,7 +425,7 @@ export function ProductListing() {
       {/* Availability */}
       <div className="space-y-3">
         <Label className="text-base font-bold text-gray-900 font-poppins">
-          Availability
+          {t('filter.availability')}
         </Label>
         <div className="space-y-2.5">
           <div className="flex items-center space-x-3 group/item">
@@ -441,7 +441,7 @@ export function ProductListing() {
               htmlFor="in-stock"
               className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
             >
-              In stock only
+              {t('filter.inStockOnly')}
             </Label>
           </div>
           <div className="flex items-center space-x-3 group/item">
@@ -457,7 +457,7 @@ export function ProductListing() {
               htmlFor="on-sale"
               className="text-sm text-gray-700 font-medium cursor-pointer group-hover/item:text-gray-900 transition-colors font-body"
             >
-              On sale
+              {t('filter.onSaleOnly')}
             </Label>
           </div>
         </div>
@@ -484,18 +484,18 @@ export function ProductListing() {
                 <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
                   {/* Mobile: Sort by and Filters side by side */}
                   <div className="flex items-center gap-2 w-full sm:w-auto lg:hidden">
-                    <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
+                    <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
                     <div className="relative group flex-1">
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="appearance-none px-3 py-2 pr-8 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md w-full"
                       >
-                        <option value="featured">Featured</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
-                        <option value="newest">Newest</option>
+                        <option value="featured">{t('sort.featured')}</option>
+                        <option value="price-low">{t('sort.priceLow')}</option>
+                        <option value="price-high">{t('sort.priceHigh')}</option>
+                        <option value="rating">{t('sort.rating')}</option>
+                        <option value="newest">{t('sort.newest')}</option>
                       </select>
                       <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
                         <svg className="w-3 h-3 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -511,14 +511,14 @@ export function ProductListing() {
                           aria-label="Open filters"
                         >
                           <Filter className="h-4 w-4" />
-                          Filters
+                          {t('common.filter')}
                         </Button>
                       </SheetTrigger>
                       <SheetContent side="left" className="w-full sm:w-[90vw] sm:max-w-md overflow-y-auto bg-white [&>button]:text-gray-900 [&>button]:hover:text-gray-700">
                         <SheetHeader>
                           <SheetTitle className="text-left flex items-center gap-2 text-gray-900">
                             <Filter className="h-5 w-5 text-[#009744]" />
-                            Filters
+                            {t('common.filter')}
                           </SheetTitle>
                         </SheetHeader>
                         <div className="mt-6 space-y-6">
@@ -529,18 +529,18 @@ export function ProductListing() {
                   </div>
                   {/* Desktop: Sort by only */}
                   <div className="hidden lg:flex items-center gap-4">
-                    <span className="text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">Sort by:</span>
+                    <span className="text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
                     <div className="relative group">
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
                         className="appearance-none px-8 py-3.5 pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[180px]"
                       >
-                        <option value="featured">Featured</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
-                        <option value="newest">Newest</option>
+                        <option value="featured">{t('sort.featured')}</option>
+                        <option value="price-low">{t('sort.priceLow')}</option>
+                        <option value="price-high">{t('sort.priceHigh')}</option>
+                        <option value="rating">{t('sort.rating')}</option>
+                        <option value="newest">{t('sort.newest')}</option>
                       </select>
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
                         <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -566,8 +566,8 @@ export function ProductListing() {
             {/* Results count */}
             <div className="mb-6 sm:mb-8 flex items-center justify-between">
               <p className="text-xs sm:text-sm text-gray-600 font-body">
-                Showing <span className="font-semibold text-gray-900">{filteredProducts.length}</span> of{" "}
-                <span className="font-semibold text-gray-900">{mockProducts.length}</span> products
+                {t('common.showing')} <span className="font-semibold text-gray-900">{filteredProducts.length}</span> {t('common.of')}{" "}
+                <span className="font-semibold text-gray-900">{mockProducts.length}</span> {t('common.products')}
               </p>
             </div>
 

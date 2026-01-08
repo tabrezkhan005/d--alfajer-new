@@ -15,11 +15,13 @@ import {
   SheetFooter,
 } from "@/src/components/ui/sheet";
 import { useCartStore, CartItem } from "@/src/lib/cart-store";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 import { cn } from "@/src/lib/utils";
 
 export function CartSheet() {
   const router = useRouter();
   const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, getTotalPrice, getTotalItems } = useCartStore();
+  const { t, formatCurrency, convertCurrency, currency } = useI18n();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export function CartSheet() {
                 <ShoppingBag className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
               </div>
               <div className="min-w-0">
-                <SheetTitle className="text-base sm:text-xl font-bold text-gray-900 font-heading truncate">Your Cart</SheetTitle>
+                <SheetTitle className="text-base sm:text-xl font-bold text-gray-900 font-heading truncate">{t('nav.cart')}</SheetTitle>
                 <p className="text-xs sm:text-sm text-gray-500 font-body">
                   {totalItems} {totalItems === 1 ? "item" : "items"}
                 </p>
@@ -57,7 +59,7 @@ export function CartSheet() {
                 className="text-gray-400 hover:text-[#AB1F23] hover:bg-red-50 transition-colors font-medium text-sm"
               >
                 <Trash2 className="h-4 w-4 mr-1" />
-                Clear
+                {t('common.delete')}
               </Button>
             )}
           </div>
@@ -73,7 +75,7 @@ export function CartSheet() {
             >
               <ShoppingCart className="h-12 w-12 text-gray-300" />
             </motion.div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2 font-heading">Your cart is empty</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 font-heading">{t('cart.empty')}</h3>
             <p className="text-gray-500 mb-8 max-w-xs font-body">
               Looks like you haven't added any products yet. Browse our premium collection!
             </p>
@@ -81,7 +83,7 @@ export function CartSheet() {
               onClick={closeCart}
               className="bg-[#009744] hover:bg-[#2E763B] text-white font-semibold px-8 py-3 rounded-full"
             >
-              Start Shopping
+              {t('cart.emptyShopping')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -103,26 +105,26 @@ export function CartSheet() {
             <SheetFooter className="flex-col gap-0 p-0 border-t border-gray-100">
               <div className="px-6 py-5 space-y-4 bg-gray-50/50">
                 <div className="flex justify-between text-sm text-gray-600 font-body">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-gray-900">AED {totalPrice.toFixed(2)}</span>
+                  <span>{t('cart.subtotal')}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice))}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 font-body">
-                  <span>Shipping</span>
+                  <span>{t('cart.shipping')}</span>
                   <span className={cn(
                     "font-medium",
                     shipping === 0 ? "text-[#009744]" : "text-gray-900"
                   )}>
-                    {shipping === 0 ? "FREE" : `AED ${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : formatCurrency(convertCurrency(shipping))}
                   </span>
                 </div>
                 {shipping > 0 && (
                   <div className="bg-[#009744]/10 rounded-lg p-3 text-sm text-[#009744] font-body">
-                    Add <span className="font-semibold">AED {(200 - totalPrice).toFixed(2)}</span> more for free shipping!
+                    Add <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice))}</span> more for free shipping!
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
-                  <span>Total</span>
-                  <span>AED {finalTotal.toFixed(2)}</span>
+                  <span>{t('cart.total')}</span>
+                  <span>{formatCurrency(convertCurrency(finalTotal))}</span>
                 </div>
               </div>
 
@@ -135,7 +137,7 @@ export function CartSheet() {
                   className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold h-14 rounded-full shadow-lg hover:shadow-xl transition-all"
                 >
                   <span className="flex items-center gap-2">
-                    Proceed to Checkout
+                    {t('cart.checkout')}
                     <ArrowRight className="h-5 w-5" />
                   </span>
                 </Button>
@@ -144,7 +146,7 @@ export function CartSheet() {
                   onClick={closeCart}
                   className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold h-12 rounded-full"
                 >
-                  Continue Shopping
+                  {t('cart.emptyShopping')}
                 </Button>
               </div>
             </SheetFooter>
