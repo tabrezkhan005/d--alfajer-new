@@ -231,7 +231,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
           {/* Quantity */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-900">Quantity</label>
+            <label className="block text-sm font-semibold text-gray-900">{t('product.quantity')}</label>
             <div className="flex items-center gap-4 w-fit">
               <Button
                 variant="outline"
@@ -288,7 +288,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 size={20}
                 className={isWishlisted ? "fill-red-500 text-red-500" : ""}
               />
-              {isWishlisted ? t("product.removeWishlist") : t("product.wishlist")}
+              {isWishlisted ? t('product.removeWishlist') : t('product.wishlist')}
             </Button>
           </div>
 
@@ -307,20 +307,20 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
             }}
           >
             <Share2 size={18} className="mr-2" />
-            Share
+            {t('product.share')}
           </Button>
 
           {/* Trust Badges */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
             <div className="text-center">
               <div className="text-2xl mb-1">🚚</div>
-              <p className="text-sm font-medium text-gray-900">Free Shipping</p>
-              <p className="text-xs text-gray-700">On orders above $50</p>
+              <p className="text-sm font-medium text-gray-900">{t('product.freeShipping')}</p>
+              <p className="text-xs text-gray-700">{t('product.onOrders')}</p>
             </div>
             <div className="text-center">
               <div className="text-2xl mb-1">🔒</div>
-              <p className="text-sm font-medium text-gray-900">Secure Payment</p>
-              <p className="text-xs text-gray-700">256-bit SSL encryption</p>
+              <p className="text-sm font-medium text-gray-900">{t('product.securePayment')}</p>
+              <p className="text-xs text-gray-700">{t('product.ssl')}</p>
             </div>
           </div>
         </div>
@@ -329,23 +329,23 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
       {/* Tabs */}
       <Tabs defaultValue="description" className="mt-12 text-gray-900">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-          <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsTrigger value="description">{t('product.description')}</TabsTrigger>
+          <TabsTrigger value="nutrition">{t('product.nutrition')}</TabsTrigger>
+          <TabsTrigger value="reviews">{t('product.reviews')}</TabsTrigger>
           <TabsTrigger value="shipping">Shipping</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4 text-gray-900">
-          <h3 className="text-xl font-bold text-gray-900">About this product</h3>
+          <h3 className="text-xl font-bold text-gray-900">{t('product.aboutProduct')}</h3>
           <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2 text-gray-900">Origin</h4>
+              <h4 className="font-semibold mb-2 text-gray-900">{t('product.origin')}</h4>
               <p className="text-gray-800">{product.origin}</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2 text-gray-900">Certifications</h4>
+              <h4 className="font-semibold mb-2 text-gray-900">{t('product.certifications')}</h4>
               <div className="flex flex-wrap gap-2">
                 {product.certifications.map((cert) => (
                   <Badge key={cert} variant="outline" className="text-gray-900 border-gray-900">

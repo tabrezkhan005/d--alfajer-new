@@ -194,12 +194,6 @@ export function WhyChooseUs() {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="mt-6 sm:mt-8 md:mt-12 lg:mt-16 xl:mt-24 flex flex-col md:flex-row items-center justify-between border-t border-slate-200 pt-4 sm:pt-6 md:pt-8 lg:pt-12 gap-3 sm:gap-4 md:gap-0 px-2 sm:px-0"
         >
-          <div className="hidden md:block">
-            <p className="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[9px] xl:text-[10px] uppercase tracking-[0.4em] text-slate-400 font-bold">
-              ESTABLISHED TRADITION — MODERN QUALITY
-            </p>
-          </div>
-
           <Button
             variant="link"
             className="group p-0 h-auto text-slate-900 hover:no-underline font-bold tracking-widest text-[7px] sm:text-[8px] md:text-[9px] lg:text-xs flex items-center gap-2 md:gap-3 lg:gap-4 w-full md:w-auto justify-center md:justify-start px-2 sm:px-0"

@@ -274,6 +274,16 @@ export function ProductListing() {
     "Traditional",
     "Authentic",
   ];
+  const certificationKeys: { [key: string]: string } = {
+    "Organic": "filter.certification.organic",
+    "Non-GMO": "filter.certification.nonGMO",
+    "Gluten-Free": "filter.certification.glutenFree",
+    "Pure": "filter.certification.pure",
+    "Raw and unprocessed": "filter.certification.rawUnprocessed",
+    "Premium Grade": "filter.certification.premiumGrade",
+    "Traditional": "filter.certification.traditional",
+    "Authentic": "filter.certification.authentic",
+  };
 
   const renderFilterContent = () => (
     <>
@@ -419,7 +429,7 @@ export function ProductListing() {
                   htmlFor={`cert-${cert}`}
                   className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
                 >
-                  <span className="font-medium">{cert}</span>
+                  <span className="font-medium">{t(certificationKeys[cert] || `filter.certification.${cert}`)}</span>
                   <span className="text-gray-400 text-xs font-normal">({count})</span>
                 </Label>
               </div>

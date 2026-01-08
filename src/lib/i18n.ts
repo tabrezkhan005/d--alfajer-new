@@ -56,6 +56,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.packing': 'Packing',
     'product.premium': 'Premium Dry Fruits',
     'product.allProducts': 'All Products',
+    'product.wishlist': 'Add to Wishlist',
+    'product.removeWishlist': 'Remove from Wishlist',
+    'product.notFound': 'Product not found',
+    'product.share': 'Share',
+    'product.freeShipping': 'Free Shipping',
+    'product.onOrders': 'On orders above $50',
+    'product.securePayment': 'Secure Payment',
+    'product.ssl': '256-bit SSL encryption',
+    'product.aboutProduct': 'About this product',
     
     // Cart
     'cart.empty': 'Your cart is empty',
@@ -263,6 +272,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.origin.kashmirIndia': 'Kashmir, India',
     'filter.origin.himalayas': 'Himalayas',
     
+    // Filter Certifications
+    'filter.certification.organic': 'Organic',
+    'filter.certification.nonGMO': 'Non-GMO',
+    'filter.certification.glutenFree': 'Gluten-Free',
+    'filter.certification.pure': 'Pure',
+    'filter.certification.rawUnprocessed': 'Raw and unprocessed',
+    'filter.certification.premiumGrade': 'Premium Grade',
+    'filter.certification.traditional': 'Traditional',
+    'filter.certification.authentic': 'Authentic',
+    
     // Footer
     'footer.about': 'About Us',
     'footer.contact': 'Contact Us',
@@ -356,6 +375,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.packing': 'التعبئة',
     'product.premium': 'الفواكه الجافة الممتازة',
     'product.allProducts': 'جميع المنتجات',
+    'product.wishlist': 'أضف إلى قائمة الرغبات',
+    'product.removeWishlist': 'إزالة من قائمة الرغبات',
+    'product.notFound': 'لم يتم العثور على المنتج',
+    'product.share': 'شارك',
+    'product.freeShipping': 'شحن مجاني',
+    'product.onOrders': 'للطلبات فوق 50 دولار',
+    'product.securePayment': 'دفع آمن',
+    'product.ssl': 'تشفير SSL بـ 256 بت',
+    'product.aboutProduct': 'حول هذا المنتج',
     
     // Cart
     'cart.empty': 'سلتك فارغة',
@@ -563,6 +591,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.origin.kashmirIndia': 'كشمير، الهند',
     'filter.origin.himalayas': 'جبال الهيمالايا',
     
+    // Filter Certifications
+    'filter.certification.organic': 'عضوي',
+    'filter.certification.nonGMO': 'خالي من الكائنات المعدلة وراثيًا',
+    'filter.certification.glutenFree': 'خالي من الغلوتين',
+    'filter.certification.pure': 'نقي',
+    'filter.certification.rawUnprocessed': 'خام وغير معالج',
+    'filter.certification.premiumGrade': 'درجة ممتازة',
+    'filter.certification.traditional': 'تقليدي',
+    'filter.certification.authentic': 'أصلي',
+    
     // Footer
     'footer.about': 'حول',
     'footer.contact': 'تواصل معنا',
@@ -656,6 +694,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.packing': 'पैकिंग',
     'product.premium': 'प्रीमियम सूखे फल',
     'product.allProducts': 'सभी उत्पाद',
+    'product.wishlist': 'विशलिस्ट में जोड़ें',
+    'product.removeWishlist': 'विशलिस्ट से हटाएं',
+    'product.notFound': 'उत्पाद नहीं मिला',
+    'product.share': 'साझा करें',
+    'product.freeShipping': 'मुफ्त शिपिंग',
+    'product.onOrders': '$50 से ऊपर के ऑर्डर पर',
+    'product.securePayment': 'सुरक्षित भुगतान',
+    'product.ssl': '256-बिट SSL एन्क्रिप्शन',
+    'product.aboutProduct': 'इस उत्पाद के बारे में',
     
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',
@@ -862,6 +909,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.origin.uae': 'संयुक्त अरब अमीरात',
     'filter.origin.kashmirIndia': 'कश्मीर, भारत',
     'filter.origin.himalayas': 'हिमालय',
+    
+    // Filter Certifications
+    'filter.certification.organic': 'जैविक',
+    'filter.certification.nonGMO': 'गैर-जीएमओ',
+    'filter.certification.glutenFree': 'ग्लूटन-मुक्त',
+    'filter.certification.pure': 'शुद्ध',
+    'filter.certification.rawUnprocessed': 'कच्चा और अप्रसंस्कृत',
+    'filter.certification.premiumGrade': 'प्रीमियम ग्रेड',
+    'filter.certification.traditional': 'पारंपरिक',
+    'filter.certification.authentic': 'प्रामाणिक',
     
     // Footer
     'footer.about': 'परिचय',
