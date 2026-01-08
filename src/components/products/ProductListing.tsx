@@ -258,6 +258,12 @@ export function ProductListing() {
 
   const packageSizes = ["50g", "250g", "500g"];
   const origins = ["India", "UAE", "Kashmir, India", "Himalayas"];
+  const originKeys: { [key: string]: string } = {
+    "India": "filter.origin.india",
+    "UAE": "filter.origin.uae",
+    "Kashmir, India": "filter.origin.kashmirIndia",
+    "Himalayas": "filter.origin.himalayas",
+  };
   const certifications = [
     "Organic",
     "Non-GMO",
@@ -382,7 +388,7 @@ export function ProductListing() {
                   htmlFor={`origin-${origin}`}
                   className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
                 >
-                  <span className="font-medium">{origin}</span>
+                  <span className="font-medium">{t(originKeys[origin] || `filter.origin.${origin}`)}</span>
                   <span className="text-gray-400 text-xs font-normal">({count})</span>
                 </Label>
               </div>
@@ -471,14 +477,14 @@ export function ProductListing() {
         {/* Header */}
         <div className="mb-8 sm:mb-10 md:mb-14">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-5 font-heading">
-            <span className="text-[#AB1F23]">Our Premium</span>{" "}
-            <span className="text-[#009744]">Products</span>
+            <span className="text-[#AB1F23]">{t('productCategory.title')}</span>{" "}
+            <span className="text-[#009744]">{t('productCategory.titleSpan')}</span>
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
             <div className="flex items-start sm:items-center gap-2 sm:gap-3">
               <div className="h-6 sm:h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden sm:block flex-shrink-0" />
               <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
-                Handpicked, organic, and packed with goodness — find your favorite natural delights here.
+                {t('productCategory.subtitle')}
               </p>
             </div>
                 <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
@@ -592,7 +598,7 @@ export function ProductListing() {
                   className="group relative bg-[#009744] hover:bg-[#2E763B] text-white px-8 sm:px-16 py-6 sm:py-8 text-sm sm:text-base md:text-lg font-bold rounded-full shadow-[0_10px_20px_-5px_rgba(0,151,68,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(0,151,68,0.4)] transition-all duration-500 font-poppins overflow-hidden border-2 border-white/10 w-full sm:w-auto"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
-                    Load More Products
+                    {t('productCategory.loadMore')}
                     <Plus className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -608,16 +614,16 @@ export function ProductListing() {
                     <Filter className="h-10 w-10 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">
-                    No products found
+                    {t('productCategory.noProductsFound')}
                   </h3>
                   <p className="text-base text-gray-600 mb-8 font-body">
-                    Try adjusting your filters to find what you're looking for.
+                    {t('productCategory.tryAdjusting')}
                   </p>
                   <Button
                     onClick={resetFilters}
                     className="bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full px-8 py-3 font-poppins"
                   >
-                    Clear All Filters
+                    {t('productCategory.clearAllFilters')}
                   </Button>
                 </div>
               </div>
@@ -631,7 +637,7 @@ export function ProductListing() {
 
 function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
   const router = useRouter();
-  const { formatCurrency, convertCurrency, currency } = useI18n();
+  const { formatCurrency, convertCurrency, currency, t } = useI18n();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, clearCart, items } = useCartStore();
@@ -691,7 +697,9 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
               product.badge === "NEW" && "bg-[#009744]"
             )}
           >
-            {product.badge}
+            {product.badge === "SALE" && t('product.badge.sale')}
+            {product.badge === "HOT" && t('product.badge.hot')}
+            {product.badge === "NEW" && t('product.badge.new')}
           </Badge>
         )}
 
@@ -744,7 +752,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
           <Link href={`/products/${product.id}`}>
             <div className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold shadow-lg rounded-full h-11 font-poppins flex items-center justify-center cursor-pointer transition-colors">
               <Eye className="h-4 w-4 mr-2" />
-              Quick View
+              {t('product.viewDetails')}
             </div>
           </Link>
         </div>
@@ -812,19 +820,19 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
             {isAdding ? (
               <>
                 <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
-                <span className="whitespace-nowrap">Added!</span>
+                <span className="whitespace-nowrap">{t('product.addedToCart')}</span>
               </>
             ) : isInCart ? (
               <>
                 <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline">Add More</span>
-                <span className="whitespace-nowrap xs:hidden">More</span>
+                <span className="whitespace-nowrap hidden xs:inline">{t('product.addMore')}</span>
+                <span className="whitespace-nowrap xs:hidden">{t('product.more')}</span>
               </>
             ) : (
               <>
                 <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline">Add to Cart</span>
-                <span className="whitespace-nowrap xs:hidden">Add</span>
+                <span className="whitespace-nowrap hidden xs:inline">{t('product.addToCart')}</span>
+                <span className="whitespace-nowrap xs:hidden">{t('product.add')}</span>
               </>
             )}
           </Button>
@@ -832,7 +840,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
             className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-8 xs:h-9 sm:h-10 md:h-12 text-[10px] xs:text-xs sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
             onClick={handleBuyNow}
           >
-            <span className="whitespace-nowrap">Buy Now</span>
+            <span className="whitespace-nowrap">{t('product.buyNow')}</span>
           </Button>
         </CardFooter>
     </Card>

@@ -233,6 +233,36 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.subscribe': 'Subscribe',
     'newsletter.benefit': 'Privileged access to our finest harvests.',
     
+    // Product Categories
+    'productCategory.title': 'Our Premium',
+    'productCategory.titleSpan': 'Products',
+    'productCategory.subtitle': 'Handpicked, organic, and packed with goodness — find your favorite natural delights here.',
+    'productCategory.premiumDryFruits': 'Premium Dry Fruits',
+    'productCategory.nutsSeeds': 'Nuts & Seeds',
+    'productCategory.authenticSpices': 'Authentic Spices',
+    'productCategory.kashmirisaffron': 'Kashmiri Saffron',
+    'productCategory.spiceBlends': 'Spice Blends',
+    'productCategory.exoticChilies': 'Exotic Chilies',
+    'productCategory.loadMore': 'Load More Products',
+    'productCategory.noProductsFound': 'No products found',
+    'productCategory.tryAdjusting': 'Try adjusting your filters to find what you\'re looking for.',
+    'productCategory.clearAllFilters': 'Clear All Filters',
+    
+    // Product Card Labels - Additional
+    'product.badge.sale': 'SALE',
+    'product.badge.hot': 'HOT',
+    'product.badge.new': 'NEW',
+    'product.addedToCart': 'Added to Cart',
+    'product.addMore': 'Add More',
+    'product.more': 'More',
+    'product.add': 'Add',
+    
+    // Filter Origins
+    'filter.origin.india': 'India',
+    'filter.origin.uae': 'UAE',
+    'filter.origin.kashmirIndia': 'Kashmir, India',
+    'filter.origin.himalayas': 'Himalayas',
+    
     // Footer
     'footer.about': 'About Us',
     'footer.contact': 'Contact Us',
@@ -503,6 +533,36 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.subscribe': 'اشترك',
     'newsletter.benefit': 'الوصول المتميز إلى أفضل حصاداتنا.',
     
+    // Product Categories
+    'productCategory.title': 'منتجاتنا',
+    'productCategory.titleSpan': 'الممتازة',
+    'productCategory.subtitle': 'مختار بعناية، عضوي، وممتلئ بالصحة - ابحث عن مفضلاتك الطبيعية هنا.',
+    'productCategory.premiumDryFruits': 'الفواكه الجافة الممتازة',
+    'productCategory.nutsSeeds': 'المكسرات والبذور',
+    'productCategory.authenticSpices': 'التوابل الأصلية',
+    'productCategory.kashmirisaffron': 'الزعفران الكشميري',
+    'productCategory.spiceBlends': 'خلطات التوابل',
+    'productCategory.exoticChilies': 'الفلفل الحار الغريب',
+    'productCategory.loadMore': 'تحميل المزيد من المنتجات',
+    'productCategory.noProductsFound': 'لم يتم العثور على منتجات',
+    'productCategory.tryAdjusting': 'حاول ضبط مرشحاتك للعثور على ما تبحث عنه.',
+    'productCategory.clearAllFilters': 'مسح جميع الفلاتر',
+    
+    // Product Card Labels - Additional
+    'product.badge.sale': 'عرض خاص',
+    'product.badge.hot': 'ساخن',
+    'product.badge.new': 'جديد',
+    'product.addedToCart': 'تمت إضافته إلى السلة',
+    'product.addMore': 'أضف المزيد',
+    'product.more': 'المزيد',
+    'product.add': 'أضف',
+    
+    // Filter Origins
+    'filter.origin.india': 'الهند',
+    'filter.origin.uae': 'الإمارات العربية المتحدة',
+    'filter.origin.kashmirIndia': 'كشمير، الهند',
+    'filter.origin.himalayas': 'جبال الهيمالايا',
+    
     // Footer
     'footer.about': 'حول',
     'footer.contact': 'تواصل معنا',
@@ -772,6 +832,36 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.placeholder': 'your@email.com',
     'newsletter.subscribe': 'सदस्यता लें',
     'newsletter.benefit': 'हमारी सबसे अच्छी फसल तक विशेषाधिकार प्राप्त पहुंच।',
+    
+    // Product Categories
+    'productCategory.title': 'हमारे प्रीमियम',
+    'productCategory.titleSpan': 'उत्पाद',
+    'productCategory.subtitle': 'हाथ से चुने हुए, जैविक, और स्वास्थ्य से भरे - यहाँ अपने पसंदीदा प्राकृतिक विलास खोजें।',
+    'productCategory.premiumDryFruits': 'प्रीमियम सूखे फल',
+    'productCategory.nutsSeeds': 'नट्स और बीज',
+    'productCategory.authenticSpices': 'प्रामाणिक मसाले',
+    'productCategory.kashmirisaffron': 'कश्मीरी केसर',
+    'productCategory.spiceBlends': 'मसाला मिश्रण',
+    'productCategory.exoticChilies': 'विदेशी मिर्च',
+    'productCategory.loadMore': 'अधिक उत्पाद लोड करें',
+    'productCategory.noProductsFound': 'कोई उत्पाद नहीं मिला',
+    'productCategory.tryAdjusting': 'आप जो खोज रहे हैं उसे खोजने के लिए अपने फ़िल्टर को समायोजित करने का प्रयास करें।',
+    'productCategory.clearAllFilters': 'सभी फ़िल्टर साफ़ करें',
+    
+    // Product Card Labels - Additional
+    'product.badge.sale': 'बिक्रय',
+    'product.badge.hot': 'गर्म',
+    'product.badge.new': 'नया',
+    'product.addedToCart': 'कार्ट में जोड़ा गया',
+    'product.addMore': 'और जोड़ें',
+    'product.more': 'अधिक',
+    'product.add': 'जोड़ें',
+    
+    // Filter Origins
+    'filter.origin.india': 'भारत',
+    'filter.origin.uae': 'संयुक्त अरब अमीरात',
+    'filter.origin.kashmirIndia': 'कश्मीर, भारत',
+    'filter.origin.himalayas': 'हिमालय',
     
     // Footer
     'footer.about': 'परिचय',
