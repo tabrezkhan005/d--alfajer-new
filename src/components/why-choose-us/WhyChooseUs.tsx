@@ -194,15 +194,6 @@ export function WhyChooseUs() {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="mt-6 sm:mt-8 md:mt-12 lg:mt-16 xl:mt-24 flex flex-col md:flex-row items-center justify-between border-t border-slate-200 pt-4 sm:pt-6 md:pt-8 lg:pt-12 gap-3 sm:gap-4 md:gap-0 px-2 sm:px-0"
         >
-          <Button
-            variant="link"
-            className="group p-0 h-auto text-slate-900 hover:no-underline font-bold tracking-widest text-[7px] sm:text-[8px] md:text-[9px] lg:text-xs flex items-center gap-2 md:gap-3 lg:gap-4 w-full md:w-auto justify-center md:justify-start px-2 sm:px-0"
-          >
-            <span>DISCOVER OUR STORY</span>
-            <div className="w-6 sm:w-7 md:w-8 md:h-10 lg:w-12 lg:h-12 rounded-full border border-slate-200 flex items-center justify-center transition-all duration-500 group-hover:bg-primary group-hover:border-primary group-hover:text-white flex-shrink-0 h-6 sm:h-7">
-              <ArrowRight className="w-2 sm:w-2.5 md:w-3 h-2 sm:h-2.5 md:h-3 lg:w-4 lg:h-4 transition-transform duration-500 group-hover:translate-x-1" />
-            </div>
-          </Button>
         </motion.div>
       </div>
     </section>

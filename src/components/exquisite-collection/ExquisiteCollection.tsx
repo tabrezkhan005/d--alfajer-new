@@ -59,6 +59,17 @@ export function ExquisiteCollection({
   categories = defaultCategories,
 }: ExquisiteCollectionProps) {
   const { t } = useI18n();
+  
+  // Category name to translation key mapping
+  const categoryKeyMap: { [key: string]: string } = {
+    "Premium Dry Fruits": "productCategory.premiumDryFruits",
+    "Nuts & Seeds": "productCategory.nutsSeeds",
+    "Authentic Spices": "productCategory.authenticSpices",
+    "Kashmiri Saffron": "productCategory.kashmirisaffron",
+    "Spice Blends": "productCategory.spiceBlends",
+    "Exotic Chilies": "productCategory.exoticChilies",
+  };
+  
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -206,7 +217,7 @@ export function ExquisiteCollection({
                         }}
                         transition={{ duration: 0.3 }}
                       >
-                        {category.name}
+                        {t(categoryKeyMap[category.name] || `productCategory.${category.name}`)}
                       </motion.h3>
 
                       <AnimatePresence>

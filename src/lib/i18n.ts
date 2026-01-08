@@ -65,6 +65,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'Secure Payment',
     'product.ssl': '256-bit SSL encryption',
     'product.aboutProduct': 'About this product',
+    'product.nutritionInfo': 'Nutrition Information',
+    'product.perServing': 'Per serving: 1 tbsp (21g)',
+    'product.customerReviews': 'Customer Reviews',
+    'product.writeReview': 'Write a Review',
+    'product.shippingInfo': 'Shipping Information',
+    'product.standardShipping': 'Standard Shipping: 5-7 business days - Free',
+    'product.expressShipping': 'Express Shipping: 2-3 business days - $10',
+    'product.overnightShipping': 'Overnight Shipping: Next business day - $25',
     
     // Cart
     'cart.empty': 'Your cart is empty',
@@ -384,6 +392,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'دفع آمن',
     'product.ssl': 'تشفير SSL بـ 256 بت',
     'product.aboutProduct': 'حول هذا المنتج',
+    'product.nutritionInfo': 'معلومات التغذية',
+    'product.perServing': 'لكل حصة: 1 ملعقة كبيرة (21 غرام)',
+    'product.customerReviews': 'تقييمات العملاء',
+    'product.writeReview': 'كتابة تقييم',
+    'product.shippingInfo': 'معلومات الشحن',
+    'product.standardShipping': 'الشحن العادي: 5-7 أيام عمل - مجاني',
+    'product.expressShipping': 'الشحن السريع: 2-3 أيام عمل - 10 دولار',
+    'product.overnightShipping': 'الشحن الفوري: يوم العمل التالي - 25 دولار',
     
     // Cart
     'cart.empty': 'سلتك فارغة',
@@ -703,6 +719,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'सुरक्षित भुगतान',
     'product.ssl': '256-बिट SSL एन्क्रिप्शन',
     'product.aboutProduct': 'इस उत्पाद के बारे में',
+    'product.nutritionInfo': 'पोषण जानकारी',
+    'product.perServing': 'प्रति सेवारत: 1 बड़ा चम्मच (21 ग्राम)',
+    'product.customerReviews': 'ग्राहक समीक्षाएं',
+    'product.writeReview': 'समीक्षा लिखें',
+    'product.shippingInfo': 'शिपिंग जानकारी',
+    'product.standardShipping': 'मानक शिपिंग: 5-7 कार्य दिवस - मुफ्त',
+    'product.expressShipping': 'एक्सप्रेस शिपिंग: 2-3 कार्य दिवस - $10',
+    'product.overnightShipping': 'रातोंरात शिपिंग: अगले कार्य दिवस - $25',
     
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',

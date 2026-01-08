@@ -328,14 +328,14 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
       {/* Tabs */}
       <Tabs defaultValue="description" className="mt-12 text-gray-900">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="description">{t('product.description')}</TabsTrigger>
-          <TabsTrigger value="nutrition">{t('product.nutrition')}</TabsTrigger>
-          <TabsTrigger value="reviews">{t('product.reviews')}</TabsTrigger>
-          <TabsTrigger value="shipping">Shipping</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
+          <TabsTrigger value="description" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.description')}</TabsTrigger>
+          <TabsTrigger value="nutrition" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.nutrition')}</TabsTrigger>
+          <TabsTrigger value="reviews" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.reviews')}</TabsTrigger>
+          <TabsTrigger value="shipping" className="text-gray-900 data-[state=active]:bg-gray-100">Shipping</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="description" className="space-y-4 text-gray-900">
+        <TabsContent value="description" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
           <h3 className="text-xl font-bold text-gray-900">{t('product.aboutProduct')}</h3>
           <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
 
@@ -358,7 +358,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
           {product.ingredients.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-2 text-gray-900">Ingredients</h4>
+              <h4 className="font-semibold mb-2 text-gray-900">{t('product.ingredients')}</h4>
               <ul className="space-y-1">
                 {product.ingredients.map((ing, idx) => (
                   <li key={idx} className="text-sm text-gray-800">
@@ -370,40 +370,40 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           )}
         </TabsContent>
 
-        <TabsContent value="nutrition" className="space-y-4 text-gray-900">
-          <h3 className="text-xl font-bold text-gray-900">Nutrition Information</h3>
+        <TabsContent value="nutrition" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900">{t('product.nutritionInfo')}</h3>
           <p className="text-sm text-gray-600">
-            Per serving: {product.nutritionFacts.servingSize}
+            {t('product.perServing')}
           </p>
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-3">
                 <div className="flex justify-between py-2 border-b">
-                  <span>Calories</span>
+                  <span>{t('product.calories')}</span>
                   <span className="font-semibold">
                     {product.nutritionFacts.calories} kcal
                   </span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
-                  <span>Protein</span>
+                  <span>{t('product.protein')}</span>
                   <span className="font-semibold">
                     {product.nutritionFacts.protein}
                   </span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
-                  <span>Fat</span>
+                  <span>{t('product.fat')}</span>
                   <span className="font-semibold">
                     {product.nutritionFacts.fat}
                   </span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
-                  <span>Carbohydrates</span>
+                  <span>{t('product.carbohydrates')}</span>
                   <span className="font-semibold">
                     {product.nutritionFacts.carbs}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span>Fiber</span>
+                  <span>{t('product.fiber')}</span>
                   <span className="font-semibold">
                     {product.nutritionFacts.fiber}
                   </span>
@@ -413,8 +413,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="reviews" className="space-y-4 text-gray-900">
-          <h3 className="text-xl font-bold mb-4 text-gray-900">Customer Reviews</h3>
+        <TabsContent value="reviews" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
+          <h3 className="text-xl font-bold mb-4 text-gray-900">{t('product.customerReviews')}</h3>
           
           {/* Rating Summary */}
           <div className="grid grid-cols-3 gap-4">
@@ -475,16 +475,16 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </div>
 
           <Button size="lg" className="w-full">
-            Write a Review
+            {t('product.writeReview')}
           </Button>
         </TabsContent>
 
-        <TabsContent value="shipping" className="space-y-4 text-gray-900">
-          <h3 className="text-xl font-bold text-gray-900">Shipping Information</h3>
+        <TabsContent value="shipping" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900">{t('product.shippingInfo')}</h3>
           <div className="space-y-3 text-gray-800">
-            <p><strong className="text-gray-900">Standard Shipping:</strong> 5-7 business days - Free</p>
-            <p><strong className="text-gray-900">Express Shipping:</strong> 2-3 business days - $10</p>
-            <p><strong className="text-gray-900">Overnight Shipping:</strong> Next business day - $25</p>
+            <p>{t('product.standardShipping')}</p>
+            <p>{t('product.expressShipping')}</p>
+            <p>{t('product.overnightShipping')}</p>
           </div>
         </TabsContent>
       </Tabs>

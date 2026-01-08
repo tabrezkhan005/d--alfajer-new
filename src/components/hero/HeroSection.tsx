@@ -230,8 +230,7 @@ export function HeroSection() {
                       {t('hero.mainTitle')}
                     </motion.h1>
                     <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] font-heading mb-4 sm:mb-8 drop-shadow-2xl px-2">
-                      <span className="text-white">to Every </span>
-                      <span className="text-[#AB1F22]">{t('hero.mainSubtitle')}</span>
+                      <span className="text-white">{t('hero.mainSubtitle')}</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-6 sm:mb-10 px-3 sm:px-4">
                       {t('hero.mainDescription')}
