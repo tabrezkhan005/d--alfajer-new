@@ -631,7 +631,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const { addItem, items } = useCartStore();
+  const { addItem, clearCart, items } = useCartStore();
 
   const isInCart = items.some((item) => item.id === product.id);
 
@@ -651,7 +651,9 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Pass false to prevent cart from opening when going directly to checkout
+    // Clear cart to ensure only this product is in checkout
+    clearCart();
+    // Add only this product to cart
     addItem({
       id: product.id,
       name: product.name,

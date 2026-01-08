@@ -121,7 +121,7 @@ export function Header() {
     <>
       <header
         ref={headerRef}
-        className={`fixed top-8 sm:top-9 left-0 right-0 z-40 flex items-center
+        className={`fixed top-6 xs:top-6 sm:top-8 md:top-9 left-0 right-0 z-40 flex items-center
           transition-all duration-300
           ${isScrolled ? "backdrop-blur-md border-b" : ""}
         `}
