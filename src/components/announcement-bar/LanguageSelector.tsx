@@ -8,24 +8,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import { LANGUAGES } from "@/src/lib/i18n";
+import type { Language } from "@/src/lib/i18n";
 
 interface LanguageSelectorProps {
-  language: string;
-  onLanguageChange: (language: string) => void;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
 }
 
-const languages = [
-  { code: "EN", name: "English", native: "English" },
-  { code: "AR", name: "Arabic", native: "العربية" },
-  { code: "HI", name: "Hindi", native: "हिन्दी" },
-];
+const languageOptions: Language[] = ["en", "ar", "hi"];
 
 export const LanguageSelector = ({
   language,
   onLanguageChange,
 }: LanguageSelectorProps) => {
-  const currentLanguage =
-    languages.find((l) => l.code === language) || languages[0];
+  const currentLanguageData = LANGUAGES[language];
 
   return (
     <DropdownMenu>
@@ -38,24 +35,27 @@ export const LanguageSelector = ({
           aria-label="Select language"
         >
           <Languages className="mr-0.5 xs:mr-1 h-2.5 xs:h-3 w-2.5 xs:w-3 flex-shrink-0" />
-          <span className="hidden sm:inline text-[10px] xs:text-xs">{currentLanguage.code}</span>
-          <span className="sm:hidden text-[8px] xs:text-[9px] truncate">{currentLanguage.native}</span>
+          <span className="hidden sm:inline text-[10px] xs:text-xs">{language.toUpperCase()}</span>
+          <span className="sm:hidden text-[8px] xs:text-[9px] truncate">{currentLanguageData.nativeName}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 sm:w-52 z-50">
-        {languages.map((lang) => (
-          <DropdownMenuItem
-            key={lang.code}
-            onClick={() => onLanguageChange(lang.code)}
-            className={`cursor-pointer py-2 px-3 text-sm ${language === lang.code ? "bg-accent font-semibold" : ""}`}
-          >
-            <span className="mr-2">{lang.native}</span>
-            <span className="text-muted-foreground text-xs">({lang.name})</span>
-            {language === lang.code && (
-              <span className="ml-auto text-xs">✓</span>
-            )}
-          </DropdownMenuItem>
-        ))}
+        {languageOptions.map((lang) => {
+          const langData = LANGUAGES[lang];
+          return (
+            <DropdownMenuItem
+              key={lang}
+              onClick={() => onLanguageChange(lang)}
+              className={`cursor-pointer py-2 px-3 text-sm ${language === lang ? "bg-accent font-semibold" : ""}`}
+            >
+              <span className="mr-2">{langData.nativeName}</span>
+              <span className="text-muted-foreground text-xs">({langData.name})</span>
+              {language === lang && (
+                <span className="ml-auto text-xs">✓</span>
+              )}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

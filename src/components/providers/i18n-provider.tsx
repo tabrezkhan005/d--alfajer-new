@@ -139,7 +139,24 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   if (!isHydrated) {
-    return <>{children}</>;
+    // Return provider with default values even during hydration
+    const defaultValue: I18nContextType = {
+      language: 'en',
+      currency: 'INR',
+      setLanguage: () => {},
+      setCurrency: () => {},
+      t: (key: string) => key,
+      formatCurrency: (amount: number) => formatCurrency(amount, 'INR'),
+      convertCurrency: (amount: number, fromCurrency: Currency = 'INR') =>
+        convertCurrency(amount, fromCurrency, 'INR'),
+      direction: 'ltr',
+      isLoading: true,
+    };
+    return (
+      <I18nContext.Provider value={defaultValue}>
+        {children}
+      </I18nContext.Provider>
+    );
   }
 
   return (

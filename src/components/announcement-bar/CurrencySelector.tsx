@@ -8,24 +8,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import { CURRENCIES } from "@/src/lib/i18n";
+import type { Currency } from "@/src/lib/i18n";
 
 interface CurrencySelectorProps {
-  currency: string;
-  onCurrencyChange: (currency: string) => void;
+  currency: Currency;
+  onCurrencyChange: (currency: Currency) => void;
 }
 
-const currencies = [
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
-  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-];
+const currencyOptions: Currency[] = ["USD", "INR", "AED", "EUR", "GBP"];
 
 export const CurrencySelector = ({
   currency,
   onCurrencyChange,
 }: CurrencySelectorProps) => {
-  const currentCurrency = currencies.find((c) => c.code === currency) || currencies[0];
+  const currentCurrencyData = CURRENCIES[currency];
 
   return (
     <DropdownMenu>
@@ -38,25 +35,28 @@ export const CurrencySelector = ({
           aria-label="Select currency"
         >
           <Globe className="mr-0.5 xs:mr-1 h-2.5 xs:h-3 w-2.5 xs:w-3 flex-shrink-0" />
-          <span className="hidden sm:inline text-[10px] xs:text-xs">{currentCurrency.symbol}</span>
-          <span className="sm:hidden text-[8px] xs:text-[9px]">{currentCurrency.code}</span>
-          <span className="ml-0.5 xs:ml-1 hidden sm:inline text-[10px] xs:text-xs">{currentCurrency.code}</span>
+          <span className="hidden sm:inline text-[10px] xs:text-xs">{currentCurrencyData.symbol}</span>
+          <span className="sm:hidden text-[8px] xs:text-[9px]">{currency}</span>
+          <span className="ml-0.5 xs:ml-1 hidden sm:inline text-[10px] xs:text-xs">{currency}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48 sm:w-52 z-50">
-        {currencies.map((curr) => (
-          <DropdownMenuItem
-            key={curr.code}
-            onClick={() => onCurrencyChange(curr.code)}
-            className={`cursor-pointer py-2 px-3 text-sm ${currency === curr.code ? "bg-accent font-semibold" : ""}`}
-          >
-            <span className="mr-2 font-medium">{curr.symbol}</span>
-            <span className="flex-1">{curr.name}</span>
-            {currency === curr.code && (
-              <span className="ml-2 text-xs">✓</span>
-            )}
-          </DropdownMenuItem>
-        ))}
+        {currencyOptions.map((curr) => {
+          const currData = CURRENCIES[curr];
+          return (
+            <DropdownMenuItem
+              key={curr}
+              onClick={() => onCurrencyChange(curr)}
+              className={`cursor-pointer py-2 px-3 text-sm ${currency === curr ? "bg-accent font-semibold" : ""}`}
+            >
+              <span className="mr-2 font-medium">{currData.symbol}</span>
+              <span className="flex-1">{currData.name}</span>
+              {currency === curr && (
+                <span className="ml-2 text-xs">✓</span>
+              )}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

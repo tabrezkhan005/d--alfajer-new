@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Filter, X, Eye, Plus, Heart, Star, Check } from "lucide-react";
 import { useCartStore } from "@/src/lib/cart-store";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 import { Button } from "@/src/components/ui/button";
 import { Checkbox } from "@/src/components/ui/checkbox";
 import { Slider } from "@/src/components/ui/slider";
@@ -157,6 +158,7 @@ interface FilterState {
 }
 
 export function ProductListing() {
+  const { t, formatCurrency, convertCurrency, currency } = useI18n();
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 200],
     packageSizes: [],
@@ -629,6 +631,7 @@ export function ProductListing() {
 
 function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
   const router = useRouter();
+  const { formatCurrency, convertCurrency } = useI18n();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, clearCart, items } = useCartStore();
@@ -785,11 +788,11 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         {/* Price */}
         <div className="flex items-center gap-2 xs:gap-3 pt-0.5 xs:pt-1">
           <span className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 font-heading">
-            AED {product.price.toFixed(2)}
+            {formatCurrency(convertCurrency(product.price))}
           </span>
           {product.originalPrice && (
             <span className="text-[10px] xs:text-xs sm:text-sm text-gray-400 line-through font-body">
-              AED {product.originalPrice.toFixed(2)}
+              {formatCurrency(convertCurrency(product.originalPrice))}
             </span>
           )}
         </div>

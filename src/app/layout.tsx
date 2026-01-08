@@ -41,7 +41,7 @@ export default function RootLayout({
               {children}
             </main>
           </AdminFooterWrapper>
-          </Providers>
+        </Providers>
       </body>
     </html>
   );

@@ -46,7 +46,7 @@ export function CheckoutPage() {
 function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t, formatCurrency } = useI18n();
+  const { t, formatCurrency, convertCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
 
   // Handle product from Buy Now button

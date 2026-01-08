@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { Separator } from "@/src/components/ui/separator";
-import { useAnnouncementBar } from "./useAnnouncementBar";
+import { useI18n } from "@/src/components/providers/i18n-provider";
 import { CurrencySelector } from "./CurrencySelector";
 import { LanguageSelector } from "./LanguageSelector";
+import { LANGUAGES, CURRENCIES } from "@/src/lib/i18n";
 
 interface AnnouncementBarProps {
   messages?: string[];
-  defaultCurrency?: string;
-  defaultLanguage?: string;
 }
 
 const defaultMessages = [
@@ -23,32 +22,36 @@ const defaultMessages = [
 
 export const AnnouncementBar = ({
   messages = defaultMessages,
-  defaultCurrency,
-  defaultLanguage,
 }: AnnouncementBarProps) => {
   const pathname = usePathname();
-  const barRef = useRef<HTMLDivElement>(null);
-  const messageRef = useRef<HTMLDivElement>(null);
-  const {
-    isVisible,
-    currentMessage,
-    currency,
-    language,
-    setCurrency,
-    setLanguage,
-    currentMessageIndex,
-  } = useAnnouncementBar({
-    messages,
-    defaultCurrency,
-    defaultLanguage,
-  });
-
+  
   // Don't show on admin pages
   const isAdminPage = pathname?.startsWith("/admin");
+  
+  // Skip rendering on admin pages entirely
+  if (isAdminPage) {
+    return null;
+  }
+  
+  return <AnnouncementBarContent messages={messages} />;
+};
+
+const AnnouncementBarContent = ({
+  messages = defaultMessages,
+}: AnnouncementBarProps) => {
+  const barRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
+  const { language, currency, setLanguage, setCurrency, isLoading } = useI18n();
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Initial animation on mount
   useEffect(() => {
-    if (!isVisible || !barRef.current) return;
+    if (!barRef.current || !isMounted) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -69,11 +72,11 @@ export const AnnouncementBar = ({
         ease: "power3.out",
       }
     );
-  }, [isVisible]);
+}, [isMounted]);
 
   // Message rotation animation
   useEffect(() => {
-    if (!isVisible || !messageRef.current || messages.length <= 1) {
+    if (!messageRef.current || messages.length <= 1) {
       return;
     }
 
@@ -95,32 +98,39 @@ export const AnnouncementBar = ({
         ease: "power2.out",
       }
     );
-  }, [currentMessageIndex, isVisible, messages.length]);
+  }, [currentMessageIndex, messages.length]);
 
+  // Rotate messages
+  useEffect(() => {
+    if (messages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [messages.length]);
 
   // Update body padding when bar is visible
   useEffect(() => {
-    if (!isVisible || isAdminPage) {
-      document.body.style.paddingTop = "0px";
-      return;
-    }
-
     // Only add minimal padding on mobile to account for fixed bar height
-    // Don't add extra padding - let header handle its own positioning
     let paddingTop = "0px";
     if (window.innerWidth < 640) {
-      // Mobile: just account for bar height
       paddingTop = "24px"; // h-6 height
     }
     document.body.style.paddingTop = paddingTop;
     return () => {
       document.body.style.paddingTop = "0px";
     };
-  }, [isVisible, isAdminPage]);
+  }, []);
 
-  if (!isVisible || isAdminPage) {
+  if (isLoading || !isMounted) {
     return null;
   }
+
+  const currentMessage = messages[currentMessageIndex] || messages[0];
+  const currentLanguageName = LANGUAGES[language as keyof typeof LANGUAGES]?.nativeName || language;
+  const currentCurrency = CURRENCIES[currency as keyof typeof CURRENCIES];
 
     return (
       <div
