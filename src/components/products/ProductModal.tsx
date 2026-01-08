@@ -261,7 +261,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               {product.badge && (
                 <Badge
                   className={cn(
-                    "absolute top-3 sm:top-4 lg:top-6 left-3 sm:left-4 lg:left-6 z-10 px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 lg:py-2.5 rounded-full text-[10px] sm:text-xs font-bold text-white shadow-lg uppercase tracking-wider font-poppins",
+                    "absolute top-3 sm:top-4 lg:top-6 left-3 sm:left-4 lg:left-6 z-10 px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 lg:py-2.5 rounded-full text-xs sm:text-sm font-bold text-white shadow-lg uppercase tracking-wider font-poppins",
                     product.badge === "SALE" && "bg-[#AB1F23]",
                     product.badge === "HOT" && "bg-orange-500",
                     product.badge === "NEW" && "bg-[#009744]"
@@ -271,7 +271,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 </Badge>
               )}
               {product.discount && !product.badge && (
-                <Badge className="absolute top-3 sm:top-4 lg:top-6 left-3 sm:left-4 lg:left-6 z-10 bg-[#AB1F23] text-white px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 lg:py-2.5 rounded-full text-[10px] sm:text-xs font-bold shadow-lg font-poppins tracking-wider">
+                <Badge className="absolute top-3 sm:top-4 lg:top-6 left-3 sm:left-4 lg:left-6 z-10 bg-[#AB1F23] text-white px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 lg:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-lg font-poppins tracking-wider">
                   -{product.discount}% OFF
                 </Badge>
               )}
@@ -360,7 +360,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                                 </svg>
                               </div>
                             </div>
-                            <span className="absolute bottom-1 left-1 text-[8px] sm:text-[10px] text-gray-600 font-medium bg-white/80 px-1 rounded">VIDEO</span>
+                            <span className="absolute bottom-1 left-1 text-xs sm:text-sm text-gray-600 font-medium bg-white/80 px-1 rounded">VIDEO</span>
                           </div>
                         ) : (
                           <img

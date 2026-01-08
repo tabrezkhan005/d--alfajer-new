@@ -230,13 +230,13 @@ function CheckoutPageContent() {
         <div className="lg:col-span-2">
           <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="space-y-4 xs:space-y-5 sm:space-y-6">
             <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-0.5 xs:p-1 rounded-lg">
-              <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+              <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Shipping
               </TabsTrigger>
-              <TabsTrigger value="payment" disabled={step === 'shipping'} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+              <TabsTrigger value="payment" disabled={step === 'shipping'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Payment
               </TabsTrigger>
-              <TabsTrigger value="review" disabled={step !== 'review'} className="text-[10px] xs:text-xs sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
+              <TabsTrigger value="review" disabled={step !== 'review'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
                 Review
               </TabsTrigger>
             </TabsList>

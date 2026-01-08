@@ -25,7 +25,7 @@ function Footer() {
                 priority
               />
             </Link>
-            <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 leading-relaxed max-w-md">
+            <p className="text-xs sm:text-sm md:text-sm text-gray-600 leading-relaxed max-w-md">
               {t('footer.tagline')}
             </p>
 
@@ -57,14 +57,14 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
+            <h3 className="text-xs sm:text-sm md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
               {t('footer.quickLinks')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
                   href="/products"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.products')}
                 </Link>
@@ -72,7 +72,7 @@ function Footer() {
               <li>
                 <Link
                   href="/collections"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.collections')}
                 </Link>
@@ -80,7 +80,7 @@ function Footer() {
               <li>
                 <Link
                   href="/shop"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.shop')}
                 </Link>
@@ -88,7 +88,7 @@ function Footer() {
               <li>
                 <Link
                   href="/about"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.about')}
                 </Link>
@@ -96,7 +96,7 @@ function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.contactUs')}
                 </Link>
@@ -106,14 +106,14 @@ function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
+            <h3 className="text-xs sm:text-sm md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
               {t('footer.customerService')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
                   href="/contact"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.contactUs')}
                 </Link>
@@ -121,7 +121,7 @@ function Footer() {
               <li>
                 <Link
                   href="/returns"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.returnRefunds')}
                 </Link>
@@ -129,7 +129,7 @@ function Footer() {
               <li>
                 <Link
                   href="/shipping"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.shippingPolicy')}
                 </Link>
@@ -137,7 +137,7 @@ function Footer() {
               <li>
                 <Link
                   href="/faqs"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.faqs')}
                 </Link>
@@ -147,19 +147,19 @@ function Footer() {
 
           {/* Contact Info */}
           <div className="sm:col-span-2 md:col-span-1">
-            <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
+            <h3 className="text-xs sm:text-sm md:text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2 sm:mb-3">
               {t('footer.contactInfo')}
             </h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li className="flex items-start gap-1.5 sm:gap-2">
                 <MapPin className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] mt-0.5 shrink-0" />
-                <span className="text-[9px] sm:text-xs md:text-sm text-gray-600">{t('footer.location')}</span>
+                <span className="text-xs sm:text-sm md:text-sm text-gray-600">{t('footer.location')}</span>
               </li>
               <li className="flex items-center gap-1.5 sm:gap-2">
                 <Phone className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] shrink-0" />
                 <a
                   href="tel:+919876543210"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.phone_text')}
                 </a>
@@ -168,7 +168,7 @@ function Footer() {
                 <Mail className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] shrink-0" />
                 <a
                   href="mailto:info@alfajermart.com"
-                  className="text-[9px] sm:text-xs md:text-sm text-gray-600 hover:text-[#009744] transition-colors break-all"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors break-all"
                 >
                   {t('footer.email_text')}
                 </a>
@@ -191,19 +191,19 @@ function Footer() {
         {/* Bottom Section */}
         <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 pt-4 sm:pt-6 md:pt-8 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 px-2">
-            <p className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 text-center sm:text-left">
+            <p className="text-xs sm:text-sm md:text-sm lg:text-sm text-gray-600 text-center sm:text-left">
               {t('footer.copyright')}
             </p>
             <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
               <Link
                 href="/privacy-policy"
-                className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
+                className="text-xs sm:text-sm md:text-sm lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
               >
                 {t('footer.privacy')}
               </Link>
               <Link
                 href="/terms"
-                className="text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
+                className="text-xs sm:text-sm md:text-sm lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
               >
                 {t('footer.termsOfService')}
               </Link>

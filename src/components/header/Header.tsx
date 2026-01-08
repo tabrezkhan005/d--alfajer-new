@@ -327,7 +327,7 @@ export function Header() {
                     <ShoppingCart className="h-5 md:h-6 w-5 md:w-6 text-[#009744]" />
                     {cartCount > 0 && (
                       <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#AB1F23] flex items-center justify-center">
-                        <span className="text-[9px] font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
+                        <span className="text-xs font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
                       </div>
                     )}
                   </div>
@@ -343,7 +343,7 @@ export function Header() {
                   <ShoppingCart className="h-5 md:h-6 w-5 md:w-6 text-[#009744]" />
                   {cartCount > 0 && (
                     <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#AB1F23] flex items-center justify-center">
-                      <span className="text-[9px] font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
+                      <span className="text-xs font-bold text-white leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
                     </div>
                   )}
                 </div>

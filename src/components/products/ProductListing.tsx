@@ -800,7 +800,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
         </div>
 
         {/* Title */}
-        <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
+        <h3 className="text-sm xs:text-base sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
           {t(productNameMap[product.id] || 'product.name') || product.name}
         </h3>
 
@@ -827,7 +827,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
           <Button
             className={cn(
               "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
-              "h-8 xs:h-9 sm:h-10 md:h-12 text-[10px] xs:text-xs sm:text-sm px-2 xs:px-3 sm:px-4",
+              "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
               "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
               "bg-[#009744] hover:bg-[#2E763B] text-white"
             )}
@@ -853,7 +853,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
             )}
           </Button>
           <Button
-            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-8 xs:h-9 sm:h-10 md:h-12 text-[10px] xs:text-xs sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
+            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
             onClick={handleBuyNow}
           >
             <span className="whitespace-nowrap">{t('product.buyNow')}</span>

@@ -20,13 +20,13 @@ export function Newsletter() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8 lg:mb-10 xl:mb-12"
           >
-            <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] font-semibold tracking-[0.3em] uppercase text-primary mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 lg:mb-4 block">
+            <span className="text-sm xs:text-base sm:text-[8px] md:text-[9px] lg:text-[10px] font-semibold tracking-[0.3em] uppercase text-primary mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 lg:mb-4 block">
               {t('newsletter.journal')}
             </span>
             <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-heading text-[#1A1A1A] mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 tracking-tight px-2 sm:px-0">
               {t('newsletter.title')}
             </h2>
-            <p className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-xs lg:text-sm text-black/50 max-w-lg mx-auto leading-relaxed font-body px-2 sm:px-0">
+            <p className="text-sm xs:text-base sm:text-[9px] md:text-xs lg:text-sm text-black/50 max-w-lg mx-auto leading-relaxed font-body px-2 sm:px-0">
               {t('newsletter.subtitle')}
             </p>
           </motion.div>
@@ -46,14 +46,14 @@ export function Newsletter() {
                   <Input 
                     type="email" 
                     placeholder={t('newsletter.placeholder')}
-                    className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 bg-white border-black/10 focus:border-success/30 rounded-none px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 text-[8px] xs:text-[9px] sm:text-xs md:text-sm lg:text-base font-body transition-all duration-300 placeholder:text-black/20 focus-visible:ring-0 focus-visible:ring-offset-0 w-full"
+                    className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 bg-white border-black/10 focus:border-success/30 rounded-none px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 text-xs xs:text-sm sm:text-xs md:text-sm lg:text-base font-body transition-all duration-300 placeholder:text-black/20 focus-visible:ring-0 focus-visible:ring-offset-0 w-full"
                     required
                   />
                   <div className="absolute bottom-0 left-0 h-[1px] bg-success w-0 group-focus-within:w-full transition-all duration-500" />
                 </div>
                 <Button 
                   type="submit" 
-                  className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 bg-primary hover:bg-primary/90 text-white rounded-none text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.15em] md:tracking-[0.2em] transition-all duration-500 group overflow-hidden relative whitespace-nowrap flex-shrink-0 w-full sm:w-auto"
+                  className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 bg-primary hover:bg-primary/90 text-white rounded-none text-xs xs:text-sm sm:text-[9px] md:text-[10px] lg:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.15em] md:tracking-[0.2em] transition-all duration-500 group overflow-hidden relative whitespace-nowrap flex-shrink-0 w-full sm:w-auto"
                 >
                   <span className="relative z-10 flex items-center gap-0.5 sm:gap-0.75 md:gap-1 lg:gap-2 justify-center">
                     {t('newsletter.subscribe')}
@@ -64,7 +64,7 @@ export function Newsletter() {
                   />
                 </Button>
               </div>
-              <p className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] text-center text-black/30 mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 lg:mt-6 tracking-widest uppercase font-medium">
+              <p className="text-xs xs:text-sm sm:text-[8px] md:text-[9px] lg:text-[10px] text-center text-black/30 mt-1.5 xs:mt-2 sm:mt-3 md:mt-4 lg:mt-6 tracking-widest uppercase font-medium">
                 {t('newsletter.benefit')}
               </p>
             </form>

@@ -150,7 +150,7 @@ const AnnouncementBarContent = ({
           <div className="flex-1 flex items-center justify-center min-w-0">
             <div
               ref={messageRef}
-              className="flex items-center gap-0.5 xs:gap-1 sm:gap-2 text-center text-[7px] xs:text-[8px] sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
+              className="flex items-center gap-0.5 xs:gap-1 sm:gap-2 text-center text-sm xs:text-base sm:text-xs md:text-sm font-medium font-body whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis"
               key={currentMessageIndex}
             >
               <span className="hidden sm:inline text-base" aria-hidden="true">
