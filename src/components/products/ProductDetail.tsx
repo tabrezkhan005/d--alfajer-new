@@ -236,10 +236,10 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
               {displayOriginalPrice && (
                 <div className="flex items-center gap-2">
                   <Badge className="bg-[#AB1F23] hover:bg-[#8B1819] text-white">
-                    SAVE {Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)}%
+                    {t('product.discount')} {Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)}%
                   </Badge>
                   <span className="text-sm text-gray-600">
-                    You save {formatCurrency(displayOriginalPrice - displayPrice)}
+                    {t('product.youSave')} {formatCurrency(displayOriginalPrice - displayPrice)}
                   </span>
                 </div>
               )}
@@ -467,7 +467,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                     {product.ingredients.map((ing, idx) => (
                       <div key={idx} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-[#009744] flex-shrink-0"></div>
-                        <span className="text-gray-700">{ing}</span>
+                        <span className="text-gray-700">{t(ing) || ing}</span>
                       </div>
                     ))}
                   </div>
@@ -531,15 +531,15 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                       />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-600 font-medium">{product.reviews} customer reviews</p>
+                  <p className="text-sm text-gray-600 font-medium">{product.reviews} {t('product.customerReviewsCount')}</p>
                 </div>
               </div>
 
               {/* Sample Reviews */}
               <div className="space-y-4">
                 {[
-                  { author: 'John Doe', rating: 5, title: 'Excellent quality!', comment: 'Great color and flavor. Highly recommended for anyone looking for authentic Kashmiri products.' },
-                  { author: 'Jane Smith', rating: 4, title: 'Good value for money', comment: 'Good product quality and fast shipping. Packaging was secure and professional.' },
+                  { author: t('review.johnDoe'), rating: 5, title: t('review.excellentQuality'), comment: t('review.greatColor') },
+                  { author: t('review.janeSmith'), rating: 4, title: t('review.greatQualityPricey'), comment: t('review.goodProductQuality') },
                 ].map((review, idx) => (
                   <div key={idx} className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                     <div className="flex items-start justify-between mb-3">

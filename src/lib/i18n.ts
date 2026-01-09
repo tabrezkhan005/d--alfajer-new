@@ -64,6 +64,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'Secure Payment',
     'product.ssl': '256-bit SSL encryption',
     'product.aboutProduct': 'About this product',
+    'product.shippingInfo': 'Shipping Information',
+    'product.discount': 'SAVE',
+    'product.youSave': 'You save',
+    'product.customerReviewsCount': 'customer reviews',
+    'product.Kashmir': 'Kashmir, India',
     
     // Cart
     'cart.empty': 'Your cart is empty',
@@ -281,6 +286,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. No added sugars or preservatives. Rich in antioxidants and natural enzymes for optimal health benefits.',
     'product.almondDesc': 'Premium California almonds, carefully selected and roasted to perfection. Rich in protein and healthy fats. Perfect for snacking or adding to your favorite recipes.',
     
+    // Product Ingredients
+    'ingredient.kashmiriRedChillies': '100% Kashmiri Red Chillies',
+    'ingredient.pureHoney': '100% Pure Honey',
+    'ingredient.saffron': 'Premium Kashmiri Saffron',
+    'ingredient.shilajit': 'Pure Himalayan Shilajit',
+    
     // Review Content
     'review.excellentQuality': 'Excellent quality!',
     'review.johnDoe': 'John Doe',
@@ -493,6 +504,28 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'دفع آمن',
     'product.ssl': 'تشفير SSL 256 بت',
     'product.aboutProduct': 'حول هذا المنتج',
+    'product.shippingInfo': 'معلومات الشحن',
+    'product.discount': 'توفير',
+    'product.youSave': 'أنت توفر',
+    'product.customerReviewsCount': 'مراجعات العملاء',
+    'product.Kashmir': 'كشمير، الهند',
+    
+    // Certifications - Arabic
+    'cert.nongmo': 'خالي من الكائنات المعدلة وراثياً',
+    'cert.glutenfree': 'خالي من الجلوتين',
+    
+    // Origins - Arabic
+    'origin.kashmirindia': 'كشمير، الهند',
+    
+    // Product Ingredients - Arabic
+    'ingredient.kashmiriRedChillies': '100% فلفل كشميري أحمر',
+    'ingredient.pureHoney': '100% عسل نقي',
+    'ingredient.saffron': 'زعفران كشميري فاخر',
+    'ingredient.shilajit': 'شيلاجيت هيمالايا نقي',
+    
+    // Review Content - Arabic
+    'review.greatColorFlavor': 'لون وطعم رائع. موصى به بشدة لمن يبحثون عن منتجات كشميرية أصلية.',
+    'review.goodValueForMoney': 'قيمة جيدة مقابل المال',
     
     // Cart
     'cart.empty': 'سلتك فارغة',
@@ -922,6 +955,28 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'सुरक्षित भुगतान',
     'product.ssl': '256-बिट SSL एन्क्रिप्शन',
     'product.aboutProduct': 'इस उत्पाद के बारे में',
+    'product.shippingInfo': 'शिपिंग जानकारी',
+    'product.discount': 'बचत',
+    'product.youSave': 'आप बचाते हैं',
+    'product.customerReviewsCount': 'ग्राहक समीक्षाएं',
+    'product.Kashmir': 'कश्मीर, भारत',
+    
+    // Certifications - Hindi
+    'cert.nongmo': 'गैर-जीएमओ',
+    'cert.glutenfree': 'लस मुक्त',
+    
+    // Origins - Hindi
+    'origin.kashmirindia': 'कश्मीर, भारत',
+    
+    // Product Ingredients - Hindi
+    'ingredient.kashmiriRedChillies': '100% कश्मीरी लाल मिर्च',
+    'ingredient.pureHoney': '100% शुद्ध शहद',
+    'ingredient.saffron': 'प्रीमियम कश्मीरी केसर',
+    'ingredient.shilajit': 'शुद्ध हिमालयी शिलाजीत',
+    
+    // Review Content - Hindi
+    'review.greatColorFlavor': 'बहुत अच्छा रंग और स्वाद। प्रामाणिक कश्मीरी उत्पादों की तलाश में किसी के लिए भी अत्यधिक अनुशंसित।',
+    'review.goodValueForMoney': 'पैसे के लिए अच्छा मूल्य',
     
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',
