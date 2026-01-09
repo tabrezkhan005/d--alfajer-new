@@ -154,6 +154,25 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.reset': 'Reset',
     'common.allProducts': 'All Products',
     
+    // Categories
+    'category.spices': 'Spices',
+    'category.honey': 'Honey & Spreads',
+    'category.nutsSeeds': 'Nuts & Seeds',
+    'category.dryFruits': 'Dry Fruits',
+    
+    // Origins
+    'origin.kashmirIndia': 'Kashmir, India',
+    'origin.uae': 'UAE',
+    'origin.himalayas': 'Himalayas',
+    'origin.india': 'India',
+    
+    // Certifications
+    'cert.organic': 'Organic',
+    'cert.raw': 'Raw',
+    'cert.unfiltered': 'Unfiltered',
+    'cert.nonGMO': 'Non-GMO',
+    'cert.glutenFree': 'Gluten-Free',
+    
     // Search Page
     'search.resultsFor': 'Search Results for',
     'search.showing': 'Showing',
@@ -261,20 +280,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. No added sugars or preservatives. Rich in antioxidants and natural enzymes for optimal health benefits.',
     'product.almondDesc': 'Premium California almonds, carefully selected and roasted to perfection. Rich in protein and healthy fats. Perfect for snacking or adding to your favorite recipes.',
     
-    // Origins & Locations
-    'origin.kashmir': 'Kashmir, India',
-    'origin.california': 'California, USA',
-    'origin.india': 'India',
-    'origin.middleEast': 'Middle East',
-    
-    // Certifications
-    'cert.organic': 'Organic',
-    'cert.nonGMO': 'Non-GMO',
-    'cert.glutenFree': 'Gluten-Free',
-    'cert.vegan': 'Vegan',
-    'cert.fairtrade': 'Fair Trade',
-    'cert.noPreservatives': 'No Preservatives',
-    
     // Review Content
     'review.excellentQuality': 'Excellent quality!',
     'review.johnDoe': 'John Doe',
@@ -358,6 +363,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Names
     'productName.kashmirilRedChilliPowder': 'Kashmiri Red Chilli Powder',
     'productName.kashmirilPureWhiteHoney': 'Kashmiri Pure White Honey',
+    'productName.kashmirilSaffron': 'Kashmiri Saffron',
+    'productName.himalayaShilajit': 'Pure Himalayan Shilajit',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'SALE',
@@ -575,6 +582,25 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.reset': 'إعادة تعيين',
     'common.allProducts': 'جميع المنتجات',
     
+    // Categories
+    'category.spices': 'التوابل',
+    'category.honey': 'العسل والمنتجات المشابهة',
+    'category.nutsSeeds': 'المكسرات والبذور',
+    'category.dryFruits': 'الفواكه المجففة',
+    
+    // Origins
+    'origin.kashmirIndia': 'كشمير، الهند',
+    'origin.uae': 'الإمارات العربية المتحدة',
+    'origin.himalayas': 'جبال الهيمالايا',
+    'origin.india': 'الهند',
+    
+    // Certifications
+    'cert.organic': 'عضوي',
+    'cert.raw': 'خام',
+    'cert.unfiltered': 'غير مفلتر',
+    'cert.nonGMO': 'خالي من الكائنات المعدلة وراثياً',
+    'cert.glutenFree': 'خالي من الغلوتين',
+    
     // Search Page
     'search.resultsFor': 'نتائج البحث عن',
     'search.showing': 'عرض',
@@ -680,20 +706,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.honeyDesc': 'عسل طبيعي نقي 100% مصدره المباشر من مربي النحل المحليين. بدون سكريات مضافة أو مواد حافظة. غني بمضادات الأكسدة والإنزيمات الطبيعية لفوائد صحية مثالية.',
     'product.almondDesc': 'لوز كاليفورنيا الممتاز، مختار بعناية وحمصه بشكل مثالي. غني بالبروتين والدهون الصحية. مثالي للوجبات الخفيفة أو إضافة إلى وصفاتك المفضلة.',
     
-    // Origins & Locations
-    'origin.kashmir': 'كشمير، الهند',
-    'origin.california': 'كاليفورنيا، الولايات المتحدة',
-    'origin.india': 'الهند',
-    'origin.middleEast': 'الشرق الأوسط',
-    
-    // Certifications
-    'cert.organic': 'عضوي',
-    'cert.nonGMO': 'غير معدل وراثياً',
-    'cert.glutenFree': 'خالي من الغلوتين',
-    'cert.vegan': 'نباتي',
-    'cert.fairtrade': 'تجارة عادلة',
-    'cert.noPreservatives': 'بدون مواد حافظة',
-    
     // Review Content
     'review.excellentQuality': 'جودة ممتازة!',
     'review.johnDoe': 'جون دو',
@@ -777,6 +789,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Names
     'productName.kashmirilRedChilliPowder': 'مسحوق الفلفل الحار الأحمر الكشميري',
     'productName.kashmirilPureWhiteHoney': 'عسل أبيض نقي كشميري',
+    'productName.kashmirilSaffron': 'الزعفران الكشميري',
+    'productName.himalayaShilajit': 'شيلاجيت الهيمالايا النقي',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'عرض خاص',
@@ -994,6 +1008,25 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.reset': 'रीसेट करें',
     'common.allProducts': 'सभी उत्पाद',
     
+    // Categories
+    'category.spices': 'मसाले',
+    'category.honey': 'शहद और फैलाने योग्य',
+    'category.nutsSeeds': 'नट्स और बीज',
+    'category.dryFruits': 'सूखे फल',
+    
+    // Origins
+    'origin.kashmirIndia': 'कश्मीर, भारत',
+    'origin.uae': 'संयुक्त अरब अमीरात',
+    'origin.himalayas': 'हिमालय',
+    'origin.india': 'भारत',
+    
+    // Certifications
+    'cert.organic': 'जैविक',
+    'cert.raw': 'कच्चा',
+    'cert.unfiltered': 'निस्पंदित',
+    'cert.nonGMO': 'गैर-जीएमओ',
+    'cert.glutenFree': 'लस मुक्त',
+    
     // Search Page
     'search.resultsFor': 'के लिए खोज परिणाम',
     'search.showing': 'दिखा रहा है',
@@ -1099,20 +1132,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.honeyDesc': '100% शुद्ध प्राकृतिक शहद जो स्थानीय मधुमक्खी पालकों से सीधे प्राप्त है। कोई अतिरिक्त चीनी या संरक्षक नहीं। एंटीऑक्सिडेंट और प्राकृतिक एंजाइम में समृद्ध सर्वोत्तम स्वास्थ्य लाभ के लिए।',
     'product.almondDesc': 'प्रीमियम कैलिफोर्निया बादाम, सावधानी से चुने और सही तरीके से भुने। प्रोटीन और स्वस्थ वसा में समृद्ध। नाश्ते के लिए या आपकी पसंदीदा रेसिपी में जोड़ने के लिए बिल्कुल सही।',
     
-    // Origins & Locations
-    'origin.kashmir': 'कश्मीर, भारत',
-    'origin.california': 'कैलिफोर्निया, यूएसए',
-    'origin.india': 'भारत',
-    'origin.middleEast': 'मध्य पूर्व',
-    
-    // Certifications
-    'cert.organic': 'जैविक',
-    'cert.nonGMO': 'गैर-जीएमओ',
-    'cert.glutenFree': 'लस मुक्त',
-    'cert.vegan': 'शाकाहारी',
-    'cert.fairtrade': 'न्यायसंगत व्यापार',
-    'cert.noPreservatives': 'कोई संरक्षक नहीं',
-    
     // Review Content
     'review.excellentQuality': 'उत्कृष्ट गुणवत्ता!',
     'review.johnDoe': 'जॉन डो',
@@ -1196,6 +1215,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Names
     'productName.kashmirilRedChilliPowder': 'कश्मीरी लाल मिर्च पाउडर',
     'productName.kashmirilPureWhiteHoney': 'कश्मीरी शुद्ध सफेद शहद',
+    'productName.kashmirilSaffron': 'कश्मीरी केसर',
+    'productName.himalayaShilajit': 'शुद्ध हिमालयी शिलाजीत',
     
     // Product Card Labels - Additional
     'product.badge.sale': 'बिक्रय',

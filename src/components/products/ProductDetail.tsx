@@ -144,7 +144,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
         <div className="space-y-6 text-gray-900">
           {/* Title & Rating */}
           <div>
-            <h1 className="text-3xl font-bold mb-4 text-gray-900">{product.name}</h1>
+            <h1 className="text-3xl font-bold mb-4 text-gray-900">{t(product.name) || product.name}</h1>
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -328,28 +328,34 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
       {/* Tabs */}
       <Tabs defaultValue="description" className="mt-12 text-gray-900">
-        <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
-          <TabsTrigger value="description" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.description')}</TabsTrigger>
-          <TabsTrigger value="nutrition" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.nutrition')}</TabsTrigger>
-          <TabsTrigger value="reviews" className="text-gray-900 data-[state=active]:bg-gray-100">{t('product.reviews')}</TabsTrigger>
-          <TabsTrigger value="shipping" className="text-gray-900 data-[state=active]:bg-gray-100">Shipping</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-[#009744] rounded-none p-0">
+          <TabsTrigger value="description" className="text-gray-900 font-semibold py-4 data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:rounded-none hover:bg-gray-200 transition-colors">{t('product.description')}</TabsTrigger>
+          <TabsTrigger value="nutrition" className="text-gray-900 font-semibold py-4 data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:rounded-none hover:bg-gray-200 transition-colors">{t('product.nutrition')}</TabsTrigger>
+          <TabsTrigger value="reviews" className="text-gray-900 font-semibold py-4 data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:rounded-none hover:bg-gray-200 transition-colors">{t('product.reviews')}</TabsTrigger>
+          <TabsTrigger value="shipping" className="text-gray-900 font-semibold py-4 data-[state=active]:bg-[#009744] data-[state=active]:text-white data-[state=active]:rounded-none hover:bg-gray-200 transition-colors">{t('product.shipping')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="description" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.aboutProduct')}</h3>
+        <TabsContent value="description" className="space-y-6 text-gray-900 bg-gradient-to-br from-white to-gray-50 p-8 rounded-b-lg border-l-4 border-b-4 border-r border-t border-[#009744] shadow-sm">
+          <h3 className="text-2xl font-bold text-gray-900 pb-4 border-b-2 border-[#009744]">{t('product.aboutProduct')}</h3>
           <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.origin')}</h4>
-              <p className="text-gray-800">{product.origin}</p>
+          <div className="grid grid-cols-2 gap-6 mt-6 p-4 bg-white rounded-lg border border-gray-200">
+            <div className="pl-4 border-l-4 border-[#009744]">
+              <h4 className="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2">
+                <span className="text-[#009744]">📍</span>
+                {t('product.origin')}
+              </h4>
+              <p className="text-gray-700 font-medium">{t(`origin.${product.origin.toLowerCase().replace(/[,\s]+/g, '')}`) || product.origin}</p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.certifications')}</h4>
+            <div className="pl-4 border-l-4 border-[#AB1F23]">
+              <h4 className="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2">
+                <span className="text-[#AB1F23]">✓</span>
+                {t('product.certifications')}
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {product.certifications.map((cert) => (
-                  <Badge key={cert} variant="outline" className="text-gray-900 border-gray-900">
-                    {cert}
+                  <Badge key={cert} className="bg-[#009744] text-white hover:bg-[#2E763B] font-semibold py-1 px-3 rounded-full text-sm">
+                    {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
                   </Badge>
                 ))}
               </div>
@@ -357,12 +363,15 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </div>
 
           {product.ingredients.length > 0 && (
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.ingredients')}</h4>
-              <ul className="space-y-1">
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+              <h4 className="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2">
+                <span>🥘</span>
+                {t('product.ingredients')}
+              </h4>
+              <ul className="space-y-2 columns-2">
                 {product.ingredients.map((ing, idx) => (
-                  <li key={idx} className="text-sm text-gray-800">
-                    • {ing}
+                  <li key={idx} className="text-sm text-gray-800 font-medium">
+                    ✓ {ing}
                   </li>
                 ))}
               </ul>
@@ -370,8 +379,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           )}
         </TabsContent>
 
-        <TabsContent value="nutrition" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.nutritionInfo')}</h3>
+        <TabsContent value="nutrition" className="space-y-6 text-gray-900 bg-gradient-to-br from-white to-gray-50 p-8 rounded-b-lg border-l-4 border-b-4 border-r border-t border-[#009744] shadow-sm">
+          <h3 className="text-2xl font-bold text-gray-900 pb-4 border-b-2 border-[#009744]">{t('product.nutritionInfo')}</h3>
           <p className="text-sm text-gray-600">
             {t('product.perServing')}
           </p>
@@ -413,8 +422,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="reviews" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold mb-4 text-gray-900">{t('product.customerReviews')}</h3>
+        <TabsContent value="reviews" className="space-y-6 text-gray-900 bg-gradient-to-br from-white to-gray-50 p-8 rounded-b-lg border-l-4 border-b-4 border-r border-t border-[#009744] shadow-sm">
+          <h3 className="text-2xl font-bold mb-6 text-gray-900 pb-4 border-b-2 border-[#009744]">{t('product.customerReviews')}</h3>
           
           {/* Rating Summary */}
           <div className="grid grid-cols-3 gap-4">
@@ -479,8 +488,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           </Button>
         </TabsContent>
 
-        <TabsContent value="shipping" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.shippingInfo')}</h3>
+        <TabsContent value="shipping" className="space-y-6 text-gray-900 bg-gradient-to-br from-white to-gray-50 p-8 rounded-b-lg border-l-4 border-b-4 border-r border-t border-[#009744] shadow-sm">
+          <h3 className="text-2xl font-bold text-gray-900 pb-4 border-b-2 border-[#009744]">{t('product.shippingInfo')}</h3>
           <div className="space-y-3 text-gray-800">
             <p>{t('product.standardShipping')}</p>
             <p>{t('product.expressShipping')}</p>

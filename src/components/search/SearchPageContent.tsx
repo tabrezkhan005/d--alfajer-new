@@ -381,7 +381,9 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">{category}</span>
+                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                  {t(`category.${category.toLowerCase().replace(/\s+/g, '')}`) || category}
+                </span>
               </label>
             ))}
           </div>
@@ -408,7 +410,9 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">{origin}</span>
+                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                  {t(`origin.${origin.toLowerCase().replace(/[,\s]+/g, '')}`) || origin}
+                </span>
               </label>
             ))}
           </div>
@@ -435,7 +439,9 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">{cert}</span>
+                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                  {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
+                </span>
               </label>
             ))}
           </div>
