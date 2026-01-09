@@ -74,7 +74,7 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "SALE",
-    description: "Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives.",
+    description: "product.kashmiChilliDesc",
   },
   {
     id: "2",

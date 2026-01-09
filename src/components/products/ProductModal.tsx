@@ -425,7 +425,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
               {/* Description */}
               <p className="text-gray-500 text-sm sm:text-base lg:text-lg leading-relaxed font-body">
-                {product.description || `Premium quality ${product.name.toLowerCase()} sourced directly from ${product.origin}. Perfectly processed and packed to preserve natural flavor and nutrients.`}
+                {product.description ? t(product.description) : `Premium quality ${product.name.toLowerCase()} sourced directly from ${product.origin}. Perfectly processed and packed to preserve natural flavor and nutrients.`}
               </p>
 
             {/* Certifications */}

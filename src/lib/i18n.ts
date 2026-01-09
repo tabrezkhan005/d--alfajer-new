@@ -276,6 +276,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.reviewPlaceholder': 'Share your detailed experience...',
     'product.submitReview': 'Submit Review',
     
+    // Product Benefits
+    'product.freeShipping': 'Free Shipping',
+    'product.easyReturns': 'Easy Returns',
+    'product.returnPolicy': '30-day money-back guarantee',
+    
     // Shipping Tab
     'product.shipping': 'Shipping',
     'product.standardShipping': 'Standard Shipping',
@@ -750,6 +755,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.reviewPlaceholder': 'شارك تجربتك المفصلة...',
     'product.submitReview': 'إرسال المراجعة',
     
+    // Product Benefits - Arabic
+    'product.freeShipping': 'شحن مجاني',
+    'product.easyReturns': 'إرجاع سهل',
+    'product.returnPolicy': 'ضمان استرجاع المبلغ خلال 30 يوم',
+    
     // Shipping Tab - Arabic
     'product.shipping': 'الشحن',
     'product.standardShipping': 'الشحن العادي',
@@ -1217,6 +1227,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.yourRating': 'आपकी रेटिंग',
     'product.reviewPlaceholder': 'अपना विस्तृत अनुभव साझा करें...',
     'product.submitReview': 'समीक्षा सबमिट करें',
+    
+    // Product Benefits - Hindi
+    'product.freeShipping': 'मुफ्त शिपिंग',
+    'product.easyReturns': 'आसान रिटर्न',
+    'product.returnPolicy': '30 दिन की मनी-बैक गारंटी',
     
     // Shipping Tab - Hindi
     'product.shipping': 'शिपिंग',
