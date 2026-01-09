@@ -3,12 +3,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Star, Heart, Share2, Check, AlertCircle, Plus, Minus, ThumbsUp, Zap } from "lucide-react";
+import { Star, Heart, Share2, Check, AlertCircle, Plus, Minus, Truck, Lock, RotateCcw } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/src/lib/cart-store";
 import { mockProductsWithVariants } from "@/src/lib/products";
 import { useI18n } from "@/src/components/providers/i18n-provider";
@@ -98,396 +98,540 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Image Gallery */}
-        <div className="space-y-4">
-          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
-            <Image
-              src={product.images[selectedImageIndex]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
-            {product.badge && (
-              <Badge className="absolute top-4 left-4 bg-red-500">
-                {product.badge}
-              </Badge>
-            )}
-          </div>
-          
-          {/* Thumbnail Grid */}
-          <div className="grid grid-cols-4 gap-2">
-            {product.images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedImageIndex(idx)}
-                className={`relative w-full aspect-square rounded-md overflow-hidden border-2 transition-colors ${
-                  selectedImageIndex === idx
-                    ? "border-amber-600"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <Image
-                  src={img}
-                  alt={`${product.name}-${idx}`}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
+    <div className="w-full bg-white">
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 py-4 border-b border-gray-200">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <a href="/" className="hover:text-[#009744] transition-colors">{t('common.home')}</a>
+          <span className="text-gray-400">/</span>
+          <a href="/products" className="hover:text-[#009744] transition-colors">{t('common.products')}</a>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-medium">{t(product.name) || product.name}</span>
         </div>
+      </div>
 
-        {/* Product Info */}
-        <div className="space-y-6 text-gray-900">
-          {/* Title & Rating */}
-          <div>
-            <h1 className="text-3xl font-bold mb-4 text-gray-900">{t(product.name) || product.name}</h1>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    size={18}
-                    className={
-                      i < Math.floor(product.rating)
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-gray-300"
-                    }
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-gray-700">
-                {product.rating} ({product.reviews} {t("product.reviews")})
-              </span>
-            </div>
-          </div>
-
-          {/* Price */}
-          <div className="space-y-2">
-            <div className="flex items-baseline gap-4">
-              <span className="text-3xl font-bold text-gray-900">
-                {formatCurrency(displayPrice)}
-              </span>
-              {displayOriginalPrice && (
-                <span className="text-lg text-gray-500 line-through">
-                  {formatCurrency(displayOriginalPrice)}
-                </span>
-              )}
-            </div>
-            {displayOriginalPrice && (
-              <p className="text-sm text-green-600">
-                Save {formatCurrency(displayOriginalPrice - displayPrice)}
-              </p>
-            )}
-          </div>
-
-          {/* Stock Status */}
-          <div className="flex items-center gap-2">
-            {selectedVariant && selectedVariant.stock > 0 ? (
-              <>
-                <Check size={20} className="text-green-600" />
-                <span className="text-green-600 font-medium">
-                  {t("product.inStock")}
-                </span>
-              </>
-            ) : (
-              <>
-                <AlertCircle size={20} className="text-red-600" />
-                <span className="text-red-600 font-medium">
-                  {t("product.outOfStock")}
-                </span>
-              </>
-            )}
-          </div>
-
-          {/* Variant Selection */}
-          <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-900">
-              {t("product.selectVariant")}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {product.variants.map((variant) => (
-                <button
-                  key={variant.id}
-                  onClick={() => setSelectedVariantId(variant.id)}
-                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all text-gray-900 ${
-                    selectedVariantId === variant.id
-                      ? "border-amber-600 bg-amber-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-                  disabled={variant.stock === 0}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          {/* Image Gallery Section */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <motion.div 
+              className="relative w-full aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-200"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Image
+                src={product.images[selectedImageIndex]}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
+              {product.badge && (
+                <motion.div 
+                  className="absolute top-4 left-4"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
                 >
-                  <div>{variant.size}</div>
-                  <div className="text-xs text-gray-600">
-                    {formatCurrency(variant.price)}
-                  </div>
-                </button>
+                  <Badge className="bg-[#AB1F23] hover:bg-[#8B1819] text-white">
+                    {product.badge === 'SALE' ? 'SALE' : product.badge === 'HOT' ? 'HOT DEAL' : 'NEW'}
+                  </Badge>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Thumbnail Grid */}
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+              {product.images.map((img, idx) => (
+                <motion.button
+                  key={idx}
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`relative w-full aspect-square rounded-md overflow-hidden border-2 transition-all ${
+                    selectedImageIndex === idx
+                      ? "border-[#009744] shadow-md"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name}-${idx}`}
+                    fill
+                    className="object-cover"
+                  />
+                </motion.button>
               ))}
             </div>
           </div>
 
-          {/* Quantity */}
-          <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-900">{t('product.quantity')}</label>
-            <div className="flex items-center gap-4 w-fit">
-              <Button
-                variant="outline"
-                size="sm"
-                className="hover:bg-white bg-white"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                <Minus size={16} />
-              </Button>
-              <span className="w-8 text-center font-semibold text-gray-900">{quantity}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="hover:bg-white bg-white"
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                <Plus size={16} />
-              </Button>
+          {/* Product Information Section */}
+          <div className="space-y-8">
+            {/* Title & Rating */}
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold text-gray-900 leading-tight">
+                {t(product.name) || product.name}
+              </h1>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={18}
+                        className={
+                          i < Math.floor(product.rating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="font-semibold text-gray-900">{product.rating}</span>
+                </div>
+                <div className="w-px h-6 bg-gray-300"></div>
+                <p className="text-gray-600">{product.reviews} {t('product.reviews')}</p>
+              </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            {/* Price Section */}
+            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200 space-y-3">
+              <div className="flex items-baseline gap-4">
+                <span className="text-4xl font-bold text-gray-900">
+                  {formatCurrency(displayPrice)}
+                </span>
+                {displayOriginalPrice && (
+                  <span className="text-xl text-gray-400 line-through">
+                    {formatCurrency(displayOriginalPrice)}
+                  </span>
+                )}
+              </div>
+              {displayOriginalPrice && (
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-[#AB1F23] hover:bg-[#8B1819] text-white">
+                    SAVE {Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)}%
+                  </Badge>
+                  <span className="text-sm text-gray-600">
+                    You save {formatCurrency(displayOriginalPrice - displayPrice)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Stock Status */}
+            <div className="flex items-center gap-3">
+              {selectedVariant && selectedVariant.stock > 0 ? (
+                <>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-green-700 font-medium">{t('product.inStock')}</span>
+                  <span className="text-gray-600 text-sm">({selectedVariant.stock} {t('common.available')})</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-red-700 font-medium">{t('product.outOfStock')}</span>
+                </>
+              )}
+            </div>
+
+            {/* Variant Selection */}
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-900">
+                {t('product.selectVariant')}
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {product.variants.map((variant) => (
+                  <motion.button
+                    key={variant.id}
+                    onClick={() => setSelectedVariantId(variant.id)}
+                    className={`p-4 rounded-lg border-2 text-sm font-medium transition-all ${
+                      selectedVariantId === variant.id
+                        ? "border-[#009744] bg-[#009744] text-white"
+                        : "border-gray-200 bg-white text-gray-900 hover:border-[#009744]"
+                    } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={variant.stock === 0}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="font-semibold">{variant.size}</div>
+                    <div className="text-xs opacity-80 mt-1">
+                      {formatCurrency(variant.price)}
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity Selector */}
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-900">
+                {t('product.quantity')}
+              </label>
+              <div className="flex items-center gap-0 w-fit border border-gray-300 rounded-lg">
                 <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={handleAddToCart}
-                  disabled={!selectedVariant || selectedVariant.stock === 0}
+                  variant="ghost"
+                  size="sm"
+                  className="h-12 w-12 rounded-none hover:bg-gray-100"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 >
-                  {t("product.addToCart")}
+                  <Minus size={18} className="text-gray-900" />
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <div className="w-12 text-center font-semibold text-gray-900 text-lg">
+                  {quantity}
+                </div>
                 <Button
-                  size="lg"
-                  className="w-full bg-red-600 hover:bg-red-700"
-                  onClick={handleBuyNow}
-                  disabled={!selectedVariant || selectedVariant.stock === 0}
+                  variant="ghost"
+                  size="sm"
+                  className="h-12 w-12 rounded-none hover:bg-gray-100 border-l border-gray-300"
+                  onClick={() => setQuantity(quantity + 1)}
                 >
-                  <Zap size={18} className="mr-2" />
-                  {t("product.buyNow")}
+                  <Plus size={18} className="text-gray-900" />
                 </Button>
-              </motion.div>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full text-gray-900 hover:bg-white bg-white"
-              onClick={() => setIsWishlisted(!isWishlisted)}
-            >
-              <Heart
-                size={20}
-                className={isWishlisted ? "fill-red-500 text-red-500" : ""}
-              />
-              {isWishlisted ? t('product.removeWishlist') : t('product.wishlist')}
-            </Button>
-          </div>
 
-          {/* Share */}
-          <Button
-            variant="outline"
-            className="w-full text-gray-900 hover:bg-white bg-white"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: product.name,
-                  text: product.shortDescription,
-                  url: window.location.href,
-                });
-              }
-            }}
-          >
-            <Share2 size={18} className="mr-2" />
-            {t('product.share')}
-          </Button>
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-4">
+              <div className="grid grid-cols-2 gap-3">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    size="lg"
+                    className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 rounded-lg"
+                    onClick={handleAddToCart}
+                    disabled={!selectedVariant || selectedVariant.stock === 0}
+                  >
+                    {t('product.addToCart')}
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    size="lg"
+                    className="w-full bg-[#AB1F23] hover:bg-[#8B1819] text-white font-semibold h-12 rounded-lg"
+                    onClick={handleBuyNow}
+                    disabled={!selectedVariant || selectedVariant.stock === 0}
+                  >
+                    {t('product.buyNow')}
+                  </Button>
+                </motion.div>
+              </div>
 
-          {/* Trust Badges */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-            <div className="text-center">
-              <div className="text-2xl mb-1">🚚</div>
-              <p className="text-sm font-medium text-gray-900">{t('product.freeShipping')}</p>
-              <p className="text-xs text-gray-700">{t('product.onOrders')}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12"
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                  >
+                    <Heart
+                      size={20}
+                      className={isWishlisted ? "fill-[#AB1F23] text-[#AB1F23]" : "text-gray-900"}
+                    />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: product.name,
+                          text: product.longDescription,
+                          url: window.location.href,
+                        });
+                      }
+                    }}
+                  >
+                    <Share2 size={20} className="text-gray-900" />
+                  </Button>
+                </motion.div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl mb-1">🔒</div>
-              <p className="text-sm font-medium text-gray-900">{t('product.securePayment')}</p>
-              <p className="text-xs text-gray-700">{t('product.ssl')}</p>
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
+              <div className="text-center">
+                <div className="flex justify-center mb-2">
+                  <Truck size={24} className="text-[#009744]" />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">{t('product.freeShipping')}</p>
+                <p className="text-xs text-gray-600 mt-1">{t('product.onOrders')}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex justify-center mb-2">
+                  <Lock size={24} className="text-[#009744]" />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">{t('product.securePayment')}</p>
+                <p className="text-xs text-gray-600 mt-1">{t('product.ssl')}</p>
+              </div>
+              <div className="text-center">
+                <div className="flex justify-center mb-2">
+                  <RotateCcw size={24} className="text-[#009744]" />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">Easy Returns</p>
+                <p className="text-xs text-gray-600 mt-1">30-day policy</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="description" className="mt-12 text-gray-900">
-        <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
-          <TabsTrigger value="description" className="text-gray-900 data-[state=active]:bg-[#009744] data-[state=active]:text-white">{t('product.description')}</TabsTrigger>
-          <TabsTrigger value="nutrition" className="text-gray-900 data-[state=active]:bg-[#009744] data-[state=active]:text-white">{t('product.nutrition')}</TabsTrigger>
-          <TabsTrigger value="reviews" className="text-gray-900 data-[state=active]:bg-[#009744] data-[state=active]:text-white">{t('product.reviews')}</TabsTrigger>
-          <TabsTrigger value="shipping" className="text-gray-900 data-[state=active]:bg-[#009744] data-[state=active]:text-white">{t('product.shipping')}</TabsTrigger>
-        </TabsList>
+        {/* Tabs Section */}
+        <div className="border-t border-gray-200 pt-12">
+          <Tabs defaultValue="description" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-white border-b border-gray-200 rounded-none h-auto p-0">
+              <TabsTrigger 
+                value="description" 
+                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
+              >
+                {t('product.description')}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nutrition" 
+                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
+              >
+                {t('product.nutrition')}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reviews" 
+                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
+              >
+                {t('product.reviews')}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="shipping" 
+                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
+              >
+                {t('product.shipping')}
+              </TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="description" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.aboutProduct')}</h3>
-          <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.origin')}</h4>
-              <p className="text-gray-800">{t(`origin.${product.origin.toLowerCase().replace(/[,\s]+/g, '')}`) || product.origin}</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.certifications')}</h4>
-              <div className="flex flex-wrap gap-2">
-                {product.certifications.map((cert) => (
-                  <Badge key={cert} variant="outline" className="text-gray-900 border-[#009744] bg-white">
-                    {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
-                  </Badge>
-                ))}
+            {/* Description Tab */}
+            <TabsContent value="description" className="py-8 space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('product.aboutProduct')}</h3>
+                <p className="text-gray-700 leading-relaxed text-lg">{product.longDescription}</p>
               </div>
-            </div>
-          </div>
 
-          {product.ingredients.length > 0 && (
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-900">{t('product.ingredients')}</h4>
-              <ul className="space-y-1">
-                {product.ingredients.map((ing, idx) => (
-                  <li key={idx} className="text-sm text-gray-800">
-                    • {ing}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="nutrition" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.nutritionInfo')}</h3>
-          <p className="text-sm text-gray-600">
-            {t('product.perServing')}
-          </p>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-3">
-                <div className="flex justify-between py-2 border-b">
-                  <span>{t('product.calories')}</span>
-                  <span className="font-semibold">
-                    {product.nutritionFacts.calories} kcal
-                  </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <h4 className="font-bold text-gray-900 mb-3 text-lg">{t('product.origin')}</h4>
+                  <p className="text-gray-700">
+                    {t(`origin.${product.origin.toLowerCase().replace(/[,\s]+/g, '')}`) || product.origin}
+                  </p>
                 </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span>{t('product.protein')}</span>
-                  <span className="font-semibold">
-                    {product.nutritionFacts.protein}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span>{t('product.fat')}</span>
-                  <span className="font-semibold">
-                    {product.nutritionFacts.fat}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span>{t('product.carbohydrates')}</span>
-                  <span className="font-semibold">
-                    {product.nutritionFacts.carbs}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span>{t('product.fiber')}</span>
-                  <span className="font-semibold">
-                    {product.nutritionFacts.fiber}
-                  </span>
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <h4 className="font-bold text-gray-900 mb-3 text-lg">{t('product.certifications')}</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {product.certifications.map((cert) => (
+                      <Badge 
+                        key={cert} 
+                        variant="outline" 
+                        className="text-[#009744] border-[#009744] bg-green-50 hover:bg-green-100"
+                      >
+                        {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="reviews" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold mb-4 text-gray-900">{t('product.customerReviews')}</h3>
-          
-          {/* Rating Summary */}
-          <div className="grid grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-4xl font-bold mb-2 text-gray-900">{product.rating}</div>
-                <div className="flex justify-center mb-2 gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={18}
-                      className={
-                        i < Math.floor(product.rating)
-                          ? "fill-amber-400 text-amber-400"
-                          : "text-gray-300"
-                      }
-                    />
-                  ))}
+              {product.ingredients.length > 0 && (
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <h4 className="font-bold text-gray-900 mb-4 text-lg">{t('product.ingredients')}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {product.ingredients.map((ing, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-[#009744] flex-shrink-0"></div>
+                        <span className="text-gray-700">{ing}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-700">{product.reviews} reviews</p>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </TabsContent>
 
-          {/* Sample Reviews */}
-          <div className="space-y-4">
-            {[
-              { author: 'John Doe', rating: 5, title: 'Excellent quality!', comment: 'Great color and flavor.' },
-              { author: 'Jane Smith', rating: 4, title: 'Good value', comment: 'Good product quality.' },
-            ].map((review, idx) => (
-              <Card key={idx}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex gap-1">
+            {/* Nutrition Tab */}
+            <TabsContent value="nutrition" className="py-8 space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('product.nutritionInfo')}</h3>
+                <p className="text-gray-600">{t('product.perServing')}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-900 font-medium">{t('product.calories')}</span>
+                    <span className="font-bold text-gray-900">{product.nutritionFacts.calories} kcal</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-900 font-medium">{t('product.protein')}</span>
+                    <span className="font-bold text-gray-900">{product.nutritionFacts.protein}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-900 font-medium">{t('product.fat')}</span>
+                    <span className="font-bold text-gray-900">{product.nutritionFacts.fat}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                    <span className="text-gray-900 font-medium">{t('product.carbohydrates')}</span>
+                    <span className="font-bold text-gray-900">{product.nutritionFacts.carbs}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-gray-900 font-medium">{t('product.fiber')}</span>
+                    <span className="font-bold text-gray-900">{product.nutritionFacts.fiber}</span>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="py-8 space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.customerReviews')}</h3>
+              </div>
+
+              {/* Rating Summary */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-green-50 to-white p-6 rounded-lg border border-gray-200 text-center">
+                  <div className="text-5xl font-bold text-gray-900 mb-2">{product.rating}</div>
+                  <div className="flex justify-center mb-3">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={20}
+                        className={
+                          i < Math.floor(product.rating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-600 font-medium">{product.reviews} customer reviews</p>
+                </div>
+              </div>
+
+              {/* Sample Reviews */}
+              <div className="space-y-4">
+                {[
+                  { author: 'John Doe', rating: 5, title: 'Excellent quality!', comment: 'Great color and flavor. Highly recommended for anyone looking for authentic Kashmiri products.' },
+                  { author: 'Jane Smith', rating: 4, title: 'Good value for money', comment: 'Good product quality and fast shipping. Packaging was secure and professional.' },
+                ].map((review, idx) => (
+                  <div key={idx} className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="flex gap-1 mb-2">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              size={16}
+                              className={
+                                i < review.rating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+                        <h4 className="font-bold text-gray-900">{review.title}</h4>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-600 font-medium mb-2">{review.author}</p>
+                    <p className="text-gray-700">{review.comment}</p>
+                  </div>
+                ))}
+              </div>
+
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  size="lg" 
+                  className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 rounded-lg"
+                >
+                  {t('product.writeReview')}
+                </Button>
+              </motion.div>
+            </TabsContent>
+
+            {/* Shipping Tab */}
+            <TabsContent value="shipping" className="py-8 space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.shippingInfo')}</h3>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
+                  <h4 className="font-bold text-gray-900 mb-2">Standard Shipping</h4>
+                  <p className="text-gray-700">{t('product.standardShipping')}</p>
+                </div>
+                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
+                  <h4 className="font-bold text-gray-900 mb-2">Express Shipping</h4>
+                  <p className="text-gray-700">{t('product.expressShipping')}</p>
+                </div>
+                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
+                  <h4 className="font-bold text-gray-900 mb-2">Overnight Shipping</h4>
+                  <p className="text-gray-700">{t('product.overnightShipping')}</p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Related Products Section */}
+        <div className="border-t border-gray-200 mt-16 pt-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">You May Also Like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {mockProductsWithVariants.filter(p => p.id !== productId).slice(0, 4).map((relatedProduct) => (
+              <motion.div
+                key={relatedProduct.id}
+                className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                whileHover={{ y: -4 }}
+              >
+                <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                  <Image
+                    src={relatedProduct.image}
+                    alt={relatedProduct.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+                    {relatedProduct.name}
+                  </h3>
+                  <div className="flex items-center gap-1 mb-3">
+                    <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           size={14}
-                          className={
-                            i < review.rating
-                              ? "fill-amber-400 text-amber-400"
-                              : "text-gray-300"
-                          }
+                          className={i < Math.floor(relatedProduct.rating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}
                         />
                       ))}
                     </div>
-                    <span className="font-semibold text-gray-900">{review.title}</span>
+                    <span className="text-xs text-gray-600">({relatedProduct.reviews})</span>
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{review.author}</p>
-                  <p className="text-gray-800">{review.comment}</p>
-                  <Button variant="outline" size="sm" className="mt-2 gap-2">
-                    <ThumbsUp size={14} />
-                    Helpful
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="font-bold text-gray-900">{formatCurrency(relatedProduct.price)}</span>
+                    {relatedProduct.originalPrice && (
+                      <span className="text-sm text-gray-400 line-through">{formatCurrency(relatedProduct.originalPrice)}</span>
+                    )}
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold"
+                  >
+                    {t('product.viewDetails')}
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
             ))}
           </div>
-
-          <Button size="lg" className="w-full">
-            {t('product.writeReview')}
-          </Button>
-        </TabsContent>
-
-        <TabsContent value="shipping" className="space-y-4 text-gray-900 bg-white p-6 rounded-b-lg border border-t-0 border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">{t('product.shippingInfo')}</h3>
-          <div className="space-y-3 text-gray-800">
-            <p>{t('product.standardShipping')}</p>
-            <p>{t('product.expressShipping')}</p>
-            <p>{t('product.overnightShipping')}</p>
-          </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
