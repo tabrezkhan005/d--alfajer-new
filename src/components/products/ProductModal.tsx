@@ -267,7 +267,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                     product.badge === "NEW" && "bg-[#009744]"
                   )}
                 >
-                  {product.badge}
+                  {product.badge === 'SALE' ? t('product.badge.sale') : product.badge === 'HOT' ? t('product.badge.hot') : t('product.badge.new')}
                 </Badge>
               )}
               {product.discount && !product.badge && (
@@ -471,7 +471,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-14 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-base sm:text-base active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-2 w-full sm:w-auto"
                 >
                   <ShoppingCart className="h-5 w-5 sm:h-5 sm:w-5" />
-                  <span>Add to Cart</span>
+                  <span>{t("product.addToCart")}</span>
                 </Button>
                 <Button
                   size="lg"
@@ -482,7 +482,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   className="flex-1 bg-[#AB1F23] hover:bg-[#8B1819] text-white font-bold h-14 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(171,31,35,0.39)] hover:shadow-[0_6px_20px_rgba(171,31,35,0.23)] transition-all duration-300 font-poppins text-base sm:text-base active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-2 w-full sm:w-auto"
                 >
                   <Zap className="h-5 w-5 sm:h-5 sm:w-5" />
-                  <span>Buy Now</span>
+                  <span>{t("product.buyNow")}</span>
                 </Button>
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -1076,18 +1076,18 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 </div>
                 <div className="bg-gradient-to-br from-[#009744] to-[#00803a] rounded-lg sm:rounded-2xl p-6 sm:p-8 text-white">
                   <Building2 className="h-10 w-10 sm:h-12 sm:w-12 mb-4 opacity-80" />
-                  <h4 className="font-bold text-lg sm:text-xl font-poppins mb-2">Interested in Wholesale?</h4>
+                  <h4 className="font-bold text-lg sm:text-xl font-poppins mb-2">{t('product.wholesaleTitle')}</h4>
                   <p className="text-white/80 font-body mb-6 text-sm sm:text-base">
-                    Get special pricing for bulk orders. Perfect for restaurants, hotels, retailers, and businesses.
+                    {t('product.wholesaleDesc')}
                   </p>
                   <div className="space-y-4">
                     <Button
                       className="w-full bg-white text-[#009744] hover:bg-gray-100 font-bold rounded-full font-poppins text-sm sm:text-base"
                     >
-                      Request Quote
+                      {t('product.wholesaleRequestQuote')}
                     </Button>
                     <p className="text-xs sm:text-sm text-white/70 text-center font-body">
-                      Or email us at <a href={`mailto:${wholesaleInfo.contact}`} className="underline font-semibold">{wholesaleInfo.contact}</a>
+                      {t('product.wholesaleEmail')} <a href={`mailto:${wholesaleInfo.contact}`} className="underline font-semibold">{wholesaleInfo.contact}</a>
                     </p>
                   </div>
                 </div>

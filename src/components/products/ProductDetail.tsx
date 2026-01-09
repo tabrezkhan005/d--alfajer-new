@@ -160,7 +160,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                   animate={{ scale: 1 }}
                 >
                   <Badge className="bg-[#AB1F23] hover:bg-[#8B1819] text-white">
-                    {product.badge === 'SALE' ? 'SALE' : product.badge === 'HOT' ? 'HOT DEAL' : 'NEW'}
+                    {product.badge === 'SALE' ? t('product.badge.sale') : product.badge === 'HOT' ? t('product.badge.hot') : t('product.badge.new')}
                   </Badge>
                 </motion.div>
               )}

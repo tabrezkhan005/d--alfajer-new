@@ -77,15 +77,15 @@ export default function WishlistPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Your wishlist is empty
+                  {t("wishlist.empty")}
                 </h2>
                 <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                  Add your favorite products to your wishlist to save them for later and get notified about price changes.
+                  {t("wishlist.emptyDescription")}
                 </p>
               </div>
               <Link href="/products">
                 <Button className="bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 px-8 rounded-lg">
-                  Continue Shopping
+                  {t("wishlist.continueShopping")}
                   <ArrowRight size={20} className="ml-2" />
                 </Button>
               </Link>
@@ -166,7 +166,7 @@ export default function WishlistPage() {
                       className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold rounded-lg h-10"
                     >
                       <ShoppingCart size={18} className="mr-2" />
-                      Add to Cart
+                      {t("wishlist.addToCart")}
                     </Button>
                     <Button
                       onClick={() => removeItem(item.id)}
@@ -174,7 +174,7 @@ export default function WishlistPage() {
                       className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold rounded-lg h-10"
                     >
                       <Trash2 size={18} className="mr-2" />
-                      Remove
+                      {t("wishlist.remove")}
                     </Button>
                   </div>
                 </div>
