@@ -64,10 +64,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'Secure Payment',
     'product.ssl': '256-bit SSL encryption',
     'product.aboutProduct': 'About this product',
-    'product.nutritionInfo': 'Nutrition Information',
-    'product.perServing': 'Per serving: 1 tbsp (21g)',
-    'product.customerReviews': 'Customer Reviews',
-    'product.writeReview': 'Write a Review',
     
     // Cart
     'cart.empty': 'Your cart is empty',
@@ -147,10 +143,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.delete': 'Delete',
     'common.edit': 'Edit',
     'common.view': 'View',
+    'common.home': 'Home',
     'common.showing': 'Showing',
     'common.of': 'of',
     'common.product': 'product',
     'common.products': 'products',
+    'common.available': 'available',
     'common.reset': 'Reset',
     'common.allProducts': 'All Products',
     
@@ -488,14 +486,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.removeWishlist': 'إزالة من قائمة الرغبات',
     'product.notFound': 'لم يتم العثور على المنتج',
     'product.share': 'شارك',
-    'product.onOrders': 'للطلبات فوق 50 دولار',
+    'product.onOrders': 'على الطلبات فوق 50 دولار',
     'product.securePayment': 'دفع آمن',
-    'product.ssl': 'تشفير SSL بـ 256 بت',
+    'product.ssl': 'تشفير SSL 256 بت',
     'product.aboutProduct': 'حول هذا المنتج',
-    'product.nutritionInfo': 'معلومات التغذية',
-    'product.perServing': 'لكل حصة: 1 ملعقة كبيرة (21 غرام)',
-    'product.customerReviews': 'تقييمات العملاء',
-    'product.writeReview': 'كتابة تقييم',
     
     // Cart
     'cart.empty': 'سلتك فارغة',
@@ -575,10 +569,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.delete': 'حذف',
     'common.edit': 'تعديل',
     'common.view': 'عرض',
+    'common.home': 'الرئيسية',
     'common.showing': 'عرض',
     'common.of': 'من',
     'common.product': 'منتج',
     'common.products': 'منتجات',
+    'common.available': 'متاح',
     'common.reset': 'إعادة تعيين',
     'common.allProducts': 'جميع المنتجات',
     
@@ -918,10 +914,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.securePayment': 'सुरक्षित भुगतान',
     'product.ssl': '256-बिट SSL एन्क्रिप्शन',
     'product.aboutProduct': 'इस उत्पाद के बारे में',
-    'product.nutritionInfo': 'पोषण जानकारी',
-    'product.perServing': 'प्रति सेवारत: 1 बड़ा चम्मच (21 ग्राम)',
-    'product.customerReviews': 'ग्राहक समीक्षाएं',
-    'product.writeReview': 'समीक्षा लिखें',
     
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',
@@ -1001,10 +993,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.delete': 'हटाएं',
     'common.edit': 'संपादित करें',
     'common.view': 'दृश्य',
+    'common.home': 'होम',
     'common.showing': 'दिखा रहा है',
     'common.of': 'का',
     'common.product': 'उत्पाद',
     'common.products': 'उत्पाद',
+    'common.available': 'उपलब्ध',
     'common.reset': 'रीसेट करें',
     'common.allProducts': 'सभी उत्पाद',
     

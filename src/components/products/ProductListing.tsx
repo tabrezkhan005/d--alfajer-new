@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Filter, X, Eye, Plus, Heart, Star, Check } from "lucide-react";
 import { useCartStore } from "@/src/lib/cart-store";
+import { useWishlistStore } from "@/src/lib/wishlist-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { Button } from "@/src/components/ui/button";
 import { Checkbox } from "@/src/components/ui/checkbox";
@@ -650,9 +651,15 @@ export function ProductListing() {
 function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
   const router = useRouter();
   const { formatCurrency, convertCurrency, currency, t } = useI18n();
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addItem, clearCart, items } = useCartStore();
+  const { isInWishlist, toggleWishlist } = useWishlistStore();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Initialize wishlist status from store
+  useEffect(() => {
+    setIsWishlisted(isInWishlist(product.id));
+  }, [product.id, isInWishlist]);
 
   const isInCart = items.some((item) => item.id === product.id);
 
@@ -684,6 +691,20 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       packageSize: product.packageSize,
     }, false);
     router.push("/checkout");
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleWishlist({
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      rating: product.rating,
+      reviews: product.reviews,
+    });
+    setIsWishlisted(!isWishlisted);
   };
 
   return (
@@ -734,10 +755,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
                 "h-11 w-11 rounded-full bg-white/95 hover:bg-white backdrop-blur-sm transition-all shadow-lg border border-gray-100",
                 isWishlisted && "bg-pink-50 border-pink-100"
               )}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsWishlisted(!isWishlisted);
-              }}
+              onClick={handleWishlistToggle}
               aria-label="Add to wishlist"
             >
               <AnimatePresence mode="wait">

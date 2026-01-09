@@ -211,8 +211,10 @@ export function Header() {
               </div>
 
               <div className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
-                <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
-                <span className="text-xs md:text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">{t('product.reviews')}</span>
+                <Link href="/wishlist" className="flex items-center gap-2">
+                  <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
+                  <span className="text-xs md:text-sm text-gray-700 font-medium group-hover:text-pink-500 transition-colors whitespace-nowrap">{t('product.wishlist')}</span>
+                </Link>
               </div>
 
               <DropdownMenu>
@@ -248,12 +250,14 @@ export function Header() {
                 >
                   <Headphones className="h-4 md:h-5 w-4 md:w-5 text-white" />
                 </button>
-                <button
-                  className="flex items-center justify-center hover:text-pink-500 transition-colors shrink-0"
-                  aria-label="Wishlist"
-                >
-                  <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
-                </button>
+                <Link href="/wishlist">
+                  <button
+                    className="flex items-center justify-center hover:text-pink-500 transition-colors shrink-0"
+                    aria-label="Wishlist"
+                  >
+                    <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                  </button>
+                </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
@@ -300,9 +304,12 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
-                  <Heart className="h-4 w-4 text-gray-600" />
-                  <span>{t('product.reviews')}</span>
+                  <Link href="/wishlist" className="flex items-center gap-2 w-full">
+                    <Heart className="h-4 w-4 text-gray-600" />
+                    <span>{t('product.wishlist')}</span>
+                  </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <ShoppingBag className="h-4 w-4 text-gray-600" />
                   <span>Orders</span>

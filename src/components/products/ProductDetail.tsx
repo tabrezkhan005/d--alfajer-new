@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/src/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/src/lib/cart-store";
+import { useWishlistStore } from "@/src/lib/wishlist-store";
 import { mockProductsWithVariants } from "@/src/lib/products";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 
@@ -50,6 +51,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   const router = useRouter();
   const { t, formatCurrency } = useI18n();
   const { addItem } = useCartStore();
+  const { isInWishlist, toggleWishlist } = useWishlistStore();
 
   const product = useMemo(
     () => mockProductsWithVariants.find((p) => p.id === productId),
@@ -62,6 +64,13 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Initialize wishlist status from store
+  useEffect(() => {
+    if (product) {
+      setIsWishlisted(isInWishlist(product.id));
+    }
+  }, [product, isInWishlist]);
 
   if (!product) {
     return <div className="p-8 text-center">{t("product.notFound")}</div>;
@@ -94,6 +103,21 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
     if (selectedVariant) {
       // Navigate to checkout with product ID (without adding to cart)
       router.push(`/checkout?product=${product.id}`);
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (product) {
+      toggleWishlist({
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: selectedVariant?.price || product.price,
+        originalPrice: selectedVariant?.originalPrice || product.originalPrice,
+        rating: product.rating,
+        reviews: product.reviews,
+      });
+      setIsWishlisted(!isWishlisted);
     }
   };
 
@@ -323,8 +347,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12"
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12 rounded-lg"
+                    onClick={handleWishlistToggle}
                   >
                     <Heart
                       size={20}
@@ -336,7 +360,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12"
+                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12 rounded-lg"
                     onClick={() => {
                       if (navigator.share) {
                         navigator.share({
@@ -564,15 +588,15 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
               <div className="space-y-4">
                 <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">Standard Shipping</h4>
+                  <h4 className="font-bold text-gray-900 mb-2">{t('product.standardShipping')}</h4>
                   <p className="text-gray-700">{t('product.standardShipping')}</p>
                 </div>
                 <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">Express Shipping</h4>
+                  <h4 className="font-bold text-gray-900 mb-2">{t('product.expressShipping')}</h4>
                   <p className="text-gray-700">{t('product.expressShipping')}</p>
                 </div>
                 <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">Overnight Shipping</h4>
+                  <h4 className="font-bold text-gray-900 mb-2">{t('product.overnightShipping')}</h4>
                   <p className="text-gray-700">{t('product.overnightShipping')}</p>
                 </div>
               </div>
@@ -582,7 +606,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
         {/* Related Products Section */}
         <div className="border-t border-gray-200 mt-16 pt-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">You May Also Like</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('product.relatedProducts')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {mockProductsWithVariants.filter(p => p.id !== productId).slice(0, 4).map((relatedProduct) => (
               <motion.div
