@@ -345,9 +345,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
               <div className="grid grid-cols-2 gap-3">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12 rounded-lg"
+                    className="w-full bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-100 font-semibold h-12 rounded-lg"
                     onClick={handleWishlistToggle}
                   >
                     <Heart
@@ -358,9 +356,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold h-12 rounded-lg"
+                    className="w-full bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-100 font-semibold h-12 rounded-lg"
                     onClick={() => {
                       if (navigator.share) {
                         navigator.share({
@@ -397,8 +393,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 <div className="flex justify-center mb-2">
                   <RotateCcw size={24} className="text-[#009744]" />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">Easy Returns</p>
-                <p className="text-xs text-gray-600 mt-1">30-day policy</p>
+                <p className="text-sm font-semibold text-gray-900">{t('product.easyReturns')}</p>
+                <p className="text-xs text-gray-600 mt-1">{t('product.returnPolicy')}</p>
               </div>
             </div>
           </div>

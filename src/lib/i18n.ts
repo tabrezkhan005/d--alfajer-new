@@ -209,10 +209,13 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Details
     'product.ingredients': 'Ingredients',
     'product.nutritionFacts': 'Nutrition Facts',
+    'product.nutritionInfo': 'Nutrition Information',
+    'product.perServing': 'Per serving',
     'product.servingSize': 'Serving Size',
     'product.calories': 'Calories',
     'product.protein': 'Protein',
     'product.fat': 'Fat',
+    'product.carbohydrates': 'Carbohydrates',
     'product.carbs': 'Carbohydrates',
     'product.fiber': 'Fiber',
     'product.allergenInfo': 'Allergen Information',
@@ -223,6 +226,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.salePrice': 'Sale Price',
     'product.originalPrice': 'Original Price',
     'product.viewDetails': 'View Details',
+    'product.customerReviews': 'Customer Reviews',
+    'product.writeReview': 'Write a Review',
     
     // Product Details - Tabs & Sections
     'product.details': 'Details',
@@ -255,8 +260,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.expressShipping': 'Express Shipping',
     'product.overnightShipping': 'Overnight Shipping',
     'product.localPickup': 'Local Pickup',
-    'product.freeShipping': 'Free',
-    'product.freePickup': 'Free',
     'product.standardShippingDesc': 'Standard delivery to your doorstep',
     'product.expressShippingDesc': 'Faster delivery option available',
     'product.overnightShippingDesc': 'Premium next-day delivery service',
@@ -635,11 +638,14 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Details
     'product.ingredients': 'المكونات',
     'product.nutritionFacts': 'معلومات التغذية',
+    'product.nutritionInfo': 'معلومات التغذية',
+    'product.perServing': 'لكل حصة',
     'product.servingSize': 'حجم الحصة',
     'product.calories': 'السعرات الحرارية',
     'product.protein': 'البروتين',
     'product.fat': 'الدهن',
     'product.carbs': 'الكربوهيدرات',
+    'product.carbohydrates': 'الكربوهيدرات',
     'product.fiber': 'الألياف',
     'product.allergenInfo': 'معلومات الحساسية',
     'product.certifications': 'الشهادات',
@@ -649,6 +655,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.salePrice': 'سعر البيع',
     'product.originalPrice': 'السعر الأصلي',
     'product.viewDetails': 'عرض التفاصيل',
+    'product.customerReviews': 'آراء العملاء',
+    'product.writeReview': 'اكتب تقييم',
     
     // Product Details - Tabs & Sections
     'product.details': 'التفاصيل',
@@ -1059,11 +1067,14 @@ export const translations: Record<Language, Record<string, string>> = {
     // Product Details
     'product.ingredients': 'सामग्री',
     'product.nutritionFacts': 'पोषण तथ्य',
+    'product.nutritionInfo': 'पोषण जानकारी',
+    'product.perServing': 'प्रति सेवारत',
     'product.servingSize': 'सेवारत आकार',
     'product.calories': 'कैलोरी',
     'product.protein': 'प्रोटीन',
     'product.fat': 'वसा',
     'product.carbs': 'कार्बोहाइड्रेट',
+    'product.carbohydrates': 'कार्बोहाइड्रेट',
     'product.fiber': 'फाइबर',
     'product.allergenInfo': 'एलर्जी सूचना',
     'product.certifications': 'प्रमाणपत्र',
@@ -1073,6 +1084,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.salePrice': 'विक्रय मूल्य',
     'product.originalPrice': 'मूल मूल्य',
     'product.viewDetails': 'विवरण देखें',
+    'product.customerReviews': 'ग्राहक समीक्षाएं',
+    'product.writeReview': 'एक समीक्षा लिखें',
     
     // Product Details - Tabs & Sections
     'product.details': 'विवरण',
