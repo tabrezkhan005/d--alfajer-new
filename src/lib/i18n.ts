@@ -305,8 +305,9 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Product Descriptions
     'product.kashmiChilliDesc': 'Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives. Sourced directly from Kashmiri farmers.',
-    'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. No added sugars or preservatives. Rich in antioxidants and natural enzymes for optimal health benefits.',
-    'product.almondDesc': 'Premium California almonds, carefully selected and roasted to perfection. Rich in protein and healthy fats. Perfect for snacking or adding to your favorite recipes.',
+    'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste.',
+    'product.saffronDesc': 'Premium Kashmiri Saffron with intense aroma and color. Hand-picked and carefully dried. Perfect for rice dishes, desserts, and traditional use.',
+    'product.shilajitDesc': 'Premium quality Shilajit resin sourced from the pristine Himalayan mountains. Pure, authentic, and rich in fulvic acid and essential minerals. Known for its traditional health benefits and natural energy support.',
     
     // Product Ingredients
     'ingredient.kashmiriRedChillies': '100% Kashmiri Red Chillies',
@@ -555,6 +556,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'ingredient.saffron': 'زعفران كشميري فاخر',
     'ingredient.shilajit': 'شيلاجيت هيمالايا نقي',
     
+    // Product Descriptions - Arabic
+    'product.kashmiChilliDesc': 'مسحوق فلفل كشميري أحمر مصنوع من فلفل أحمر مختار بعناية. غني بالنكهة ودرجة حرارة مثالية لجميع احتياجاتك الطهوية. معالج بشكل طبيعي بدون أي إضافات أو مواد حافظة. يتم الحصول عليه مباشرة من مزارعي كشمير.',
+    'product.honeyDesc': 'عسل طبيعي 100٪ نقي يتم الحصول عليه مباشرة من مربي النحل المحليين. غير معالج وغير مصفى للحفاظ على جميع الإنزيمات الطبيعية وفوائد الصحة. لون ذهبي غني مع طعم زهري أصلي.',
+    'product.saffronDesc': 'زعفران كشميري فاخر برائحة وألوان مكثفة. مختار يدويًا وجاف بعناية. مثالي لأطباق الأرز والحلويات والاستخدام التقليدي.',
+    'product.shilajitDesc': 'راتينج شيلاجيت عالي الجودة يتم الحصول عليه من جبال الهيمالايا النقية. نقي وأصلي وغني بحمض الفولفيك والمعادن الأساسية. معروف بفوائده الصحية التقليدية وبدعم الطاقة الطبيعية.',
+    
     // Review Content - Arabic
     'review.greatColorFlavor': 'لون وطعم رائع. موصى به بشدة لمن يبحثون عن منتجات كشميرية أصلية.',
     'review.goodValueForMoney': 'قيمة جيدة مقابل المال',
@@ -781,11 +788,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.faqAnswer2': 'ستتلقى رقم تتبع عبر البريد الإلكتروني بعد شحن طلبك. يمكنك تتبعه في الوقت الفعلي على موقعنا أو تطبيق الناقل.',
     'product.faqQuestion3': 'ماذا لو وصلت الحزمة تالفة؟',
     'product.faqAnswer3': 'نضمن منتجات طازة وسليمة. إذا وصلت الحزمة تالفة، اتصل بنا على الفور مع صور للحصول على استرجاع كامل أو استبدال بدون تكلفة إضافية.',
-    
-    // Product Descriptions
-    'product.kashmiChilliDesc': 'مسحوق الفلفل الحار الكشميري الأحمر المصنوع من الفلفل الحار الأحمر المختار بعناية. غني بالنكهة ومستوى الحرارة المثالي لجميع احتياجاتك الطهي. معالج بشكل طبيعي بدون مضافات أو مواد حافظة. مشترى مباشرة من المزارعين الكشميريين.',
-    'product.honeyDesc': 'عسل طبيعي نقي 100% مصدره المباشر من مربي النحل المحليين. بدون سكريات مضافة أو مواد حافظة. غني بمضادات الأكسدة والإنزيمات الطبيعية لفوائد صحية مثالية.',
-    'product.almondDesc': 'لوز كاليفورنيا الممتاز، مختار بعناية وحمصه بشكل مثالي. غني بالبروتين والدهون الصحية. مثالي للوجبات الخفيفة أو إضافة إلى وصفاتك المفضلة.',
     
     // Review Content
     'review.excellentQuality': 'جودة ممتازة!',
@@ -1028,6 +1030,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'ingredient.saffron': 'प्रीमियम कश्मीरी केसर',
     'ingredient.shilajit': 'शुद्ध हिमालयी शिलाजीत',
     
+    // Product Descriptions - Hindi
+    'product.kashmiChilliDesc': 'कश्मीरी लाल मिर्च पाउडर सावधानी से चुनी गई लाल मिर्च से बना है। स्वाद में समृद्ध और आपकी सभी पाक जरूरतों के लिए परिपूर्ण गर्मी स्तर। बिना किसी योजक या संरक्षक के प्राकृतिक रूप से संसाधित। कश्मीरी किसानों से सीधे प्राप्त।',
+    'product.honeyDesc': '100% शुद्ध प्राकृतिक शहद सीधे स्थानीय मधुमक्खी पालकों से प्राप्त। सभी प्राकृतिक एंजाइमों और स्वास्थ्य लाभों को संरक्षित करने के लिए असंसाधित और अनफ़िल्टर्ड। समृद्ध, सोने का रंग प्रामाणिक पुष्प स्वाद के साथ।',
+    'product.saffronDesc': 'तीव्र सुगंध और रंग के साथ प्रीमियम कश्मीरी केसर। हाथ से उठाया और सावधानी से सूखा। चावल के व्यंजन, मिठाई और पारंपरिक उपयोग के लिए बिल्कुल सही।',
+    'product.shilajitDesc': 'प्राचीन हिमालय पर्वत से प्राप्त प्रीमियम गुणवत्ता शिलाजीत राल। शुद्ध, प्रामाणिक, और फुल्विक एसिड और आवश्यक खनिजों में समृद्ध। इसके पारंपरिक स्वास्थ्य लाभ और प्राकृतिक ऊर्जा समर्थन के लिए जाना जाता है।',
+    
     // Review Content - Hindi
     'review.greatColorFlavor': 'बहुत अच्छा रंग और स्वाद। प्रामाणिक कश्मीरी उत्पादों की तलाश में किसी के लिए भी अत्यधिक अनुशंसित।',
     'review.goodValueForMoney': 'पैसे के लिए अच्छा मूल्य',
@@ -1254,11 +1262,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.faqAnswer2': 'आपके ऑर्डर के शिप होने के बाद आपको ईमेल के माध्यम से एक ट्रैकिंग नंबर मिलेगा। आप इसे हमारी वेबसाइट या कूरियर के ऐप पर रीयल-टाइम में ट्रैक कर सकते हैं।',
     'product.faqQuestion3': 'यदि मेरा पैकेज क्षतिग्रस्त आता है तो क्या होगा?',
     'product.faqAnswer3': 'हम ताजा, बरकरार उत्पादों की गारंटी देते हैं। यदि पैकेज क्षतिग्रस्त आता है, तो तुरंत फोटो के साथ हमसे संपर्क करें पूर्ण धनवापसी या बिना किसी अतिरिक्त लागत के प्रतिस्थापन के लिए।',
-    
-    // Product Descriptions
-    'product.kashmiChilliDesc': 'कश्मीरी लाल मिर्च पाउडर सावधानी से चुनी गई लाल मिर्च से बना है। स्वाद में समृद्ध और आपकी सभी पाक जरूरतों के लिए परिपूर्ण गर्मी स्तर। बिना किसी योजक या संरक्षक के प्राकृतिक रूप से संसाधित। कश्मीरी किसानों से सीधे प्राप्त।',
-    'product.honeyDesc': '100% शुद्ध प्राकृतिक शहद जो स्थानीय मधुमक्खी पालकों से सीधे प्राप्त है। कोई अतिरिक्त चीनी या संरक्षक नहीं। एंटीऑक्सिडेंट और प्राकृतिक एंजाइम में समृद्ध सर्वोत्तम स्वास्थ्य लाभ के लिए।',
-    'product.almondDesc': 'प्रीमियम कैलिफोर्निया बादाम, सावधानी से चुने और सही तरीके से भुने। प्रोटीन और स्वस्थ वसा में समृद्ध। नाश्ते के लिए या आपकी पसंदीदा रेसिपी में जोड़ने के लिए बिल्कुल सही।',
     
     // Review Content
     'review.excellentQuality': 'उत्कृष्ट गुणवत्ता!',

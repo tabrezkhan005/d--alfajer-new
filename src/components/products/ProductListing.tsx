@@ -101,7 +101,7 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "HOT",
-    description: "100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste.",
+    description: "product.honeyDesc",
   },
   {
     id: "3",
@@ -123,7 +123,7 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "SALE",
-    description: "Premium Kashmiri Saffron with intense aroma and color. Hand-picked and carefully dried. Perfect for rice dishes, desserts, and traditional use.",
+    description: "product.saffronDesc",
   },
   {
     id: "4",
@@ -147,7 +147,7 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "HOT",
-    description: "Premium quality Shilajit resin sourced from the pristine Himalayan mountains. Pure, authentic, and rich in fulvic acid and essential minerals. Known for its traditional health benefits and natural energy support.",
+    description: "product.shilajitDesc",
   },
 ];
 

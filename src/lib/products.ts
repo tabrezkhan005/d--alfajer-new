@@ -84,7 +84,7 @@ export const mockProductsWithVariants: Product[] = [
     id: '1',
     name: 'productName.kashmirilRedChilliPowder',
     shortDescription: 'Premium grade Kashmiri red chilli powder with perfect color and heat.',
-    longDescription: 'Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives. Sourced directly from Kashmiri farmers.',
+    longDescription: 'product.kashmiChilliDesc',
     category: 'Spices',
     image: '/images/products/chillipowder/chillipowder_main.jpeg',
     images: [
@@ -148,7 +148,7 @@ export const mockProductsWithVariants: Product[] = [
     id: '2',
     name: 'productName.kashmirilPureWhiteHoney',
     shortDescription: '100% pure natural honey sourced directly from local beekeepers.',
-    longDescription: '100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste. No added sugars or preservatives.',
+    longDescription: 'product.honeyDesc',
     category: 'Honey & Spreads',
     image: '/images/products/honey/honey_main.jpeg',
     images: [
@@ -206,7 +206,7 @@ export const mockProductsWithVariants: Product[] = [
     id: '3',
     name: 'productName.kashmirilSaffron',
     shortDescription: 'Premium Kashmiri Saffron with intense aroma and color.',
-    longDescription: 'Premium grade Kashmiri saffron sourced directly from the fields of Kashmir. Known for its distinct color, aroma, and flavor. Perfect for rice dishes, desserts, and traditional medications. Each strand is carefully hand-picked and dried.',
+    longDescription: 'product.saffronDesc',
     category: 'Spices',
     image: '/images/products/chillipowder/chillipowder_main.jpeg',
     images: [
