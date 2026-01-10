@@ -148,7 +148,7 @@ export default function LoginPage() {
                     <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <input
                       type="text"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
                       placeholder="John Doe"
                       value={formData.name}
                       onChange={(e) =>
@@ -168,7 +168,7 @@ export default function LoginPage() {
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
                     type="email"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) =>
@@ -187,7 +187,7 @@ export default function LoginPage() {
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
+                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) =>
@@ -218,7 +218,7 @@ export default function LoginPage() {
                     <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <input
                       type={showPassword ? "text" : "password"}
-                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
+                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
                       placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={(e) =>
