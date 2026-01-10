@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import {
   User,
   Headphones,
   Menu,
+  LogOut,
 } from "lucide-react";
 
 import { Input } from "@/src/components/ui/input";
@@ -29,13 +30,16 @@ import {
 import { useCartStore } from "@/src/lib/cart-store";
 import { CartSheet } from "@/src/components/cart";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { useAuth } from "@/src/lib/auth-context";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { items, openCart, getTotalItems, getTotalPrice } = useCartStore();
   const { t, formatCurrency, convertCurrency, currency } = useI18n();
+  const { user, isLoggedIn, logout } = useAuth();
 
   const headerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
@@ -204,10 +208,12 @@ export function Header() {
               className="hidden lg:flex items-center gap-3 lg:gap-4"
             >
               <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-                <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
-                  <Headphones className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">{t('header.support')}</span>
+                <Link href="/support" className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
+                    <Headphones className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">{t('header.support')}</span>
+                </Link>
               </div>
 
               <div className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
@@ -217,25 +223,38 @@ export function Header() {
                 </Link>
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-                    <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
-                    <div className="flex flex-col items-start">
-                      <span className="text-xs md:text-sm text-gray-900 font-medium">{t('nav.account')}</span>
+              {isLoggedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                      <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs md:text-sm text-gray-900 font-medium">{user?.name || t('nav.account')}</span>
+                      </div>
                     </div>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuLabel>{t('header.account')}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>{t('nav.account')}</DropdownMenuItem>
-                  <DropdownMenuItem>Create Account</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Orders</DropdownMenuItem>
-                  <DropdownMenuItem>{t('product.reviews')}</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        logout();
+                        router.push("/");
+                      }}
+                      className="text-red-600 cursor-pointer flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                >
+                  <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                  <span className="text-xs md:text-sm text-gray-700 font-medium whitespace-nowrap">Login</span>
+                </Link>
+              )}
             </div>
 
             {/* Desktop: Compact actions (when scrolled) */}
@@ -258,25 +277,39 @@ export function Header() {
                     <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                   </button>
                 </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                {isLoggedIn ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
+                        aria-label="Account"
+                      >
+                        <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          logout();
+                          router.push("/");
+                        }}
+                        className="text-red-600 cursor-pointer flex items-center gap-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link href="/login">
                     <button
                       className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                      aria-label={t('header.account')}
+                      aria-label="Login"
                     >
                       <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-52">
-                    <DropdownMenuLabel>{t('header.account')}</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>{t('nav.account')}</DropdownMenuItem>
-                    <DropdownMenuItem>Create Account</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Orders</DropdownMenuItem>
-                    <DropdownMenuItem>{t('product.reviews')}</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </Link>
+                )}
             </div>
 
             {/* Mobile: Hamburger menu with dropdown */}
@@ -292,16 +325,48 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
-                <DropdownMenuLabel className="text-gray-900">{t('header.account')}</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-200" />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
-                  <User className="h-4 w-4 text-gray-600" />
-                  <span>{t('nav.account')}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
-                  <User className="h-4 w-4 text-gray-600" />
-                  <span>Create Account</span>
-                </DropdownMenuItem>
+                {isLoggedIn ? (
+                  <>
+                    <DropdownMenuLabel className="text-gray-900">
+                      {user?.name || t('nav.account')}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/account"
+                        className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100"
+                      >
+                        <User className="h-4 w-4 text-gray-600" />
+                        <span>My Account</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        logout();
+                        router.push("/");
+                      }}
+                      className="flex items-center gap-2 cursor-pointer text-red-600 hover:bg-gray-100 focus:bg-gray-100"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuLabel className="text-gray-900">Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/login"
+                        className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100"
+                      >
+                        <User className="h-4 w-4 text-gray-600" />
+                        <span>Login</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator className="bg-gray-200" />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
                   <Link href="/wishlist" className="flex items-center gap-2 w-full">
@@ -310,14 +375,14 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-gray-200" />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
-                  <ShoppingBag className="h-4 w-4 text-gray-600" />
-                  <span>Orders</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-gray-200" />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100">
-                  <Headphones className="h-4 w-4 text-gray-600" />
-                  <span>{t('header.support')}</span>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/support"
+                    className="flex items-center gap-2 cursor-pointer text-gray-900 hover:bg-gray-100 focus:bg-gray-100"
+                  >
+                    <Headphones className="h-4 w-4 text-gray-600" />
+                    <span>{t('header.support')}</span>
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
