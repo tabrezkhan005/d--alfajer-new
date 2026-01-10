@@ -98,22 +98,22 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-md"
+          className="w-full max-w-sm"
         >
           {/* Header */}
           <motion.div
             variants={itemVariants}
-            className="text-center mb-8"
+            className="text-center mb-6"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
               {isSignup ? "Create Account" : "Welcome Back"}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm text-gray-600">
               {isSignup
                 ? "Join us and start shopping"
                 : "Sign in to your account"}
@@ -123,12 +123,12 @@ export default function LoginPage() {
           {/* Form Card */}
           <motion.div
             variants={itemVariants}
-            className="bg-white border border-gray-200 rounded-lg p-8 shadow-lg"
+            className="bg-white border border-gray-200 rounded-lg p-6 shadow-lg"
           >
             {error && (
               <motion.div
                 variants={itemVariants}
-                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
               >
                 {error}
               </motion.div>
@@ -136,12 +136,12 @@ export default function LoginPage() {
 
             <form
               onSubmit={isSignup ? handleSignup : handleLogin}
-              className="space-y-6"
+              className="space-y-4"
             >
               {/* Name Field - Signup Only */}
               {isSignup && (
                 <motion.div variants={itemVariants}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
@@ -161,7 +161,7 @@ export default function LoginPage() {
 
               {/* Email Field */}
               <motion.div variants={itemVariants}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
@@ -180,7 +180,7 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <motion.div variants={itemVariants}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -211,7 +211,7 @@ export default function LoginPage() {
               {/* Confirm Password Field - Signup Only */}
               {isSignup && (
                 <motion.div variants={itemVariants}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Confirm Password
                   </label>
                   <div className="relative">
@@ -259,7 +259,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   {isLoading ? "Processing..." : isSignup ? "Create Account" : "Sign In"}
                 </Button>
@@ -269,7 +269,7 @@ export default function LoginPage() {
             {/* Toggle Between Login and Signup */}
             <motion.div
               variants={itemVariants}
-              className="mt-6 text-center text-sm text-gray-600"
+              className="mt-4 text-center text-xs text-gray-600"
             >
               {isSignup ? (
                 <>
@@ -314,10 +314,10 @@ export default function LoginPage() {
           </motion.div>
 
           {/* Continue as Guest */}
-          <motion.div variants={itemVariants} className="mt-6 text-center">
+          <motion.div variants={itemVariants} className="mt-4 text-center">
             <Link
               href="/"
-              className="text-gray-600 hover:text-gray-900 text-sm font-medium transition"
+              className="text-gray-600 hover:text-gray-900 text-xs font-medium transition"
             >
               Continue as Guest
             </Link>
