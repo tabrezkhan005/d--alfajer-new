@@ -224,28 +224,27 @@ export function Header() {
               </div>
 
               {isLoggedIn ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-                      <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
-                      <div className="flex flex-col items-start">
-                        <span className="text-xs md:text-sm text-gray-900 font-medium">{user?.name || t('nav.account')}</span>
-                      </div>
+                <div className="group relative">
+                  <Link href="/account" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                    <div className="flex flex-col items-start">
+                      <span className="text-xs md:text-sm text-gray-900 font-medium">{user?.name || t('nav.account')}</span>
                     </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem
+                  </Link>
+                  {/* Hover Dropdown Logout */}
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-48 z-50">
+                    <button
                       onClick={() => {
                         logout();
                         router.push("/");
                       }}
-                      className="text-red-600 cursor-pointer flex items-center gap-2"
+                      className="w-full px-4 py-2.5 text-left text-red-600 hover:bg-red-50 flex items-center gap-2 text-sm font-medium rounded-lg transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <Link
                   href="/login"
@@ -278,28 +277,29 @@ export function Header() {
                   </button>
                 </Link>
                 {isLoggedIn ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  <div className="group relative">
+                    <Link href="/account">
                       <button
                         className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
                         aria-label="Account"
                       >
                         <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                       </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem
+                    </Link>
+                    {/* Hover Dropdown Logout */}
+                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-48 z-50">
+                      <button
                         onClick={() => {
                           logout();
                           router.push("/");
                         }}
-                        className="text-red-600 cursor-pointer flex items-center gap-2"
+                        className="w-full px-4 py-2.5 text-left text-red-600 hover:bg-red-50 flex items-center gap-2 text-sm font-medium rounded-lg transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      </button>
+                    </div>
+                  </div>
                 ) : (
                   <Link href="/login">
                     <button
