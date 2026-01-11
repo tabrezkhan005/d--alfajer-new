@@ -60,7 +60,7 @@ export default function WishlistPage() {
             <h1 className="text-4xl font-bold text-gray-900">{t("product.wishlist")}</h1>
           </div>
           <p className="text-gray-600 text-lg">
-            {getTotalItems()} {getTotalItems() === 1 ? t("common.product") : t("common.products")} in your wishlist
+            {getTotalItems()} {getTotalItems() === 1 ? t("common.product") : t("common.products")} {t("wishlist.inYourWishlist")}
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export default function WishlistPage() {
                   {/* Name */}
                   <Link href={`/products/${item.id}`}>
                     <h3 className="font-semibold text-gray-900 hover:text-[#009744] transition-colors line-clamp-2">
-                      {item.name}
+                      {t(item.name)}
                     </h3>
                   </Link>
 
@@ -170,8 +170,7 @@ export default function WishlistPage() {
                     </Button>
                     <Button
                       onClick={() => removeItem(item.id)}
-                      variant="outline"
-                      className="w-full border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold rounded-lg h-10"
+                      className="w-full bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold rounded-lg h-10"
                     >
                       <Trash2 size={18} className="mr-2" />
                       {t("wishlist.remove")}
