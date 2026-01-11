@@ -11,7 +11,6 @@ import {
   Phone,
   Package,
   Heart,
-  Settings,
   LogOut,
   Edit2,
   Trash2,
@@ -28,7 +27,7 @@ export default function AccountPage() {
   const { user, isLoggedIn, logout, isLoading } = useAuth();
   const { items: wishlistItems, removeItem: removeFromWishlist } = useWishlistStore();
   const { getOrdersByUser, removeOrder } = useOrders();
-  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist" | "settings">(
+  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">(
     "profile"
   );
   const [isEditing, setIsEditing] = useState(false);
@@ -139,7 +138,6 @@ export default function AccountPage() {
             { id: "profile", label: "Profile", icon: User },
             { id: "orders", label: "Orders", icon: Package },
             { id: "wishlist", label: "Wishlist", icon: Heart },
-            { id: "settings", label: "Settings", icon: Settings },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -296,42 +294,86 @@ export default function AccountPage() {
                 <motion.div
                   key={index}
                   variants={itemVariants}
-                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <span className="font-semibold text-gray-900">{order.id}</span>
-                        <span
-                          className={`px-3 py-1 text-sm rounded-full font-medium ${
-                            order.status === "Delivered"
-                              ? "bg-green-100 text-green-800"
-                              : order.status === "Shipped"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {order.status}
-                        </span>
+                  <div className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-gray-200">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                          <span className="font-semibold text-gray-900 text-lg">{order.id}</span>
+                          <span
+                            className={`px-3 py-1 text-sm rounded-full font-medium ${
+                              order.status === "Delivered"
+                                ? "bg-green-100 text-green-800"
+                                : order.status === "Shipped"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {order.status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">{order.date}</p>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{order.items}</p>
-                      <p className="text-xs text-gray-500">{order.date}</p>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-900 mb-2">
+                          AED {order.total.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900 mb-2">
-                        {order.total}
-                      </p>
-                      <div className="flex gap-2 justify-end">
-                        <Button className="bg-[#009744] hover:bg-[#007A37] text-white text-sm px-4 py-2 rounded-lg">
-                          View Details
-                        </Button>
-                        <Button
-                          onClick={() => removeOrder(order.id)}
-                          className="bg-red-100 hover:bg-red-200 text-red-700 text-sm px-4 py-2 rounded-lg"
-                        >
-                          Remove
-                        </Button>
-                      </div>
+
+                    {/* Order Items */}
+                    <div className="space-y-4 mb-6">
+                      <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">Items Ordered</h3>
+                      {order.items && order.items.length > 0 ? (
+                        <div className="space-y-3">
+                          {order.items.map((item: any, itemIndex: number) => (
+                            <div
+                              key={itemIndex}
+                              className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                            >
+                              {item.image && (
+                                <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-gray-900 mb-1">{item.name}</h4>
+                                <p className="text-sm text-gray-600 mb-2">
+                                  {item.packageSize && <span className="mr-3">{item.packageSize}</span>}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm text-gray-600">
+                                    Qty: <span className="font-semibold">{item.quantity}</span>
+                                  </span>
+                                  <span className="font-semibold text-[#009744]">
+                                    AED {(item.price * item.quantity).toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-600 text-sm">No items in this order</p>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-4 border-t border-gray-200">
+                      <Button className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg">
+                        View Details
+                      </Button>
+                      <Button
+                        onClick={() => removeOrder(order.id)}
+                        className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg"
+                      >
+                        Remove Order
+                      </Button>
                     </div>
                   </div>
                 </motion.div>
@@ -423,79 +465,27 @@ export default function AccountPage() {
           </motion.div>
         )}
 
-        {/* Settings Tab */}
-        {activeTab === "settings" && (
+        {/* Settings Tab - Logout */}
+        <div className="mt-8">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white border border-red-200 rounded-lg p-6 bg-red-50"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
-
-            <motion.div
-              variants={itemVariants}
-              className="bg-white border border-gray-200 rounded-lg p-6"
+            <h3 className="font-semibold text-gray-900 mb-4">Account Actions</h3>
+            <Button
+              onClick={() => {
+                logout();
+                router.push("/");
+              }}
+              className="bg-[#AB1F23] hover:bg-[#8a1819] text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2"
             >
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Mail size={20} className="text-[#009744]" />
-                Notifications
-              </h3>
-              <div className="space-y-3">
-                {[
-                  "Order updates",
-                  "Promotional emails",
-                  "New product launches",
-                  "Special offers",
-                ].map((item, i) => (
-                  <label key={i} className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      className="w-4 h-4 rounded border-gray-300 text-[#009744]"
-                    />
-                    <span className="text-gray-700">{item}</span>
-                  </label>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              className="bg-white border border-gray-200 rounded-lg p-6"
-            >
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Settings size={20} className="text-[#009744]" />
-                Privacy & Security
-              </h3>
-              <div className="space-y-3">
-                <Button className="w-full border border-gray-300 text-gray-900 hover:bg-gray-50 py-2 rounded-lg">
-                  Change Password
-                </Button>
-                <Button className="w-full border border-gray-300 text-gray-900 hover:bg-gray-50 py-2 rounded-lg">
-                  Two-Factor Authentication
-                </Button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              className="bg-white border border-gray-200 rounded-lg p-6"
-            >
-              <h3 className="font-semibold text-gray-900 mb-4">Danger Zone</h3>
-              <Button
-                onClick={() => {
-                  logout();
-                  router.push("/");
-                }}
-                className="bg-[#AB1F23] hover:bg-[#8a1819] text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2"
-              >
-                <LogOut size={18} />
-                Logout
-              </Button>
-            </motion.div>
+              <LogOut size={18} />
+              Logout
+            </Button>
           </motion.div>
-        )}
+        </div>
       </div>
         </>
       )}

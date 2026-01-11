@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/ta
 import { Badge } from "@/src/components/ui/badge";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { useAuth } from "@/src/lib/auth-context";
+import { useOrders } from "@/src/lib/orders-store";
 import {
   shippingMethods,
   paymentMethods,
@@ -48,6 +50,8 @@ function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const { t, formatCurrency, convertCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
+  const { user } = useAuth();
+  const { addOrder } = useOrders();
 
   // Handle product from Buy Now button
   useEffect(() => {
@@ -162,6 +166,27 @@ function CheckoutPageContent() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       const newOrderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
       setOrderNumber(newOrderNumber);
+      
+      // Save order to orders store if user is logged in
+      if (user) {
+        const orderDate = new Date();
+        const orderDateStr = orderDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+        
+        addOrder(
+          {
+            date: orderDateStr,
+            items: items,
+            total: total,
+            status: "Processing" as const,
+          },
+          user.id
+        );
+      }
+      
       clearCart();
     } finally {
       setIsProcessing(false);

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import type { CartItem } from './cart-store';
 
 export interface Order {
   id: string;
   date: string;
-  items: string;
-  total: string;
+  items: CartItem[];
+  total: number;
   status: "Delivered" | "Shipped" | "Processing";
   userId: string;
 }
