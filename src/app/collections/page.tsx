@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Leaf, Sparkles, Heart, Star, Grid3x3, ArrowRight } from "lucide-react";
+import { Leaf, Sparkles, Heart, Star, Grid3x3 } from "lucide-react";
 import { Newsletter } from "@/src/components/newsletter/Newsletter";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
@@ -26,7 +26,6 @@ export default function CollectionsPage() {
       titleKey: "collections.spices_title",
       descriptionKey: "collections.spices_desc",
       icon: Sparkles,
-      items: 12,
       color: "from-orange-500/20 to-red-500/20",
       accent: "text-orange-600",
     },
@@ -35,7 +34,6 @@ export default function CollectionsPage() {
       titleKey: "collections.dryfruits_title",
       descriptionKey: "collections.dryfruits_desc",
       icon: Leaf,
-      items: 15,
       color: "from-amber-500/20 to-yellow-500/20",
       accent: "text-amber-600",
     },
@@ -44,7 +42,6 @@ export default function CollectionsPage() {
       titleKey: "collections.honey_title",
       descriptionKey: "collections.honey_desc",
       icon: Heart,
-      items: 8,
       color: "from-yellow-500/20 to-orange-500/20",
       accent: "text-yellow-600",
     },
@@ -53,7 +50,6 @@ export default function CollectionsPage() {
       titleKey: "collections.premium_title",
       descriptionKey: "collections.premium_desc",
       icon: Star,
-      items: 20,
       color: "from-[#009744]/20 to-green-500/20",
       accent: "text-[#009744]",
     },
@@ -113,7 +109,7 @@ export default function CollectionsPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid sm:grid-cols-2 gap-6 lg:gap-8"
+          className="grid grid-cols-4 gap-4 lg:gap-6"
         >
           {collections.map((collection) => {
             const Icon = collection.icon;
@@ -123,21 +119,15 @@ export default function CollectionsPage() {
                 variants={itemVariants}
                 className="group"
               >
-                <Link href={`/collections/${collection.id}`}>
-                  <div className={`bg-gradient-to-br ${collection.color} border border-gray-200 rounded-2xl p-8 lg:p-12 h-72 flex flex-col items-center justify-center text-center hover:shadow-2xl hover:border-[#009744]/30 transition-all duration-300 transform hover:scale-105`}>
-                    <div className={`${collection.accent} mb-6 transition-transform group-hover:scale-110`}>
-                      <Icon className="w-16 h-16 lg:w-20 lg:h-20" />
-                    </div>
-                    <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-                      {t(collection.titleKey)}
-                    </h2>
-                    <p className="text-gray-700 mb-6 text-sm lg:text-base">{t(collection.descriptionKey)}</p>
-                    <div className="flex items-center gap-2 text-[#009744] font-semibold group-hover:gap-3 transition-all">
-                      <span>{collection.items} {t("common.products")}</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                <div className={`bg-gradient-to-br ${collection.color} border border-gray-200 rounded-2xl p-4 lg:p-6 h-56 flex flex-col items-center justify-center text-center hover:shadow-2xl hover:border-[#009744]/30 transition-all duration-300 transform hover:scale-105`}>
+                  <div className={`${collection.accent} mb-3 transition-transform group-hover:scale-110`}>
+                    <Icon className="w-12 h-12 lg:w-16 lg:h-16" />
                   </div>
-                </Link>
+                  <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-1">
+                    {t(collection.titleKey)}
+                  </h2>
+                  <p className="text-gray-700 text-xs lg:text-sm">{t(collection.descriptionKey)}</p>
+                </div>
               </motion.div>
             );
           })}
