@@ -7,9 +7,11 @@ import { Mail, MessageSquare, Phone, MapPin, Clock, ChevronDown, Send, Headset }
 import { motion } from "framer-motion";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { Newsletter } from "@/src/components/newsletter/Newsletter";
+import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
+import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 
 export default function SupportPage() {
-  const { t } = useI18n();
+  const { t, language, setLanguage, currency, setCurrency } = useI18n();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [formData, setFormData] = useState({
     name: "",
@@ -85,6 +87,14 @@ export default function SupportPage() {
 
   return (
     <div className="w-full bg-white overflow-x-hidden">
+      {/* Language & Currency Selector */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-end gap-3">
+          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          <CurrencySelector currency={currency} onCurrencyChange={setCurrency} />
+        </div>
+      </div>
+
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">

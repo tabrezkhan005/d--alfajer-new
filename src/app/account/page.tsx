@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
+import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 import { useAuth } from "@/src/lib/auth-context";
 import { useWishlistStore, type WishlistItem } from "@/src/lib/wishlist-store";
 import { useOrders } from "@/src/lib/orders-store";
@@ -26,6 +28,7 @@ export default function AccountPage() {
   const router = useRouter();
   const { t } = useI18n();
   const { user, isLoggedIn, logout, isLoading } = useAuth();
+  const { language, setLanguage, currency, setCurrency } = useI18n();
   const { items: wishlistItems, removeItem: removeFromWishlist } = useWishlistStore();
   const { getOrdersByUser, removeOrder } = useOrders();
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">(
@@ -109,6 +112,14 @@ export default function AccountPage() {
 
       {!isLoading && isLoggedIn && (
         <>
+      {/* Language & Currency Selector */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-end gap-3">
+          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          <CurrencySelector currency={currency} onCurrencyChange={setCurrency} />
+        </div>
+      </div>
+
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">

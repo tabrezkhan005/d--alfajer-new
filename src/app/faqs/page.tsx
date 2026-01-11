@@ -5,8 +5,12 @@ import { motion } from "framer-motion";
 import { ChevronDown, HelpCircle, MessageSquare } from "lucide-react";
 import { Newsletter } from "@/src/components/newsletter/Newsletter";
 import { useState } from "react";
+import { useI18n } from "@/src/components/providers/i18n-provider";
+import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
+import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 
 export default function FAQPage() {
+  const { language, setLanguage, currency, setCurrency } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const containerVariants = {
@@ -156,6 +160,14 @@ export default function FAQPage() {
 
   return (
     <div className="w-full bg-white overflow-x-hidden">
+      {/* Language & Currency Selector */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-end gap-3">
+          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          <CurrencySelector currency={currency} onCurrencyChange={setCurrency} />
+        </div>
+      </div>
+
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
