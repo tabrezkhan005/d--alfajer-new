@@ -10,7 +10,7 @@ import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSele
 import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 
 export default function FAQPage() {
-  const { language, setLanguage, currency, setCurrency } = useI18n();
+  const { language, setLanguage, currency, setCurrency, t } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const containerVariants = {

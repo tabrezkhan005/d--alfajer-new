@@ -231,6 +231,76 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.removeFromWishlist': 'Remove',
     'account.closeModal': 'Close',
     
+    // Pages
+    'page.contact': 'Contact Us',
+    'page.shop': 'Shop All Products',
+    'page.collections': 'Collections',
+    'page.returns': 'Returns & Exchanges',
+    'page.shipping': 'Shipping Policy',
+    'page.faqs': 'Frequently Asked Questions',
+    'page.support': 'Support & Help',
+    
+    // Contact Page
+    'contact.title': 'Contact Us',
+    'contact.subtitle': 'Get in touch with us',
+    'contact.emailSupport': 'Email Support',
+    'contact.phoneSupport': 'Phone Support',
+    'contact.liveChat': 'Live Chat',
+    'contact.visitUs': 'Visit Us',
+    'contact.sendEmail': 'Send us an email anytime',
+    'contact.chatNow': 'Chat with our team now',
+    'contact.visitStore': 'Visit our physical store',
+    'contact.businessHours': '9 AM - 6 PM (UAE time)',
+    'contact.form': 'Contact Form',
+    'contact.name': 'Your Name',
+    'contact.email': 'Your Email',
+    'contact.subject': 'Subject',
+    'contact.message': 'Your Message',
+    'contact.send': 'Send Message',
+    
+    // Shop Page
+    'shop.allProducts': 'All Products',
+    'shop.premium': 'Premium Selection',
+    'shop.quality': 'Premium Quality Products',
+    
+    // Collections Page
+    'collections.title': 'Collections',
+    'collections.subtitle': 'Explore our expertly curated collections',
+    'collections.featured': 'Featured Section',
+    
+    // Returns Page
+    'returns.title': 'Returns & Exchanges',
+    'returns.subtitle': 'Our Return Policy',
+    'returns.policy': 'Easy Returns',
+    'returns.days': '30 Days Money Back Guarantee',
+    'returns.description': 'Not satisfied? Return within 30 days for a full refund',
+    'returns.process': 'Return Process',
+    'returns.nonReturnable': 'Non-Returnable Items',
+    'returns.faq': 'Common Questions',
+    
+    // Shipping Page
+    'shipping.title': 'Shipping Policy',
+    'shipping.subtitle': 'Fast & Reliable Shipping',
+    'shipping.domestic': 'Domestic Shipping',
+    'shipping.international': 'International Shipping',
+    'shipping.business': 'Business Hours',
+    'shipping.days': '3-5 business days',
+    'shipping.express': 'Express',
+    'shipping.standard': 'Standard',
+    
+    // FAQs Page
+    'faq.title': 'Frequently Asked Questions',
+    'faq.subtitle': 'Find answers to your questions',
+    'faq.category': 'Category',
+    'faq.ordering': 'Ordering & Payment',
+    'faq.shipping': 'Shipping & Delivery',
+    'faq.returns': 'Returns & Refunds',
+    'faq.account': 'Account & Wishlist',
+    'faq.products': 'Products',
+    'faq.support': 'Customer Support',
+    'faq.contactUs': 'Contact Us',
+    'faq.stillNeed': 'Still need help?',
+    'faq.supportTeam': 'Our support team is here to assist you 24/7',
     // Hero Section
     'hero.title': 'Premium Dry Fruits & Spices',
     'hero.subtitle': 'Handpicked, organic, and packed with goodness',
@@ -747,6 +817,76 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.removeFromWishlist': 'إزالة',
     'account.closeModal': 'إغلاق',
     
+    // Pages - Arabic
+    'page.contact': 'تواصل معنا',
+    'page.shop': 'تسوق جميع المنتجات',
+    'page.collections': 'المجموعات',
+    'page.returns': 'العودة والتبديل',
+    'page.shipping': 'سياسة الشحن',
+    'page.faqs': 'أسئلة شائعة',
+    'page.support': 'الدعم والمساعدة',
+    
+    // Contact Page - Arabic
+    'contact.title': 'تواصل معنا',
+    'contact.subtitle': 'تواصل معنا',
+    'contact.emailSupport': 'دعم البريد الإلكتروني',
+    'contact.phoneSupport': 'دعم الهاتف',
+    'contact.liveChat': 'الدردشة المباشرة',
+    'contact.visitUs': 'زيارتنا',
+    'contact.sendEmail': 'أرسل لنا بريداً إلكترونياً في أي وقت',
+    'contact.chatNow': 'تحدث مع فريقنا الآن',
+    'contact.visitStore': 'قم بزيارة متجرنا الفعلي',
+    'contact.businessHours': '9 صباحاً - 6 مساءً (توقيت الإمارات)',
+    'contact.form': 'نموذج الاتصال',
+    'contact.name': 'اسمك',
+    'contact.email': 'بريدك الإلكتروني',
+    'contact.subject': 'الموضوع',
+    'contact.message': 'رسالتك',
+    'contact.send': 'إرسال الرسالة',
+    
+    // Shop Page - Arabic
+    'shop.allProducts': 'جميع المنتجات',
+    'shop.premium': 'اختيار ممتاز',
+    'shop.quality': 'منتجات عالية الجودة',
+    
+    // Collections Page - Arabic
+    'collections.title': 'المجموعات',
+    'collections.subtitle': 'استكشف مجموعاتنا المنسقة بعناية',
+    'collections.featured': 'القسم المميز',
+    
+    // Returns Page - Arabic
+    'returns.title': 'العودة والتبديل',
+    'returns.subtitle': 'سياسة الإرجاع الخاصة بنا',
+    'returns.policy': 'إرجاع سهل',
+    'returns.days': 'ضمان استرجاع الأموال لمدة 30 يوماً',
+    'returns.description': 'غير راضٍ؟ أرجع خلال 30 يوماً للحصول على استرجاع كامل',
+    'returns.process': 'عملية الإرجاع',
+    'returns.nonReturnable': 'العناصر غير القابلة للإرجاع',
+    'returns.faq': 'أسئلة شائعة',
+    
+    // Shipping Page - Arabic
+    'shipping.title': 'سياسة الشحن',
+    'shipping.subtitle': 'شحن سريع وموثوق',
+    'shipping.domestic': 'الشحن المحلي',
+    'shipping.international': 'الشحن الدولي',
+    'shipping.business': 'ساعات العمل',
+    'shipping.days': '3-5 أيام عمل',
+    'shipping.express': 'سريع',
+    'shipping.standard': 'معياري',
+    
+    // FAQs Page - Arabic
+    'faq.title': 'أسئلة شائعة',
+    'faq.subtitle': 'ابحث عن إجابات لأسئلتك',
+    'faq.category': 'الفئة',
+    'faq.ordering': 'الطلب والدفع',
+    'faq.shipping': 'الشحن والتسليم',
+    'faq.returns': 'العودة والاسترجاع',
+    'faq.account': 'الحساب وقائمة الرغبات',
+    'faq.products': 'المنتجات',
+    'faq.support': 'خدمة العملاء',
+    'faq.contactUs': 'تواصل معنا',
+    'faq.stillNeed': 'هل تحتاج إلى مزيد من المساعدة؟',
+    'faq.supportTeam': 'فريق الدعم الخاص بنا هنا لمساعدتك 24/7',
     // Hero Section
     'hero.title': 'الفواكه الجافة والتوابل الممتازة',
     'hero.subtitle': 'مختار بعناية وعضوي وممتلئ بالصحة',
@@ -1251,6 +1391,76 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.removeFromWishlist': 'हटाएं',
     'account.closeModal': 'बंद करें',
     
+    // Pages - Hindi
+    'page.contact': 'संपर्क करें',
+    'page.shop': 'सभी उत्पाद खरीदें',
+    'page.collections': 'संग्रह',
+    'page.returns': 'रिटर्न और विनिमय',
+    'page.shipping': 'शिपिंग नीति',
+    'page.faqs': 'अक्सर पूछे जाने वाले प्रश्न',
+    'page.support': 'समर्थन और सहायता',
+    
+    // Contact Page - Hindi
+    'contact.title': 'संपर्क करें',
+    'contact.subtitle': 'हमसे संपर्क करें',
+    'contact.emailSupport': 'ईमेल समर्थन',
+    'contact.phoneSupport': 'फोन समर्थन',
+    'contact.liveChat': 'लाइव चैट',
+    'contact.visitUs': 'हमें देखें',
+    'contact.sendEmail': 'कभी भी हमें एक ईमेल भेजें',
+    'contact.chatNow': 'अभी हमारी टीम से बात करें',
+    'contact.visitStore': 'हमारे भौतिक दुकान पर जाएं',
+    'contact.businessHours': '9 पूर्वाह्न - 6 अपराह्न (यूएई समय)',
+    'contact.form': 'संपर्क फॉर्म',
+    'contact.name': 'आपका नाम',
+    'contact.email': 'आपका ईमेल',
+    'contact.subject': 'विषय',
+    'contact.message': 'आपका संदेश',
+    'contact.send': 'संदेश भेजें',
+    
+    // Shop Page - Hindi
+    'shop.allProducts': 'सभी उत्पाद',
+    'shop.premium': 'प्रीमियम चयन',
+    'shop.quality': 'उच्च गुणवत्ता वाले उत्पाद',
+    
+    // Collections Page - Hindi
+    'collections.title': 'संग्रह',
+    'collections.subtitle': 'हमारे विशेषज्ञ द्वारा तैयार किए गए संग्रह को खोजें',
+    'collections.featured': 'विशेषता अनुभाग',
+    
+    // Returns Page - Hindi
+    'returns.title': 'रिटर्न और विनिमय',
+    'returns.subtitle': 'हमारी रिटर्न नीति',
+    'returns.policy': 'आसान रिटर्न',
+    'returns.days': '30 दिन की मनी बैक गारंटी',
+    'returns.description': 'संतुष्ट नहीं? 30 दिनों में पूर्ण वापसी के लिए लौटाएं',
+    'returns.process': 'रिटर्न प्रक्रिया',
+    'returns.nonReturnable': 'गैर-रिटर्न योग्य आइटम',
+    'returns.faq': 'सामान्य प्रश्न',
+    
+    // Shipping Page - Hindi
+    'shipping.title': 'शिपिंग नीति',
+    'shipping.subtitle': 'तेज़ और विश्वसनीय शिपिंग',
+    'shipping.domestic': 'घरेलू शिपिंग',
+    'shipping.international': 'अंतर्राष्ट्रीय शिपिंग',
+    'shipping.business': 'व्यावसायिक घंटे',
+    'shipping.days': '3-5 कार्यदिवस',
+    'shipping.express': 'एक्सप्रेस',
+    'shipping.standard': 'मानक',
+    
+    // FAQs Page - Hindi
+    'faq.title': 'अक्सर पूछे जाने वाले प्रश्न',
+    'faq.subtitle': 'अपने प्रश्नों के उत्तर खोजें',
+    'faq.category': 'श्रेणी',
+    'faq.ordering': 'ऑर्डरिंग और भुगतान',
+    'faq.shipping': 'शिपिंग और डिलीवरी',
+    'faq.returns': 'रिटर्न और धनवापसी',
+    'faq.account': 'खाता और विशलिस्ट',
+    'faq.products': 'उत्पाद',
+    'faq.support': 'ग्राहक समर्थन',
+    'faq.contactUs': 'संपर्क करें',
+    'faq.stillNeed': 'अभी भी सहायता चाहिए?',
+    'faq.supportTeam': 'हमारी सहायता टीम आपकी सहायता के लिए 24/7 यहां है',
     // Hero Section
     'hero.title': 'प्रीमियम सूखे फल और मसाले',
     'hero.subtitle': 'हाथ से चुने हुए, जैविक और स्वास्थ्य से भरे',

@@ -11,7 +11,7 @@ import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSele
 import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 
 export default function ContactPage() {
-  const { language, setLanguage, currency, setCurrency } = useI18n();
+  const { language, setLanguage, currency, setCurrency, t } = useI18n();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,10 +56,10 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors font-medium">
-              Home
+              {t('common.home')}
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Contact Us</span>
+            <span className="text-gray-900 font-semibold">{t('page.contact')}</span>
           </div>
         </div>
       </div>
@@ -78,13 +78,13 @@ export default function ContactPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Mail className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">Get in Touch</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('contact.subtitle')}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              We'd Love to Hear From You
+              {t('contact.title')}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Have questions? Our dedicated team is here to help and will respond as soon as possible.
+              {t('contact.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -100,10 +100,10 @@ export default function ContactPage() {
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {[
-            { icon: Mail, title: "Email", content: "support@alfajer.com", desc: "Response within 24h" },
-            { icon: Phone, title: "Phone", content: "+971 4 XXX XXXX", desc: "Call us anytime" },
-            { icon: MapPin, title: "Visit Us", content: "Dubai, UAE", desc: "International reach" },
-            { icon: Clock, title: "Support", content: "24/7 Available", desc: "Always online" }
+            { icon: Mail, title: t('contact.emailSupport'), content: "support@alfajer.com", desc: t('contact.sendEmail') },
+            { icon: Phone, title: t('contact.phoneSupport'), content: "+971 4 XXX XXXX", desc: t('contact.businessHours') },
+            { icon: MapPin, title: t('contact.visitUs'), content: "Dubai, UAE", desc: t('contact.visitStore') },
+            { icon: Clock, title: t('page.support'), content: "24/7", desc: t('contact.liveChat') }
           ].map((info, i) => (
             <motion.div
               key={i}
@@ -138,62 +138,62 @@ export default function ContactPage() {
               transition={{ delay: 0.2 }}
               className="bg-white p-8 lg:p-10 rounded-2xl border border-gray-200 shadow-sm"
             >
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Send us a Message</h2>
-              <p className="text-gray-600 mb-8">We'll get back to you within 24 hours</p>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{t('contact.form')}</h2>
+              <p className="text-gray-600 mb-8">{t('contact.sendEmail')}</p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.name')} *</label>
                   <input
                     type="text"
                     required
+                    placeholder={t('contact.name')}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                    placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.email')} *</label>
                   <input
                     type="email"
                     required
+                    placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                    placeholder="your@email.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Subject *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.subject')} *</label>
                   <input
                     type="text"
                     required
+                    placeholder={t('contact.subject')}
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                    placeholder="How can we assist?"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.message')} *</label>
                   <textarea
                     required
                     rows={5}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition resize-none"
-                    placeholder="Your message..."
+                    placeholder={t('contact.message')}
                   />
                 </div>
                 <Button
                   type="submit"
                   className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2"
                 >
-                  <Send className="h-4 w-4" /> Send Message
+                  <Send className="h-4 w-4" /> {t('contact.send')}
                 </Button>
                 {submitted && (
                   <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-green-600 text-sm font-semibold">
-                    ✓ Message sent successfully! We'll be in touch soon.
+                    ✓ {t('common.success')}!
                   </motion.p>
                 )}
               </form>
@@ -206,7 +206,7 @@ export default function ContactPage() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Quick Answers</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{t('faq.title')}</h2>
               <p className="text-gray-600 mb-8">Find answers to common questions</p>
               <div className="space-y-4">
                 {[

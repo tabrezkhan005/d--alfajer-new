@@ -10,7 +10,7 @@ import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSele
 import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 
 export default function ShopPage() {
-  const { language, setLanguage, currency, setCurrency } = useI18n();
+  const { language, setLanguage, currency, setCurrency, t } = useI18n();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

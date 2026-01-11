@@ -127,7 +127,11 @@ export default function AccountPage() {
               {t("common.home")}
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">{t('account.profile')}</span>
+            <span className="text-gray-900 font-medium">
+              {activeTab === "profile" && t('account.profile')}
+              {activeTab === "orders" && t('account.orders')}
+              {activeTab === "wishlist" && t('account.wishlist')}
+            </span>
           </div>
         </div>
       </div>
