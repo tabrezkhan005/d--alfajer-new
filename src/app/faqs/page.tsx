@@ -25,135 +25,63 @@ export default function FAQPage() {
 
   const faqs = [
     {
-      category: "Ordering & Payment",
+      categoryKey: "faq.ordering_category",
       icon: "🛒",
       items: [
-        {
-          q: "How do I place an order?",
-          a: "Browse our products, add items to your cart, proceed to checkout, and follow the payment instructions. You'll receive an order confirmation email immediately.",
-        },
-        {
-          q: "What payment methods do you accept?",
-          a: "We accept credit cards, debit cards, digital wallets, and bank transfers. All transactions are secure and encrypted.",
-        },
-        {
-          q: "Can I save my payment information?",
-          a: "Yes, you can save your payment information securely for faster checkout on future purchases.",
-        },
-        {
-          q: "Do you offer installment plans?",
-          a: "Yes, we offer installment options for orders above AED 500. Details are available during checkout.",
-        },
+        { qKey: "faq.ordering_q1", aKey: "faq.ordering_a1" },
+        { qKey: "faq.ordering_q2", aKey: "faq.ordering_a2" },
+        { qKey: "faq.ordering_q3", aKey: "faq.ordering_a3" },
+        { qKey: "faq.ordering_q4", aKey: "faq.ordering_a4" },
       ],
     },
     {
-      category: "Shipping & Delivery",
+      categoryKey: "faq.shipping_category",
       icon: "📦",
       items: [
-        {
-          q: "How long does delivery take?",
-          a: "Domestic orders within UAE take 3-5 business days. International orders take 7-14 business days depending on destination.",
-        },
-        {
-          q: "Do you ship internationally?",
-          a: "Yes, we ship to most countries worldwide. Shipping costs vary by destination and are calculated at checkout.",
-        },
-        {
-          q: "Can I track my order?",
-          a: "Yes, you'll receive a tracking number via email once your order ships. Track it in real-time on our partner's portal.",
-        },
-        {
-          q: "Is free shipping available?",
-          a: "Yes! Free shipping on orders above AED 200 within UAE. International orders may have additional fees.",
-        },
+        { qKey: "faq.shipping_q1", aKey: "faq.shipping_a1" },
+        { qKey: "faq.shipping_q2", aKey: "faq.shipping_a2" },
+        { qKey: "faq.shipping_q3", aKey: "faq.shipping_a3" },
+        { qKey: "faq.shipping_q4", aKey: "faq.shipping_a4" },
       ],
     },
     {
-      category: "Products & Quality",
+      categoryKey: "faq.products_category",
       icon: "⭐",
       items: [
-        {
-          q: "Are your products organic?",
-          a: "Yes, all our products are 100% authentic and sourced from premium suppliers. Many are certified organic.",
-        },
-        {
-          q: "How do you ensure product quality?",
-          a: "We have strict quality control processes. Every product is inspected before shipping to ensure freshness and quality.",
-        },
-        {
-          q: "How should I store the products?",
-          a: "Store in cool, dry places away from direct sunlight. Most products come with storage instructions on the packaging.",
-        },
-        {
-          q: "Are there expiry dates?",
-          a: "Yes, all products have expiry dates clearly marked. We always send fresh stock with maximum shelf life remaining.",
-        },
+        { qKey: "faq.products_q1", aKey: "faq.products_a1" },
+        { qKey: "faq.products_q2", aKey: "faq.products_a2" },
+        { qKey: "faq.products_q3", aKey: "faq.products_a3" },
+        { qKey: "faq.products_q4", aKey: "faq.products_a4" },
       ],
     },
     {
-      category: "Returns & Refunds",
+      categoryKey: "faq.returns_category",
       icon: "↩️",
       items: [
-        {
-          q: "What is your return policy?",
-          a: "You can return items within 30 days of delivery for a full refund or exchange. Items must be in original condition.",
-        },
-        {
-          q: "How do I initiate a return?",
-          a: "Contact us at support@alfajer.com with your order number. We'll provide return instructions and a prepaid shipping label.",
-        },
-        {
-          q: "How long does a refund take?",
-          a: "Once we receive and verify your return, refunds are processed within 5-7 business days.",
-        },
-        {
-          q: "Can I exchange for a different product?",
-          a: "Absolutely! You can exchange for the same or different product within 30 days.",
-        },
+        { qKey: "faq.returns_q1", aKey: "faq.returns_a1" },
+        { qKey: "faq.returns_q2", aKey: "faq.returns_a2" },
+        { qKey: "faq.returns_q3", aKey: "faq.returns_a3" },
+        { qKey: "faq.returns_q4", aKey: "faq.returns_a4" },
       ],
     },
     {
-      category: "Account & Wishlist",
+      categoryKey: "faq.account_category",
       icon: "👤",
       items: [
-        {
-          q: "How do I create an account?",
-          a: "Click on 'Sign Up' in the top menu, fill in your details, and verify your email. You can start shopping immediately!",
-        },
-        {
-          q: "Can I add items to my wishlist?",
-          a: "Yes, click the heart icon on any product to add it to your wishlist. You can view it anytime from your account.",
-        },
-        {
-          q: "How do I update my profile?",
-          a: "Go to your Account page and click 'Edit Profile' to update your personal information.",
-        },
-        {
-          q: "How do I change my password?",
-          a: "Go to Account > Settings > Change Password. Enter your current password and your new password.",
-        },
+        { qKey: "faq.account_q1", aKey: "faq.account_a1" },
+        { qKey: "faq.account_q2", aKey: "faq.account_a2" },
+        { qKey: "faq.account_q3", aKey: "faq.account_a3" },
+        { qKey: "faq.account_q4", aKey: "faq.account_a4" },
       ],
     },
     {
-      category: "Customer Support",
+      categoryKey: "faq.support_category",
       icon: "📞",
       items: [
-        {
-          q: "What are your customer service hours?",
-          a: "We provide 24/7 support via email and live chat. Phone support is available 9 AM to 6 PM (UAE time).",
-        },
-        {
-          q: "How can I contact customer service?",
-          a: "Email: support@alfajer.com | Phone: +971 4 XXX XXXX | Live Chat on our website",
-        },
-        {
-          q: "What if I have a problem with my order?",
-          a: "Contact us immediately with your order number. We'll investigate and resolve any issues quickly.",
-        },
-        {
-          q: "Do you offer bulk orders?",
-          a: "Yes! For bulk orders above 50 units, contact our corporate team for special pricing.",
-        },
+        { qKey: "faq.support_q1", aKey: "faq.support_a1" },
+        { qKey: "faq.support_q2", aKey: "faq.support_a2" },
+        { qKey: "faq.support_q3", aKey: "faq.support_a3" },
+        { qKey: "faq.support_q4", aKey: "faq.support_a4" },
       ],
     },
   ];
@@ -172,9 +100,9 @@ export default function FAQPage() {
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">Home</Link>
+            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t('common.home')}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Frequently Asked Questions</span>
+            <span className="text-gray-900 font-semibold">{t('faq.title')}</span>
           </div>
         </div>
       </div>
@@ -193,13 +121,13 @@ export default function FAQPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <HelpCircle className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">Get Answers</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('faq.getAnswers')}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Frequently Asked Questions
+              {t('faq.title')}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Find quick answers to your questions about our products and services.
+              {t('faq.hero_description')}
             </p>
           </motion.div>
         </div>
@@ -219,7 +147,7 @@ export default function FAQPage() {
               <div className="flex items-center gap-3 mb-8">
                 <span className="text-4xl">{section.icon}</span>
                 <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 pb-3 border-b-2 border-[#009744]/30 flex-1">
-                  {section.category}
+                  {t(section.categoryKey)}
                 </h2>
               </div>
               <div className="space-y-4">
@@ -235,7 +163,7 @@ export default function FAQPage() {
                         onClick={() => setOpenIndex(openIndex === globalIdx ? null : globalIdx)}
                         className="w-full px-6 py-5 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
                       >
-                        <h3 className="text-lg font-semibold text-gray-900 text-left">{faq.q}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 text-left">{t(faq.qKey)}</h3>
                         <ChevronDown
                           className={`flex-shrink-0 w-5 h-5 text-[#009744] transition-transform duration-300 ${
                             openIndex === globalIdx ? "transform rotate-180" : ""
@@ -250,7 +178,7 @@ export default function FAQPage() {
                           transition={{ duration: 0.3 }}
                           className="px-6 py-5 bg-white border-t border-gray-200"
                         >
-                          <p className="text-gray-700 leading-relaxed">{faq.a}</p>
+                          <p className="text-gray-700 leading-relaxed">{t(faq.aKey)}</p>
                         </motion.div>
                       )}
                     </motion.div>
@@ -276,13 +204,13 @@ export default function FAQPage() {
             <div className="flex justify-center mb-4">
               <MessageSquare className="h-10 w-10" />
             </div>
-            <h2 className="text-3xl font-bold mb-3">Still need help?</h2>
-            <p className="text-lg text-white/90 mb-8">Can't find what you're looking for? Our support team is here to assist you 24/7.</p>
+            <h2 className="text-3xl font-bold mb-3">{t('faq.stillNeed')}</h2>
+            <p className="text-lg text-white/90 mb-8">{t('faq.stillNeedDesc')}</p>
             <Link
               href="/contact"
               className="inline-block bg-white text-[#009744] hover:bg-gray-100 font-bold py-3 px-10 rounded-lg transition-colors"
             >
-              Contact Us
+              {t('faq.contactUs')}
             </Link>
           </div>
         </motion.div>
