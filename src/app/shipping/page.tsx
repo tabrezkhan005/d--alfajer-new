@@ -34,9 +34,9 @@ export default function ShippingPage() {
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">Home</Link>
+            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t('common.home')}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Shipping Policy</span>
+            <span className="text-gray-900 font-semibold">{t('shipping.title')}</span>
           </div>
         </div>
       </div>
@@ -55,13 +55,13 @@ export default function ShippingPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Truck className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">Fast & Reliable Delivery</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('shipping.fastReliable')}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Shipping Policy
+              {t('shipping.title')}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              We deliver worldwide with transparent pricing, real-time tracking, and 100% care for your orders.
+              {t('shipping.description')}
             </p>
           </motion.div>
         </div>
@@ -77,10 +77,10 @@ export default function ShippingPage() {
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {[
-            { icon: Truck, title: "Domestic (UAE)", time: "3-5 days", price: "Free on AED 200+" },
-            { icon: Globe, title: "International", time: "7-14 days", price: "Calculated at checkout" },
-            { icon: Clock, title: "Express", time: "Next day", price: "Select areas" },
-            { icon: Package, title: "Tracking", time: "Real-time", price: "Free for all" }
+            { icon: Truck, titleKey: "shipping.domestic_title", timeKey: "shipping.domestic_time", priceKey: "shipping.domestic_price" },
+            { icon: Globe, titleKey: "shipping.international_title", timeKey: "shipping.international_time", priceKey: "shipping.international_price" },
+            { icon: Clock, titleKey: "shipping.express_title", timeKey: "shipping.express_time", priceKey: "shipping.express_price" },
+            { icon: Package, titleKey: "shipping.tracking_title", timeKey: "shipping.tracking_time", priceKey: "shipping.tracking_price" }
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -88,9 +88,9 @@ export default function ShippingPage() {
               className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
             >
               <item.icon className="h-12 w-12 text-[#009744] mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-gray-900 font-semibold text-sm mb-1">{item.time}</p>
-              <p className="text-gray-500 text-xs">{item.price}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{t(item.titleKey)}</h3>
+              <p className="text-gray-900 font-semibold text-sm mb-1">{t(item.timeKey)}</p>
+              <p className="text-gray-500 text-xs">{t(item.priceKey)}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -107,12 +107,12 @@ export default function ShippingPage() {
             className="space-y-6"
           >
             {[
-              { title: "Domestic Shipping (UAE)", content: "Orders are processed within 1-2 business days. Delivery takes 3-5 business days depending on location. Free shipping on orders above AED 200." },
-              { title: "International Shipping", content: "We ship to most countries worldwide. International orders are processed within 2-3 days and arrive within 7-14 business days depending on destination and customs." },
-              { title: "Shipping Costs", content: "Costs are calculated based on destination, weight, and size. You'll see exact shipping costs during checkout before purchase." },
-              { title: "Order Tracking", content: "Receive a tracking number via email once your order ships. Track your package in real-time on our partner's portal." },
-              { title: "Delivery Address", content: "Ensure your delivery address is complete and accurate. We're not responsible for packages delivered to incorrect addresses." },
-              { title: "Handling & Packaging", content: "All orders are carefully packed to ensure perfect condition. Every package is insured and handled with care by our logistics partners." }
+              { titleKey: "shipping.domestic_detail_title", contentKey: "shipping.domestic_detail_content" },
+              { titleKey: "shipping.international_detail_title", contentKey: "shipping.international_detail_content" },
+              { titleKey: "shipping.costs_title", contentKey: "shipping.costs_content" },
+              { titleKey: "shipping.tracking_detail_title", contentKey: "shipping.tracking_detail_content" },
+              { titleKey: "shipping.address_title", contentKey: "shipping.address_content" },
+              { titleKey: "shipping.handling_title", contentKey: "shipping.handling_content" }
             ].map((section, i) => (
               <motion.div
                 key={i}
@@ -121,9 +121,9 @@ export default function ShippingPage() {
               >
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle className="h-6 w-6 text-[#009744] flex-shrink-0 mt-1" />
-                  <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{section.title}</h2>
+                  <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{t(section.titleKey)}</h2>
                 </div>
-                <p className="text-gray-700 leading-relaxed ml-9">{section.content}</p>
+                <p className="text-gray-700 leading-relaxed ml-9">{t(section.contentKey)}</p>
               </motion.div>
             ))}
           </motion.div>
