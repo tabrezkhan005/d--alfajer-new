@@ -34,9 +34,9 @@ export default function ReturnsPage() {
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">Home</Link>
+            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t('common.home')}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Returns & Exchanges</span>
+            <span className="text-gray-900 font-semibold">{t('returns.title')}</span>
           </div>
         </div>
       </div>
@@ -55,13 +55,13 @@ export default function ReturnsPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <RotateCcw className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">100% Satisfaction</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('returns.satisfaction')}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Returns & Exchanges
+              {t('returns.title')}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              We stand behind every product. Easy returns and exchanges within 30 days, no questions asked.
+              {t('returns.description')}
             </p>
           </motion.div>
         </div>
@@ -77,10 +77,10 @@ export default function ReturnsPage() {
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {[
-            { icon: Zap, title: "30-Day Window", desc: "Hassle-free returns" },
-            { icon: CheckCircle, title: "Full Refund", desc: "Money-back guarantee" },
-            { icon: RotateCcw, title: "Easy Exchange", desc: "Swap for anything" },
-            { icon: AlertCircle, title: "No Questions", desc: "Instant approval" }
+            { icon: Zap, titleKey: "returns.benefit1_title", descKey: "returns.benefit1_desc" },
+            { icon: CheckCircle, titleKey: "returns.benefit2_title", descKey: "returns.benefit2_desc" },
+            { icon: RotateCcw, titleKey: "returns.benefit3_title", descKey: "returns.benefit3_desc" },
+            { icon: AlertCircle, titleKey: "returns.benefit4_title", descKey: "returns.benefit4_desc" }
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -88,8 +88,8 @@ export default function ReturnsPage() {
               className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
             >
               <item.icon className="h-12 w-12 text-[#009744] mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-gray-500 text-sm">{item.desc}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{t(item.titleKey)}</h3>
+              <p className="text-gray-500 text-sm">{t(item.descKey)}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -107,26 +107,26 @@ export default function ReturnsPage() {
           >
             {[
               { 
-                title: "30-Day Return Window", 
-                content: "You have 30 days from delivery to return your purchase for a refund or exchange. Items must be in original condition with original packaging included." 
+                titleKey: "returns.window_title", 
+                contentKey: "returns.window_content" 
               },
               { 
-                title: "Return Eligibility", 
-                content: "All products are eligible for return except custom orders or items damaged due to misuse.",
-                items: ["Product must be unopened or original condition", "Must include original packaging and materials", "Order number or receipt required"]
+                titleKey: "returns.eligibility_title", 
+                contentKey: "returns.eligibility_content",
+                itemKeys: ["returns.eligibility_item1", "returns.eligibility_item2", "returns.eligibility_item3"]
               },
               { 
-                title: "Return Process", 
-                content: "Simple 5-step process to get your money back:",
-                items: ["Contact support@alfajer.com with your order number", "Provide reason for your return", "Receive prepaid return shipping label", "Ship item back to us", "Refund processed in 5-7 business days"]
+                titleKey: "returns.process_title", 
+                contentKey: "returns.process_content",
+                itemKeys: ["returns.process_item1", "returns.process_item2", "returns.process_item3", "returns.process_item4", "returns.process_item5"]
               },
               { 
-                title: "Exchange Policy", 
-                content: "Exchange for a different size, color, or product within 30 days. If you choose a different product, adjust the price difference at checkout." 
+                titleKey: "returns.exchange_title", 
+                contentKey: "returns.exchange_content" 
               },
               { 
-                title: "Refunds & Timing", 
-                content: "Once we receive and verify your return, we process your refund to the original payment method within 5-7 business days. Original shipping costs are non-refundable unless the item was damaged or incorrect." 
+                titleKey: "returns.refund_title", 
+                contentKey: "returns.refund_content" 
               }
             ].map((section, i) => (
               <motion.div
@@ -136,15 +136,15 @@ export default function ReturnsPage() {
               >
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle className="h-6 w-6 text-[#009744] flex-shrink-0 mt-1" />
-                  <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{section.title}</h2>
+                  <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{t(section.titleKey)}</h2>
                 </div>
-                <p className="text-gray-700 leading-relaxed ml-9 mb-4">{section.content}</p>
-                {section.items && (
+                <p className="text-gray-700 leading-relaxed ml-9 mb-4">{t(section.contentKey)}</p>
+                {section.itemKeys && (
                   <ul className="ml-9 space-y-2">
-                    {section.items.map((item, idx) => (
+                    {section.itemKeys.map((itemKey, idx) => (
                       <li key={idx} className="text-gray-700 flex items-start gap-2">
                         <span className="text-[#009744] mt-1">✓</span>
-                        <span>{item}</span>
+                        <span>{t(itemKey)}</span>
                       </li>
                     ))}
                   </ul>
@@ -166,19 +166,19 @@ export default function ReturnsPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <AlertCircle className="h-7 w-7 text-red-600 flex-shrink-0" />
-            <h2 className="text-2xl font-bold text-red-900">We Cannot Accept for Return</h2>
+            <h2 className="text-2xl font-bold text-red-900">{t('returns.cannotAccept')}</h2>
           </div>
           <ul className="space-y-3 ml-10">
             {[
-              "Products that have been opened or used",
-              "Items without original packaging",
-              "Perishable items after 5 days of delivery",
-              "Custom or special order items",
-              "Items damaged due to customer mishandling"
-            ].map((item, i) => (
+              "returns.cannotAccept_item1",
+              "returns.cannotAccept_item2",
+              "returns.cannotAccept_item3",
+              "returns.cannotAccept_item4",
+              "returns.cannotAccept_item5"
+            ].map((itemKey, i) => (
               <li key={i} className="text-red-800 flex items-start gap-2">
                 <span className="mt-1">×</span>
-                <span>{item}</span>
+                <span>{t(itemKey)}</span>
               </li>
             ))}
           </ul>
@@ -188,7 +188,7 @@ export default function ReturnsPage() {
       {/* FAQ */}
       <div className="bg-gray-50 py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-10 text-center">Common Questions</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-10 text-center">{t('returns.faq_title')}</h2>
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -197,20 +197,20 @@ export default function ReturnsPage() {
             className="grid sm:grid-cols-2 gap-6"
           >
             {[
-              { q: "How do I start a return?", a: "Email support@alfajer.com with your order number. We'll respond within 24 hours with return shipping instructions." },
-              { q: "Who pays for return shipping?", a: "We provide a free prepaid return label so you don't have to pay anything." },
-              { q: "How long for refund?", a: "After we receive and verify your return, refunds process in 5-7 business days to your original payment method." },
-              { q: "Can I exchange for different size/color?", a: "Absolutely! Exchange within 30 days for any size, color, or different product." },
-              { q: "Item arrived damaged?", a: "Contact us immediately with photos. We'll send a replacement or full refund right away." },
-              { q: "No shipping refund?", a: "Original shipping is non-refundable unless the item was damaged, defective, or incorrect." }
+              { qKey: "returns.faq_q1", aKey: "returns.faq_a1" },
+              { qKey: "returns.faq_q2", aKey: "returns.faq_a2" },
+              { qKey: "returns.faq_q3", aKey: "returns.faq_a3" },
+              { qKey: "returns.faq_q4", aKey: "returns.faq_a4" },
+              { qKey: "returns.faq_q5", aKey: "returns.faq_a5" },
+              { qKey: "returns.faq_q6", aKey: "returns.faq_a6" }
             ].map((faq, i) => (
               <motion.div
                 key={i}
                 variants={itemVariants}
                 className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
               >
-                <h3 className="font-bold text-gray-900 mb-2 text-lg">{faq.q}</h3>
-                <p className="text-gray-700 leading-relaxed">{faq.a}</p>
+                <h3 className="font-bold text-gray-900 mb-2 text-lg">{t(faq.qKey)}</h3>
+                <p className="text-gray-700 leading-relaxed">{t(faq.aKey)}</p>
               </motion.div>
             ))}
           </motion.div>
