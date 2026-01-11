@@ -14,7 +14,7 @@ const itemVariants = {
 };
 
 export default function ProductsPage() {
-  const { language, setLanguage, currency, setCurrency } = useI18n();
+  const { language, setLanguage, currency, setCurrency, t } = useI18n();
   
   return (
     <div className="w-full bg-white overflow-x-hidden">
@@ -31,10 +31,10 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors">
-              Home
+              {t("common.home")}
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">Products</span>
+            <span className="text-gray-900 font-medium">{t("page.shop")}</span>
           </div>
         </div>
       </div>
@@ -47,9 +47,9 @@ export default function ProductsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">All Products</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("page.shop")}</h1>
             <p className="text-lg text-white/90 max-w-2xl">
-              Discover our full range of premium organic products and authentic spices
+              {t("productPage.description")}
             </p>
           </motion.div>
         </div>

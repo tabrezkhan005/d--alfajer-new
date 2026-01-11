@@ -243,6 +243,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.faqs': 'Frequently Asked Questions',
     'page.support': 'Support & Help',
     
+    // Products Page
+    'productPage.description': 'Discover our full range of premium organic products and authentic spices',
+    
     // Contact Page
     'contact.title': 'Contact Us',
     'contact.subtitle': 'Get in touch with us',
@@ -867,6 +870,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.faqs': 'أسئلة شائعة',
     'page.support': 'الدعم والمساعدة',
     
+    // Products Page - Arabic
+    'productPage.description': 'اكتشف النطاق الكامل لمنتجاتنا العضوية الممتازة والتوابل الأصلية',
+    
     // Contact Page - Arabic
     'contact.title': 'تواصل معنا',
     'contact.subtitle': 'تواصل معنا',
@@ -1478,6 +1484,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.shipping': 'शिपिंग नीति',
     'page.faqs': 'अक्सर पूछे जाने वाले प्रश्न',
     'page.support': 'समर्थन और सहायता',
+    
+    // Products Page - Hindi
+    'productPage.description': 'हमारी प्रीमियम जैविक उत्पादों और प्रामाणिक मसालों की पूरी श्रृंखला की खोज करें',
     
     // Contact Page - Hindi
     'contact.title': 'संपर्क करें',
