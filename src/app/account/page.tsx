@@ -26,9 +26,8 @@ import { useOrders } from "@/src/lib/orders-store";
 
 export default function AccountPage() {
   const router = useRouter();
-  const { t } = useI18n();
   const { user, isLoggedIn, logout, isLoading } = useAuth();
-  const { language, setLanguage, currency, setCurrency } = useI18n();
+  const { language, setLanguage, currency, setCurrency, t } = useI18n();
   const { items: wishlistItems, removeItem: removeFromWishlist } = useWishlistStore();
   const { getOrdersByUser, removeOrder } = useOrders();
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">(
@@ -105,7 +104,7 @@ export default function AccountPage() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-[#009744] rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your account...</p>
+            <p className="text-gray-600">{t('account.loading')}</p>
           </div>
         </div>
       )}
@@ -128,7 +127,7 @@ export default function AccountPage() {
               {t("common.home")}
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">Account</span>
+            <span className="text-gray-900 font-medium">{t('account.profile')}</span>
           </div>
         </div>
       </div>
@@ -159,9 +158,9 @@ export default function AccountPage() {
       <div className="max-w-7xl mx-auto px-4 border-b border-gray-200">
         <div className="flex gap-8 overflow-x-auto">
           {[
-            { id: "profile", label: "Profile", icon: User },
-            { id: "orders", label: "Orders", icon: Package },
-            { id: "wishlist", label: "Wishlist", icon: Heart },
+            { id: "profile", label: t("account.profile"), icon: User },
+            { id: "orders", label: t("account.orders"), icon: Package },
+            { id: "wishlist", label: t("account.wishlist"), icon: Heart },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -194,14 +193,14 @@ export default function AccountPage() {
               className="bg-white border border-gray-200 rounded-lg p-8"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Profile Information</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('account.editProfile')}</h2>
                 {!isEditing && (
                   <Button
                     onClick={() => setIsEditing(true)}
                     className="bg-[#009744] hover:bg-[#007A37] text-white flex items-center gap-2"
                   >
                     <Edit2 size={16} />
-                    Edit Profile
+                    {t('account.editProfile')}
                   </Button>
                 )}
               </div>
@@ -210,7 +209,7 @@ export default function AccountPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
+                      {t('account.name')}
                     </label>
                     <input
                       type="text"
@@ -223,7 +222,7 @@ export default function AccountPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
+                      {t('account.email')}
                     </label>
                     <input
                       type="email"
@@ -236,7 +235,7 @@ export default function AccountPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
+                      {t('account.phone')}
                     </label>
                     <input
                       type="tel"
@@ -249,7 +248,7 @@ export default function AccountPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address
+                      {t('account.address')}
                     </label>
                     <textarea
                       rows={3}
@@ -265,13 +264,13 @@ export default function AccountPage() {
                       onClick={handleUpdateProfile}
                       className="bg-[#009744] hover:bg-[#007A37] text-white font-semibold px-8 py-2 rounded-lg"
                     >
-                      Save Changes
+                      {t('account.saveChanges')}
                     </Button>
                     <Button
                       onClick={() => setIsEditing(false)}
                       className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold px-8 py-2 rounded-lg"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 </div>
@@ -280,21 +279,21 @@ export default function AccountPage() {
                   <div className="flex items-start gap-4 pb-4 border-b border-gray-200">
                     <Mail className="w-5 h-5 text-[#009744] mt-1" />
                     <div>
-                      <p className="text-sm text-gray-600">Email</p>
+                      <p className="text-sm text-gray-600">{t('account.email')}</p>
                       <p className="font-medium text-gray-900">{userData.email}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4 pb-4 border-b border-gray-200">
                     <Phone className="w-5 h-5 text-[#009744] mt-1" />
                     <div>
-                      <p className="text-sm text-gray-600">Phone Number</p>
+                      <p className="text-sm text-gray-600">{t('account.phone')}</p>
                       <p className="font-medium text-gray-900">{userData.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
                     <MapPin className="w-5 h-5 text-[#009744] mt-1" />
                     <div>
-                      <p className="text-sm text-gray-600">Address</p>
+                      <p className="text-sm text-gray-600">{t('account.address')}</p>
                       <p className="font-medium text-gray-900">{userData.address}</p>
                     </div>
                   </div>
@@ -312,7 +311,7 @@ export default function AccountPage() {
             animate="visible"
             className="space-y-6"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Order History</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('account.orders')}</h2>
             {userOrders && userOrders.length > 0 ? (
               userOrders.map((order, index) => (
                 <motion.div
@@ -334,10 +333,10 @@ export default function AccountPage() {
                                   : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
-                            {order.status}
+                            {t(`account.${order.status.toLowerCase()}`)}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600">{order.date}</p>
+                        <p className="text-sm text-gray-600">{t('account.orderDate')}: {order.date}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-gray-900 mb-2">
@@ -348,7 +347,7 @@ export default function AccountPage() {
 
                     {/* Order Items */}
                     <div className="space-y-4 mb-6">
-                      <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">Items Ordered</h3>
+                      <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">{t('account.orderDetails')}</h3>
                       {order.items && order.items.length > 0 ? (
                         <div className="space-y-3">
                           {order.items.map((item: any, itemIndex: number) => (
@@ -372,7 +371,7 @@ export default function AccountPage() {
                                 </p>
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm text-gray-600">
-                                    Qty: <span className="font-semibold">{item.quantity}</span>
+                                    {t('account.quantity')}: <span className="font-semibold">{item.quantity}</span>
                                   </span>
                                   <span className="font-semibold text-[#009744]">
                                     AED {(item.price * item.quantity).toFixed(2)}
@@ -383,7 +382,7 @@ export default function AccountPage() {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-600 text-sm">No items in this order</p>
+                        <p className="text-gray-600 text-sm">{t('account.noOrders')}</p>
                       )}
                     </div>
 
@@ -393,13 +392,13 @@ export default function AccountPage() {
                         onClick={() => handleViewOrderDetails(order)}
                         className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg"
                       >
-                        View Details
+                        {t('account.viewDetails')}
                       </Button>
                       <Button
                         onClick={() => removeOrder(order.id)}
                         className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg"
                       >
-                        Remove Order
+                        {t('common.delete')}
                       </Button>
                     </div>
                   </div>
@@ -408,10 +407,10 @@ export default function AccountPage() {
             ) : (
               <div className="text-center py-12">
                 <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg">No orders yet</p>
+                <p className="text-gray-600 text-lg">{t('account.noOrders')}</p>
                 <Link href="/shop">
                   <Button className="mt-4 bg-[#009744] hover:bg-[#007A37] text-white px-6 py-2 rounded-lg">
-                    Start Shopping
+                    {t('common.allProducts')}
                   </Button>
                 </Link>
               </div>
@@ -427,7 +426,7 @@ export default function AccountPage() {
             animate="visible"
             className="space-y-6"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">My Wishlist</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('account.wishlist')}</h2>
             {wishlistItems && wishlistItems.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wishlistItems.map((item: WishlistItem, index: number) => (
@@ -464,14 +463,14 @@ export default function AccountPage() {
                       </div>
                       <div className="flex gap-2">
                         <Button className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white rounded-lg py-2">
-                          Add to Cart
+                          {t('account.addToCart')}
                         </Button>
                         <Button
                           onClick={() => removeFromWishlist(item.id)}
                           className="flex-1 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg py-2 flex items-center justify-center gap-1"
                         >
                           <Trash2 size={16} />
-                          Remove
+                          {t('account.removeFromWishlist')}
                         </Button>
                       </div>
                     </div>
@@ -481,10 +480,10 @@ export default function AccountPage() {
             ) : (
               <div className="text-center py-12">
                 <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg">Your wishlist is empty</p>
+                <p className="text-gray-600 text-lg">{t('account.emptyWishlist')}</p>
                 <Link href="/shop">
                   <Button className="mt-4 bg-[#009744] hover:bg-[#007A37] text-white px-6 py-2 rounded-lg">
-                    Continue Shopping
+                    {t('common.allProducts')}
                   </Button>
                 </Link>
               </div>
@@ -500,7 +499,7 @@ export default function AccountPage() {
             transition={{ duration: 0.6 }}
             className="bg-white border border-red-200 rounded-lg p-6 bg-red-50"
           >
-            <h3 className="font-semibold text-gray-900 mb-4">Account Actions</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('account.profile')}</h3>
             <Button
               onClick={() => {
                 logout();
@@ -509,7 +508,7 @@ export default function AccountPage() {
               className="bg-[#AB1F23] hover:bg-[#8a1819] text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2"
             >
               <LogOut size={18} />
-              Logout
+              {t('account.logout')}
             </Button>
           </motion.div>
         </div>
@@ -533,7 +532,7 @@ export default function AccountPage() {
           >
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('account.orderDetails')}</h2>
               <button
                 onClick={handleCloseOrderModal}
                 className="text-gray-500 hover:text-gray-700 transition"
@@ -547,15 +546,15 @@ export default function AccountPage() {
               {/* Order Header Info */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Order ID</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('account.orderDate')}</p>
                   <p className="font-semibold text-gray-900">{selectedOrder.id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Order Date</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('account.orderDate')}</p>
                   <p className="font-semibold text-gray-900">{selectedOrder.date}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Status</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('account.orderStatus')}</p>
                   <span
                     className={`inline-block px-3 py-1 text-sm rounded-full font-medium ${
                       selectedOrder.status === "Delivered"
@@ -565,18 +564,18 @@ export default function AccountPage() {
                           : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {selectedOrder.status}
+                    {t(`account.${selectedOrder.status.toLowerCase()}`)}
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('account.orderTotal')}</p>
                   <p className="font-semibold text-lg text-[#009744]">AED {selectedOrder.total.toFixed(2)}</p>
                 </div>
               </div>
 
               {/* Ordered Items */}
               <div className="border-t pt-6">
-                <h3 className="font-semibold text-gray-900 mb-4 text-lg">Items Ordered</h3>
+                <h3 className="font-semibold text-gray-900 mb-4 text-lg">{t('account.orderDetails')}</h3>
                 <div className="space-y-4">
                   {selectedOrder.items && selectedOrder.items.length > 0 ? (
                     selectedOrder.items.map((item: any, index: number) => (
@@ -600,15 +599,15 @@ export default function AccountPage() {
                           )}
                           <div className="grid grid-cols-3 gap-4 mt-3">
                             <div>
-                              <p className="text-xs text-gray-600 uppercase tracking-wide">Unit Price</p>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.unitPrice')}</p>
                               <p className="font-semibold text-gray-900">AED {item.price.toFixed(2)}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-600 uppercase tracking-wide">Quantity</p>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.quantity')}</p>
                               <p className="font-semibold text-gray-900">{item.quantity}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-600 uppercase tracking-wide">Subtotal</p>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.orderTotal')}</p>
                               <p className="font-semibold text-[#009744]">AED {(item.price * item.quantity).toFixed(2)}</p>
                             </div>
                           </div>
@@ -616,14 +615,14 @@ export default function AccountPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-600">No items in this order</p>
+                    <p className="text-gray-600">{t('account.noOrders')}</p>
                   )}
                 </div>
               </div>
 
               {/* Order Summary */}
               <div className="border-t pt-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t('account.orderTotal')}</h3>
                 <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-700">Subtotal</span>
