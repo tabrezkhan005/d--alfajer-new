@@ -87,14 +87,6 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  href="/about"
-                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
-                >
-                  {t('footer.about')}
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/contact"
                   className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >

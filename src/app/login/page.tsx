@@ -11,7 +11,7 @@ import { useI18n } from "@/src/components/providers/i18n-provider";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, signup, isLoading } = useAuth();
   const { t } = useI18n();
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ export default function LoginPage() {
     }
 
     try {
-      await login(formData.email, formData.password);
+      await signup(formData.name, formData.email, formData.password);
       router.push("/account");
     } catch (err) {
       setError("Signup failed. Please try again.");
