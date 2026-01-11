@@ -166,6 +166,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.available': 'available',
     'common.reset': 'Reset',
     'common.allProducts': 'All Products',
+    'common.name': 'Name',
+    'common.email': 'Email',
     
     // Categories
     'category.spices': 'Spices',
@@ -787,6 +789,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.available': 'متاح',
     'common.reset': 'إعادة تعيين',
     'common.allProducts': 'جميع المنتجات',
+    'common.name': 'الاسم',
+    'common.email': 'البريد الإلكتروني',
     
     // Categories
     'category.spices': 'التوابل',
@@ -1396,6 +1400,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.available': 'उपलब्ध',
     'common.reset': 'रीसेट करें',
     'common.allProducts': 'सभी उत्पाद',
+    'common.name': 'नाम',
+    'common.email': 'ईमेल',
     
     // Categories
     'category.spices': 'मसाले',

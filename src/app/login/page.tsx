@@ -142,7 +142,7 @@ export default function LoginPage() {
               {isSignup && (
                 <motion.div variants={itemVariants}>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    {t('auth.fullName')}
+                    {t('common.name')}
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -162,7 +162,7 @@ export default function LoginPage() {
               {/* Email Field */}
               <motion.div variants={itemVariants}>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  {t('auth.email')}
+                  {t('common.email')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />

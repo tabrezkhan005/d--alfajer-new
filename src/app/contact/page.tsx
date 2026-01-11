@@ -142,7 +142,7 @@ export default function ContactPage() {
               <p className="text-gray-600 mb-8">{t('contact.sendEmail')}</p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.name')} *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('common.name')} *</label>
                   <input
                     type="text"
                     required
@@ -153,7 +153,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('contact.email')} *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('common.email')} *</label>
                   <input
                     type="email"
                     required
