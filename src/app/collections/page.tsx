@@ -23,8 +23,8 @@ export default function CollectionsPage() {
   const collections = [
     {
       id: 1,
-      title: "Premium Spices",
-      description: "Hand-selected premium spices from around the world",
+      titleKey: "collections.spices_title",
+      descriptionKey: "collections.spices_desc",
       icon: Sparkles,
       items: 12,
       color: "from-orange-500/20 to-red-500/20",
@@ -32,8 +32,8 @@ export default function CollectionsPage() {
     },
     {
       id: 2,
-      title: "Organic Dry Fruits",
-      description: "100% organic certified dry fruits and nuts",
+      titleKey: "collections.dryfruits_title",
+      descriptionKey: "collections.dryfruits_desc",
       icon: Leaf,
       items: 15,
       color: "from-amber-500/20 to-yellow-500/20",
@@ -41,8 +41,8 @@ export default function CollectionsPage() {
     },
     {
       id: 3,
-      title: "Honey Collection",
-      description: "Pure, raw honey from trusted sources",
+      titleKey: "collections.honey_title",
+      descriptionKey: "collections.honey_desc",
       icon: Heart,
       items: 8,
       color: "from-yellow-500/20 to-orange-500/20",
@@ -50,8 +50,8 @@ export default function CollectionsPage() {
     },
     {
       id: 4,
-      title: "Premium Selections",
-      description: "Curated selection of our best sellers",
+      titleKey: "collections.premium_title",
+      descriptionKey: "collections.premium_desc",
       icon: Star,
       items: 20,
       color: "from-[#009744]/20 to-green-500/20",
@@ -73,9 +73,9 @@ export default function CollectionsPage() {
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">Home</Link>
+            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t("common.home")}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Collections</span>
+            <span className="text-gray-900 font-semibold">{t("page.collections")}</span>
           </div>
         </div>
       </div>
@@ -94,13 +94,13 @@ export default function CollectionsPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Grid3x3 className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">Browse by Category</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t("collections.browseByCategory")}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Our Collections
+              {t("collections.title")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Explore our expertly curated collections of premium products organized by category for easy browsing.
+              {t("collections.description")}
             </p>
           </motion.div>
         </div>
@@ -129,11 +129,11 @@ export default function CollectionsPage() {
                       <Icon className="w-16 h-16 lg:w-20 lg:h-20" />
                     </div>
                     <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-                      {collection.title}
+                      {t(collection.titleKey)}
                     </h2>
-                    <p className="text-gray-700 mb-6 text-sm lg:text-base">{collection.description}</p>
+                    <p className="text-gray-700 mb-6 text-sm lg:text-base">{t(collection.descriptionKey)}</p>
                     <div className="flex items-center gap-2 text-[#009744] font-semibold group-hover:gap-3 transition-all">
-                      <span>{collection.items} Products</span>
+                      <span>{collection.items} {t("common.products")}</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
@@ -155,20 +155,20 @@ export default function CollectionsPage() {
             <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
           </div>
           <div className="relative">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-8 lg:mb-10">Why Browse Our Collections?</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-8 lg:mb-10">{t("collections.whyBrowse")}</h2>
             <div className="grid sm:grid-cols-3 gap-6 lg:gap-8">
               {[
                 {
-                  title: "Organized Selection",
-                  description: "Easily find exactly what you're looking for by browsing our carefully curated categories",
+                  titleKey: "collections.benefit1_title",
+                  descriptionKey: "collections.benefit1_desc",
                 },
                 {
-                  title: "Quality Assured",
-                  description: "Every product in our collections meets our strict standards for freshness and authenticity",
+                  titleKey: "collections.benefit2_title",
+                  descriptionKey: "collections.benefit2_desc",
                 },
                 {
-                  title: "Expert Curation",
-                  description: "Our team hand-selects products to ensure you get the best of each category",
+                  titleKey: "collections.benefit3_title",
+                  descriptionKey: "collections.benefit3_desc",
                 },
               ].map((item, idx) => (
                 <motion.div
@@ -176,8 +176,8 @@ export default function CollectionsPage() {
                   variants={itemVariants}
                   className="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-xl hover:bg-white/15 transition-all"
                 >
-                  <h3 className="font-bold text-white mb-2 text-lg">{item.title}</h3>
-                  <p className="text-white/90 text-sm leading-relaxed">{item.description}</p>
+                  <h3 className="font-bold text-white mb-2 text-lg">{t(item.titleKey)}</h3>
+                  <p className="text-white/90 text-sm leading-relaxed">{t(item.descriptionKey)}</p>
                 </motion.div>
               ))}
             </div>
