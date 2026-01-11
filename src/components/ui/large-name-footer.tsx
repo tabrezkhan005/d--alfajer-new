@@ -196,7 +196,7 @@ function Footer() {
             </p>
             <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
               <Link
-                href="/privacy-policy"
+                href="/privacy"
                 className="text-xs sm:text-sm md:text-sm lg:text-sm text-gray-600 hover:text-[#009744] transition-colors whitespace-nowrap"
               >
                 {t('footer.privacy')}
