@@ -157,7 +157,7 @@ export default function ContactPage() {
                   <input
                     type="email"
                     required
-                    placeholder="your@email.com"
+                    placeholder={t('contact.email')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
@@ -207,13 +207,13 @@ export default function ContactPage() {
               transition={{ delay: 0.2 }}
             >
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{t('faq.title')}</h2>
-              <p className="text-gray-600 mb-8">Find answers to common questions</p>
+              <p className="text-gray-600 mb-8">{t('faq.description')}</p>
               <div className="space-y-4">
                 {[
-                  { q: "What is your delivery time?", a: "We deliver within 3-5 business days across UAE and internationally." },
-                  { q: "Do you offer international shipping?", a: "Yes, we ship worldwide with full tracking and insurance." },
-                  { q: "What if I'm not satisfied?", a: "30-day money-back guarantee on all products." },
-                  { q: "Are your products certified organic?", a: "Yes, 100% authentic and certified products only." },
+                  { q: t('faq.delivery_q'), a: t('faq.delivery_a') },
+                  { q: t('faq.shipping_q'), a: t('faq.shipping_a') },
+                  { q: t('faq.satisfaction_q'), a: t('faq.satisfaction_a') },
+                  { q: t('faq.organic_q'), a: t('faq.organic_a') },
                 ].map((faq, i) => (
                   <motion.div
                     key={i}

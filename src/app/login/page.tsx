@@ -142,14 +142,14 @@ export default function LoginPage() {
               {isSignup && (
                 <motion.div variants={itemVariants}>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Full Name
+                    {t('auth.fullName')}
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <input
                       type="text"
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
-                      placeholder="John Doe"
+                      placeholder={t('auth.namePlaceholder')}
                       value={formData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
@@ -162,14 +162,14 @@ export default function LoginPage() {
               {/* Email Field */}
               <motion.div variants={itemVariants}>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Email Address
+                  {t('auth.email')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
                     type="email"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -181,14 +181,14 @@ export default function LoginPage() {
               {/* Password Field */}
               <motion.div variants={itemVariants}>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                  Password
+                  {t('auth.password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
                     className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={formData.password}
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
@@ -212,14 +212,14 @@ export default function LoginPage() {
               {isSignup && (
                 <motion.div variants={itemVariants}>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Confirm Password
+                    {t('auth.confirmPassword')}
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <input
                       type={showPassword ? "text" : "password"}
                       className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
-                      placeholder="••••••••"
+                      placeholder={t('auth.passwordPlaceholder')}
                       value={formData.confirmPassword}
                       onChange={(e) =>
                         setFormData({

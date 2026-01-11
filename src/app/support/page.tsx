@@ -33,50 +33,50 @@ export default function SupportPage() {
   const contactMethods = [
     {
       icon: Mail,
-      title: "Email Support",
+      title: t("support.email_support"),
       value: "support@alfajer.ae",
-      description: "Send us an email anytime",
+      description: t("support.email_description"),
     },
     {
       icon: Phone,
-      title: "Phone Support",
+      title: t("support.phone_support"),
       value: "+971 4 XXX XXXX",
-      description: "9 AM - 6 PM (UAE time)",
+      description: t("support.phone_description"),
     },
     {
       icon: MessageSquare,
-      title: "Live Chat",
-      value: "24/7 Available",
-      description: "Chat with our team now",
+      title: t("support.live_chat"),
+      value: t("support.available_24_7"),
+      description: t("support.chat_description"),
     },
     {
       icon: MapPin,
-      title: "Visit Us",
-      value: "Dubai, UAE",
-      description: "Visit our physical store",
+      title: t("support.visit_us"),
+      value: t("support.location"),
+      description: t("support.visit_description"),
     },
   ];
 
   const faqs = [
     {
-      question: "What is your return policy?",
-      answer: "We offer a 30-day money-back guarantee on all products. If you're not satisfied, contact us for a full refund.",
+      question: t("support.faq_return_policy_q"),
+      answer: t("support.faq_return_policy_a"),
     },
     {
-      question: "How long does shipping take?",
-      answer: "Standard shipping takes 3-5 business days. Express shipping is available for 1-2 day delivery.",
+      question: t("support.faq_shipping_q"),
+      answer: t("support.faq_shipping_a"),
     },
     {
-      question: "Are your products organic?",
-      answer: "Yes, all our products are 100% organic and sourced directly from certified farms.",
+      question: t("support.faq_organic_q"),
+      answer: t("support.faq_organic_a"),
     },
     {
-      question: "Do you ship internationally?",
-      answer: "Yes, we ship worldwide. Shipping costs and times vary by location.",
+      question: t("support.faq_international_q"),
+      answer: t("support.faq_international_a"),
     },
     {
-      question: "How do I track my order?",
-      answer: "You'll receive a tracking number via email after your order ships. Track it in real-time on our website.",
+      question: t("support.faq_track_q"),
+      answer: t("support.faq_track_a"),
     },
   ];
 
@@ -101,7 +101,7 @@ export default function SupportPage() {
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t("common.home")}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Support</span>
+            <span className="text-gray-900 font-semibold">{t("support.title")}</span>
           </div>
         </div>
       </div>
@@ -120,13 +120,13 @@ export default function SupportPage() {
           >
             <div className="flex items-center gap-3 mb-4">
               <Headset className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">We're Here to Help</span>
+              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t("support.here_to_help")}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Customer Support
+              {t("support.customer_support")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Our dedicated team is available 24/7 to help with any questions or concerns.
+              {t("support.hero_description")}
             </p>
           </motion.div>
         </div>
@@ -168,18 +168,18 @@ export default function SupportPage() {
             transition={{ duration: 0.6 }}
             className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-8"
           >
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">Send us a Message</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">{t("support.send_message")}</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Name
+                    {t("common.name")}
                   </label>
                   <input
                     type="text"
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                    placeholder="Your name"
+                    placeholder={t("support.placeholder_name")}
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -188,13 +188,13 @@ export default function SupportPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email
+                    {t("common.email")}
                   </label>
                   <input
                     type="email"
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                    placeholder="your@email.com"
+                    placeholder={t("support.placeholder_email")}
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -204,13 +204,13 @@ export default function SupportPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Subject
+                  {t("support.subject")}
                 </label>
                 <input
                   type="text"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition"
-                  placeholder="How can we help?"
+                  placeholder={t("support.placeholder_subject")}
                   value={formData.subject}
                   onChange={(e) =>
                     setFormData({ ...formData, subject: e.target.value })
@@ -219,13 +219,13 @@ export default function SupportPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Message
+                  {t("support.message")}
                 </label>
                 <textarea
                   required
                   rows={5}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition resize-none"
-                  placeholder="Tell us more..."
+                  placeholder={t("support.placeholder_message")}
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
@@ -237,7 +237,7 @@ export default function SupportPage() {
                 className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition"
               >
                 <Send size={18} />
-                Send Message
+                {t("support.send_message_btn")}
               </Button>
             </form>
           </motion.div>
@@ -249,7 +249,7 @@ export default function SupportPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">Quick Answers</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">{t("support.quick_answers")}</h2>
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <motion.div
