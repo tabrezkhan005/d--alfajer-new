@@ -52,7 +52,7 @@ export default function WishlistPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 pt-16 sm:pt-20 lg:pt-24">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">

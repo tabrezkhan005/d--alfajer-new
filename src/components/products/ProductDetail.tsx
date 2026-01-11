@@ -124,7 +124,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   return (
     <div className="w-full bg-white">
       {/* Breadcrumb Navigation */}
-      <div className="max-w-7xl mx-auto px-4 py-4 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 py-4 border-b border-gray-200 pt-16 sm:pt-20 lg:pt-24">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <a href="/" className="hover:text-[#009744] transition-colors">{t('common.home')}</a>
           <span className="text-gray-400">/</span>

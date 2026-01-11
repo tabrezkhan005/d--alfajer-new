@@ -206,7 +206,7 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center w-full pt-16 sm:pt-20 lg:pt-24">
+      <div className="absolute inset-0 z-20 flex items-center justify-center w-full pt-20 sm:pt-24 lg:pt-32">
         <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
@@ -218,26 +218,26 @@ export function HeroSection() {
                   exit="hidden"
                   className="w-full max-w-6xl mx-auto px-2 sm:px-4"
                 >
-                  <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
+                  <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
                     <span className="bg-[#AB1F23]/20 backdrop-blur-md border border-[#AB1F23]/30 px-3 sm:px-4 py-1.5 rounded-full flex items-center gap-2">
                       <Heart className="h-3 sm:h-4 w-3 sm:w-4 text-[#AB1F23]" fill="#AB1F23" />
                       <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase">Real Customers, Real Joy</span>
                     </span>
                   </motion.div>
 
-                  <div className="text-center mb-6 sm:mb-10">
-                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.05] font-heading mb-2 sm:mb-4 drop-shadow-2xl px-2">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] font-heading mb-1 sm:mb-2 drop-shadow-2xl px-2">
                       {t('hero.mainTitle')}
                     </motion.h1>
-                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] font-heading mb-4 sm:mb-8 drop-shadow-2xl px-2">
+                    <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] font-heading mb-3 sm:mb-4 drop-shadow-2xl px-2">
                       <span className="text-white">{t('hero.mainSubtitle')}</span>
                     </motion.h1>
-                    <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-6 sm:mb-10 px-3 sm:px-4">
+                    <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-4 sm:mb-6 px-3 sm:px-4">
                       {t('hero.mainDescription')}
                     </motion.p>
                   </div>
 
-                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-10 px-2 sm:px-4">
+                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6 px-2 sm:px-4">
                     {[
                       { icon: "/images/icons/fresh_6643364.png", labelKey: "hero.box1Label", descKey: "hero.box1Desc", color: "#009744" },
                       { icon: "/images/icons/green-logistics_9402143.png", labelKey: "hero.box2Label", descKey: "hero.box2Desc", color: "#FFD700" },
@@ -265,24 +265,24 @@ export function HeroSection() {
                     ))}
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 px-2 sm:px-4">
+                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
                     <Button
                       size="lg"
-                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
+                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
                     >
-                      <span className="relative z-10 flex items-center gap-2 sm:gap-3 justify-center">
+                      <span className="relative z-10 flex items-center gap-2 sm:gap-2 justify-center">
                         {t('hero.cta')}
-                        <ArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                        <ArrowRight className="h-4 sm:h-4 w-4 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-3 justify-center w-full sm:w-auto"
+                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-2 justify-center w-full sm:w-auto"
                     >
                       {t('hero.story')}
-                      <Play className="h-4 sm:h-5 w-4 sm:w-5 fill-white" />
+                      <Play className="h-4 sm:h-4 w-4 sm:w-4 fill-white" />
                     </Button>
                   </motion.div>
                 </motion.div>

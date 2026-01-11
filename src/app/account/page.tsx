@@ -142,7 +142,7 @@ export default function AccountPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12">
+      <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12 pt-16 sm:pt-20 lg:pt-24">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
