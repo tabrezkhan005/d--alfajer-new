@@ -629,14 +629,9 @@ export default function AccountPage() {
               <div className="border-t pt-6 flex gap-3">
                 <Button
                   onClick={handleCloseOrderModal}
-                  className="flex-1 border border-gray-300 text-gray-900 hover:bg-gray-50 py-3 rounded-lg font-semibold"
+                  className="w-full bg-[#009744] hover:bg-[#007A37] text-white py-3 rounded-lg font-semibold"
                 >
                   Close
-                </Button>
-                <Button
-                  className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white py-3 rounded-lg font-semibold"
-                >
-                  Track Order
                 </Button>
               </div>
             </div>
