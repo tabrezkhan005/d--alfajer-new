@@ -14,6 +14,7 @@ import {
   LogOut,
   Edit2,
   Trash2,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/src/components/providers/i18n-provider";
@@ -38,6 +39,8 @@ export default function AccountPage() {
     address: "",
   });
   const [userOrders, setUserOrders] = useState<any[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -63,6 +66,16 @@ export default function AccountPage() {
     };
     localStorage.setItem("user", JSON.stringify(updatedUser));
     setIsEditing(false);
+  };
+
+  const handleViewOrderDetails = (order: any) => {
+    setSelectedOrder(order);
+    setShowOrderModal(true);
+  };
+
+  const handleCloseOrderModal = () => {
+    setShowOrderModal(false);
+    setTimeout(() => setSelectedOrder(null), 300);
   };
 
   const containerVariants = {
@@ -365,7 +378,10 @@ export default function AccountPage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-4 border-t border-gray-200">
-                      <Button className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg">
+                      <Button
+                        onClick={() => handleViewOrderDetails(order)}
+                        className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg"
+                      >
                         View Details
                       </Button>
                       <Button
@@ -487,6 +503,146 @@ export default function AccountPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Order Details Modal */}
+      {showOrderModal && selectedOrder && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={handleCloseOrderModal}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+              <button
+                onClick={handleCloseOrderModal}
+                className="text-gray-500 hover:text-gray-700 transition"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Order Header Info */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Order ID</p>
+                  <p className="font-semibold text-gray-900">{selectedOrder.id}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Order Date</p>
+                  <p className="font-semibold text-gray-900">{selectedOrder.date}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Status</p>
+                  <span
+                    className={`inline-block px-3 py-1 text-sm rounded-full font-medium ${
+                      selectedOrder.status === "Delivered"
+                        ? "bg-green-100 text-green-800"
+                        : selectedOrder.status === "Shipped"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {selectedOrder.status}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total</p>
+                  <p className="font-semibold text-lg text-[#009744]">AED {selectedOrder.total.toFixed(2)}</p>
+                </div>
+              </div>
+
+              {/* Ordered Items */}
+              <div className="border-t pt-6">
+                <h3 className="font-semibold text-gray-900 mb-4 text-lg">Items Ordered</h3>
+                <div className="space-y-4">
+                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                    selectedOrder.items.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                      >
+                        {item.image && (
+                          <div className="w-28 h-28 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 text-lg mb-2">{item.name}</h4>
+                          {item.packageSize && (
+                            <p className="text-sm text-gray-600 mb-2">Size: {item.packageSize}</p>
+                          )}
+                          <div className="grid grid-cols-3 gap-4 mt-3">
+                            <div>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">Unit Price</p>
+                              <p className="font-semibold text-gray-900">AED {item.price.toFixed(2)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">Quantity</p>
+                              <p className="font-semibold text-gray-900">{item.quantity}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600 uppercase tracking-wide">Subtotal</p>
+                              <p className="font-semibold text-[#009744]">AED {(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600">No items in this order</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="border-t pt-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
+                <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Subtotal</span>
+                    <span className="font-semibold text-gray-900">AED {selectedOrder.total.toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between items-center">
+                    <span className="text-lg font-semibold text-gray-900">Total</span>
+                    <span className="text-xl font-bold text-[#009744]">AED {selectedOrder.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="border-t pt-6 flex gap-3">
+                <Button
+                  onClick={handleCloseOrderModal}
+                  className="flex-1 border border-gray-300 text-gray-900 hover:bg-gray-50 py-3 rounded-lg font-semibold"
+                >
+                  Close
+                </Button>
+                <Button
+                  className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white py-3 rounded-lg font-semibold"
+                >
+                  Track Order
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
         </>
       )}
     </div>
