@@ -14,15 +14,20 @@ import {
   Settings,
   LogOut,
   Edit2,
+  Trash2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { useAuth } from "@/src/lib/auth-context";
+import { useWishlistStore, type WishlistItem } from "@/src/lib/wishlist-store";
+import { useOrders } from "@/src/lib/orders-store";
 
 export default function AccountPage() {
   const router = useRouter();
   const { t } = useI18n();
   const { user, isLoggedIn, logout, isLoading } = useAuth();
+  const { items: wishlistItems, removeItem: removeFromWishlist } = useWishlistStore();
+  const { getOrdersByUser, removeOrder } = useOrders();
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist" | "settings">(
     "profile"
   );
@@ -33,6 +38,7 @@ export default function AccountPage() {
     phone: "",
     address: "",
   });
+  const [userOrders, setUserOrders] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -44,57 +50,20 @@ export default function AccountPage() {
         phone: user.phone || "+971 50 XXX XXXX",
         address: user.address || "Dubai, UAE",
       });
+      // Get user's orders
+      const orders = getOrdersByUser(user.id);
+      setUserOrders(orders);
     }
-  }, [isLoggedIn, isLoading, user, router]);
-
-  const orders = [
-    {
-      id: "ORD-001",
-      date: "Dec 15, 2024",
-      items: "Kashmiri Red Chilli Powder",
-      total: "AED 149",
-      status: "Delivered",
-    },
-    {
-      id: "ORD-002",
-      date: "Dec 10, 2024",
-      items: "Premium Honey",
-      total: "AED 199",
-      status: "Processing",
-    },
-    {
-      id: "ORD-003",
-      date: "Dec 5, 2024",
-      items: "Himalayan Shilajit",
-      total: "AED 299",
-      status: "Shipped",
-    },
-  ];
-
-  const wishlistItems = [
-    {
-      id: 1,
-      name: "Premium Saffron",
-      price: "AED 399",
-      image: "/images/products/saffron.jpg",
-    },
-    {
-      id: 2,
-      name: "Organic Honey",
-      price: "AED 199",
-      image: "/images/products/honey.jpg",
-    },
-    {
-      id: 3,
-      name: "Kashmiri Red Chilli Powder",
-      price: "AED 149",
-      image: "/images/products/chillipowder.jpg",
-    },
-  ];
+  }, [isLoggedIn, isLoading, user, router, getOrdersByUser]);
 
   const handleUpdateProfile = () => {
+    // Update user in localStorage
+    const updatedUser = {
+      ...user,
+      ...userData,
+    };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
     setIsEditing(false);
-    // Handle profile update
   };
 
   const containerVariants = {
@@ -322,42 +291,62 @@ export default function AccountPage() {
             className="space-y-6"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Order History</h2>
-            {orders.map((order, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-3">
-                      <span className="font-semibold text-gray-900">{order.id}</span>
-                      <span
-                        className={`px-3 py-1 text-sm rounded-full font-medium ${
-                          order.status === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Shipped"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
+            {userOrders && userOrders.length > 0 ? (
+              userOrders.map((order, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4 mb-3">
+                        <span className="font-semibold text-gray-900">{order.id}</span>
+                        <span
+                          className={`px-3 py-1 text-sm rounded-full font-medium ${
+                            order.status === "Delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "Shipped"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{order.items}</p>
+                      <p className="text-xs text-gray-500">{order.date}</p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{order.items}</p>
-                    <p className="text-xs text-gray-500">{order.date}</p>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-gray-900 mb-2">
+                        {order.total}
+                      </p>
+                      <div className="flex gap-2 justify-end">
+                        <Button className="bg-[#009744] hover:bg-[#007A37] text-white text-sm px-4 py-2 rounded-lg">
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => removeOrder(order.id)}
+                          className="bg-red-100 hover:bg-red-200 text-red-700 text-sm px-4 py-2 rounded-lg"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900 mb-2">
-                      {order.total}
-                    </p>
-                    <Button className="bg-[#009744] hover:bg-[#007A37] text-white text-sm px-4 py-2 rounded-lg">
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg">No orders yet</p>
+                <Link href="/shop">
+                  <Button className="mt-4 bg-[#009744] hover:bg-[#007A37] text-white px-6 py-2 rounded-lg">
+                    Start Shopping
+                  </Button>
+                </Link>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -370,31 +359,67 @@ export default function AccountPage() {
             className="space-y-6"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6">My Wishlist</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {wishlistItems.map((item, index) => (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <div className="h-48 bg-gray-200 relative">
-                    <Heart className="w-6 h-6 text-red-500 absolute top-3 right-3 fill-red-500" />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
-                    <p className="text-[#009744] font-bold text-lg mb-4">{item.price}</p>
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white rounded-lg py-2">
-                        Add to Cart
-                      </Button>
-                      <Button className="flex-1 border border-gray-300 text-gray-900 hover:bg-gray-50 rounded-lg py-2">
-                        Remove
-                      </Button>
+            {wishlistItems && wishlistItems.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {wishlistItems.map((item: WishlistItem, index: number) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                  >
+                    <div className="h-48 bg-gray-200 relative overflow-hidden">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                          <Heart className="w-12 h-12 text-gray-400" />
+                        </div>
+                      )}
+                      <Heart className="w-6 h-6 text-red-500 absolute top-3 right-3 fill-red-500" />
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-[#009744] font-bold text-lg">
+                          AED {item.price.toFixed(2)}
+                        </p>
+                        {item.rating && (
+                          <div className="text-sm text-gray-600">
+                            ★ {item.rating} ({item.reviews} reviews)
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white rounded-lg py-2">
+                          Add to Cart
+                        </Button>
+                        <Button
+                          onClick={() => removeFromWishlist(item.id)}
+                          className="flex-1 border border-red-300 text-red-700 hover:bg-red-50 rounded-lg py-2 flex items-center justify-center gap-1"
+                        >
+                          <Trash2 size={16} />
+                          Remove
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg">Your wishlist is empty</p>
+                <Link href="/shop">
+                  <Button className="mt-4 bg-[#009744] hover:bg-[#007A37] text-white px-6 py-2 rounded-lg">
+                    Continue Shopping
+                  </Button>
+                </Link>
+              </div>
+            )}
           </motion.div>
         )}
 
