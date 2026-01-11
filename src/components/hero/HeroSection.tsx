@@ -408,36 +408,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* ---------------- NAVIGATION ---------------- */}
-      <div className="absolute bottom-6 sm:bottom-10 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4 sm:gap-6 px-4">
-        <div className="flex gap-2 sm:gap-3">
-          {heroSlides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => api?.scrollTo(i)}
-              className={`group relative h-1 rounded-full transition-all duration-500 overflow-hidden ${
-                i === current ? "w-8 sm:w-12 bg-white/20" : "w-3 sm:w-4 bg-white/30 hover:bg-white/50"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            >
-              {i === current && (
-                <motion.div
-                  initial={{ x: "-100%" }}
-                  animate={{ x: "0%" }}
-                  transition={{ duration: 8, ease: "linear" }}
-                  className="absolute inset-0 bg-[#009744]"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="hidden sm:flex items-center gap-2 text-white/30 text-[9px] sm:text-[10px] font-black tracking-[0.2em] uppercase">
-          <span className="text-white/80">{String(current + 1).padStart(2, '0')}</span>
-          <div className="h-px w-6 sm:w-8 bg-white/20" />
-          <span>{String(heroSlides.length).padStart(2, '0')}</span>
-        </div>
-      </div>
+      {/* Navigation and indicators removed for cleaner design */}
 
       {/* ---------------- SIDEBAR DECOR (Professional Touch) - HIDDEN ON MOBILE/TABLET-------- */}
       <div className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden xl:flex flex-col gap-12 items-center">
