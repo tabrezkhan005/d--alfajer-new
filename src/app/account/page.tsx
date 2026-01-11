@@ -369,7 +369,7 @@ export default function AccountPage() {
                                 </div>
                               )}
                               <div className="flex-1">
-                                <h4 className="font-semibold text-gray-900 mb-1">{item.name}</h4>
+                                <h4 className="font-semibold text-gray-900 mb-1">{t(item.name)}</h4>
                                 <p className="text-sm text-gray-600 mb-2">
                                   {item.packageSize && <span className="mr-3">{item.packageSize}</span>}
                                 </p>
@@ -454,7 +454,7 @@ export default function AccountPage() {
                       <Heart className="w-6 h-6 text-red-500 absolute top-3 right-3 fill-red-500" />
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t(item.name)}</h3>
                       <div className="flex items-center justify-between mb-4">
                         <p className="text-[#009744] font-bold text-lg">
                           AED {item.price.toFixed(2)}
@@ -597,7 +597,7 @@ export default function AccountPage() {
                           </div>
                         )}
                         <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900 text-lg mb-2">{item.name}</h4>
+                          <h4 className="font-semibold text-gray-900 text-lg mb-2">{t(item.name)}</h4>
                           {item.packageSize && (
                             <p className="text-sm text-gray-600 mb-2">Size: {item.packageSize}</p>
                           )}
