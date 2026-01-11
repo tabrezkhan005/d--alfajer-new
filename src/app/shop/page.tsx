@@ -39,10 +39,10 @@ export default function ShopPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors font-medium">
-              Home
+              {t("common.home")}
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">Shop All Products</span>
+            <span className="text-gray-900 font-semibold">{t("page.shop")}</span>
           </div>
         </div>
       </div>
@@ -64,15 +64,14 @@ export default function ShopPage() {
             <div className="flex items-center gap-3 mb-4">
               <ShoppingBag className="h-8 w-8" />
               <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">
-                Premium Collection
+                {t("shop.premiumCollection")}
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Discover Our Premium Selection
+              {t("shop.discoverPremium")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Explore our carefully curated collection of organic spices and premium products, 
-              sourced from the finest producers around the world.
+              {t("shop.exploreCollection")}
             </p>
           </motion.div>
         </div>
@@ -88,9 +87,9 @@ export default function ShopPage() {
           className="grid md:grid-cols-3 gap-6 sm:gap-8"
         >
           {[
-            { icon: Sparkles, title: "Premium Quality", desc: "Handpicked from the best sources" },
-            { icon: Check, title: "Certified Organic", desc: "100% authentic and pure products" },
-            { icon: ShoppingBag, title: "Easy Shopping", desc: "Simple checkout and fast delivery" }
+            { icon: Sparkles, titleKey: "shop.quality_title", descKey: "shop.quality_desc" },
+            { icon: Check, titleKey: "shop.certified_title", descKey: "shop.certified_desc" },
+            { icon: ShoppingBag, titleKey: "shop.shopping_title", descKey: "shop.shopping_desc" }
           ].map((feature, i) => (
             <motion.div
               key={i}
@@ -98,8 +97,8 @@ export default function ShopPage() {
               className="p-6 sm:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg transition-all hover:border-[#009744]/30"
             >
               <feature.icon className="h-12 w-12 text-[#009744] mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{t(feature.titleKey)}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{t(feature.descKey)}</p>
             </motion.div>
           ))}
         </motion.div>

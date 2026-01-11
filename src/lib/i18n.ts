@@ -303,6 +303,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.allProducts': 'All Products',
     'shop.premium': 'Premium Selection',
     'shop.quality': 'Premium Quality Products',
+    'shop.premiumCollection': 'Premium Collection',
+    'shop.discoverPremium': 'Discover Our Premium Selection',
+    'shop.exploreCollection': 'Explore our carefully curated collection of organic spices and premium products, sourced from the finest producers around the world.',
+    'shop.quality_title': 'Premium Quality',
+    'shop.quality_desc': 'Handpicked from the best sources',
+    'shop.certified_title': 'Certified Organic',
+    'shop.certified_desc': '100% authentic and pure products',
+    'shop.shopping_title': 'Easy Shopping',
+    'shop.shopping_desc': 'Simple checkout and fast delivery',
     
     // Collections Page
     'collections.browseByCategory': 'Browse by Category',
@@ -946,6 +955,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.allProducts': 'جميع المنتجات',
     'shop.premium': 'اختيار ممتاز',
     'shop.quality': 'منتجات عالية الجودة',
+    'shop.premiumCollection': 'مجموعة مميزة',
+    'shop.discoverPremium': 'اكتشف اختيارنا الفاخر',
+    'shop.exploreCollection': 'استكشف مجموعتنا المنسقة بعناية من البهارات العضوية والمنتجات الفاخرة، المتحصل عليها من أفضل المنتجين في جميع أنحاء العالم',
+    'shop.quality_title': 'جودة فاخرة',
+    'shop.quality_desc': 'مختارة بعناية من أفضل المصادر',
+    'shop.certified_title': 'معتمد عضوي',
+    'shop.certified_desc': '100% منتجات أصلية وخالصة',
+    'shop.shopping_title': 'تسوق سهل',
+    'shop.shopping_desc': 'دفع سهل وتسليم سريع',
     
     // Collections Page - Arabic
     'collections.browseByCategory': 'تصفح حسب الفئة',
@@ -1577,6 +1595,15 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.allProducts': 'सभी उत्पाद',
     'shop.premium': 'प्रीमियम चयन',
     'shop.quality': 'उच्च गुणवत्ता वाले उत्पाद',
+    'shop.premiumCollection': 'प्रीमियम संग्रह',
+    'shop.discoverPremium': 'हमारे प्रीमियम चयन की खोज करें',
+    'shop.exploreCollection': 'दुनिया भर के सबसे अच्छे उत्पादकों से प्राप्त जैविक मसालों और प्रीमियम उत्पादों के हमारे सावधानीपूर्वक क्यूरेटेड संग्रह की खोज करें',
+    'shop.quality_title': 'प्रीमियम गुणवत्ता',
+    'shop.quality_desc': 'सर्वश्रेष्ठ स्रोतों से सावधानीपूर्वक चुना गया',
+    'shop.certified_title': 'प्रमाणित जैविक',
+    'shop.certified_desc': '100% प्रामाणिक और शुद्ध उत्पाद',
+    'shop.shopping_title': 'आसान खरीदारी',
+    'shop.shopping_desc': 'सरल चेकआउट और तेजी से डिलीवरी',
     
     // Collections Page - Hindi
     'collections.browseByCategory': 'श्रेणी द्वारा ब्राउज़ करें',
