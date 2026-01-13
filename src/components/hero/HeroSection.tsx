@@ -135,7 +135,7 @@ export function HeroSection() {
   const slide = heroSlides[current];
 
   return (
-    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100dvh" }}>
+    <section className="relative w-full overflow-hidden bg-black pt-20 xs:pt-24 sm:pt-28 md:pt-32" style={{ minHeight: "100dvh" }}>
       {/* ---------------- BACKGROUND CAROUSEL ---------------- */}
       <div className="absolute inset-0 z-0 h-full w-full">
         <Carousel
