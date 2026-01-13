@@ -199,7 +199,7 @@ function CheckoutPageContent() {
         <Card className="w-full max-w-sm bg-white dark:bg-white border-gray-200">
           <CardContent className="pt-6 text-center bg-white dark:bg-white">
             <p className="text-base xs:text-lg sm:text-xl font-semibold mb-4 text-gray-900">{t('cart.empty')}</p>
-            <Button className="w-full bg-[#009744] hover:bg-[#2E763B] text-white" onClick={() => router.push('/')}>Continue Shopping</Button>
+            <Button className="w-full bg-[#009744] hover:bg-[#2E763B] text-white" onClick={() => router.push('/')}>{t('checkout.continueShopping')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -216,20 +216,20 @@ function CheckoutPageContent() {
               <Check className="w-6 xs:w-7 sm:w-8 h-6 xs:h-7 sm:h-8 text-[#009744]" />
             </div>
           </div>
-          <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 sm:mb-2">Order Placed Successfully!</h1>
-          <p className="text-sm xs:text-base sm:text-lg text-gray-700 mb-4 xs:mb-5 sm:mb-6">Thank you for your order.</p>
+          <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 sm:mb-2">{t('checkout.placedSuccessfully')}</h1>
+          <p className="text-sm xs:text-base sm:text-lg text-gray-700 mb-4 xs:mb-5 sm:mb-6">{t('checkout.thankYou')}</p>
           
           <Card className="bg-gray-50 border-gray-200 mb-4 xs:mb-5 sm:mb-6">
             <CardContent className="pt-4 xs:pt-5 sm:pt-6">
               <div className="text-center">
-                <p className="text-xs xs:text-sm text-gray-700 mb-1.5 xs:mb-2">Order Number</p>
+                <p className="text-xs xs:text-sm text-gray-700 mb-1.5 xs:mb-2">{t('checkout.orderNumber')}</p>
                 <p className="text-xl xs:text-2xl sm:text-3xl font-bold text-[#009744]">{orderNumber}</p>
               </div>
             </CardContent>
           </Card>
 
           <p className="text-xs xs:text-sm text-gray-700 mb-4 xs:mb-5 sm:mb-6">
-            A confirmation email has been sent to your inbox. You can track your order status there.
+            {t('checkout.confirmationEmail')}
           </p>
 
           <Button 
@@ -237,7 +237,7 @@ function CheckoutPageContent() {
             className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
             onClick={() => router.push('/')}
           >
-            Continue Shopping
+            {t('checkout.continueShopping')}
           </Button>
         </div>
       </div>
@@ -248,7 +248,7 @@ function CheckoutPageContent() {
     <div className="min-h-screen bg-white py-6 xs:py-7 sm:py-8 md:py-10 dark:bg-white text-gray-900">
       <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-4 xs:gap-5 sm:gap-6 md:gap-8">
         <h1 className="col-span-full text-2xl xs:text-3xl sm:text-4xl font-bold mb-3 xs:mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-gray-900">
-          <span className="text-[#009744]">Secure</span> <span className="text-[#AB1F23]">Checkout</span>
+          <span className="text-[#009744]">{t('checkout.security') || 'Secure'}</span> <span className="text-[#AB1F23]">{t('checkout.title')}</span>
           <div className="flex-1 h-[2px] bg-gradient-to-r from-[#009744] to-[#AB1F23] w-full sm:ml-4 sm:w-auto"></div>
         </h1>
         {/* Main Checkout Form */}
@@ -256,13 +256,13 @@ function CheckoutPageContent() {
           <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="space-y-4 xs:space-y-5 sm:space-y-6">
             <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-0.5 xs:p-1 rounded-lg">
               <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                Shipping
+                {t('checkout.shippingTab')}
               </TabsTrigger>
               <TabsTrigger value="payment" disabled={step === 'shipping'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                Payment
+                {t('checkout.paymentTab')}
               </TabsTrigger>
               <TabsTrigger value="review" disabled={step !== 'review'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                Review
+                {t('checkout.reviewTab')}
               </TabsTrigger>
             </TabsList>
 
@@ -275,9 +275,9 @@ function CheckoutPageContent() {
                 <CardContent className="space-y-3 xs:space-y-3.5 sm:space-y-4 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.firstName') || 'First Name'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.firstName')}</Label>
                       <Input
-                        placeholder="First name"
+                        placeholder={t('checkout.placeholderFirstName')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         value={shippingAddress.firstName || ''}
                         onChange={(e) =>
@@ -289,9 +289,9 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.lastName') || 'Last Name'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.lastName')}</Label>
                       <Input
-                        placeholder="Last name"
+                        placeholder={t('checkout.placeholderLastName')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
@@ -304,9 +304,9 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.email') || 'Email'}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.email')}</Label>
                     <Input
-                      placeholder="email@example.com"
+                      placeholder={t('checkout.placeholderEmail')}
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       type="email"
                       value={shippingAddress.email || ''}
@@ -320,9 +320,9 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.phone') || 'Phone'}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.phone')}</Label>
                     <Input
-                      placeholder="+1 (555) 000-0000"
+                      placeholder={t('checkout.placeholderPhone')}
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
@@ -334,9 +334,9 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.streetAddress') || 'Street Address'}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.streetAddress')}</Label>
                     <Input
-                      placeholder="Street address"
+                      placeholder={t('checkout.placeholderStreet')}
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
@@ -348,9 +348,9 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.apartment') || 'Apartment (optional)'}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.apartment')}</Label>
                     <Input
-                      placeholder="Apartment, suite, etc."
+                      placeholder={t('checkout.placeholderApartment')}
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
@@ -363,9 +363,9 @@ function CheckoutPageContent() {
 
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.city') || 'City'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.city')}</Label>
                       <Input
-                        placeholder="City"
+                        placeholder={t('checkout.placeholderCity')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
@@ -376,9 +376,9 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.state') || 'State'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.state')}</Label>
                       <Input
-                        placeholder="State/Province"
+                        placeholder={t('checkout.placeholderState')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
@@ -392,9 +392,9 @@ function CheckoutPageContent() {
 
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postalCode') || 'Postal Code'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postal')}</Label>
                       <Input
-                        placeholder="Postal code"
+                        placeholder={t('checkout.placeholderPostal')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
@@ -405,7 +405,7 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.country') || 'Country'}</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.country')}</Label>
                       <select
                         value={shippingAddress.country || ''}
                         onChange={(e) =>
@@ -416,7 +416,7 @@ function CheckoutPageContent() {
                         }
                         className="w-full px-2.5 xs:px-3 sm:px-3 py-2 xs:py-2 sm:py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-xs sm:text-sm h-9 xs:h-9 sm:h-10"
                       >
-                        <option value="" className="bg-white text-gray-800">{t('checkout.selectCountry') || 'Select Country'}</option>
+                        <option value="" className="bg-white text-gray-800">{t('checkout.selectCountry')}</option>
                         <option value="IN" className="bg-white text-gray-800">India</option>
                         <option value="US" className="bg-white text-gray-800">United States</option>
                         <option value="GB" className="bg-white text-gray-800">United Kingdom</option>
@@ -452,7 +452,7 @@ function CheckoutPageContent() {
                         <p className="text-xs xs:text-sm text-gray-600">{method.description}</p>
                       </div>
                       <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">
-                        {method.price === 0 ? 'Free' : formatCurrency(method.price)}
+                        {method.price === 0 ? t('checkout.free') : formatCurrency(method.price)}
                       </p>
                     </label>
                   ))}
@@ -465,7 +465,7 @@ function CheckoutPageContent() {
                 onClick={() => setStep('payment')}
                 disabled={!isShippingAddressValid}
               >
-                Continue to Payment
+                {t('checkout.continueToPayment')}
               </Button>
             </TabsContent>
 
@@ -633,7 +633,7 @@ function CheckoutPageContent() {
         <div>
           <Card className="sticky top-8 border-2 border-[#009744] shadow-lg bg-white dark:bg-white">
             <CardHeader className="bg-gradient-to-r from-[#009744] to-[#2E763B] text-white rounded-t-lg">
-              <CardTitle className="text-white">Order Summary</CardTitle>
+              <CardTitle className="text-white">{t('checkout.orderSummary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 bg-white dark:bg-white">
               {/* Items */}
@@ -645,7 +645,7 @@ function CheckoutPageContent() {
                   >
                     <div>
                       <p className="font-medium text-gray-900">{item.name}</p>
-                      <p className="text-gray-700">Qty: {item.quantity}</p>
+                      <p className="text-gray-700">{t('checkout.qty')}: {item.quantity}</p>
                     </div>
                     <p className="font-semibold text-gray-900">
                       {formatCurrency(item.price * item.quantity)}
@@ -657,7 +657,7 @@ function CheckoutPageContent() {
               {/* Totals */}
               <div className="space-y-2 border-t pt-4 text-gray-900">
                 <div className="flex justify-between text-gray-900">
-                  <span className="text-gray-900">Subtotal</span>
+                  <span className="text-gray-900">{t('checkout.subtotal')}</span>
                   <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
 
@@ -673,7 +673,7 @@ function CheckoutPageContent() {
                     <span className="text-gray-900">{t('cart.shipping')}</span>
                     <span className="font-semibold text-gray-900">
                       {selectedShippingMethod.price === 0
-                        ? 'Free'
+                        ? t('checkout.free')
                         : formatCurrency(selectedShippingMethod.price)}
                     </span>
                   </div>
