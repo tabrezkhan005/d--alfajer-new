@@ -89,9 +89,9 @@ function SearchPageContentInner() {
     <div className="min-h-screen bg-white">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-white via-white to-[#009744]/5 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-          <div className="space-y-2 sm:space-y-3">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
+        <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-6 xs:py-7 sm:py-8 md:py-10 lg:py-12">
+          <div className="space-y-2 xs:space-y-2.5 sm:space-y-3">
+            <h1 className="text-2xl xs:text-2.5xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
               {query ? (
                 <>
                   <span className="text-gray-900">{t('search.resultsFor')}</span>
@@ -103,7 +103,7 @@ function SearchPageContentInner() {
             </h1>
             <div className="flex items-center gap-2">
               <div className="h-[2px] w-8 bg-gradient-to-r from-[#009744] to-transparent" />
-              <p className="text-sm sm:text-base text-gray-600 font-body">
+              <p className="text-xs xs:text-xs sm:text-base text-gray-600 font-body">
                 {t('search.showing')}: <span className="font-semibold text-gray-900">{filteredProducts.length}</span> {filteredProducts.length === 1 ? t('common.product') : t('common.products')}
               </p>
             </div>
@@ -112,13 +112,13 @@ function SearchPageContentInner() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-6 xs:py-7 sm:py-8 md:py-10 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 xs:gap-5 sm:gap-6 md:gap-7 lg:gap-8">
           {/* Sidebar Filters - Desktop */}
           <div className="hidden lg:block">
-            <div className="sticky top-24 bg-gray-50 rounded-2xl border border-gray-200 p-5 sm:p-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
+            <div className="sticky top-24 bg-gray-50 rounded-2xl border border-gray-200 p-5 xs:p-5.5 sm:p-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
               <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-200">
-                <h2 className="text-lg font-bold text-gray-900 font-heading">{t('common.filter')}</h2>
+                <h2 className="text-sm xs:text-base sm:text-lg font-bold text-gray-900 font-heading">{t('common.filter')}</h2>
                 <button onClick={() => setFilters({ priceRange: [0, 1000] })} className="text-xs font-semibold text-[#009744] hover:text-[#2E763B] transition-colors">
                   {t('common.reset')}
                 </button>
@@ -137,17 +137,17 @@ function SearchPageContentInner() {
           {/* Products Section */}
           <div className="lg:col-span-3">
             {/* Mobile Filter and Sort */}
-            <div className="lg:hidden flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+            <div className="lg:hidden flex flex-col xs:flex-col sm:flex-row gap-2 xs:gap-3 sm:gap-4 mb-5 xs:mb-6">
               <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="flex items-center justify-center gap-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold">
+                  <Button variant="outline" className="flex items-center justify-center gap-2 border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold text-xs xs:text-xs sm:text-sm">
                     <Filter className="h-4 w-4" />
                     {t('common.filter')}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-full sm:w-80 bg-white">
+                <SheetContent side="left" className="w-full sm:w-80 bg-white p-3 xs:p-4">
                   <SheetHeader>
-                    <SheetTitle className="text-gray-900">{t('common.filter')}</SheetTitle>
+                    <SheetTitle className="text-gray-900 text-base xs:text-lg">{t('common.filter')}</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6">
                     <FilterSidebar
@@ -166,7 +166,7 @@ function SearchPageContentInner() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 bg-white hover:border-[#009744] focus:outline-none focus:ring-2 focus:ring-[#009744] focus:border-transparent transition-colors"
+                  className="w-full px-3 xs:px-3.5 sm:px-4 py-2 xs:py-2.5 border border-gray-300 rounded-lg text-xs xs:text-xs sm:text-sm font-semibold text-gray-900 bg-white hover:border-[#009744] focus:outline-none focus:ring-2 focus:ring-[#009744] focus:border-transparent transition-colors"
                 >
                   <option value="featured">{t('sort.featured') || 'Featured'}</option>
                   <option value="price-low">{t('sort.priceLow') || 'Price: Low to High'}</option>
@@ -180,11 +180,11 @@ function SearchPageContentInner() {
             <div className="hidden lg:flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
               <div />
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-gray-900">{t('common.sort')}:</span>
+                <span className="text-xs xs:text-xs sm:text-sm font-semibold text-gray-900">{t('common.sort')}:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 bg-white hover:border-[#009744] focus:outline-none focus:ring-2 focus:ring-[#009744] focus:border-transparent transition-colors"
+                  className="px-3 xs:px-3.5 sm:px-4 py-2 xs:py-2.5 border border-gray-300 rounded-lg text-xs xs:text-xs sm:text-sm font-semibold text-gray-900 bg-white hover:border-[#009744] focus:outline-none focus:ring-2 focus:ring-[#009744] focus:border-transparent transition-colors"
                 >
                   <option value="featured">{t('sort.featured') || 'Featured'}</option>
                   <option value="price-low">{t('sort.priceLow') || 'Price: Low to High'}</option>
@@ -338,10 +338,10 @@ function FilterSidebar({
   t,
 }: FilterSidebarProps) {
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-4 xs:space-y-4.5 sm:space-y-5">
       {/* Price Filter */}
-      <div className="pb-5 border-b border-gray-200">
-        <h3 className="font-bold text-gray-900 mb-4 text-sm sm:text-base">{t("filter.priceRange")}</h3>
+      <div className="pb-4 xs:pb-4.5 sm:pb-5 border-b border-gray-200">
+        <h3 className="font-bold text-gray-900 mb-3 text-xs xs:text-xs sm:text-sm">{t("filter.priceRange")}</h3>
         <Slider
           value={filters.priceRange || [0, 1000]}
           onValueChange={(value) =>
@@ -353,9 +353,9 @@ function FilterSidebar({
           min={0}
           max={1000}
           step={10}
-          className="mb-4 [&_[role=slider]]:bg-[#009744] [&>div>div]:bg-[#009744]"
+          className="mb-3 [&_[role=slider]]:bg-[#009744] [&>div>div]:bg-[#009744]"
         />
-        <div className="flex justify-between text-xs sm:text-sm text-gray-600 font-medium">
+        <div className="flex justify-between text-xs text-gray-600 font-medium">
           <span>AED {filters.priceRange?.[0] || 0}</span>
           <span>AED {filters.priceRange?.[1] || 1000}</span>
         </div>
@@ -363,11 +363,11 @@ function FilterSidebar({
 
       {/* Category Filter */}
       {categories.length > 0 && (
-        <div className="pb-5 border-b border-gray-200">
-          <h3 className="font-bold text-gray-900 mb-3 text-sm sm:text-base">{t('filter.category') || 'Category'}</h3>
-          <div className="space-y-2.5">
+        <div className="pb-4 xs:pb-4.5 sm:pb-5 border-b border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-2 xs:mb-2.5 sm:mb-3 text-xs xs:text-xs sm:text-sm">{t('filter.category') || 'Category'}</h3>
+          <div className="space-y-1.5 xs:space-y-2">
             {categories.map((category) => (
-              <label key={category} className="flex items-center gap-3 cursor-pointer group">
+              <label key={category} className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 cursor-pointer group">
                 <Checkbox
                   checked={filters.categories?.includes(category) || false}
                   onCheckedChange={(checked) => {
@@ -381,7 +381,7 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                <span className="text-xs text-gray-700 group-hover:text-[#009744] transition-colors">
                   {t(`category.${category.toLowerCase().replace(/\s+/g, '')}`) || category}
                 </span>
               </label>
@@ -392,11 +392,11 @@ function FilterSidebar({
 
       {/* Origin Filter */}
       {origins.length > 0 && (
-        <div className="pb-5 border-b border-gray-200">
-          <h3 className="font-bold text-gray-900 mb-3 text-sm sm:text-base">{t('filter.origin') || 'Origin'}</h3>
-          <div className="space-y-2.5">
+        <div className="pb-4 xs:pb-4.5 sm:pb-5 border-b border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-2 xs:mb-2.5 sm:mb-3 text-xs xs:text-xs sm:text-sm">{t('filter.origin') || 'Origin'}</h3>
+          <div className="space-y-1.5 xs:space-y-2">
             {origins.map((origin) => (
-              <label key={origin} className="flex items-center gap-3 cursor-pointer group">
+              <label key={origin} className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 cursor-pointer group">
                 <Checkbox
                   checked={filters.origins?.includes(origin) || false}
                   onCheckedChange={(checked) => {
@@ -410,7 +410,7 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                <span className="text-xs text-gray-700 group-hover:text-[#009744] transition-colors">
                   {t(`origin.${origin.toLowerCase().replace(/[,\s]+/g, '')}`) || origin}
                 </span>
               </label>
@@ -421,11 +421,11 @@ function FilterSidebar({
 
       {/* Certification Filter */}
       {certifications.length > 0 && (
-        <div className="pb-5 border-b border-gray-200">
-          <h3 className="font-bold text-gray-900 mb-3 text-sm sm:text-base">{t('filter.certification') || 'Certifications'}</h3>
-          <div className="space-y-2.5">
+        <div className="pb-4 xs:pb-4.5 sm:pb-5 border-b border-gray-200">
+          <h3 className="font-bold text-gray-900 mb-2 xs:mb-2.5 sm:mb-3 text-xs xs:text-xs sm:text-sm">{t('filter.certification') || 'Certifications'}</h3>
+          <div className="space-y-1.5 xs:space-y-2">
             {certifications.map((cert) => (
-              <label key={cert} className="flex items-center gap-3 cursor-pointer group">
+              <label key={cert} className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 cursor-pointer group">
                 <Checkbox
                   checked={filters.certifications?.includes(cert) || false}
                   onCheckedChange={(checked) => {
@@ -439,7 +439,7 @@ function FilterSidebar({
                   }}
                   className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
                 />
-                <span className="text-xs sm:text-sm text-gray-700 group-hover:text-[#009744] transition-colors">
+                <span className="text-xs text-gray-700 group-hover:text-[#009744] transition-colors">
                   {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
                 </span>
               </label>
@@ -449,8 +449,8 @@ function FilterSidebar({
       )}
 
       {/* Stock Filter */}
-      <div className="pb-5 border-b border-gray-200">
-        <label className="flex items-center gap-3 cursor-pointer group">
+      <div className="pb-4 xs:pb-4.5 sm:pb-5 border-b border-gray-200">
+        <label className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 cursor-pointer group">
           <Checkbox
             checked={filters.inStockOnly || false}
             onCheckedChange={(checked) =>
@@ -458,13 +458,13 @@ function FilterSidebar({
             }
             className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded"
           />
-          <span className="text-xs sm:text-sm font-medium text-gray-900">{t("filter.inStockOnly")}</span>
+          <span className="text-xs font-medium text-gray-900">{t("filter.inStockOnly")}</span>
         </label>
       </div>
 
       {/* Sale Filter */}
       <div>
-        <label className="flex items-center gap-3 cursor-pointer group">
+        <label className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 cursor-pointer group">
           <Checkbox
             checked={filters.onSaleOnly || false}
             onCheckedChange={(checked) =>
@@ -472,7 +472,7 @@ function FilterSidebar({
             }
             className="border-gray-300 data-[state=checked]:bg-[#AB1F23] data-[state=checked]:border-[#AB1F23] rounded"
           />
-          <span className="text-xs sm:text-sm font-medium text-gray-900">{t('filter.onSaleOnly') || 'On Sale'}</span>
+          <span className="text-xs font-medium text-gray-900">{t('filter.onSaleOnly') || 'On Sale'}</span>
         </label>
       </div>
     </div>
