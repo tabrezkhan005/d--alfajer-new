@@ -77,7 +77,7 @@ export default function CollectionsPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-28 xs:pt-32 sm:pt-36 md:pt-40 lg:pt-44">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-40 xs:pt-44 sm:pt-48 md:pt-52 lg:pt-56">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-64 xs:w-72 sm:w-80 md:w-96 h-64 xs:h-72 sm:h-80 md:h-96 bg-white rounded-full blur-3xl"></div>
         </div>
