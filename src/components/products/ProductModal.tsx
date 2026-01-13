@@ -252,7 +252,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 bg-white rounded-lg sm:rounded-2xl lg:rounded-3xl border-0 shadow-2xl left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[calc(100vw-2rem)] sm:w-full sm:max-w-5xl mx-0 text-gray-900">
         <VisuallyHidden>
-          <DialogTitle>{product.name}</DialogTitle>
+          <DialogTitle>{t(product.name)}</DialogTitle>
         </VisuallyHidden>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 text-gray-900">
@@ -403,7 +403,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               {/* Title */}
               <div className="space-y-3">
                 <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 font-heading leading-tight tracking-tight">
-                  {product.name}
+                  {t(product.name)}
                 </h2>
                 <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 text-xs sm:text-sm font-medium">
                   <span className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-poppins">Origin: {product.origin}</span>
@@ -425,7 +425,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
               {/* Description */}
               <p className="text-gray-500 text-sm sm:text-base lg:text-lg leading-relaxed font-body">
-                {product.description ? t(product.description) : `Premium quality ${product.name.toLowerCase()} sourced directly from ${product.origin}. Perfectly processed and packed to preserve natural flavor and nutrients.`}
+                {product.description ? t(product.description) : `Premium quality ${t(product.name).toLowerCase()} sourced directly from ${product.origin}. Perfectly processed and packed to preserve natural flavor and nutrients.`}
               </p>
 
             {/* Certifications */}
@@ -594,7 +594,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   <h4 className="font-bold text-gray-900 font-poppins text-base sm:text-lg border-b-3 border-[#009744] pb-2">{t('product.productSpecifications')}</h4>
                   <div className="space-y-3">
                     {[
-                      { label: "Product Name", value: product.name },
+                      { label: "Product Name", value: t(product.name) },
                       { label: "Package Size", value: product.packageSize },
                       { label: "Origin", value: product.origin },
                       { label: "Shelf Life", value: "12 months from packaging" },

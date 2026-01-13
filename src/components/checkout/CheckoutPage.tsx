@@ -652,7 +652,7 @@ function CheckoutPageContent() {
                     className="flex justify-between text-sm pb-2 border-b text-gray-900"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{item.name}</p>
+                      <p className="font-medium text-gray-900">{t(item.name)}</p>
                       <p className="text-gray-700">{t('checkout.qty')}: {item.quantity}</p>
                     </div>
                     <p className="font-semibold text-gray-900">
