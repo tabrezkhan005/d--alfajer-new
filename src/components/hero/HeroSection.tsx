@@ -221,7 +221,7 @@ export function HeroSection() {
                   <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
                     <span className="bg-[#AB1F23]/20 backdrop-blur-md border border-[#AB1F23]/30 px-3 sm:px-4 py-1.5 rounded-full flex items-center gap-2">
                       <Heart className="h-3 sm:h-4 w-3 sm:w-4 text-[#AB1F23]" fill="#AB1F23" />
-                      <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase">Real Customers, Real Joy</span>
+                      <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase">{t('hero.realCustomersJoy')}</span>
                     </span>
                   </motion.div>
 

@@ -275,10 +275,10 @@ function CheckoutPageContent() {
                 <CardContent className="space-y-3 xs:space-y-3.5 sm:space-y-4 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">First Name</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.firstName') || 'First Name'}</Label>
                       <Input
                         placeholder="First name"
-                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         value={shippingAddress.firstName || ''}
                         onChange={(e) =>
                           setShippingAddress({
@@ -289,10 +289,10 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Last Name</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.lastName') || 'Last Name'}</Label>
                       <Input
                         placeholder="Last name"
-                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -304,10 +304,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Email</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.email') || 'Email'}</Label>
                     <Input
                       placeholder="email@example.com"
-                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       type="email"
                       value={shippingAddress.email || ''}
                       onChange={(e) =>
@@ -320,10 +320,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Phone</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.phone') || 'Phone'}</Label>
                     <Input
                       placeholder="+1 (555) 000-0000"
-                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -334,10 +334,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Street Address</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.streetAddress') || 'Street Address'}</Label>
                     <Input
                       placeholder="Street address"
-                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -348,10 +348,10 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Apartment (optional)</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.apartment') || 'Apartment (optional)'}</Label>
                     <Input
                       placeholder="Apartment, suite, etc."
-                      className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -363,10 +363,10 @@ function CheckoutPageContent() {
 
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">City</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.city') || 'City'}</Label>
                       <Input
                         placeholder="City"
-                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -376,10 +376,10 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">State</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.state') || 'State'}</Label>
                       <Input
                         placeholder="State/Province"
-                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -392,10 +392,10 @@ function CheckoutPageContent() {
 
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Postal Code</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postalCode') || 'Postal Code'}</Label>
                       <Input
                         placeholder="Postal code"
-                        className="text-xs xs:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744]"
+                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -405,7 +405,7 @@ function CheckoutPageContent() {
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-sm sm:text-base">Country</Label>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.country') || 'Country'}</Label>
                       <select
                         value={shippingAddress.country || ''}
                         onChange={(e) =>
@@ -414,9 +414,9 @@ function CheckoutPageContent() {
                             country: e.target.value,
                           })
                         }
-                        className="w-full px-2 xs:px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-sm"
+                        className="w-full px-2.5 xs:px-3 sm:px-3 py-2 xs:py-2 sm:py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-xs sm:text-sm h-9 xs:h-9 sm:h-10"
                       >
-                        <option value="" className="bg-white text-gray-800">Select Country</option>
+                        <option value="" className="bg-white text-gray-800">{t('checkout.selectCountry') || 'Select Country'}</option>
                         <option value="IN" className="bg-white text-gray-800">India</option>
                         <option value="US" className="bg-white text-gray-800">United States</option>
                         <option value="GB" className="bg-white text-gray-800">United Kingdom</option>
