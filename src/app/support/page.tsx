@@ -88,8 +88,8 @@ export default function SupportPage() {
   return (
     <div className="w-full bg-white overflow-x-hidden">
       {/* Language & Currency Selector */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-end gap-3">
+      <div className="bg-white border-b border-gray-200 sticky top-16 sm:top-20 md:top-24 lg:top-28 z-30">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 flex justify-end gap-2 sm:gap-3">
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
           <CurrencySelector currency={currency} onCurrencyChange={setCurrency} />
         </div>
@@ -97,35 +97,35 @@ export default function SupportPage() {
 
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t("common.home")}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">{t("support.title")}</span>
+            <span className="text-gray-900 font-semibold truncate">{t("support.title")}</span>
           </div>
         </div>
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-16 sm:pt-20 lg:pt-24">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-12 sm:pt-16 md:pt-20 lg:pt-28">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <Headset className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t("support.here_to_help")}</span>
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <Headset className="h-6 sm:h-7 md:h-8 w-6 sm:w-7 md:w-8 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white/20 px-2 sm:px-3 py-1 rounded-full">{t("support.here_to_help")}</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight">
               {t("support.customer_support")}
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed">
               {t("support.hero_description")}
             </p>
           </motion.div>
@@ -133,13 +133,13 @@ export default function SupportPage() {
       </div>
 
       {/* Contact Methods */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-12 sm:mb-16"
         >
           {contactMethods.map((method, index) => {
             const Icon = method.icon;
@@ -147,11 +147,11 @@ export default function SupportPage() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
+                className="p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
               >
-                <Icon className="h-12 w-12 text-[#009744] mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{method.title}</h3>
-                <p className="text-[#009744] font-semibold text-sm mb-1">{method.value}</p>
+                <Icon className="h-10 sm:h-12 w-10 sm:w-12 text-[#009744] mb-3 sm:mb-4" />
+                <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-2">{method.title}</h3>
+                <p className="text-[#009744] font-semibold text-xs sm:text-sm mb-1">{method.value}</p>
                 <p className="text-gray-500 text-xs">{method.description}</p>
               </motion.div>
             );
@@ -159,16 +159,16 @@ export default function SupportPage() {
         </motion.div>
 
         {/* Contact Form & FAQ Split */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-8"
+            className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 sm:p-6 md:p-8"
           >
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-8">{t("support.send_message")}</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">{t("support.send_message")}</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>

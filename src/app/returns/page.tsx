@@ -23,8 +23,8 @@ export default function ReturnsPage() {
   return (
     <div className="w-full bg-white overflow-x-hidden">
       {/* Language & Currency Selector */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-end gap-3">
+      <div className="bg-white border-b border-gray-200 sticky top-16 sm:top-20 md:top-24 lg:top-28 z-30">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 flex justify-end gap-2 sm:gap-3">
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
           <CurrencySelector currency={currency} onCurrencyChange={setCurrency} />
         </div>
@@ -32,35 +32,35 @@ export default function ReturnsPage() {
 
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
             <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t('common.home')}</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold">{t('returns.title')}</span>
+            <span className="text-gray-900 font-semibold truncate">{t('returns.title')}</span>
           </div>
         </div>
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-16 sm:pt-20 lg:pt-24">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-12 sm:pt-16 md:pt-20 lg:pt-28">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <RotateCcw className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('returns.satisfaction')}</span>
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <RotateCcw className="h-6 sm:h-7 md:h-8 w-6 sm:w-7 md:w-8 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white/20 px-2 sm:px-3 py-1 rounded-full">{t('returns.satisfaction')}</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight">
               {t('returns.title')}
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed">
               {t('returns.description')}
             </p>
           </motion.div>
@@ -68,13 +68,13 @@ export default function ReturnsPage() {
       </div>
 
       {/* Key Benefits */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
         >
           {[
             { icon: Zap, titleKey: "returns.benefit1_title", descKey: "returns.benefit1_desc" },
@@ -85,19 +85,19 @@ export default function ReturnsPage() {
             <motion.div
               key={i}
               variants={itemVariants}
-              className="p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
+              className="p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
             >
-              <item.icon className="h-12 w-12 text-[#009744] mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{t(item.titleKey)}</h3>
-              <p className="text-gray-500 text-sm">{t(item.descKey)}</p>
+              <item.icon className="h-10 sm:h-12 w-10 sm:w-12 text-[#009744] mb-3 sm:mb-4" />
+              <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-2">{t(item.titleKey)}</h3>
+              <p className="text-gray-500 text-xs sm:text-sm">{t(item.descKey)}</p>
             </motion.div>
           ))}
         </motion.div>
       </div>
 
       {/* Policy Details */}
-      <div className="bg-gray-50 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-gray-50 py-8 sm:py-12 md:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -156,17 +156,17 @@ export default function ReturnsPage() {
       </div>
 
       {/* Cannot Accept */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-red-50 border border-red-200 rounded-xl p-6 lg:p-10"
+          className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6 md:p-8 lg:p-10"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="h-7 w-7 text-red-600 flex-shrink-0" />
-            <h2 className="text-2xl font-bold text-red-900">{t('returns.cannotAccept')}</h2>
+          <div className="flex items-start gap-2 sm:gap-3 mb-4">
+            <AlertCircle className="h-6 sm:h-7 w-6 sm:w-7 text-red-600 flex-shrink-0 mt-0.5" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-red-900">{t('returns.cannotAccept')}</h2>
           </div>
           <ul className="space-y-3 ml-10">
             {[
@@ -186,15 +186,15 @@ export default function ReturnsPage() {
       </div>
 
       {/* FAQ */}
-      <div className="bg-gray-50 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-10 text-center">{t('returns.faq_title')}</h2>
+      <div className="bg-gray-50 py-8 sm:py-12 md:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 md:mb-10 text-center">{t('returns.faq_title')}</h2>
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid sm:grid-cols-2 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
           >
             {[
               { qKey: "returns.faq_q1", aKey: "returns.faq_a1" },
