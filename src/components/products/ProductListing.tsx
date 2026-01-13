@@ -605,10 +605,10 @@ export function ProductListing() {
 
             {/* View All Products Button */}
             {filteredProducts.length > 0 && (
-              <div className="mt-12 sm:mt-16 md:mt-20 text-center">
+              <div className="mt-12 sm:mt-16 md:mt-20 flex justify-center">
                 <Button
                   size="lg"
-                  className="group relative bg-[#009744] hover:bg-[#2E763B] text-white px-8 sm:px-16 py-6 sm:py-8 text-sm sm:text-base md:text-lg font-bold rounded-full shadow-[0_10px_20px_-5px_rgba(0,151,68,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(0,151,68,0.4)] transition-all duration-500 font-poppins overflow-hidden border-2 border-white/10 w-full sm:w-auto"
+                  className="group relative bg-[#009744] hover:bg-[#2E763B] text-white px-8 sm:px-16 py-6 sm:py-8 text-sm sm:text-base md:text-lg font-bold rounded-full shadow-[0_10px_20px_-5px_rgba(0,151,68,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(0,151,68,0.4)] transition-all duration-500 font-poppins overflow-hidden border-2 border-white/10"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
                     {t('productCategory.loadMore')}
@@ -837,41 +837,43 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       </CardContent>
 
 
-<CardFooter className="p-3 xs:p-3.5 sm:p-4 md:p-5 pt-1 xs:pt-2 sm:pt-0 sm:mt-auto flex-shrink-0 flex gap-1.5 xs:gap-2 sm:gap-2">
-          <Button
-            className={cn(
-              "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
-              "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
-              "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
-              "bg-[#009744] hover:bg-[#2E763B] text-white"
-            )}
-            onClick={handleAddToCart}
-          >
-            {isAdding ? (
-              <>
-                <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
-                <span className="whitespace-nowrap">{t('product.addedToCart')}</span>
-              </>
-            ) : isInCart ? (
-              <>
-                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline">{t('product.addMore')}</span>
-                <span className="whitespace-nowrap xs:hidden">{t('product.more')}</span>
-              </>
-            ) : (
-              <>
-                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline">{t('product.addToCart')}</span>
-                <span className="whitespace-nowrap xs:hidden">{t('product.add')}</span>
-              </>
-            )}
-          </Button>
-          <Button
-            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white"
-            onClick={handleBuyNow}
-          >
-            <span className="whitespace-nowrap">{t('product.buyNow')}</span>
-          </Button>
+<CardFooter className="p-3 xs:p-3.5 sm:p-4 md:p-5 pt-1 xs:pt-2 sm:pt-0 sm:mt-auto flex-shrink-0 flex flex-col gap-2 xs:gap-2 sm:gap-2 w-full">
+          <div className="flex gap-1.5 xs:gap-2 sm:gap-2 w-full">
+            <Button
+              className={cn(
+                "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
+                "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
+                "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
+                "bg-[#009744] hover:bg-[#2E763B] text-white"
+              )}
+              onClick={handleAddToCart}
+            >
+              {isAdding ? (
+                <>
+                  <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
+                  <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.addedToCart')}</span>
+                </>
+              ) : isInCart ? (
+                <>
+                  <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                  <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addMore')}</span>
+                  <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.more')}</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                  <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addToCart')}</span>
+                  <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.add')}</span>
+                </>
+              )}
+            </Button>
+            <Button
+              className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white flex items-center justify-center"
+              onClick={handleBuyNow}
+            >
+              <span className="whitespace-nowrap">{t('product.buyNow')}</span>
+            </Button>
+          </div>
         </CardFooter>
     </Card>
   );

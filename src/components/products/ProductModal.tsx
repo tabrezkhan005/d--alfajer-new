@@ -465,35 +465,38 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 sm:gap-4 pt-4 flex-col sm:flex-row">
-                <Button
-                  size="lg"
-                  className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-14 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-base sm:text-base active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-2 w-full sm:w-auto"
-                >
-                  <ShoppingCart className="h-5 w-5 sm:h-5 sm:w-5" />
-                  <span>{t("product.addToCart")}</span>
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    router.push(`/checkout?product=${product.id}`);
-                    onOpenChange(false);
-                  }}
-                  className="flex-1 bg-[#AB1F23] hover:bg-[#8B1819] text-white font-bold h-14 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(171,31,35,0.39)] hover:shadow-[0_6px_20px_rgba(171,31,35,0.23)] transition-all duration-300 font-poppins text-base sm:text-base active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-2 w-full sm:w-auto"
-                >
-                  <Zap className="h-5 w-5 sm:h-5 sm:w-5" />
-                  <span>{t("product.buyNow")}</span>
-                </Button>
+              <div className="flex flex-col gap-2 sm:gap-3 pt-4 w-full">
+                <div className="flex gap-2 sm:gap-3 w-full">
+                  <Button
+                    size="lg"
+                    className="flex-1 bg-[#009744] hover:bg-[#00803a] text-white font-bold h-12 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(0,151,68,0.39)] hover:shadow-[0_6px_20px_rgba(0,151,68,0.23)] transition-all duration-300 font-poppins text-sm sm:text-base active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{t("product.addToCart")}</span>
+                  </Button>
+                  <Button
+                    size="lg"
+                    onClick={() => {
+                      router.push(`/checkout?product=${product.id}`);
+                      onOpenChange(false);
+                    }}
+                    className="flex-1 bg-[#AB1F23] hover:bg-[#8B1819] text-white font-bold h-12 sm:h-14 rounded-full shadow-[0_4px_14px_0_rgba(171,31,35,0.39)] hover:shadow-[0_6px_20px_rgba(171,31,35,0.23)] transition-all duration-300 font-poppins text-sm sm:text-base active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{t("product.buyNow")}</span>
+                  </Button>
+                </div>
                 <motion.div
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  className="w-full sm:w-auto"
                 >
                   <Button
                     size="lg"
                     variant="outline"
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={cn(
-                      "h-12 sm:h-14 w-12 sm:w-14 rounded-full border-2 transition-all bg-white",
+                      "h-12 sm:h-14 w-full sm:w-14 rounded-full border-2 transition-all bg-white",
                       isWishlisted
                         ? "bg-pink-50 border-pink-200 text-pink-500 shadow-[0_4px_14px_0_rgba(255,182,193,0.39)]"
                         : "border-gray-200 text-gray-600 hover:border-pink-200 hover:text-pink-500 hover:bg-pink-50/50 shadow-sm"
@@ -506,8 +509,10 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.8, opacity: 0 }}
                         transition={{ duration: 0.2 }}
+                        className="flex items-center justify-center gap-2 w-full"
                       >
                         <Heart className={cn("h-5 w-5 sm:h-6 sm:w-6 transition-all", isWishlisted && "fill-current scale-110")} />
+                        <span className="sm:hidden text-sm font-medium">{isWishlisted ? t('product.wishlisted') : t('product.addToWishlist')}</span>
                       </motion.div>
                     </AnimatePresence>
                   </Button>
