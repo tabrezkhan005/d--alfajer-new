@@ -448,8 +448,16 @@ function CheckoutPageContent() {
                         className="mr-2 xs:mr-3 accent-[#009744]"
                       />
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base">{method.name}</p>
-                        <p className="text-xs xs:text-sm text-gray-600">{method.description}</p>
+                        <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base">
+                          {method.id === 'standard' ? t('checkout.shippingSpeed.standard') : 
+                           method.id === 'express' ? t('checkout.shippingSpeed.express') : 
+                           t('checkout.shippingSpeed.overnight')}
+                        </p>
+                        <p className="text-xs xs:text-sm text-gray-600">
+                          {method.id === 'standard' ? t('checkout.shippingDays.standard') : 
+                           method.id === 'express' ? t('checkout.shippingDays.express') : 
+                           t('checkout.shippingDays.overnight')}
+                        </p>
                       </div>
                       <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">
                         {method.price === 0 ? t('checkout.free') : formatCurrency(method.price)}
