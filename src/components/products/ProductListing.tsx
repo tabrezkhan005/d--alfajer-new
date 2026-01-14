@@ -868,7 +868,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
               )}
             </Button>
             <Button
-              className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#AB1F23] hover:bg-[#8B1819] text-white flex items-center justify-center"
+              className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#D1515A] hover:bg-[#B83E45] text-white flex items-center justify-center"
               onClick={handleBuyNow}
             >
               <span className="whitespace-nowrap">{t('product.buyNow')}</span>
