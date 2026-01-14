@@ -208,7 +208,7 @@ export const mockProductsWithVariants: Product[] = [
     shortDescription: 'Premium Kashmiri Saffron with intense aroma and color.',
     longDescription: 'product.saffronDesc',
     category: 'Spices',
-    image: '/images/products/kashmir tea/kashmir_main.jpeg',
+    image: '/images/products/kashmirtea/kashmir_main.jpeg',
     images: [
       '/images/products/kashmirtea/kashmir_main.jpeg',
       '/images/products/kashmirtea/kashmir1.jpeg',

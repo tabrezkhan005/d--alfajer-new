@@ -106,12 +106,12 @@ const mockProducts: Product[] = [
   {
     id: "3",
     name: "productName.kashmirilSaffron",
-    image: "/images/products/chillipowder/chillipowder_main.jpeg",
+    image: "/images/products/kashmirtea/kashmir_main.jpeg",
     images: [
-      "/images/products/chillipowder/chillipowder_main.jpeg",
-      "/images/products/chillipowder/chillipowder_1.jpeg",
-      "/images/products/chillipowder/chillipowder_2.jpeg",
-      "/images/products/chillipowder/chillipowder_3.jpeg",
+      "/images/products/kashmirtea/kashmir_main.jpeg",
+      "/images/products/kashmirtea/kashmir1.jpeg",
+      "/images/products/kashmirtea/kashmir2.jpeg",
+      "/images/products/kashmirtea/kashmir3.jpeg",
     ],
     price: 149.99,
     originalPrice: 179.99,
@@ -825,7 +825,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
         {/* Price */}
         <div className="flex items-center gap-2 xs:gap-3 pt-0.5 xs:pt-1">
-          <span className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 font-heading">
+          <span className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 font-poppins">
             {formatCurrency(convertCurrency(product.price, 'INR'))}
           </span>
           {product.originalPrice && (
