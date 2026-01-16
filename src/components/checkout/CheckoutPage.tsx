@@ -195,9 +195,12 @@ function CheckoutPageContent() {
           name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
           address: shippingAddress,
           phone: shippingAddress.phone,
-          shippingMethod: shippingMethodId, // Optional, depending on API handling
-          paymentMethod: paymentMethodId,   // Optional
-          userId: user?.id,                 // Pass userId if available
+          shippingMethod: shippingMethodId,
+          paymentMethod: paymentMethodId,
+          userId: user?.id,
+          giftMessage,
+          subscription: subscribe ? { enabled: true, frequency: 'monthly' } : null,
+          promoCode: appliedPromo?.code,
         }),
       });
 

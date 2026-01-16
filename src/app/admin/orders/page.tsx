@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, Loader2, Filter } from "lucide-react";
+import { Eye, Loader2, Filter, Download } from "lucide-react";
 import { DataTable } from "@/src/components/admin/data-table";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
@@ -17,6 +17,7 @@ import {
 } from "@/src/components/ui/select";
 import { toast } from "sonner";
 
+// Status badge helper
 const getStatusBadge = (status: string | null) => {
   const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     pending: "outline",
@@ -33,6 +34,7 @@ const getStatusBadge = (status: string | null) => {
   );
 };
 
+// Date formatter helper
 const formatDate = (dateString: string | null) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -40,6 +42,16 @@ const formatDate = (dateString: string | null) => {
     month: "short",
     day: "numeric",
   });
+};
+
+// Helper to escape CSV fields
+const escapeCSV = (field: any) => {
+  if (field === null || field === undefined) return '';
+  const stringField = String(field);
+  if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+    return `"${stringField.replace(/"/g, '""')}"`;
+  }
+  return stringField;
 };
 
 export default function OrdersPage() {
@@ -93,6 +105,41 @@ export default function OrdersPage() {
   const getCustomerEmail = (order: OrderWithItems) => {
     const address = order.shipping_address as { email?: string } | null;
     return address?.email || "";
+  };
+
+  const handleExportCSV = () => {
+    if (orders.length === 0) {
+      toast.error("No orders to export");
+      return;
+    }
+
+    const headers = ["Order ID", "Date", "Customer Name", "Email", "Total", "Status", "Items Count"];
+    const csvContent = [
+      headers.join(','),
+      ...orders.map(order => {
+        const name = getCustomerName(order);
+        const email = getCustomerEmail(order);
+        return [
+          escapeCSV(order.id),
+          escapeCSV(new Date(order.created_at || '').toLocaleDateString()),
+          escapeCSV(name),
+          escapeCSV(email),
+          escapeCSV(order.total_amount),
+          escapeCSV(order.status),
+          escapeCSV(order.items?.length || 0)
+        ].join(',');
+      })
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const columns = [
@@ -193,6 +240,10 @@ export default function OrdersPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" size="sm" onClick={handleExportCSV} className="h-9 sm:h-10">
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-40 h-9 sm:h-10">
               <Filter className="mr-2 h-4 w-4" />

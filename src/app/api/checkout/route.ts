@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
       variantId?: string;
       packageSize?: string;
     }) => {
-      const productId = item.productId || item.id;
-      const productData = priceMap.get(productId);
+      const productId = (item.productId || item.id) as string;
+      const productData = priceMap.get(productId || '');
       // Use database price if available, otherwise use submitted price
       const validatedPrice = productData?.price || item.price;
       subtotal += validatedPrice * item.quantity;
@@ -138,9 +138,34 @@ export async function POST(request: NextRequest) {
         coupon_code: promoCode || null,
         payment_status: 'pending',
         payment_method: paymentMethodId || 'card',
+        gift_message: body.giftMessage || null,
       })
       .select()
       .single();
+
+    // Create Subscription if requested
+    if (body.subscription && body.subscription.enabled && userId && order) {
+      // Calculate subscription amount (could be discounted)
+      const subscriptionAmount = totalAmount; // Simplified logic
+
+      const { error: subError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: userId,
+          plan_name: `Monthly Subscription - ${order.id}`,
+          amount: subscriptionAmount,
+          currency: 'INR',
+          frequency: body.subscription.frequency || 'monthly',
+          status: 'active',
+          start_date: new Date().toISOString(),
+          next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+
+      if (subError) {
+        console.error('Error creating subscription:', subError);
+        // Non-blocking error
+      }
+    }
 
     if (orderError) {
       console.error('Error creating order:', orderError);

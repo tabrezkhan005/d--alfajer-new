@@ -357,6 +357,7 @@ export type Database = {
                     status: string | null
                     tax_amount: number | null
                     total_amount: number
+                    gift_message: string | null
                     tracking_id: string | null
                     updated_at: string | null
                     user_id: string | null
@@ -580,6 +581,56 @@ export type Database = {
                         columns: ["category_id"]
                         isOneToOne: false
                         referencedRelation: "categories"
+                        referencedColumns: ["id"]
+                    },
+                ]
+            }
+            subscriptions: {
+                Row: {
+                    amount: number
+                    created_at: string | null
+                    currency: string | null
+                    frequency: string
+                    id: string
+                    next_billing_date: string | null
+                    plan_name: string
+                    start_date: string | null
+                    status: string
+                    updated_at: string | null
+                    user_id: string | null
+                }
+                Insert: {
+                    amount: number
+                    created_at?: string | null
+                    currency?: string | null
+                    frequency: string
+                    id?: string
+                    next_billing_date?: string | null
+                    plan_name: string
+                    start_date?: string | null
+                    status?: string
+                    updated_at?: string | null
+                    user_id?: string | null
+                }
+                Update: {
+                    amount?: number
+                    created_at?: string | null
+                    currency?: string | null
+                    frequency?: string
+                    id?: string
+                    next_billing_date?: string | null
+                    plan_name?: string
+                    start_date?: string | null
+                    status?: string
+                    updated_at?: string | null
+                    user_id?: string | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "subscriptions_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
                         referencedColumns: ["id"]
                     },
                 ]
