@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -111,12 +111,12 @@ export default function LoginPage() {
             className="text-center mb-6"
           >
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-              {isSignup ? "Create Account" : "Welcome Back"}
+              {isSignup ? t('auth.createAccount') : t('auth.welcomeBack')}
             </h1>
             <p className="text-sm text-gray-600">
               {isSignup
-                ? "Join us and start shopping"
-                : "Sign in to your account"}
+                ? t('auth.joinUs')
+                : t('auth.signInToAccount')}
             </p>
           </motion.div>
 
@@ -243,13 +243,13 @@ export default function LoginPage() {
                       type="checkbox"
                       className="w-4 h-4 rounded border-gray-300 text-[#009744]"
                     />
-                    <span className="text-sm text-gray-700">Remember me</span>
+                    <span className="text-sm text-gray-700">{t('auth.rememberMe')}</span>
                   </label>
                   <Link
                     href="#"
                     className="text-sm text-[#009744] hover:underline"
                   >
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                   </Link>
                 </motion.div>
               )}
@@ -261,7 +261,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  {isLoading ? "Processing..." : isSignup ? "Create Account" : "Sign In"}
+                  {isLoading ? t('common.loading') : isSignup ? t('auth.createAccount') : t('auth.signIn')}
                 </Button>
               </motion.div>
             </form>
@@ -273,7 +273,7 @@ export default function LoginPage() {
             >
               {isSignup ? (
                 <>
-                  Already have an account?{" "}
+                  {t('auth.alreadyHaveAccount')}{" "}
                   <button
                     onClick={() => {
                       setIsSignup(false);
@@ -287,12 +287,12 @@ export default function LoginPage() {
                     }}
                     className="text-[#009744] hover:underline font-medium"
                   >
-                    Sign In
+                    {t('auth.signIn')}
                   </button>
                 </>
               ) : (
                 <>
-                  Don't have an account?{" "}
+                  {t('auth.dontHaveAccount')}{" "}
                   <button
                     onClick={() => {
                       setIsSignup(true);
@@ -306,7 +306,7 @@ export default function LoginPage() {
                     }}
                     className="text-[#009744] hover:underline font-medium"
                   >
-                    Sign Up
+                    {t('auth.signUp')}
                   </button>
                 </>
               )}
@@ -319,7 +319,7 @@ export default function LoginPage() {
               href="/"
               className="text-gray-600 hover:text-gray-900 text-xs font-medium transition"
             >
-              Continue as Guest
+              {t('auth.continueGuest')}
             </Link>
           </motion.div>
         </motion.div>

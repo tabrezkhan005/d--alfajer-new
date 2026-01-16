@@ -23,16 +23,24 @@ export const translations: Record<Language, Record<string, string>> = {
     'announcement.shipping': 'Free shipping on orders above 999',
     'announcement.quality': 'Premium quality dry fruits & spices',
     'announcement.worldwide': 'Delivering worldwide',
-    'announcement.authentic': '100% authentic products guaranteed',    
+    'announcement.authentic': '100% authentic products guaranteed',
     // Currencies for display
     'currency.inr': 'INR',
     'currency.usd': 'USD',
     'currency.aed': 'AED',
     'currency.eur': 'EUR',
-    'currency.gbp': 'GBP',    
+    'currency.gbp': 'GBP',
     // Navigation
     'nav.home': 'Home',
     'nav.categories': 'Categories',
+    'category.dryfruits': 'Dry Fruits',
+    'category.giftpacks': 'Gift Packs',
+    'category.honey&spreads': 'Honey & Spreads',
+    'category.mixes': 'Mixes',
+    'category.nuts': 'Nuts',
+    'category.organic': 'Organic',
+    'category.seeds': 'Seeds',
+    'category.tea&beverages': 'Tea & Beverages',
     'nav.offers': 'Offers',
     'nav.about': 'About',
     'nav.blog': 'Blog',
@@ -40,7 +48,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.cart': 'Cart',
     'nav.search': 'Search',
     'nav.contact': 'Contact',
-    
+
     // Products
     'product.addToCart': 'Add to Cart',
     'product.buyNow': 'Buy Now',
@@ -59,7 +67,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.wishlist': 'Add to Wishlist',
     'product.removeWishlist': 'Remove from Wishlist',
     'product.notFound': 'Product not found',
-    
+
     // Wishlist Page
     'wishlist.title': 'My Wishlist',
     'wishlist.empty': 'Your wishlist is empty',
@@ -80,24 +88,50 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.youSave': 'You save',
     'product.customerReviewsCount': 'customer reviews',
     'product.Kashmir': 'Kashmir, India',
-    
+
     // Cart
     'cart.empty': 'Your cart is empty',
-    'cart.emptyShopping': 'Continue Shopping',
+    'cart.emptyShopping': 'Start Shopping',
     'cart.subtotal': 'Subtotal',
     'cart.shipping': 'Shipping',
     'cart.tax': 'Tax',
     'cart.total': 'Total',
     'cart.checkout': 'Proceed to Checkout',
+    'cart.empty_desc': 'Looks like you haven\'t added any products yet. Browse our premium collection!',
+    'cart.item_one': 'item',
+    'cart.item_other': 'items',
+    'cart.free': 'FREE',
+    'cart.add_more_pre': 'Add',
+    'cart.add_more_post': 'more for free shipping!',
     'cart.itemCount': 'Items in Cart',
     'cart.removeItem': 'Remove',
     'cart.updateQuantity': 'Update Quantity',
-    
+
     // Checkout
     'checkout.title': 'Checkout',
     'checkout.shippingAddress': 'Shipping Address',
     'checkout.billingAddress': 'Billing Address',
     'checkout.shippingMethod': 'Shipping Method',
+
+    // Auth
+    'auth.namePlaceholder': 'Enter your name',
+    'auth.emailPlaceholder': 'Enter your email',
+    'auth.password': 'Password',
+    'auth.passwordPlaceholder': 'Enter your password',
+    'auth.welcomeBack': 'Welcome Back',
+    'auth.createAccount': 'Create Account',
+    'auth.signInToAccount': 'Sign in to your account',
+    'auth.joinUs': 'Join us and start shopping',
+    'auth.rememberMe': 'Remember me',
+    'auth.forgotPassword': 'Forgot password?',
+    'auth.signIn': 'Sign In',
+    'auth.alreadyHaveAccount': 'Already have an account?',
+    'auth.dontHaveAccount': 'Don\'t have an account?',
+    'auth.signUp': 'Sign Up',
+    'auth.continueGuest': 'Continue as Guest',
+    'auth.confirmPassword': 'Confirm Password',
+
+
     'checkout.paymentMethod': 'Payment Method',
     'checkout.promoCode': 'Promo Code',
     'checkout.applyCode': 'Apply Code',
@@ -134,6 +168,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'checkout.qty': 'Qty',
     'checkout.free': 'Free',
     'checkout.useSameAddress': 'Use same address for billing',
+    'checkout.invalidPromo': 'Invalid promo code',
+    'checkout.errorPromo': 'Error validating promo code',
+    'checkout.couponApplied': 'Coupon applied successfully',
+    'checkout.remove': 'Remove',
+    'checkout.enterPromoPlaceholder': 'Enter promo code',
+    'checkout.giftPlaceholder': 'Add a gift message...',
+    'checkout.getDiscount': 'Get 10% off your next order',
     'checkout.enterPlaceholder': 'Enter',
     'checkout.selectPlaceholder': 'Select',
     'checkout.placeholderFirstName': 'First name',
@@ -154,7 +195,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'checkout.pleaseAccept': 'Please check this box to proceed',
     'checkout.fillAllFields': 'Please fill all required fields',
     'checkout.security': 'Secure',
-    
+
     // Payment
     'payment.creditCard': 'Credit/Debit Card',
     'payment.upi': 'UPI',
@@ -162,7 +203,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'payment.applePay': 'Apple Pay',
     'payment.googlePay': 'Google Pay',
     'payment.netBanking': 'Net Banking',
-    
+
     // Filters
     'filter.priceRange': 'Price Range',
     'filter.category': 'Category',
@@ -176,7 +217,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.reset': 'Reset',
     'filter.min': 'Min',
     'filter.max': 'Max',
-    
+
     // Sort
     'sort.featured': 'Featured',
     'sort.newest': 'Newest',
@@ -184,7 +225,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'sort.priceHigh': 'Price: High to Low',
     'sort.popularity': 'Popularity',
     'sort.rating': 'Highest Rated',
-    
+
     // General
     'currency.select': 'Select Currency',
     'language.select': 'Select Language',
@@ -209,33 +250,33 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'All Products',
     'common.name': 'Name',
     'common.email': 'Email',
-    
+
     // Categories
     'category.spices': 'Spices',
     'category.honey': 'Honey & Spreads',
     'category.nutsSeeds': 'Nuts & Seeds',
     'category.dryFruits': 'Dry Fruits',
-    
+
     // Origins
     'origin.kashmirIndia': 'Kashmir, India',
     'origin.uae': 'UAE',
     'origin.himalayas': 'Himalayas',
     'origin.india': 'India',
-    
+
     // Certifications
     'cert.organic': 'Organic',
     'cert.raw': 'Raw',
     'cert.unfiltered': 'Unfiltered',
     'cert.nonGMO': 'Non-GMO',
     'cert.glutenFree': 'Gluten-Free',
-    
+
     // Search Page
     'search.resultsFor': 'Search Results for',
     'search.showing': 'Showing',
     'search.noProducts': 'No products found',
     'search.tryAdjusting': 'Try adjusting your filters or search terms',
     'search.browseAll': 'Browse All Products',
-    
+
     // Header
     'header.logo': 'Alfajer',
     'header.account': 'Account',
@@ -243,7 +284,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'header.support': 'Support',
     'header.about': 'About Us',
     'header.contact': 'Contact Us',
-    
+
     // Account Page
     'account.loading': 'Loading your account...',
     'account.profile': 'Profile',
@@ -273,7 +314,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.addToCart': 'Add to Cart',
     'account.removeFromWishlist': 'Remove',
     'account.closeModal': 'Close',
-    
+
     // Pages
     'page.contact': 'Contact Us',
     'page.shop': 'Shop All Products',
@@ -282,10 +323,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.shipping': 'Shipping Policy',
     'page.faqs': 'Frequently Asked Questions',
     'page.support': 'Support & Help',
-    
+
     // Products Page
     'productPage.description': 'Discover our full range of premium organic products and authentic spices',
-    
+
     // Contact Page
     'contact.title': 'Contact Us',
     'contact.subtitle': 'Get in touch with us',
@@ -303,7 +344,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.subject': 'Subject',
     'contact.message': 'Your Message',
     'contact.send': 'Send Message',
-    
+
     // Support Page
     'support.title': 'Support & Help',
     'support.here_to_help': 'We\'re Here to Help',
@@ -338,7 +379,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'support.faq_international_a': 'Yes, we ship worldwide. Shipping costs and times vary by location.',
     'support.faq_track_q': 'How do I track my order?',
     'support.faq_track_a': 'You\'ll receive a tracking number via email after your order ships. Track it in real-time on our website.',
-    
+
     // Shop Page
     'shop.allProducts': 'All Products',
     'shop.premium': 'Premium Selection',
@@ -352,7 +393,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.certified_desc': '100% authentic and pure products',
     'shop.shopping_title': 'Easy Shopping',
     'shop.shopping_desc': 'Simple checkout and fast delivery',
-    
+
     // Collections Page
     'collections.browseByCategory': 'Browse by Category',
     'collections.title': 'Our Collections',
@@ -373,7 +414,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collections.benefit3_title': 'Expert Curation',
     'collections.benefit3_desc': 'Our team hand-selects products to ensure you get the best of each category',
     'collections.featured': 'Featured Section',
-    
+
     // Returns Page
     'returns.satisfaction': '100% Satisfaction',
     'returns.title': 'Returns & Exchanges',
@@ -429,7 +470,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'returns.faq_a5': 'Contact us immediately with photos. We\'ll send a replacement or full refund right away.',
     'returns.faq_q6': 'No shipping refund?',
     'returns.faq_a6': 'Original shipping is non-refundable unless the item was damaged, defective, or incorrect.',
-    
+
     // Shipping Page
     'shipping.title': 'Shipping Policy',
     'shipping.fastReliable': 'Fast & Reliable Delivery',
@@ -465,7 +506,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shipping.address_content': 'Ensure your delivery address is complete and accurate. We\'re not responsible for packages delivered to incorrect addresses.',
     'shipping.handling_title': 'Handling & Packaging',
     'shipping.handling_content': 'All orders are carefully packed to ensure perfect condition. Every package is insured and handled with care by our logistics partners.',
-    
+
     // FAQs Page
     'faq.title': 'Frequently Asked Questions',
     'faq.subtitle': 'Find answers to your questions',
@@ -491,7 +532,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.stillNeed': 'Still need help?',
     'faq.stillNeedDesc': 'Can\'t find what you\'re looking for? Our support team is here to assist you 24/7.',
     'faq.supportTeam': 'Our support team is here to assist you 24/7',
-    
+
     // FAQs - Ordering & Payment
     'faq.ordering_category': 'Ordering & Payment',
     'faq.ordering_q1': 'How do I place an order?',
@@ -502,7 +543,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.ordering_a3': 'Yes, you can save your payment information securely for faster checkout on future purchases.',
     'faq.ordering_q4': 'Do you offer installment plans?',
     'faq.ordering_a4': 'Yes, we offer installment options for orders above AED 500. Details are available during checkout.',
-    
+
     // FAQs - Shipping & Delivery
     'faq.shipping_category': 'Shipping & Delivery',
     'faq.shipping_q1': 'How long does delivery take?',
@@ -513,7 +554,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.shipping_a3': 'Yes, you\'ll receive a tracking number via email once your order ships. Track it in real-time on our partner\'s portal.',
     'faq.shipping_q4': 'Is free shipping available?',
     'faq.shipping_a4': 'Yes! Free shipping on orders above AED 200 within UAE. International orders may have additional fees.',
-    
+
     // FAQs - Products & Quality
     'faq.products_category': 'Products & Quality',
     'faq.products_q1': 'Are your products organic?',
@@ -524,7 +565,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.products_a3': 'Store in cool, dry places away from direct sunlight. Most products come with storage instructions on the packaging.',
     'faq.products_q4': 'Are there expiry dates?',
     'faq.products_a4': 'Yes, all products have expiry dates clearly marked. We always send fresh stock with maximum shelf life remaining.',
-    
+
     // FAQs - Returns & Refunds
     'faq.returns_category': 'Returns & Refunds',
     'faq.returns_q1': 'What is your return policy?',
@@ -535,7 +576,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.returns_a3': 'Once we receive and verify your return, refunds are processed within 5-7 business days.',
     'faq.returns_q4': 'Can I exchange for a different product?',
     'faq.returns_a4': 'Absolutely! You can exchange for the same or different product within 30 days.',
-    
+
     // FAQs - Account & Wishlist
     'faq.account_category': 'Account & Wishlist',
     'faq.account_q1': 'How do I create an account?',
@@ -546,7 +587,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.account_a3': 'Go to your Account page and click \'Edit Profile\' to update your personal information.',
     'faq.account_q4': 'How do I change my password?',
     'faq.account_a4': 'Go to Account > Settings > Change Password. Enter your current password and your new password.',
-    
+
     // FAQs - Customer Support
     'faq.support_category': 'Customer Support',
     'faq.support_q1': 'What are your customer service hours?',
@@ -570,14 +611,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.mainTitle': 'Bringing Healthy Smiles',
     'hero.mainSubtitle': 'to Every Home',
     'hero.mainDescription': 'Experience the joy of premium organic products delivered fresh to your door. From handpicked almonds to pure honey - bringing health and happiness to families across the UAE.',
-    
+
     // Collections
     'collection.exquisite': 'Exquisite Collection',
     'collection.featured': 'Featured Products',
     'collection.bestsellers': 'Best Sellers',
     'collection.newArrivals': 'New Arrivals',
     'collection.specialty': 'Specialty Items',
-    
+
     // Product Details
     'product.ingredients': 'Ingredients',
     'product.nutritionFacts': 'Nutrition Facts',
@@ -600,7 +641,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.viewDetails': 'View Details',
     'product.customerReviews': 'Customer Reviews',
     'product.writeReview': 'Write a Review',
-    
+
     // Product Details - Tabs & Sections
     'product.details': 'Details',
     'product.nutrition': 'Nutrition',
@@ -632,12 +673,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.yourRating': 'Your Rating',
     'product.reviewPlaceholder': 'Share your detailed experience...',
     'product.submitReview': 'Submit Review',
-    
+
     // Product Benefits
     'product.freeShipping': 'Free Shipping',
     'product.easyReturns': 'Easy Returns',
     'product.returnPolicy': '30-day money-back guarantee',
-    
+
     // Shipping Tab
     'product.shipping': 'Shipping',
     'product.standardShipping': 'Standard Shipping',
@@ -659,19 +700,19 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.faqAnswer2': 'You will receive a tracking number via email after your order ships. You can track it in real-time on our website or the courier\'s app.',
     'product.faqQuestion3': 'What if my package arrives damaged?',
     'product.faqAnswer3': 'We guarantee fresh, intact products. If your package arrives damaged, contact us immediately with photos for a full refund or replacement at no extra cost.',
-    
+
     // Product Descriptions
     'product.kashmiChilliDesc': 'Kashmiri red chilli powder made from carefully selected red chillies. Rich in flavor and perfect heat level for all your culinary needs. Naturally processed without any additives or preservatives. Sourced directly from Kashmiri farmers.',
     'product.honeyDesc': '100% pure natural honey sourced directly from local beekeepers. Unprocessed and unfiltered to preserve all natural enzymes and health benefits. Rich, golden color with authentic floral taste.',
     'product.saffronDesc': 'Premium Kashmiri Saffron with intense aroma and color. Hand-picked and carefully dried. Perfect for rice dishes, desserts, and traditional use.',
     'product.shilajitDesc': 'Premium quality Shilajit resin sourced from the pristine Himalayan mountains. Pure, authentic, and rich in fulvic acid and essential minerals. Known for its traditional health benefits and natural energy support.',
-    
+
     // Product Ingredients
     'ingredient.kashmiriRedChillies': '100% Kashmiri Red Chillies',
     'ingredient.pureHoney': '100% Pure Honey',
     'ingredient.saffron': 'Premium Kashmiri Saffron',
     'ingredient.shilajit': 'Pure Himalayan Shilajit',
-    
+
     // Review Content
     'review.excellentQuality': 'Excellent quality!',
     'review.johnDoe': 'John Doe',
@@ -687,7 +728,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'review.greatQualityPricey': 'Great quality, slightly pricey',
     'review.priceQuality': 'The product quality is outstanding. A bit expensive but you get what you pay for. Will definitely order again.',
     'review.priyaS': 'Priya S.',
-    
+
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': 'Farm Fresh',
     'hero.box1Desc': 'Direct from source',
@@ -697,7 +738,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.box3Desc': 'Premium Quality',
     'hero.box4Label': 'Top Rated',
     'hero.box4Desc': 'Trusted Brand',
-    
+
     // Exquisite Collection
     'collection.exploreOur': 'Explore Our',
     'collection.exquisiteTitle': 'Exquisite Collection',
@@ -710,7 +751,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collection.kashmirisaffron': 'Kashmiri Saffron',
     'collection.spiceBlends': 'Spice Blends',
     'collection.exoticChilies': 'Exotic Chilies',
-    
+
     // Why Choose Us
     'whychoose.title': 'Crafting Excellence',
     'whychoose.subtitle': 'In Every Detail.',
@@ -728,7 +769,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'whychoose.feature5Desc': 'We honor centuries-old traditions while embracing modern standards, bringing you the authentic taste of the Orient.',
     'whychoose.feature6Title': 'Fast & Fresh Delivery',
     'whychoose.feature6Desc': 'We ensure our products reach you in their freshest state through our optimized supply chain and fresh storage.',
-    
+
     // Newsletter
     'newsletter.journal': 'The Al Fajr Journal',
     'newsletter.title': 'Curated Wisdom, Delivered.',
@@ -736,7 +777,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.placeholder': 'your@email.com',
     'newsletter.subscribe': 'Subscribe',
     'newsletter.benefit': 'Privileged access to our finest harvests.',
-    
+
     // Product Categories
     'productCategory.title': 'Our Premium',
     'productCategory.titleSpan': 'Products',
@@ -751,13 +792,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'No products found',
     'productCategory.tryAdjusting': 'Try adjusting your filters to find what you\'re looking for.',
     'productCategory.clearAllFilters': 'Clear All Filters',
-    
+
     // Product Names
     'productName.kashmirilRedChilliPowder': 'Kashmiri Red Chilli Powder',
     'productName.kashmirilPureWhiteHoney': 'Kashmiri Pure White Honey',
     'productName.kashmirilSaffron': 'Kashmiri Saffron',
     'productName.himalayaShilajit': 'Pure Himalayan Shilajit',
-    
+
     // Product Card Labels - Additional
     'product.badge.sale': 'SALE',
     'product.badge.hot': 'HOT',
@@ -766,13 +807,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.addMore': 'Add More',
     'product.more': 'More',
     'product.add': 'Add',
-    
+
     // Filter Origins
     'filter.origin.india': 'India',
     'filter.origin.uae': 'UAE',
     'filter.origin.kashmirIndia': 'Kashmir, India',
     'filter.origin.himalayas': 'Himalayas',
-    
+
     // Filter Certifications
     'filter.certification.organic': 'Organic',
     'filter.certification.nonGMO': 'Non-GMO',
@@ -782,7 +823,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.certification.premiumGrade': 'Premium Grade',
     'filter.certification.traditional': 'Traditional',
     'filter.certification.authentic': 'Authentic',
-    
+
     // Footer
     'footer.about': 'About Us',
     'footer.contact': 'Contact Us',
@@ -816,7 +857,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email_text': 'info@alfajermart.com',
     'footer.brand': 'Al Fajer Mart',
     'footer.termsOfService': 'Terms of Service',
-    
+
     // Cart Page
     'cart.addToCart': 'Add to Cart',
     'cart.quantity': 'Quantity',
@@ -833,16 +874,24 @@ export const translations: Record<Language, Record<string, string>> = {
     'announcement.shipping': 'شحن مجاني للطلبات فوق 999',
     'announcement.quality': 'الفواكه الجافة والتوابل عالية الجودة',
     'announcement.worldwide': 'التسليم في جميع أنحاء العالم',
-    'announcement.authentic': '100٪ منتجات أصلية مضمونة',    
+    'announcement.authentic': '100٪ منتجات أصلية مضمونة',
     // Currencies for display
     'currency.inr': 'روبية',
     'currency.usd': 'دولار',
     'currency.aed': 'درهم',
     'currency.eur': 'يورو',
-    'currency.gbp': 'باوند',    
+    'currency.gbp': 'باوند',
     // Navigation
     'nav.home': 'الرئيسية',
     'nav.categories': 'الفئات',
+    'category.dryfruits': 'فواكه جافة',
+    'category.giftpacks': 'عروض الهدايا',
+    'category.honey&spreads': 'العسل والمراهم',
+    'category.mixes': 'خلطات',
+    'category.nuts': 'كسرات',
+    'category.organic': 'عضوي',
+    'category.seeds': 'بذور',
+    'category.tea&beverages': 'الشاي والمشروبات',
     'nav.offers': 'العروض',
     'nav.about': 'حول',
     'nav.blog': 'مدونة',
@@ -850,7 +899,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.cart': 'السلة',
     'nav.search': 'البحث',
     'nav.contact': 'اتصل',
-    
+
     // Products
     'product.addToCart': 'أضف إلى السلة',
     'product.buyNow': 'اشتر الآن',
@@ -869,7 +918,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.wishlist': 'أضف إلى قائمة الرغبات',
     'product.removeWishlist': 'إزالة من قائمة الرغبات',
     'product.notFound': 'لم يتم العثور على المنتج',
-    
+
     // Wishlist Page - Arabic
     'wishlist.title': 'قائمة الرغبات الخاصة بي',
     'wishlist.empty': 'قائمة الرغبات الخاصة بك فارغة',
@@ -890,42 +939,48 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.youSave': 'أنت توفر',
     'product.customerReviewsCount': 'مراجعات العملاء',
     'product.Kashmir': 'كشمير، الهند',
-    
+
     // Certifications - Arabic
     'cert.nongmo': 'خالي من الكائنات المعدلة وراثياً',
     'cert.glutenfree': 'خالي من الجلوتين',
-    
+
     // Origins - Arabic
     'origin.kashmirindia': 'كشمير، الهند',
-    
+
     // Product Ingredients - Arabic
     'ingredient.kashmiriRedChillies': '100% فلفل كشميري أحمر',
     'ingredient.pureHoney': '100% عسل نقي',
     'ingredient.saffron': 'زعفران كشميري فاخر',
     'ingredient.shilajit': 'شيلاجيت هيمالايا نقي',
-    
+
     // Product Descriptions - Arabic
     'product.kashmiChilliDesc': 'مسحوق فلفل كشميري أحمر مصنوع من فلفل أحمر مختار بعناية. غني بالنكهة ودرجة حرارة مثالية لجميع احتياجاتك الطهوية. معالج بشكل طبيعي بدون أي إضافات أو مواد حافظة. يتم الحصول عليه مباشرة من مزارعي كشمير.',
     'product.honeyDesc': 'عسل طبيعي 100٪ نقي يتم الحصول عليه مباشرة من مربي النحل المحليين. غير معالج وغير مصفى للحفاظ على جميع الإنزيمات الطبيعية وفوائد الصحة. لون ذهبي غني مع طعم زهري أصلي.',
     'product.saffronDesc': 'زعفران كشميري فاخر برائحة وألوان مكثفة. مختار يدويًا وجاف بعناية. مثالي لأطباق الأرز والحلويات والاستخدام التقليدي.',
     'product.shilajitDesc': 'راتينج شيلاجيت عالي الجودة يتم الحصول عليه من جبال الهيمالايا النقية. نقي وأصلي وغني بحمض الفولفيك والمعادن الأساسية. معروف بفوائده الصحية التقليدية وبدعم الطاقة الطبيعية.',
-    
+
     // Review Content - Arabic
     'review.greatColorFlavor': 'لون وطعم رائع. موصى به بشدة لمن يبحثون عن منتجات كشميرية أصلية.',
     'review.goodValueForMoney': 'قيمة جيدة مقابل المال',
-    
+
     // Cart
     'cart.empty': 'سلتك فارغة',
-    'cart.emptyShopping': 'متابعة التسوق',
+    'cart.emptyShopping': 'ابدأ التسوق',
     'cart.subtotal': 'المجموع الجزئي',
     'cart.shipping': 'الشحن',
     'cart.tax': 'الضريبة',
     'cart.total': 'الإجمالي',
     'cart.checkout': 'الذهاب إلى الدفع',
+    'cart.empty_desc': 'يبدو أنك لم تضف أي منتجات بعد. تصفح مجموعتنا المميزة!',
+    'cart.item_one': 'عنصر',
+    'cart.item_other': 'عناصر',
+    'cart.free': 'مجاني',
+    'cart.add_more_pre': 'أضف',
+    'cart.add_more_post': 'للحصول على شحن مجاني!',
     'cart.itemCount': 'عدد العناصر في السلة',
     'cart.removeItem': 'إزالة',
     'cart.updateQuantity': 'تحديث الكمية',
-    
+
     // Payment
     'payment.creditCard': 'بطاقة ائتمان',
     'payment.upi': 'يوبي آي',
@@ -933,7 +988,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'payment.applePay': 'Apple Pay',
     'payment.googlePay': 'Google Pay',
     'payment.netBanking': 'الخدمات البنكية عبر الإنترنت',
-    
+
     // Filters
     'filter.priceRange': 'نطاق السعر',
     'filter.category': 'الفئة',
@@ -947,7 +1002,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.reset': 'إعادة تعيين',
     'filter.min': 'الحد الأدنى',
     'filter.max': 'الحد الأقصى',
-    
+
     // Sort
     'sort.featured': 'مختار',
     'sort.newest': 'الأحدث',
@@ -955,7 +1010,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'sort.priceHigh': 'السعر: من الأعلى إلى الأقل',
     'sort.popularity': 'الشهرة',
     'sort.rating': 'الأعلى تقييماً',
-    
+
     // General
     'currency.select': 'اختر العملة',
     'language.select': 'اختر اللغة',
@@ -980,33 +1035,33 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'جميع المنتجات',
     'common.name': 'الاسم',
     'common.email': 'البريد الإلكتروني',
-    
+
     // Categories
     'category.spices': 'التوابل',
     'category.honey': 'العسل والمنتجات المشابهة',
     'category.nutsSeeds': 'المكسرات والبذور',
     'category.dryFruits': 'الفواكه المجففة',
-    
+
     // Origins
     'origin.kashmirIndia': 'كشمير، الهند',
     'origin.uae': 'الإمارات العربية المتحدة',
     'origin.himalayas': 'جبال الهيمالايا',
     'origin.india': 'الهند',
-    
+
     // Certifications
     'cert.organic': 'عضوي',
     'cert.raw': 'خام',
     'cert.unfiltered': 'غير مفلتر',
     'cert.nonGMO': 'خالي من الكائنات المعدلة وراثياً',
     'cert.glutenFree': 'خالي من الغلوتين',
-    
+
     // Search Page
     'search.resultsFor': 'نتائج البحث عن',
     'search.showing': 'عرض',
     'search.noProducts': 'لم يتم العثور على منتجات',
     'search.tryAdjusting': 'حاول تعديل الفلاتر أو مصطلحات البحث',
     'search.browseAll': 'استعرض جميع المنتجات',
-    
+
     // Header
     'header.logo': 'ألفاجر',
     'header.account': 'حسابي',
@@ -1014,7 +1069,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'header.support': 'الدعم',
     'header.about': 'حول',
     'header.contact': 'تواصل معنا',
-    
+
     // Account Page - Arabic
     'account.loading': 'جاري تحميل حسابك...',
     'account.profile': 'الملف الشخصي',
@@ -1044,7 +1099,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.addToCart': 'أضف إلى السلة',
     'account.removeFromWishlist': 'إزالة',
     'account.closeModal': 'إغلاق',
-    
+
     // Pages - Arabic
     'page.contact': 'تواصل معنا',
     'page.shop': 'تسوق جميع المنتجات',
@@ -1053,10 +1108,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.shipping': 'سياسة الشحن',
     'page.faqs': 'أسئلة شائعة',
     'page.support': 'الدعم والمساعدة',
-    
+
     // Products Page - Arabic
     'productPage.description': 'اكتشف النطاق الكامل لمنتجاتنا العضوية الممتازة والتوابل الأصلية',
-    
+
     // Contact Page - Arabic
     'contact.title': 'تواصل معنا',
     'contact.subtitle': 'تواصل معنا',
@@ -1074,7 +1129,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.subject': 'الموضوع',
     'contact.message': 'رسالتك',
     'contact.send': 'إرسال الرسالة',
-    
+
     // Support Page - Arabic
     'support.title': 'الدعم والمساعدة',
     'support.here_to_help': 'نحن هنا للمساعدة',
@@ -1109,7 +1164,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'support.faq_international_a': 'نعم، نحن نشحن في جميع أنحاء العالم. تختلف تكاليف الشحن والأوقات حسب الموقع',
     'support.faq_track_q': 'كيف يمكنني تتبع طلبي؟',
     'support.faq_track_a': 'ستتلقى رقم تتبع عبر البريد الإلكتروني بعد شحن طلبك. تابعه في الوقت الفعلي على موقعنا',
-    
+
     // Shop Page - Arabic
     'shop.allProducts': 'جميع المنتجات',
     'shop.premium': 'اختيار ممتاز',
@@ -1123,7 +1178,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.certified_desc': '100% منتجات أصلية وخالصة',
     'shop.shopping_title': 'تسوق سهل',
     'shop.shopping_desc': 'دفع سهل وتسليم سريع',
-    
+
     // Collections Page - Arabic
     'collections.browseByCategory': 'تصفح حسب الفئة',
     'collections.title': 'مجموعاتنا',
@@ -1144,7 +1199,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collections.benefit3_title': 'المنسقة من الخبراء',
     'collections.benefit3_desc': 'يختار فريقنا المنتجات بعناية لضمان حصولك على الأفضل في كل فئة',
     'collections.featured': 'القسم المميز',
-    
+
     // Returns Page - Arabic
     'returns.satisfaction': 'رضا 100%',
     'returns.title': 'العودة والتبديل',
@@ -1200,7 +1255,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'returns.faq_a5': 'اتصل بنا فوراً مع الصور. سنرسل لك استبدالاً أو استرجاع أموال كامل على الفور.',
     'returns.faq_q6': 'بدون استرجاع الشحن؟',
     'returns.faq_a6': 'شحن الأصل غير قابل للاسترجاع إلا إذا كان العنصر تالفاً أو معيباً أو غير صحيح.',
-    
+
     // Shipping Page - Arabic
     'shipping.title': 'سياسة الشحن',
     'shipping.fastReliable': 'توصيل سريع وموثوق',
@@ -1236,7 +1291,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shipping.address_content': 'تأكد من أن عنوان التسليم كامل ودقيق. نحن لا نتحمل المسؤولية عن الحزم المسلمة لعناوين غير صحيحة.',
     'shipping.handling_title': 'التعامل والتغليف',
     'shipping.handling_content': 'جميع الطلبات معبأة بعناية لضمان حالة مثالية. كل حزمة مؤمنة ومعاملة برعاية من قبل شركاء الخدمات اللوجستية لدينا.',
-    
+
     // FAQs Page - Arabic
     'faq.title': 'أسئلة شائعة',
     'faq.subtitle': 'ابحث عن إجابات لأسئلتك',
@@ -1262,7 +1317,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.stillNeed': 'هل تحتاج إلى مزيد من المساعدة؟',
     'faq.stillNeedDesc': 'لا يمكنك العثور على ما تبحث عنه؟ فريق الدعم الخاص بنا هنا لمساعدتك 24/7.',
     'faq.supportTeam': 'فريق الدعم الخاص بنا هنا لمساعدتك 24/7',
-    
+
     // FAQs - Ordering & Payment - Arabic
     'faq.ordering_category': 'الطلب والدفع',
     'faq.ordering_q1': 'كيف أضع طلباً؟',
@@ -1273,7 +1328,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.ordering_a3': 'نعم، يمكنك حفظ معلومات الدفع الخاصة بك بأمان للعمليات الشراء المستقبلية الأسرع.',
     'faq.ordering_q4': 'هل تقدمون خطط الدفع بالتقسيط؟',
     'faq.ordering_a4': 'نعم، نحن نقدم خيارات الدفع بالتقسيط للطلبات فوق 500 درهم إماراتي. التفاصيل متاحة عند الدفع.',
-    
+
     // FAQs - Shipping & Delivery - Arabic
     'faq.shipping_category': 'الشحن والتسليم',
     'faq.shipping_q1': 'كم يستغرق التسليم؟',
@@ -1284,7 +1339,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.shipping_a3': 'نعم، ستتلقى رقم تتبع عبر البريد الإلكتروني بمجرد شحن طلبك. تابعه فوراً على بوابة شريكنا.',
     'faq.shipping_q4': 'هل الشحن مجاني؟',
     'faq.shipping_a4': 'نعم! شحن مجاني على الطلبات فوق 200 درهم إماراتي في الإمارات. قد تكون هناك رسوم إضافية للطلبات الدولية.',
-    
+
     // FAQs - Products & Quality - Arabic
     'faq.products_category': 'المنتجات والجودة',
     'faq.products_q1': 'هل منتجاتك عضوية؟',
@@ -1295,7 +1350,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.products_a3': 'خزن في أماكن باردة وجافة بعيداً عن أشعة الشمس المباشرة. تأتي معظم المنتجات مع تعليمات التخزين على التغليف.',
     'faq.products_q4': 'هل هناك تواريخ انتهاء الصلاحية؟',
     'faq.products_a4': 'نعم، جميع المنتجات لها تواريخ انتهاء محددة بوضوح. نحن نرسل دائماً مخزوناً طازجاً بأقصى عمر افتراضي متبقي.',
-    
+
     // FAQs - Returns & Refunds - Arabic
     'faq.returns_category': 'العودة والاسترجاع',
     'faq.returns_q1': 'ما هي سياسة الإرجاع الخاصة بكم؟',
@@ -1306,7 +1361,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.returns_a3': 'بمجرد استقبالنا والتحقق من عودتك، يتم معالجة المبالغ المستردة خلال 5-7 أيام عمل.',
     'faq.returns_q4': 'هل يمكنني التبديل بمنتج مختلف؟',
     'faq.returns_a4': 'بالتأكيد! يمكنك التبديل بنفس المنتج أو منتج مختلف خلال 30 يوماً.',
-    
+
     // FAQs - Account & Wishlist - Arabic
     'faq.account_category': 'الحساب وقائمة الرغبات',
     'faq.account_q1': 'كيف أنشئ حساباً؟',
@@ -1317,7 +1372,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.account_a3': 'انتقل إلى صفحة حسابك وانقر على \'تعديل الملف الشخصي\' لتحديث معلوماتك الشخصية.',
     'faq.account_q4': 'كيف أغير كلمة المرور الخاصة بي؟',
     'faq.account_a4': 'انتقل إلى الحساب > الإعدادات > تغيير كلمة المرور. أدخل كلمة المرور الحالية والجديدة.',
-    
+
     // FAQs - Customer Support - Arabic
     'faq.support_category': 'خدمة العملاء',
     'faq.support_q1': 'ما هي ساعات خدمة العملاء؟',
@@ -1341,14 +1396,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.mainTitle': 'نحضر الابتسامات الصحية',
     'hero.mainSubtitle': 'إلى كل منزل',
     'hero.mainDescription': 'استمتع بمتعة المنتجات العضوية الممتازة الطازجة المسلمة إلى باب منزلك. من اللوز المختار بعناية إلى العسل النقي - نحضر الصحة والسعادة للعائلات في جميع أنحاء الإمارات.',
-    
+
     // Collections
     'collection.exquisite': 'المجموعة الرائعة',
     'collection.featured': 'المنتجات المميزة',
     'collection.bestsellers': 'الأكثر مبيعاً',
     'collection.newArrivals': 'الوصول الجديد',
     'collection.specialty': 'عناصر متخصصة',
-    
+
     // Product Details
     'product.ingredients': 'المكونات',
     'product.nutritionFacts': 'معلومات التغذية',
@@ -1371,7 +1426,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.viewDetails': 'عرض التفاصيل',
     'product.customerReviews': 'آراء العملاء',
     'product.writeReview': 'اكتب تقييم',
-    
+
     // Product Details - Tabs & Sections
     'product.details': 'التفاصيل',
     'product.nutrition': 'التغذية',
@@ -1403,12 +1458,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.yourRating': 'تقييمك',
     'product.reviewPlaceholder': 'شارك تجربتك المفصلة...',
     'product.submitReview': 'إرسال المراجعة',
-    
+
     // Product Benefits - Arabic
     'product.freeShipping': 'شحن مجاني',
     'product.easyReturns': 'إرجاع سهل',
     'product.returnPolicy': 'ضمان استرجاع المبلغ خلال 30 يوم',
-    
+
     // Shipping Tab - Arabic
     'product.shipping': 'الشحن',
     'product.standardShipping': 'الشحن العادي',
@@ -1430,7 +1485,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.faqAnswer2': 'ستتلقى رقم تتبع عبر البريد الإلكتروني بعد شحن طلبك. يمكنك تتبعه في الوقت الفعلي على موقعنا أو تطبيق الناقل.',
     'product.faqQuestion3': 'ماذا لو وصلت الحزمة تالفة؟',
     'product.faqAnswer3': 'نضمن منتجات طازة وسليمة. إذا وصلت الحزمة تالفة، اتصل بنا على الفور مع صور للحصول على استرجاع كامل أو استبدال بدون تكلفة إضافية.',
-    
+
     // Review Content
     'review.excellentQuality': 'جودة ممتازة!',
     'review.johnDoe': 'جون دو',
@@ -1446,7 +1501,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'review.greatQualityPricey': 'جودة ممتازة، غالية الثمن قليلاً',
     'review.priceQuality': 'جودة المنتج استثنائية. سعر مرتفع قليلاً لكنك تحصل على ما تدفع مقابله. سأطلب مرة أخرى بالتأكيد.',
     'review.priyaS': 'بريا س.',
-    
+
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': '100% عضوي',
     'hero.box1Desc': 'مباشرة من المصدر',
@@ -1456,7 +1511,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.box3Desc': 'جودة ممتازة',
     'hero.box4Label': 'الأعلى تقييماً',
     'hero.box4Desc': 'العلامة التجارية الموثوقة',
-    
+
     // Exquisite Collection
     'collection.exploreOur': 'استكشف لنا',
     'collection.exquisiteTitle': 'المجموعة الفاخرة',
@@ -1469,7 +1524,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collection.kashmirisaffron': 'الزعفران الكشميري',
     'collection.spiceBlends': 'خلطات التوابل',
     'collection.exoticChilies': 'الفلفل الحار الغريب',
-    
+
     // Why Choose Us
     'whychoose.title': 'صياغة التميز',
     'whychoose.subtitle': 'في كل التفاصيل.',
@@ -1487,7 +1542,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'whychoose.feature5Desc': 'نحن نكرم التقاليد العريقة مع احتضان المعايير الحديثة، مما يجلب لك الطعم الأصلي للشرق.',
     'whychoose.feature6Title': 'التسليم السريع والطازج',
     'whychoose.feature6Desc': 'نضمن وصول منتجاتنا إليك في أطازجها من خلال سلسلة التوريد المُحسّنة والتخزين الطازج.',
-    
+
     // Newsletter
     'newsletter.journal': 'مجلة الفاجر',
     'newsletter.title': 'الحكمة المختارة، المسلمة.',
@@ -1495,7 +1550,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.placeholder': 'your@email.com',
     'newsletter.subscribe': 'اشترك',
     'newsletter.benefit': 'الوصول المتميز إلى أفضل حصاداتنا.',
-    
+
     // Product Categories
     'productCategory.title': 'منتجاتنا',
     'productCategory.titleSpan': 'الممتازة',
@@ -1510,13 +1565,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'لم يتم العثور على منتجات',
     'productCategory.tryAdjusting': 'حاول ضبط مرشحاتك للعثور على ما تبحث عنه.',
     'productCategory.clearAllFilters': 'مسح جميع الفلاتر',
-    
+
     // Product Names
     'productName.kashmirilRedChilliPowder': 'مسحوق الفلفل الحار الأحمر الكشميري',
     'productName.kashmirilPureWhiteHoney': 'عسل أبيض نقي كشميري',
     'productName.kashmirilSaffron': 'الزعفران الكشميري',
     'productName.himalayaShilajit': 'شيلاجيت الهيمالايا النقي',
-    
+
     // Product Card Labels - Additional
     'product.badge.sale': 'عرض خاص',
     'product.badge.hot': 'ساخن',
@@ -1525,13 +1580,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.addMore': 'أضف المزيد',
     'product.more': 'المزيد',
     'product.add': 'أضف',
-    
+
     // Filter Origins
     'filter.origin.india': 'الهند',
     'filter.origin.uae': 'الإمارات العربية المتحدة',
     'filter.origin.kashmirIndia': 'كشمير، الهند',
     'filter.origin.himalayas': 'جبال الهيمالايا',
-    
+
     // Filter Certifications
     'filter.certification.organic': 'عضوي',
     'filter.certification.nonGMO': 'خالي من الكائنات المعدلة وراثيًا',
@@ -1541,7 +1596,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.certification.premiumGrade': 'درجة ممتازة',
     'filter.certification.traditional': 'تقليدي',
     'filter.certification.authentic': 'أصلي',
-    
+
     // Footer
     'footer.about': 'حول',
     'footer.contact': 'تواصل معنا',
@@ -1575,7 +1630,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email_text': 'info@alfajermart.com',
     'footer.brand': 'ألفاجر مارت',
     'footer.termsOfService': 'شروط الخدمة',
-    
+
     // Cart Page
     'cart.addToCart': 'أضف إلى السلة',
     'cart.quantity': 'الكمية',
@@ -1586,12 +1641,32 @@ export const translations: Record<Language, Record<string, string>> = {
     'cart.applyPromo': 'تطبيق رمز العرض',
     'cart.proceedCheckout': 'الذهاب إلى الدفع',
     'cart.itemsInCart': 'عنصر (عناصر) في سلتك',
-    
+
     // Checkout Page
     'checkout.title': 'الدفع',
     'checkout.shippingAddress': 'عنوان الشحن',
     'checkout.billingAddress': 'عنوان الفواتير',
     'checkout.shippingMethod': 'طريقة الشحن',
+
+    // Auth
+    'auth.namePlaceholder': 'أدخل اسمك',
+    'auth.emailPlaceholder': 'أدخل بريدك الإلكتروني',
+    'auth.password': 'كلمة المرور',
+    'auth.passwordPlaceholder': 'أدخل كلمة المرور',
+    'auth.welcomeBack': 'مرحباً بعودتك',
+    'auth.createAccount': 'إنشاء حساب',
+    'auth.signInToAccount': 'تسجيل الدخول إلى حسابك',
+    'auth.joinUs': 'انضم إلينا وابدأ التسوق',
+    'auth.rememberMe': 'تذكرني',
+    'auth.forgotPassword': 'نسيت كلمة المرور؟',
+    'auth.signIn': 'تسجيل الدخول',
+    'auth.alreadyHaveAccount': 'هل لديك حساب بالفعل؟',
+    'auth.dontHaveAccount': 'ليس لديك حساب؟',
+    'auth.signUp': 'اشتراك',
+    'auth.continueGuest': 'متابعة كضيف',
+    'auth.confirmPassword': 'تأكيد كلمة المرور',
+
+
     'checkout.paymentMethod': 'طريقة الدفع',
     'checkout.promoCode': 'رمز العرض الترويجي',
     'checkout.applyCode': 'تطبيق الرمز',
@@ -1628,6 +1703,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'checkout.qty': 'الكمية',
     'checkout.free': 'مجاني',
     'checkout.useSameAddress': 'استخدم نفس العنوان للفواتير',
+    'checkout.invalidPromo': 'رمز ترويجي غير صالح',
+    'checkout.errorPromo': 'خطأ في التحقق من الرمز الترويجي',
+    'checkout.couponApplied': 'تم تطبيق القسيمة بنجاح',
+    'checkout.remove': 'إزالة',
+    'checkout.enterPromoPlaceholder': 'أدخل الرمز الترويجي',
+    'checkout.giftPlaceholder': 'أضف رسالة هدية...',
+    'checkout.getDiscount': 'احصل على خصم 10% على طلبك القادم',
     'checkout.enterPlaceholder': 'أدخل',
     'checkout.selectPlaceholder': 'اختر',
     'checkout.placeholderFirstName': 'الاسم الأول',
@@ -1661,16 +1743,24 @@ export const translations: Record<Language, Record<string, string>> = {
     'announcement.shipping': '999 से ऊपर के ऑर्डर पर निःशुल्क शिपिंग',
     'announcement.quality': 'प्रीमियम गुणवत्ता सूखे फल और मसाले',
     'announcement.worldwide': 'दुनिया भर में डिलीवरी',
-    'announcement.authentic': '100% प्रामाणिक उत्पाद गारंटीकृत',    
+    'announcement.authentic': '100% प्रामाणिक उत्पाद गारंटीकृत',
     // Currencies for display
     'currency.inr': 'रुपया',
     'currency.usd': 'डॉलर',
     'currency.aed': 'दिरहम',
     'currency.eur': 'यूरो',
-    'currency.gbp': 'पाउंड',    
+    'currency.gbp': 'पाउंड',
     // Navigation
     'nav.home': 'होम',
     'nav.categories': 'श्रेणियां',
+    'category.dryfruits': 'सूखे मेवे',
+    'category.giftpacks': 'उपहार पैक',
+    'category.honey&spreads': 'शहद और स्प्रेड',
+    'category.mixes': 'मिश्रण',
+    'category.nuts': 'नट्स',
+    'category.organic': 'जैविक',
+    'category.seeds': 'बीज',
+    'category.tea&beverages': 'चाय और पेय',
     'nav.offers': 'ऑफर्स',
     'nav.about': 'परिचय',
     'nav.blog': 'ब्लॉग',
@@ -1678,7 +1768,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.cart': 'कार्ट',
     'nav.search': 'खोज',
     'nav.contact': 'संपर्क करें',
-    
+
     // Products
     'product.addToCart': 'कार्ट में जोड़ें',
     'product.buyNow': 'अभी खरीदें',
@@ -1697,7 +1787,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.wishlist': 'विशलिस्ट में जोड़ें',
     'product.removeWishlist': 'विशलिस्ट से हटाएं',
     'product.notFound': 'उत्पाद नहीं मिला',
-    
+
     // Wishlist Page - Hindi
     'wishlist.title': 'मेरी विशलिस्ट',
     'wishlist.empty': 'आपकी विशलिस्ट खाली है',
@@ -1718,42 +1808,48 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.youSave': 'आप बचाते हैं',
     'product.customerReviewsCount': 'ग्राहक समीक्षाएं',
     'product.Kashmir': 'कश्मीर, भारत',
-    
+
     // Certifications - Hindi
     'cert.nongmo': 'गैर-जीएमओ',
     'cert.glutenfree': 'लस मुक्त',
-    
+
     // Origins - Hindi
     'origin.kashmirindia': 'कश्मीर, भारत',
-    
+
     // Product Ingredients - Hindi
     'ingredient.kashmiriRedChillies': '100% कश्मीरी लाल मिर्च',
     'ingredient.pureHoney': '100% शुद्ध शहद',
     'ingredient.saffron': 'प्रीमियम कश्मीरी केसर',
     'ingredient.shilajit': 'शुद्ध हिमालयी शिलाजीत',
-    
+
     // Product Descriptions - Hindi
     'product.kashmiChilliDesc': 'कश्मीरी लाल मिर्च पाउडर सावधानी से चुनी गई लाल मिर्च से बना है। स्वाद में समृद्ध और आपकी सभी पाक जरूरतों के लिए परिपूर्ण गर्मी स्तर। बिना किसी योजक या संरक्षक के प्राकृतिक रूप से संसाधित। कश्मीरी किसानों से सीधे प्राप्त।',
     'product.honeyDesc': '100% शुद्ध प्राकृतिक शहद सीधे स्थानीय मधुमक्खी पालकों से प्राप्त। सभी प्राकृतिक एंजाइमों और स्वास्थ्य लाभों को संरक्षित करने के लिए असंसाधित और अनफ़िल्टर्ड। समृद्ध, सोने का रंग प्रामाणिक पुष्प स्वाद के साथ।',
     'product.saffronDesc': 'तीव्र सुगंध और रंग के साथ प्रीमियम कश्मीरी केसर। हाथ से उठाया और सावधानी से सूखा। चावल के व्यंजन, मिठाई और पारंपरिक उपयोग के लिए बिल्कुल सही।',
     'product.shilajitDesc': 'प्राचीन हिमालय पर्वत से प्राप्त प्रीमियम गुणवत्ता शिलाजीत राल। शुद्ध, प्रामाणिक, और फुल्विक एसिड और आवश्यक खनिजों में समृद्ध। इसके पारंपरिक स्वास्थ्य लाभ और प्राकृतिक ऊर्जा समर्थन के लिए जाना जाता है।',
-    
+
     // Review Content - Hindi
     'review.greatColorFlavor': 'बहुत अच्छा रंग और स्वाद। प्रामाणिक कश्मीरी उत्पादों की तलाश में किसी के लिए भी अत्यधिक अनुशंसित।',
     'review.goodValueForMoney': 'पैसे के लिए अच्छा मूल्य',
-    
+
     // Cart
     'cart.empty': 'आपकी कार्ट खाली है',
-    'cart.emptyShopping': 'खरीदारी जारी रखें',
+    'cart.emptyShopping': 'खरीदारी शुरू करें',
     'cart.subtotal': 'उप कुल',
     'cart.shipping': 'शिपिंग',
     'cart.tax': 'कर',
     'cart.total': 'कुल',
     'cart.checkout': 'चेकआउट पर जाएं',
+    'cart.empty_desc': 'ऐसा लगता है कि आपने अभी तक कोई उत्पाद नहीं जोड़ा है। हमारा प्रीमियम संग्रह ब्राउज़ करें!',
+    'cart.item_one': 'वस्तु',
+    'cart.item_other': 'वस्तुएं',
+    'cart.free': 'मुफ्त',
+    'cart.add_more_pre': 'मुफ्त शिपिंग के लिए',
+    'cart.add_more_post': 'और जोड़ें!',
     'cart.itemCount': 'कार्ट में वस्तुएं',
     'cart.removeItem': 'हटाएं',
     'cart.updateQuantity': 'मात्रा अपडेट करें',
-    
+
     // Payment
     'payment.creditCard': 'क्रेडिट/डेबिट कार्ड',
     'payment.upi': 'यूपीआई',
@@ -1761,7 +1857,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'payment.applePay': 'Apple Pay',
     'payment.googlePay': 'Google Pay',
     'payment.netBanking': 'नेट बैंकिंग',
-    
+
     // Filters
     'filter.priceRange': 'मूल्य श्रेणी',
     'filter.category': 'श्रेणी',
@@ -1775,7 +1871,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.reset': 'रीसेट',
     'filter.min': 'न्यूनतम',
     'filter.max': 'अधिकतम',
-    
+
     // Sort
     'sort.featured': 'विशेष',
     'sort.newest': 'नवीनतम',
@@ -1783,7 +1879,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'sort.priceHigh': 'कीमत: अधिक से कम',
     'sort.popularity': 'लोकप्रियता',
     'sort.rating': 'सर्वोच्च रेटिंग',
-    
+
     // General
     'currency.select': 'मुद्रा चुनें',
     'language.select': 'भाषा चुनें',
@@ -1808,33 +1904,33 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'सभी उत्पाद',
     'common.name': 'नाम',
     'common.email': 'ईमेल',
-    
+
     // Categories
     'category.spices': 'मसाले',
     'category.honey': 'शहद और फैलाने योग्य',
     'category.nutsSeeds': 'नट्स और बीज',
     'category.dryFruits': 'सूखे फल',
-    
+
     // Origins
     'origin.kashmirIndia': 'कश्मीर, भारत',
     'origin.uae': 'संयुक्त अरब अमीरात',
     'origin.himalayas': 'हिमालय',
     'origin.india': 'भारत',
-    
+
     // Certifications
     'cert.organic': 'जैविक',
     'cert.raw': 'कच्चा',
     'cert.unfiltered': 'निस्पंदित',
     'cert.nonGMO': 'गैर-जीएमओ',
     'cert.glutenFree': 'लस मुक्त',
-    
+
     // Search Page
     'search.resultsFor': 'के लिए खोज परिणाम',
     'search.showing': 'दिखा रहा है',
     'search.noProducts': 'कोई उत्पाद नहीं मिला',
     'search.tryAdjusting': 'अपने फिल्टर या खोज शर्तों को समायोजित करने का प्रयास करें',
     'search.browseAll': 'सभी उत्पाद ब्राउज़ करें',
-    
+
     // Header
     'header.logo': 'अलफाजर',
     'header.account': 'खाता',
@@ -1842,7 +1938,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'header.support': 'समर्थन',
     'header.about': 'परिचय',
     'header.contact': 'संपर्क करें',
-    
+
     // Account Page - Hindi
     'account.loading': 'आपके खाते को लोड किया जा रहा है...',
     'account.profile': 'प्रोफ़ाइल',
@@ -1872,7 +1968,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'account.addToCart': 'कार्ट में जोड़ें',
     'account.removeFromWishlist': 'हटाएं',
     'account.closeModal': 'बंद करें',
-    
+
     // Pages - Hindi
     'page.contact': 'संपर्क करें',
     'page.shop': 'सभी उत्पाद खरीदें',
@@ -1881,10 +1977,10 @@ export const translations: Record<Language, Record<string, string>> = {
     'page.shipping': 'शिपिंग नीति',
     'page.faqs': 'अक्सर पूछे जाने वाले प्रश्न',
     'page.support': 'समर्थन और सहायता',
-    
+
     // Products Page - Hindi
     'productPage.description': 'हमारी प्रीमियम जैविक उत्पादों और प्रामाणिक मसालों की पूरी श्रृंखला की खोज करें',
-    
+
     // Contact Page - Hindi
     'contact.title': 'संपर्क करें',
     'contact.subtitle': 'हमसे संपर्क करें',
@@ -1902,7 +1998,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.subject': 'विषय',
     'contact.message': 'आपका संदेश',
     'contact.send': 'संदेश भेजें',
-    
+
     // Support Page - Hindi
     'support.title': 'समर्थन और सहायता',
     'support.here_to_help': 'हम आपकी सहायता के लिए यहां हैं',
@@ -1937,7 +2033,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'support.faq_international_a': 'हां, हम दुनिया भर में शिप करते हैं। शिपिंग लागत और समय स्थान के अनुसार भिन्न होता है',
     'support.faq_track_q': 'मैं अपने ऑर्डर को कैसे ट्रैक करूं?',
     'support.faq_track_a': 'आपके ऑर्डर के शिप होने के बाद आपको ईमेल के माध्यम से ट्रैकिंग नंबर मिलेगा। इसे हमारी वेबसाइट पर रीयल-टाइम में ट्रैक करें',
-    
+
     // Shop Page - Hindi
     'shop.allProducts': 'सभी उत्पाद',
     'shop.premium': 'प्रीमियम चयन',
@@ -1951,7 +2047,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shop.certified_desc': '100% प्रामाणिक और शुद्ध उत्पाद',
     'shop.shopping_title': 'आसान खरीदारी',
     'shop.shopping_desc': 'सरल चेकआउट और तेजी से डिलीवरी',
-    
+
     // Collections Page - Hindi
     'collections.browseByCategory': 'श्रेणी द्वारा ब्राउज़ करें',
     'collections.title': 'हमारे संग्रह',
@@ -1972,7 +2068,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collections.benefit3_title': 'विशेषज्ञ क्यूरेशन',
     'collections.benefit3_desc': 'हमारी टीम प्रत्येक श्रेणी का सर्वश्रेष्ठ सुनिश्चित करने के लिए उत्पादों को सावधानীपूर्वक चुनती है',
     'collections.featured': 'विशेषता अनुभाग',
-    
+
     // Returns Page - Hindi
     'returns.satisfaction': '100% संतुष्टि',
     'returns.title': 'रिटर्न और विनिमय',
@@ -2028,7 +2124,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'returns.faq_a5': 'तुरंत हमसे फ़ोटो के साथ संपर्क करें। हम तुरंत एक प्रतिस्थापन या पूर्ण रिफंड भेजेंगे।',
     'returns.faq_q6': 'कोई शिपिंग रिफंड नहीं?',
     'returns.faq_a6': 'मूल शिपिंग गैर-वापसी योग्य है जब तक कि आइटम क्षतिग्रस्त, दोषपूर्ण, या गलत न हो।',
-    
+
     // Shipping Page - Hindi
     'shipping.title': 'शिपिंग नीति',
     'shipping.fastReliable': 'तेजी से और विश्वसनीय डिलीवरी',
@@ -2064,7 +2160,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'shipping.address_content': 'सुनिश्चित करें कि आपका डिलीवरी पता पूर्ण और सटीक है। हम गलत पते पर दिए गए पैकेजों के लिए जिम्मेदार नहीं हैं।',
     'shipping.handling_title': 'हैंडलिंग और पैकेजिंग',
     'shipping.handling_content': 'सभी ऑर्डर को सही स्थिति सुनिश्चित करने के लिए सावधानी से पैक किया जाता है। प्रत्येक पैकेज बीमाकृत है और हमारे लॉजिस्टिक पार्टनर द्वारा देखभाल के साथ संभाला जाता है।',
-    
+
     // FAQs Page - Hindi
     'faq.title': 'अक्सर पूछे जाने वाले प्रश्न',
     'faq.subtitle': 'अपने प्रश्नों के उत्तर खोजें',
@@ -2090,7 +2186,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.stillNeed': 'अभी भी सहायता चाहिए?',
     'faq.stillNeedDesc': 'आप जो खोज रहे हैं वह नहीं मिल रहा? हमारी सहायता टीम आपकी सहायता के लिए 24/7 यहां है।',
     'faq.supportTeam': 'हमारी सहायता टीम आपकी सहायता के लिए 24/7 यहां है',
-    
+
     // FAQs - Ordering & Payment - Hindi
     'faq.ordering_category': 'ऑर्डरिंग और भुगतान',
     'faq.ordering_q1': 'मैं ऑर्डर कैसे दूं?',
@@ -2101,7 +2197,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.ordering_a3': 'हाँ, आप अपनी भुगतान जानकारी को सुरक्षित रूप से भविष्य की खरीद पर तेजी से चेकआउट के लिए सहेज सकते हैं।',
     'faq.ordering_q4': 'क्या आप किश्त योजना प्रदान करते हैं?',
     'faq.ordering_a4': 'हाँ, हम AED 500 से अधिक के ऑर्डर के लिए किश्त विकल्प प्रदान करते हैं। चेकआउट के दौरान विवरण उपलब्ध हैं।',
-    
+
     // FAQs - Shipping & Delivery - Hindi
     'faq.shipping_category': 'शिपिंग और डिलीवरी',
     'faq.shipping_q1': 'डिलीवरी में कितना समय लगता है?',
@@ -2112,7 +2208,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.shipping_a3': 'हाँ, आपके ऑर्डर के शिप होने के बाद आपको ईमेल के माध्यम से एक ट्रैकिंग नंबर मिलेगा। हमारे पार्टनर के पोर्टल पर इसे रीयल-टाइम में ट्रैक करें।',
     'faq.shipping_q4': 'क्या मुफ्त शिपिंग उपलब्ध है?',
     'faq.shipping_a4': 'हाँ! यूएई के भीतर 200 AED से अधिक के ऑर्डर पर मुफ्त शिपिंग। अंतर्राष्ट्रीय ऑर्डर पर अतिरिक्त शुल्क हो सकते हैं।',
-    
+
     // FAQs - Products & Quality - Hindi
     'faq.products_category': 'उत्पाद और गुणवत्ता',
     'faq.products_q1': 'क्या आपके उत्पाद जैविक हैं?',
@@ -2123,7 +2219,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.products_a3': 'सीधी धूप से दूर ठंडी, सूखी जगह पर रखें। अधिकांश उत्पाद पैकेजिंग पर भंडारण निर्देशों के साथ आते हैं।',
     'faq.products_q4': 'क्या समाप्ति तिथियां हैं?',
     'faq.products_a4': 'हाँ, सभी उत्पादों पर समाप्ति तिथियां स्पष्ट रूप से चिह्नित हैं। हम हमेशा अधिकतम शेष शेल्फ जीवन के साथ ताजी स्टॉक भेजते हैं।',
-    
+
     // FAQs - Returns & Refunds - Hindi
     'faq.returns_category': 'रिटर्न और धनवापसी',
     'faq.returns_q1': 'आपकी रिटर्न नीति क्या है?',
@@ -2134,7 +2230,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.returns_a3': 'एक बार जब हम आपके रिटर्न को प्राप्त और सत्यापित कर लें, तो 5-7 कार्यदिवसों में धनवापसी प्रक्रिया की जाती है।',
     'faq.returns_q4': 'क्या मैं एक अलग उत्पाद के लिए विनिमय कर सकता हूं?',
     'faq.returns_a4': 'बिल्कुल! आप 30 दिनों के भीतर एक ही या भिन्न उत्पाद के लिए विनिमय कर सकते हैं।',
-    
+
     // FAQs - Account & Wishlist - Hindi
     'faq.account_category': 'खाता और विशलिस्ट',
     'faq.account_q1': 'मैं खाता कैसे बनाऊं?',
@@ -2145,7 +2241,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'faq.account_a3': 'अपने खाता पृष्ठ पर जाएं और अपनी व्यक्तिगत जानकारी अपडेट करने के लिए \'प्रोफाइल संपादित करें\' पर क्लिक करें।',
     'faq.account_q4': 'मैं अपना पासवर्ड कैसे बदलूं?',
     'faq.account_a4': 'खाता > सेटिंग्स > पासवर्ड बदलें पर जाएं। अपना वर्तमान पासवर्ड और नया पासवर्ड दर्ज करें।',
-    
+
     // FAQs - Customer Support - Hindi
     'faq.support_category': 'ग्राहक समर्थन',
     'faq.support_q1': 'ग्राहक सेवा के घंटे क्या हैं?',
@@ -2169,14 +2265,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.mainTitle': 'स्वस्थ मुस्कान लाना',
     'hero.mainSubtitle': 'हर घर को',
     'hero.mainDescription': 'प्रीमियम जैविक उत्पादों के आनंद का अनुभव करें जो ताजी आपके दरवाजे तक पहुंचाए जाते हैं। हाथ से चुने हुए बादाम से लेकर शुद्ध शहद तक - संपूर्ण यूएई में परिवारों को स्वास्थ्य और खुशी लाना।',
-    
+
     // Collections
     'collection.exquisite': 'विशिष्ट संग्रह',
     'collection.featured': 'विशेषता उत्पाद',
     'collection.bestsellers': 'बेस्टसेलर',
     'collection.newArrivals': 'नए आगमन',
     'collection.specialty': 'विशेष आइटम',
-    
+
     // Product Details
     'product.ingredients': 'सामग्री',
     'product.nutritionFacts': 'पोषण तथ्य',
@@ -2199,7 +2295,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.viewDetails': 'विवरण देखें',
     'product.customerReviews': 'ग्राहक समीक्षाएं',
     'product.writeReview': 'एक समीक्षा लिखें',
-    
+
     // Product Details - Tabs & Sections
     'product.details': 'विवरण',
     'product.nutrition': 'पोषण',
@@ -2231,12 +2327,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.yourRating': 'आपकी रेटिंग',
     'product.reviewPlaceholder': 'अपना विस्तृत अनुभव साझा करें...',
     'product.submitReview': 'समीक्षा सबमिट करें',
-    
+
     // Product Benefits - Hindi
     'product.freeShipping': 'मुफ्त शिपिंग',
     'product.easyReturns': 'आसान रिटर्न',
     'product.returnPolicy': '30 दिन की मनी-बैक गारंटी',
-    
+
     // Shipping Tab - Hindi
     'product.shipping': 'शिपिंग',
     'product.standardShipping': 'मानक शिपिंग',
@@ -2258,7 +2354,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.faqAnswer2': 'आपके ऑर्डर के शिप होने के बाद आपको ईमेल के माध्यम से एक ट्रैकिंग नंबर मिलेगा। आप इसे हमारी वेबसाइट या कूरियर के ऐप पर रीयल-टाइम में ट्रैक कर सकते हैं।',
     'product.faqQuestion3': 'यदि मेरा पैकेज क्षतिग्रस्त आता है तो क्या होगा?',
     'product.faqAnswer3': 'हम ताजा, बरकरार उत्पादों की गारंटी देते हैं। यदि पैकेज क्षतिग्रस्त आता है, तो तुरंत फोटो के साथ हमसे संपर्क करें पूर्ण धनवापसी या बिना किसी अतिरिक्त लागत के प्रतिस्थापन के लिए।',
-    
+
     // Review Content
     'review.excellentQuality': 'उत्कृष्ट गुणवत्ता!',
     'review.johnDoe': 'जॉन डो',
@@ -2274,7 +2370,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'review.greatQualityPricey': 'बहुत अच्छी गुणवत्ता, थोड़ी महंगी',
     'review.priceQuality': 'उत्पाद की गुणवत्ता असाधारण है। कीमत थोड़ी अधिक है लेकिन आपको अपने पैसे का मूल्य मिलता है। निश्चित रूप से फिर से ऑर्डर करूंगा।',
     'review.priyaS': 'प्रिया एस।',
-    
+
     // Hero Section - 4 Feature Boxes
     'hero.box1Label': '100% जैविक',
     'hero.box1Desc': 'सीधे स्रोत से',
@@ -2284,7 +2380,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.box3Desc': 'प्रीमियम गुणवत्ता',
     'hero.box4Label': 'शीर्ष रेटेड',
     'hero.box4Desc': 'विश्वसनीय ब्रांड',
-    
+
     // Exquisite Collection
     'collection.exploreOur': 'हमारे अन्वेषण करें',
     'collection.exquisiteTitle': 'विशिष्ट संग्रह',
@@ -2297,7 +2393,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'collection.kashmirisaffron': 'कश्मीरी केसर',
     'collection.spiceBlends': 'मसाला मिश्रण',
     'collection.exoticChilies': 'विदेशी मिर्च',
-    
+
     // Why Choose Us
     'whychoose.title': 'हर विवरण में उत्कृष्टता',
     'whychoose.subtitle': 'का निर्माण।',
@@ -2315,7 +2411,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'whychoose.feature5Desc': 'हम आधुनिक मानकों को गले लगाते हुए सदियों पुरानी परंपराओं का सम्मान करते हैं, जो आपको पूर्व का प्रामाणिक स्वाद लाते हैं।',
     'whychoose.feature6Title': 'तेज और ताजा डिलीवरी',
     'whychoose.feature6Desc': 'हम अपने अनुकूलित आपूर्ति श्रृंखला और ताजा भंडारण के माध्यम से हमारे उत्पादों को सबसे ताजी स्थिति में आपतक पहुंचाने का आश्वासन देते हैं।',
-    
+
     // Newsletter
     'newsletter.journal': 'अल फाजर जर्नल',
     'newsletter.title': 'क्यूरेटेड विजडम, डिलीवर किया गया।',
@@ -2323,7 +2419,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'newsletter.placeholder': 'your@email.com',
     'newsletter.subscribe': 'सदस्यता लें',
     'newsletter.benefit': 'हमारी सबसे अच्छी फसल तक विशेषाधिकार प्राप्त पहुंच।',
-    
+
     // Product Categories
     'productCategory.title': 'हमारे प्रीमियम',
     'productCategory.titleSpan': 'उत्पाद',
@@ -2338,13 +2434,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'productCategory.noProductsFound': 'कोई उत्पाद नहीं मिला',
     'productCategory.tryAdjusting': 'आप जो खोज रहे हैं उसे खोजने के लिए अपने फ़िल्टर को समायोजित करने का प्रयास करें।',
     'productCategory.clearAllFilters': 'सभी फ़िल्टर साफ़ करें',
-    
+
     // Product Names
     'productName.kashmirilRedChilliPowder': 'कश्मीरी लाल मिर्च पाउडर',
     'productName.kashmirilPureWhiteHoney': 'कश्मीरी शुद्ध सफेद शहद',
     'productName.kashmirilSaffron': 'कश्मीरी केसर',
     'productName.himalayaShilajit': 'शुद्ध हिमालयी शिलाजीत',
-    
+
     // Product Card Labels - Additional
     'product.badge.sale': 'बिक्रय',
     'product.badge.hot': 'गर्म',
@@ -2353,13 +2449,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'product.addMore': 'और जोड़ें',
     'product.more': 'अधिक',
     'product.add': 'जोड़ें',
-    
+
     // Filter Origins
     'filter.origin.india': 'भारत',
     'filter.origin.uae': 'संयुक्त अरब अमीरात',
     'filter.origin.kashmirIndia': 'कश्मीर, भारत',
     'filter.origin.himalayas': 'हिमालय',
-    
+
     // Filter Certifications
     'filter.certification.organic': 'जैविक',
     'filter.certification.nonGMO': 'गैर-जीएमओ',
@@ -2369,7 +2465,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'filter.certification.premiumGrade': 'प्रीमियम ग्रेड',
     'filter.certification.traditional': 'पारंपरिक',
     'filter.certification.authentic': 'प्रामाणिक',
-    
+
     // Footer
     'footer.about': 'परिचय',
     'footer.contact': 'संपर्क करें',
@@ -2403,7 +2499,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.email_text': 'info@alfajermart.com',
     'footer.brand': 'अल फाजर मार्ट',
     'footer.termsOfService': 'सेवा की शर्तें',
-    
+
     // Cart Page
     'cart.addToCart': 'कार्ट में जोड़ें',
     'cart.quantity': 'मात्रा',
@@ -2414,12 +2510,32 @@ export const translations: Record<Language, Record<string, string>> = {
     'cart.applyPromo': 'प्रचार कोड लागू करें',
     'cart.proceedCheckout': 'चेकआउट पर जाएं',
     'cart.itemsInCart': 'आपकी कार्ट में आइटम',
-    
+
     // Checkout Page
     'checkout.title': 'चेकआउट',
     'checkout.shippingAddress': 'शिपिंग पता',
     'checkout.billingAddress': 'बिलिंग पता',
     'checkout.shippingMethod': 'शिपिंग विधि',
+
+    // Auth
+    'auth.namePlaceholder': 'अपना नाम दर्ज करें',
+    'auth.emailPlaceholder': 'अपना ईमेल दर्ज करें',
+    'auth.password': 'पासवर्ड',
+    'auth.passwordPlaceholder': 'अपना पासवर्ड दर्ज करें',
+    'auth.welcomeBack': 'वापसी पर स्वागत है',
+    'auth.createAccount': 'खाता बनाएं',
+    'auth.signInToAccount': 'अपने खाते में साइन इन करें',
+    'auth.joinUs': 'हमसे जुड़ें और खरीदारी शुरू करें',
+    'auth.rememberMe': 'मुझे याद रखें',
+    'auth.forgotPassword': 'पासवर्ड भूल गए?',
+    'auth.signIn': 'साइन इन करें',
+    'auth.alreadyHaveAccount': 'क्या आपके पास पहले से एक खाता है?',
+    'auth.dontHaveAccount': 'क्या आपके पास कोई खाता नहीं है?',
+    'auth.signUp': 'साइन अप करें',
+    'auth.continueGuest': 'अतिथि के रूप में जारी रखें',
+    'auth.confirmPassword': 'पासवर्ड की पुष्टि करें',
+
+
     'checkout.paymentMethod': 'भुगतान विधि',
     'checkout.promoCode': 'प्रचार कोड',
     'checkout.applyCode': 'कोड लागू करें',
@@ -2456,6 +2572,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'checkout.qty': 'मात्रा',
     'checkout.free': 'मुफ्त',
     'checkout.useSameAddress': 'बिलिंग के लिए समान पता उपयोग करें',
+    'checkout.invalidPromo': 'अमान्य प्रचार कोड',
+    'checkout.errorPromo': 'प्रचार कोड सत्यापन में त्रुटि',
+    'checkout.couponApplied': 'कूपन सफलतापूर्वक लागू किया गया',
+    'checkout.remove': 'हटाएं',
+    'checkout.enterPromoPlaceholder': 'प्रचार कोड दर्ज करें',
+    'checkout.giftPlaceholder': 'उपहार संदेश जोड़ें...',
+    'checkout.getDiscount': 'अपने अगले ऑर्डर पर 10% की छूट प्राप्त करें',
     'checkout.enterPlaceholder': 'दर्ज करें',
     'checkout.selectPlaceholder': 'चुनें',
     'checkout.placeholderFirstName': 'प्रथम नाम',

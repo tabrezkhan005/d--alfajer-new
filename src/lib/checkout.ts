@@ -148,21 +148,36 @@ export const paymentMethods: PaymentMethod[] = [
   },
 ];
 
-// Promo codes
-export const promoCodes: Record<string, { discount: number; type: 'percentage' | 'fixed' }> = {
-  'SAVE10': { discount: 10, type: 'percentage' },
-  'SAVE20': { discount: 20, type: 'percentage' },
-  'FLAT500': { discount: 500, type: 'fixed' },
-  'WELCOME5': { discount: 5, type: 'percentage' },
-  'BULK100': { discount: 100, type: 'fixed' },
-};
+import { createClient } from '@/src/lib/supabase/client';
 
-export function validatePromoCode(code: string): { valid: boolean; discount?: number; type?: 'percentage' | 'fixed' } {
-  const promoCode = promoCodes[code.toUpperCase()];
-  if (!promoCode) {
+export async function validatePromoCode(code: string): Promise<{ valid: boolean; discount?: number; type?: 'percentage' | 'fixed' }> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .eq('code', code.toUpperCase())
+    .eq('is_active', true)
+    .single();
+
+  if (error || !data) {
     return { valid: false };
   }
-  return { valid: true, discount: promoCode.discount, type: promoCode.type };
+
+  // Check Expiry
+  if (data.end_date && new Date(data.end_date) < new Date()) {
+    return { valid: false };
+  }
+
+  // Check Usage Limit
+  if (data.usage_limit && (data.usage_count || 0) >= data.usage_limit) {
+    return { valid: false };
+  }
+
+  return {
+    valid: true,
+    discount: data.discount_value,
+    type: data.discount_type as 'percentage' | 'fixed'
+  };
 }
 
 export function calculateTax(subtotal: number, country: string): number {

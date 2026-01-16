@@ -47,7 +47,7 @@ export function CartSheet() {
               <div className="min-w-0">
                 <SheetTitle className="text-base sm:text-xl font-bold text-gray-900 font-heading truncate">{t('nav.cart')}</SheetTitle>
                 <p className="text-xs sm:text-sm text-gray-500 font-body">
-                  {totalItems} {totalItems === 1 ? "item" : "items"}
+                  {totalItems} {totalItems === 1 ? t('cart.item_one') : t('cart.item_other')}
                 </p>
               </div>
             </div>
@@ -77,7 +77,7 @@ export function CartSheet() {
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2 font-heading">{t('cart.empty')}</h3>
             <p className="text-gray-500 mb-8 max-w-xs font-body">
-              Looks like you haven't added any products yet. Browse our premium collection!
+              {t('cart.empty_desc')}
             </p>
             <Button
               onClick={closeCart}
@@ -114,12 +114,12 @@ export function CartSheet() {
                     "font-medium",
                     shipping === 0 ? "text-[#009744]" : "text-gray-900"
                   )}>
-                    {shipping === 0 ? "FREE" : formatCurrency(convertCurrency(shipping, 'AED'))}
+                    {shipping === 0 ? t('cart.free') : formatCurrency(convertCurrency(shipping, 'AED'))}
                   </span>
                 </div>
                 {shipping > 0 && (
                   <div className="bg-[#009744]/10 rounded-lg p-3 text-sm text-[#009744] font-body">
-                    Add <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'AED'))}</span> more for free shipping!
+                    {t('cart.add_more_pre')} <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'AED'))}</span> {t('cart.add_more_post')}
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
@@ -166,6 +166,7 @@ function CartItemCard({
   onRemove: (id: string) => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
 }) {
+  const { formatCurrency, convertCurrency, t } = useI18n();
   return (
     <motion.div
       layout
@@ -187,7 +188,7 @@ function CartItemCard({
         <div className="flex justify-between items-start gap-2">
           <div className="min-w-0">
             <h4 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug font-body">
-              {item.name}
+              {t(item.name) || item.name}
             </h4>
             <p className="text-xs text-gray-500 mt-1 font-body">{item.packageSize}</p>
           </div>
@@ -223,11 +224,11 @@ function CartItemCard({
 
           <div className="text-right">
             <p className="font-bold text-gray-900 font-heading">
-              AED {(item.price * item.quantity).toFixed(2)}
+              {formatCurrency(convertCurrency(item.price * item.quantity, 'AED'))}
             </p>
             {item.quantity > 1 && (
               <p className="text-xs text-gray-500 font-body">
-                AED {item.price.toFixed(2)} each
+                {formatCurrency(convertCurrency(item.price, 'AED'))} {t('cart.each')}
               </p>
             )}
           </div>

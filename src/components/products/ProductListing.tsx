@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Filter, X, Eye, Plus, Heart, Star, Check } from "lucide-react";
+import { Filter, X, Eye, Plus, Heart, Star, Check, Loader2 } from "lucide-react";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useWishlistStore } from "@/src/lib/wishlist-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sr
 import { cn } from "@/src/lib/utils";
 import { ProductModal } from "./ProductModal";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProducts, type TransformedProduct } from "@/src/lib/hooks/use-products";
 
 // Product name translation mapping
 const productNameMap: Record<string, string> = {
@@ -45,6 +46,7 @@ interface Product {
   inStock: boolean;
   onSale: boolean;
   badge?: "SALE" | "HOT" | "NEW";
+  slug: string;
 }
 
 // Products data from images folder
@@ -74,7 +76,8 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "SALE",
-    description: "product.kashmiChilliDesc",
+    description: "Our Kashmiri Red Chilli Powder is made from the finest chillies, ground to perfection. It adds a vibrant red color and a moderate heat to your dishes.",
+    slug: "kashmiri-red-chilli-powder",
   },
   {
     id: "2",
@@ -101,7 +104,8 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "HOT",
-    description: "product.honeyDesc",
+    description: "Our Kashmiri Pure White Honey is harvested from the pristine valleys of Kashmir. It is 100% natural, raw, and unprocessed, known for its unique taste and health benefits.",
+    slug: "kashmiri-pure-white-honey",
   },
   {
     id: "3",
@@ -123,7 +127,8 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "SALE",
-    description: "product.saffronDesc",
+    description: "Known as the 'Red Gold', our Kashmiri Saffron is handpicked and carefully dried to preserve its aroma and color. Perfect for biryanis, desserts, and health tonics.",
+    slug: "kashmiri-saffron",
   },
   {
     id: "4",
@@ -147,7 +152,8 @@ const mockProducts: Product[] = [
     inStock: true,
     onSale: true,
     badge: "HOT",
-    description: "product.shilajitDesc",
+    description: "Our Shilajit is sourced from the high altitudes of the Himalayas. It is a potent substance known for its rejuvenating properties and ability to boost energy levels.",
+    slug: "himalaya-shilajit",
   },
 ];
 
@@ -162,8 +168,40 @@ interface FilterState {
 
 export function ProductListing() {
   const { t, formatCurrency, convertCurrency, currency } = useI18n();
+
+  // Fetch products from Supabase
+  const { products: dbProducts, loading: loadingProducts } = useProducts();
+
+  // Combine database products with mock products (fallback)
+  const allProducts: Product[] = useMemo(() => {
+    if (dbProducts.length > 0) {
+      // Transform database products to Product interface
+      return dbProducts.map(p => ({
+        id: p.id,
+        name: p.name,
+        image: p.image,
+        images: p.images,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        discount: p.discount,
+        rating: p.rating,
+        reviews: p.reviews,
+        packageSize: p.packageSize,
+        origin: p.origin,
+        description: p.description,
+        certifications: p.certifications,
+        inStock: p.inStock,
+        onSale: p.onSale,
+        badge: p.badge,
+        slug: p.slug,
+      }));
+    }
+    // Fallback to mock data if no database products
+    return mockProducts;
+  }, [dbProducts]);
+
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 200],
+    priceRange: [0, 10000],
     packageSizes: [],
     origins: [],
     certifications: [],
@@ -171,7 +209,7 @@ export function ProductListing() {
     onSaleOnly: false,
   });
 
-  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 200]);
+  const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -184,7 +222,7 @@ export function ProductListing() {
 
   // Auto-apply filters
   const filteredProducts = useMemo(() => {
-    return mockProducts.filter((product) => {
+    return allProducts.filter((product) => {
       // Price filter
       if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) {
         return false;
@@ -214,7 +252,7 @@ export function ProductListing() {
 
       return true;
     });
-  }, [filters]);
+  }, [filters, allProducts]);
 
   const handlePriceRangeChange = (values: number[]) => {
     const newRange = [values[0], values[1]] as [number, number];
@@ -324,28 +362,28 @@ export function ProductListing() {
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.min')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
-                        <Input
-                          type="number"
-                          value={priceInputs[0]}
-                          onChange={(e) => handlePriceInputChange(0, e.target.value)}
-                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
-                          min={0}
-                          max={200}
-                        />
+                <Input
+                  type="number"
+                  value={priceInputs[0]}
+                  onChange={(e) => handlePriceInputChange(0, e.target.value)}
+                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                  min={0}
+                  max={200}
+                />
               </div>
             </div>
             <div className="flex-1">
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.max')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
-                        <Input
-                          type="number"
-                          value={priceInputs[1]}
-                          onChange={(e) => handlePriceInputChange(1, e.target.value)}
-                          className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
-                          min={0}
-                          max={200}
-                        />
+                <Input
+                  type="number"
+                  value={priceInputs[1]}
+                  onChange={(e) => handlePriceInputChange(1, e.target.value)}
+                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                  min={0}
+                  max={200}
+                />
               </div>
             </div>
           </div>
@@ -359,7 +397,7 @@ export function ProductListing() {
         </Label>
         <div className="space-y-2.5">
           {packageSizes.map((size) => {
-            const count = mockProducts.filter((p) => p.packageSize === size).length;
+            const count = allProducts.filter((p) => p.packageSize === size).length;
             return (
               <div key={size} className="flex items-center space-x-3 group/item">
                 <Checkbox
@@ -388,7 +426,7 @@ export function ProductListing() {
         </Label>
         <div className="space-y-2.5">
           {origins.map((origin) => {
-            const count = mockProducts.filter((p) => p.origin === origin).length;
+            const count = allProducts.filter((p) => p.origin === origin).length;
             return (
               <div key={origin} className="flex items-center space-x-3 group/item">
                 <Checkbox
@@ -401,7 +439,7 @@ export function ProductListing() {
                   htmlFor={`origin-${origin}`}
                   className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
                 >
-                  <span className="font-medium">{t(originKeys[origin] || `filter.origin.${origin}`)}</span>
+                  <span className="font-medium">{originKeys[origin] ? t(originKeys[origin]) : origin}</span>
                   <span className="text-gray-400 text-xs font-normal">({count})</span>
                 </Label>
               </div>
@@ -417,7 +455,7 @@ export function ProductListing() {
         </Label>
         <div className="space-y-2.5">
           {certifications.map((cert) => {
-            const count = mockProducts.filter((p) =>
+            const count = allProducts.filter((p) =>
               p.certifications.includes(cert)
             ).length;
             return (
@@ -432,7 +470,7 @@ export function ProductListing() {
                   htmlFor={`cert-${cert}`}
                   className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
                 >
-                  <span className="font-medium">{t(certificationKeys[cert] || `filter.certification.${cert}`)}</span>
+                  <span className="font-medium">{certificationKeys[cert] ? t(certificationKeys[cert]) : cert}</span>
                   <span className="text-gray-400 text-xs font-normal">({count})</span>
                 </Label>
               </div>
@@ -500,75 +538,75 @@ export function ProductListing() {
                 {t('productCategory.subtitle')}
               </p>
             </div>
-                <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
-                  {/* Mobile: Sort by and Filters side by side */}
-                  <div className="flex items-center gap-2 w-full sm:w-auto lg:hidden">
-                    <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
-                    <div className="relative group flex-1">
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="appearance-none px-3 py-2 pr-8 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md w-full"
-                      >
-                        <option value="featured">{t('sort.featured')}</option>
-                        <option value="price-low">{t('sort.priceLow')}</option>
-                        <option value="price-high">{t('sort.priceHigh')}</option>
-                        <option value="rating">{t('sort.rating')}</option>
-                        <option value="newest">{t('sort.newest')}</option>
-                      </select>
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
-                        <svg className="w-3 h-3 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                          <path d="M6 9l6 6 6-6" />
-                        </svg>
-                      </div>
-                    </div>
-                    <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                      <SheetTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-[#009744] hover:bg-[#009744] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md font-semibold font-poppins text-xs sm:text-sm"
-                          aria-label="Open filters"
-                        >
-                          <Filter className="h-4 w-4" />
-                          {t('common.filter')}
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent side="left" className="w-full sm:w-[90vw] sm:max-w-md overflow-y-auto bg-white [&>button]:text-gray-900 [&>button]:hover:text-gray-700">
-                        <SheetHeader>
-                          <SheetTitle className="text-left flex items-center gap-2 text-gray-900">
-                            <Filter className="h-5 w-5 text-[#009744]" />
-                            {t('common.filter')}
-                          </SheetTitle>
-                        </SheetHeader>
-                        <div className="mt-6 space-y-6">
-                          {renderFilterContent()}
-                        </div>
-                      </SheetContent>
-                    </Sheet>
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+              {/* Mobile: Sort by and Filters side by side */}
+              <div className="flex items-center gap-2 w-full sm:w-auto lg:hidden">
+                <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
+                <div className="relative group flex-1">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none px-3 py-2 pr-8 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md w-full"
+                  >
+                    <option value="featured">{t('sort.featured')}</option>
+                    <option value="price-low">{t('sort.priceLow')}</option>
+                    <option value="price-high">{t('sort.priceHigh')}</option>
+                    <option value="rating">{t('sort.rating')}</option>
+                    <option value="newest">{t('sort.newest')}</option>
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
+                    <svg className="w-3 h-3 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
                   </div>
-                  {/* Desktop: Sort by only */}
-                  <div className="hidden lg:flex items-center gap-4">
-                    <span className="text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
-                    <div className="relative group">
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="appearance-none px-8 py-3.5 pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[180px]"
-                      >
-                        <option value="featured">{t('sort.featured')}</option>
-                        <option value="price-low">{t('sort.priceLow')}</option>
-                        <option value="price-high">{t('sort.priceHigh')}</option>
-                        <option value="rating">{t('sort.rating')}</option>
-                        <option value="newest">{t('sort.newest')}</option>
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
-                        <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                          <path d="M6 9l6 6 6-6" />
-                        </svg>
-                      </div>
+                </div>
+                <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-[#009744] hover:bg-[#009744] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md font-semibold font-poppins text-xs sm:text-sm"
+                      aria-label="Open filters"
+                    >
+                      <Filter className="h-4 w-4" />
+                      {t('common.filter')}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-full sm:w-[90vw] sm:max-w-md overflow-y-auto bg-white [&>button]:text-gray-900 [&>button]:hover:text-gray-700">
+                    <SheetHeader>
+                      <SheetTitle className="text-left flex items-center gap-2 text-gray-900">
+                        <Filter className="h-5 w-5 text-[#009744]" />
+                        {t('common.filter')}
+                      </SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6 space-y-6">
+                      {renderFilterContent()}
                     </div>
-                  </div>
+                  </SheetContent>
+                </Sheet>
               </div>
+              {/* Desktop: Sort by only */}
+              <div className="hidden lg:flex items-center gap-4">
+                <span className="text-sm md:text-base lg:text-lg text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
+                <div className="relative group">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none px-8 py-3.5 pr-14 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-sm md:text-base font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md min-w-[180px]"
+                  >
+                    <option value="featured">{t('sort.featured')}</option>
+                    <option value="price-low">{t('sort.priceLow')}</option>
+                    <option value="price-high">{t('sort.priceHigh')}</option>
+                    <option value="rating">{t('sort.rating')}</option>
+                    <option value="newest">{t('sort.newest')}</option>
+                  </select>
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
+                    <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -586,22 +624,22 @@ export function ProductListing() {
             <div className="mb-6 sm:mb-8 flex items-center justify-between">
               <p className="text-xs sm:text-sm text-gray-600 font-body">
                 {t('common.showing')} <span className="font-semibold text-gray-900">{filteredProducts.length}</span> {t('common.of')}{" "}
-                <span className="font-semibold text-gray-900">{mockProducts.length}</span> {t('common.products')}
+                <span className="font-semibold text-gray-900">{allProducts.length}</span> {t('common.products')}
               </p>
             </div>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
-                ))}
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
+              ))}
+            </div>
 
-              {/* Product Modal */}
-              <ProductModal
-                product={selectedProduct}
-                open={isModalOpen}
-                onOpenChange={setIsModalOpen}
-              />
+            {/* Product Modal */}
+            <ProductModal
+              product={selectedProduct}
+              open={isModalOpen}
+              onOpenChange={setIsModalOpen}
+            />
 
             {/* View All Products Button */}
             {filteredProducts.length > 0 && (
@@ -742,44 +780,44 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
           </Badge>
         )}
 
-  {/* Wishlist Button */}
-          <motion.div
-            className="absolute top-4 right-4 z-10"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+        {/* Wishlist Button */}
+        <motion.div
+          className="absolute top-4 right-4 z-10"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "h-11 w-11 rounded-full bg-white/95 hover:bg-white backdrop-blur-sm transition-all shadow-lg border border-gray-100",
+              isWishlisted && "bg-pink-50 border-pink-100"
+            )}
+            onClick={handleWishlistToggle}
+            aria-label="Add to wishlist"
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "h-11 w-11 rounded-full bg-white/95 hover:bg-white backdrop-blur-sm transition-all shadow-lg border border-gray-100",
-                isWishlisted && "bg-pink-50 border-pink-100"
-              )}
-              onClick={handleWishlistToggle}
-              aria-label="Add to wishlist"
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={isWishlisted ? "active" : "inactive"}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Heart
-                    className={cn(
-                      "h-5 w-5 transition-colors",
-                      isWishlisted ? "fill-pink-500 text-pink-500" : "text-gray-600"
-                    )}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </Button>
-          </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isWishlisted ? "active" : "inactive"}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Heart
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    isWishlisted ? "fill-pink-500 text-pink-500" : "text-gray-600"
+                  )}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </Button>
+        </motion.div>
 
         {/* Quick View - Shows on hover */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pt-20 pb-5 px-5">
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${product.slug}`}>
             <div className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold shadow-lg rounded-full h-11 font-poppins flex items-center justify-center cursor-pointer transition-colors">
               <Eye className="h-4 w-4 mr-2" />
               {t('product.viewDetails')}
@@ -815,7 +853,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
         {/* Title */}
         <h3 className="text-sm xs:text-base sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
-          {t(productNameMap[product.id] || 'product.name') || product.name}
+          {productNameMap[product.id] ? t(productNameMap[product.id]) : product.name}
         </h3>
 
         {/* Package Size */}
@@ -837,44 +875,44 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
       </CardContent>
 
 
-<CardFooter className="p-3 xs:p-3.5 sm:p-4 md:p-5 pt-1 xs:pt-2 sm:pt-0 sm:mt-auto flex-shrink-0 flex flex-col gap-2 xs:gap-2 sm:gap-2 w-full">
-          <div className="flex gap-1.5 xs:gap-2 sm:gap-2 w-full">
-            <Button
-              className={cn(
-                "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
-                "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
-                "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
-                "bg-[#009744] hover:bg-[#2E763B] text-white"
-              )}
-              onClick={handleAddToCart}
-            >
-              {isAdding ? (
-                <>
-                  <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
-                  <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.addedToCart')}</span>
-                </>
-              ) : isInCart ? (
-                <>
-                  <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                  <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addMore')}</span>
-                  <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.more')}</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                  <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addToCart')}</span>
-                  <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.add')}</span>
-                </>
-              )}
-            </Button>
-            <Button
-              className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#D1515A] hover:bg-[#B83E45] text-white flex items-center justify-center"
-              onClick={handleBuyNow}
-            >
-              <span className="whitespace-nowrap">{t('product.buyNow')}</span>
-            </Button>
-          </div>
-        </CardFooter>
+      <CardFooter className="p-3 xs:p-3.5 sm:p-4 md:p-5 pt-1 xs:pt-2 sm:pt-0 sm:mt-auto flex-shrink-0 flex flex-col gap-2 xs:gap-2 sm:gap-2 w-full">
+        <div className="flex gap-1.5 xs:gap-2 sm:gap-2 w-full">
+          <Button
+            className={cn(
+              "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins",
+              "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
+              "flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-1.5",
+              "bg-[#009744] hover:bg-[#2E763B] text-white"
+            )}
+            onClick={handleAddToCart}
+          >
+            {isAdding ? (
+              <>
+                <Check className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 animate-bounce shrink-0" />
+                <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.addedToCart')}</span>
+              </>
+            ) : isInCart ? (
+              <>
+                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addMore')}</span>
+                <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.more')}</span>
+              </>
+            ) : (
+              <>
+                <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
+                <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addToCart')}</span>
+                <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.add')}</span>
+              </>
+            )}
+          </Button>
+          <Button
+            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#D1515A] hover:bg-[#B83E45] text-white flex items-center justify-center"
+            onClick={handleBuyNow}
+          >
+            <span className="whitespace-nowrap">{t('product.buyNow')}</span>
+          </Button>
+        </div>
+      </CardFooter>
     </Card>
   );
 }

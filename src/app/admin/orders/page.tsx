@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, Package, Filter } from "lucide-react";
+import { Eye, Loader2, Filter } from "lucide-react";
 import { DataTable } from "@/src/components/admin/data-table";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
-import { mockOrders } from "@/src/lib/mock-data";
-import type { Order } from "@/src/lib/mock-data";
-import { formatCurrency, formatDate } from "@/src/lib/utils";
+import { formatCurrency } from "@/src/lib/utils";
+import { getAllOrders, updateOrderStatus, type OrderWithItems } from "@/src/lib/supabase/orders";
 import {
   Select,
   SelectContent,
@@ -16,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
+import { toast } from "sonner";
 
-const getStatusBadge = (status: Order["status"]) => {
+const getStatusBadge = (status: string | null) => {
   const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     pending: "outline",
     processing: "default",
@@ -27,68 +27,144 @@ const getStatusBadge = (status: Order["status"]) => {
   };
 
   return (
-    <Badge variant={variants[status] || "outline"} className="capitalize">
-      {status}
+    <Badge variant={variants[status || "pending"] || "outline"} className="capitalize">
+      {status || "pending"}
     </Badge>
   );
 };
 
-export default function OrdersPage() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
-  const filteredOrders =
-    statusFilter === "all"
-      ? mockOrders
-      : mockOrders.filter((order) => order.status === statusFilter);
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<OrderWithItems[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+
+  // Fetch orders from Supabase
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        setLoading(true);
+        const data = await getAllOrders({ status: statusFilter });
+        setOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Failed to load orders");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOrders();
+  }, [statusFilter]);
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    setUpdatingStatus(orderId);
+    const success = await updateOrderStatus(orderId, newStatus);
+
+    if (success) {
+      setOrders(orders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+      toast.success("Order status updated");
+    } else {
+      toast.error("Failed to update status");
+    }
+
+    setUpdatingStatus(null);
+  };
+
+  const getCustomerName = (order: OrderWithItems) => {
+    const address = order.shipping_address as { firstName?: string; lastName?: string; email?: string } | null;
+    if (address?.firstName || address?.lastName) {
+      return `${address.firstName || ""} ${address.lastName || ""}`.trim();
+    }
+    return address?.email || "Guest";
+  };
+
+  const getCustomerEmail = (order: OrderWithItems) => {
+    const address = order.shipping_address as { email?: string } | null;
+    return address?.email || "";
+  };
 
   const columns = [
     {
       key: "id",
       header: "Order ID",
-      render: (row: Order) => (
+      render: (row: OrderWithItems) => (
         <Link
           href={`/admin/orders/${row.id}`}
           className="font-medium text-primary hover:underline"
         >
-          {row.id}
+          {row.id.slice(0, 8)}...
         </Link>
       ),
     },
     {
       key: "customerName",
       header: "Customer",
-      render: (row: Order) => (
+      render: (row: OrderWithItems) => (
         <div>
-          <div className="font-medium">{row.customerName}</div>
-          <div className="text-xs text-muted-foreground">{row.email}</div>
+          <div className="font-medium">{getCustomerName(row)}</div>
+          <div className="text-xs text-muted-foreground">{getCustomerEmail(row)}</div>
         </div>
       ),
     },
     {
       key: "items",
       header: "Items",
+      render: (row: OrderWithItems) => row.items?.length || 0,
     },
     {
       key: "total",
       header: "Total",
-      render: (row: Order) => (
-        <span className="font-medium">{formatCurrency(row.total)}</span>
+      render: (row: OrderWithItems) => (
+        <span className="font-medium">{formatCurrency(row.total_amount)}</span>
       ),
     },
     {
       key: "status",
       header: "Status",
-      render: (row: Order) => getStatusBadge(row.status),
+      render: (row: OrderWithItems) => (
+        <Select
+          value={row.status || "pending"}
+          onValueChange={(value) => handleStatusChange(row.id, value)}
+          disabled={updatingStatus === row.id}
+        >
+          <SelectTrigger className="w-32 h-8">
+            {updatingStatus === row.id ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <SelectValue />
+            )}
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="processing">Processing</SelectItem>
+            <SelectItem value="shipped">Shipped</SelectItem>
+            <SelectItem value="delivered">Delivered</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      ),
     },
     {
       key: "date",
       header: "Date",
-      render: (row: Order) => formatDate(row.date),
+      render: (row: OrderWithItems) => formatDate(row.created_at),
     },
     {
       key: "actions",
       header: "Actions",
-      render: (row: Order) => (
+      render: (row: OrderWithItems) => (
         <Button variant="ghost" size="icon" asChild>
           <Link href={`/admin/orders/${row.id}`}>
             <Eye className="h-4 w-4" />
@@ -98,6 +174,14 @@ export default function OrdersPage() {
       ),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -126,15 +210,20 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      <DataTable
-        data={filteredOrders}
-        columns={columns}
-        searchKey="customerName"
-        onRowClick={(row) => {
-          // Navigate to order detail
-          window.location.href = `/admin/orders/${row.id}`;
-        }}
-      />
+      {orders.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No orders found</p>
+        </div>
+      ) : (
+        <DataTable
+          data={orders}
+          columns={columns}
+          searchKey="id"
+          onRowClick={(row) => {
+            window.location.href = `/admin/orders/${row.id}`;
+          }}
+        />
+      )}
     </div>
   );
 }

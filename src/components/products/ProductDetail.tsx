@@ -15,10 +15,11 @@ import { mockProductsWithVariants } from "@/src/lib/products";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 
 interface ProductDetailProps {
-  productId: string;
+  productId?: string;
+  initialProduct?: any;
 }
 
-export function ProductDetail({ productId }: ProductDetailProps) {
+export function ProductDetail({ productId, initialProduct }: ProductDetailProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -44,18 +45,18 @@ export function ProductDetail({ productId }: ProductDetailProps) {
     );
   }
 
-  return <ProductDetailContent productId={productId} />;
+  return <ProductDetailContent productId={productId} initialProduct={initialProduct} />;
 }
 
-function ProductDetailContent({ productId }: ProductDetailProps) {
+function ProductDetailContent({ productId, initialProduct }: ProductDetailProps) {
   const router = useRouter();
   const { t, formatCurrency } = useI18n();
   const { addItem } = useCartStore();
   const { isInWishlist, toggleWishlist } = useWishlistStore();
 
   const product = useMemo(
-    () => mockProductsWithVariants.find((p) => p.id === productId),
-    [productId]
+    () => initialProduct || mockProductsWithVariants.find((p) => p.id === productId),
+    [productId, initialProduct]
   );
 
   const [selectedVariantId, setSelectedVariantId] = useState(
@@ -76,8 +77,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
     return <div className="p-8 text-center">{t("product.notFound")}</div>;
   }
 
-  const selectedVariant = product.variants.find(
-    (v) => v.id === selectedVariantId
+  const selectedVariant = product.variants?.find(
+    (v: { id: string; price: number; originalPrice?: number; stock: number }) => v.id === selectedVariantId
   );
   const displayPrice = selectedVariant?.price || product.price;
   const displayOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
@@ -140,21 +141,21 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
           {/* Image Gallery Section */}
           <div className="space-y-4">
             {/* Main Image */}
-            <motion.div 
+            <motion.div
               className="relative w-full aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-200"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
               <Image
-                src={product.images[selectedImageIndex]}
-                alt={product.name}
+                src={product.images?.[selectedImageIndex] || product.image || "/images/placeholder.jpg"}
+                alt={product.name || "Product image"}
                 fill
                 className="object-cover"
                 priority
               />
               {product.badge && (
-                <motion.div 
+                <motion.div
                   className="absolute top-4 left-4"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -168,21 +169,20 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
 
             {/* Thumbnail Grid */}
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-              {product.images.map((img, idx) => (
+              {(product.images || []).filter((img: string) => img && img.trim() !== "").map((img: string, idx: number) => (
                 <motion.button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`relative w-full aspect-square rounded-md overflow-hidden border-2 transition-all ${
-                    selectedImageIndex === idx
-                      ? "border-[#009744] shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  className={`relative w-full aspect-square rounded-md overflow-hidden border-2 transition-all ${selectedImageIndex === idx
+                    ? "border-[#009744] shadow-md"
+                    : "border-gray-200 hover:border-gray-300"
+                    }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Image
-                    src={img}
-                    alt={`${product.name}-${idx}`}
+                    src={img || "/images/placeholder.jpg"}
+                    alt={`${product.name || "Product"}-${idx}`}
                     fill
                     className="object-cover"
                   />
@@ -198,7 +198,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
               <h1 className="text-4xl font-bold text-gray-900 leading-tight">
                 {t(product.name) || product.name}
               </h1>
-              
+
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
@@ -267,15 +267,14 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 {t('product.selectVariant')}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {product.variants.map((variant) => (
+                {(product.variants || []).map((variant: { id: string; size: string; price: number; stock: number }) => (
                   <motion.button
                     key={variant.id}
                     onClick={() => setSelectedVariantId(variant.id)}
-                    className={`p-4 rounded-lg border-2 text-sm font-medium transition-all ${
-                      selectedVariantId === variant.id
-                        ? "border-[#009744] bg-[#009744] text-white"
-                        : "border-gray-200 bg-white text-gray-900 hover:border-[#009744]"
-                    } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`p-4 rounded-lg border-2 text-sm font-medium transition-all ${selectedVariantId === variant.id
+                      ? "border-[#009744] bg-[#009744] text-white"
+                      : "border-gray-200 bg-white text-gray-900 hover:border-[#009744]"
+                      } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={variant.stock === 0}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -404,26 +403,26 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
         <div className="border-t border-gray-200 pt-12">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-white border-b border-gray-200 rounded-none h-auto p-0">
-              <TabsTrigger 
-                value="description" 
+              <TabsTrigger
+                value="description"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
                 {t('product.description')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="nutrition" 
+              <TabsTrigger
+                value="nutrition"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
                 {t('product.nutrition')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="reviews" 
+              <TabsTrigger
+                value="reviews"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
                 {t('product.reviews')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="shipping" 
+              <TabsTrigger
+                value="shipping"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
                 {t('product.shipping')}
@@ -447,10 +446,10 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h4 className="font-bold text-gray-900 mb-3 text-lg">{t('product.certifications')}</h4>
                   <div className="flex flex-wrap gap-2">
-                    {product.certifications.map((cert) => (
-                      <Badge 
-                        key={cert} 
-                        variant="outline" 
+                    {(product.certifications || []).map((cert: string) => (
+                      <Badge
+                        key={cert}
+                        variant="outline"
                         className="text-[#009744] border-[#009744] bg-green-50 hover:bg-green-100"
                       >
                         {t(`cert.${cert.toLowerCase().replace(/[\s-]+/g, '')}`) || cert}
@@ -460,11 +459,11 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                 </div>
               </div>
 
-              {product.ingredients.length > 0 && (
+              {(product.ingredients?.length || 0) > 0 && (
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h4 className="font-bold text-gray-900 mb-4 text-lg">{t('product.ingredients')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {product.ingredients.map((ing, idx) => (
+                    {(product.ingredients || []).map((ing: string, idx: number) => (
                       <div key={idx} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-[#009744] flex-shrink-0"></div>
                         <span className="text-gray-700">{t(ing) || ing}</span>
@@ -567,8 +566,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
               </div>
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 rounded-lg"
                 >
                   {t('product.writeReview')}
@@ -640,8 +639,8 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
                       <span className="text-sm text-gray-400 line-through">{formatCurrency(relatedProduct.originalPrice)}</span>
                     )}
                   </div>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold"
                   >
                     {t('product.viewDetails')}

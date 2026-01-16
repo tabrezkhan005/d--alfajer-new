@@ -38,7 +38,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { items, openCart, getTotalItems, getTotalPrice } = useCartStore();
-  const { t, formatCurrency, convertCurrency, currency } = useI18n();
+  const { t, formatCurrency, convertCurrency, currency, language, setLanguage } = useI18n();
   const { user, isLoggedIn, logout } = useAuth();
 
   const headerRef = useRef<HTMLDivElement>(null);
@@ -207,6 +207,20 @@ export function Header() {
               ref={fullActionsRef}
               className="hidden lg:flex items-center gap-3 lg:gap-4"
             >
+              {/* Language Switcher */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1 px-2 text-gray-700 hover:text-[#009744] hover:bg-transparent">
+                    <span className="text-xs md:text-sm font-medium uppercase">{language}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer">English</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">العربية</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('hi')} className="cursor-pointer">हिंदी</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                 <Link href="/support" className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
@@ -262,54 +276,68 @@ export function Header() {
               className="hidden lg:flex items-center gap-2 md:gap-3"
               style={{ opacity: isScrolled ? 1 : 0, pointerEvents: isScrolled ? "auto" : "none" }}
             >
-                <button
-                  className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-[#009744] flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                  aria-label="Support"
-                >
-                  <Headphones className="h-4 md:h-5 w-4 md:w-5 text-white" />
-                </button>
-                <Link href="/wishlist">
-                  <button
-                    className="flex items-center justify-center hover:text-pink-500 transition-colors shrink-0"
-                    aria-label="Wishlist"
-                  >
-                    <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0 text-gray-600 font-bold uppercase text-xs">
+                    {language}
                   </button>
-                </Link>
-                {isLoggedIn ? (
-                  <div className="group relative">
-                    <Link href="/account">
-                      <button
-                        className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                        aria-label="Account"
-                      >
-                        <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
-                      </button>
-                    </Link>
-                    {/* Hover Dropdown Logout */}
-                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-48 z-50">
-                      <button
-                        onClick={() => {
-                          logout();
-                          router.push("/");
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-red-600 hover:bg-red-50 flex items-center gap-2 text-sm font-medium rounded-lg transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <Link href="/login">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer">EN</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">AR</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('hi')} className="cursor-pointer">HI</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <button
+                className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-[#009744] flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
+                aria-label="Support"
+              >
+                <Headphones className="h-4 md:h-5 w-4 md:w-5 text-white" />
+              </button>
+
+              <Link href="/wishlist">
+                <button
+                  className="flex items-center justify-center hover:text-pink-500 transition-colors shrink-0"
+                  aria-label="Wishlist"
+                >
+                  <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                </button>
+              </Link>
+              {isLoggedIn ? (
+                <div className="group relative">
+                  <Link href="/account">
                     <button
                       className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                      aria-label="Login"
+                      aria-label="Account"
                     >
                       <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
                     </button>
                   </Link>
-                )}
+                  {/* Hover Dropdown Logout */}
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-48 z-50">
+                    <button
+                      onClick={() => {
+                        logout();
+                        router.push("/");
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-red-600 hover:bg-red-50 flex items-center gap-2 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <button
+                    className="flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
+                    aria-label="Login"
+                  >
+                    <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
+                  </button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile: Hamburger menu with dropdown */}
@@ -325,6 +353,12 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+                <DropdownMenuLabel className="text-gray-900">Language</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer text-gray-900 hover:bg-gray-100">English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer text-gray-900 hover:bg-gray-100">العربية</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('hi')} className="cursor-pointer text-gray-900 hover:bg-gray-100">हिंदी</DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-200" />
+
                 {isLoggedIn ? (
                   <>
                     <DropdownMenuLabel className="text-gray-900">

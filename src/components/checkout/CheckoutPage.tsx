@@ -20,10 +20,11 @@ import {
   calculateTax,
   type ShippingAddress,
 } from "@/src/lib/checkout";
+import { toast } from "sonner";
 
 export function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -57,19 +58,32 @@ function CheckoutPageContent() {
   useEffect(() => {
     const productId = searchParams.get('product');
     if (productId && items.length === 0) {
-      // Get product details and add to cart
-      const mockProducts = [
-        { id: "1", name: "Organic Honey 500g", price: 24.99, image: "/images/products/honey/honey.png", packageSize: "500g" },
-        { id: "2", name: "Premium Almonds 250g", price: 32.50, image: "/images/products/chillipowder/chillipowder.png", packageSize: "250g" },
-        { id: "3", name: "Kashmir Tea 100g", price: 18.99, image: "/images/products/kashmir tea/kashmir-tea.png", packageSize: "100g" },
-        { id: "4", name: "Shirajit 50g", price: 45.00, image: "/images/products/shirajit/shirajit.png", packageSize: "50g" },
-      ];
-      
-      const product = mockProducts.find(p => p.id === productId);
-      if (product) {
-        // Add item without opening cart (false parameter)
-        addItem({ id: product.id, name: product.name, price: product.price, image: product.image, packageSize: product.packageSize }, false);
-      }
+      const fetchProduct = async () => {
+        try {
+          // Dynamic import to avoid circular dependencies if any, or just use the client directly
+          const { getSupabaseClient } = await import("@/src/lib/supabase/client");
+          const supabase = getSupabaseClient();
+          const { data: product, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', productId)
+            .single();
+
+          if (product && !error) {
+            addItem({
+              id: product.id,
+              name: product.name,
+              price: product.base_price || 0,
+              image: product.images?.[0] || '/images/placeholder.png',
+              packageSize: 'Standard',
+            }, false);
+          }
+        } catch (error) {
+          console.error("Error fetching product for buy now:", error);
+        }
+      };
+
+      fetchProduct();
     }
   }, [searchParams, items.length, addItem]);
 
@@ -100,7 +114,7 @@ function CheckoutPageContent() {
   // Calculate totals
   const subtotal = getTotalPrice();
   const shippingCost = selectedShippingMethod?.price || 0;
-  
+
   let discountAmount = 0;
   if (appliedPromo) {
     discountAmount =
@@ -114,19 +128,27 @@ function CheckoutPageContent() {
   const total = subtotalAfterDiscount + shippingCost + tax;
 
   // Handle promo code
-  const handleApplyPromo = () => {
+  const handleApplyPromo = async () => {
     setPromoError('');
-    const validation = validatePromoCode(promoCode);
-    if (!validation.valid) {
-      setPromoError('Invalid promo code');
-      return;
+    setIsProcessing(true);
+    try {
+      const validation = await validatePromoCode(promoCode);
+      if (!validation.valid) {
+        setPromoError(t('checkout.invalidPromo'));
+        return;
+      }
+      setAppliedPromo({
+        code: promoCode.toUpperCase(),
+        discount: validation.discount!,
+        type: validation.type!,
+      });
+      setPromoCode('');
+      toast(t('checkout.couponApplied'));
+    } catch (error) {
+      setPromoError(t('checkout.errorPromo'));
+    } finally {
+      setIsProcessing(false);
     }
-    setAppliedPromo({
-      code: promoCode.toUpperCase(),
-      discount: validation.discount!,
-      type: validation.type!,
-    });
-    setPromoCode('');
   };
 
   // Validate shipping address
@@ -162,32 +184,46 @@ function CheckoutPageContent() {
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const newOrderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      setOrderNumber(newOrderNumber);
-      
-      // Save order to orders store if user is logged in
-      if (user) {
-        const orderDate = new Date();
-        const orderDateStr = orderDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-        
-        addOrder(
-          {
-            date: orderDateStr,
-            items: items,
-            total: total,
-            status: "Processing" as const,
-          },
-          user.id
-        );
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items,
+          email: shippingAddress.email,
+          name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+          address: shippingAddress,
+          phone: shippingAddress.phone,
+          shippingMethod: shippingMethodId, // Optional, depending on API handling
+          paymentMethod: paymentMethodId,   // Optional
+          userId: user?.id,                 // Pass userId if available
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to place order');
       }
-      
+
+      const data = await response.json();
+
+      // If the API returns an order number, use it
+      const newOrderNumber = data.orderNumber || 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      setOrderNumber(newOrderNumber);
+
+      // Clear cart
       clearCart();
+
+      // Refresh orders if using store (optional, or rely on real-time)
+      // addOrder logic might be redundant if we fetch real orders from DB now
+      if (user) {
+        // Optionally manually add to local store for immediate feedback if store doesn't auto-sync
+        // But since we are redirecting/showing success, and dashboard fetches from DB, we might be fine.
+      }
+
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('There was an error placing your order. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -218,7 +254,7 @@ function CheckoutPageContent() {
           </div>
           <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 sm:mb-2">{t('checkout.placedSuccessfully')}</h1>
           <p className="text-sm xs:text-base sm:text-lg text-gray-700 mb-4 xs:mb-5 sm:mb-6">{t('checkout.thankYou')}</p>
-          
+
           <Card className="bg-gray-50 border-gray-200 mb-4 xs:mb-5 sm:mb-6">
             <CardContent className="pt-4 xs:pt-5 sm:pt-6">
               <div className="text-center">
@@ -232,7 +268,7 @@ function CheckoutPageContent() {
             {t('checkout.confirmationEmail')}
           </p>
 
-          <Button 
+          <Button
             size="lg"
             className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
             onClick={() => router.push('/')}
@@ -449,14 +485,14 @@ function CheckoutPageContent() {
                       />
                       <div className="flex-1">
                         <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base">
-                          {method.id === 'standard' ? t('checkout.shippingSpeed.standard') : 
-                           method.id === 'express' ? t('checkout.shippingSpeed.express') : 
-                           t('checkout.shippingSpeed.overnight')}
+                          {method.id === 'standard' ? t('checkout.shippingSpeed.standard') :
+                            method.id === 'express' ? t('checkout.shippingSpeed.express') :
+                              t('checkout.shippingSpeed.overnight')}
                         </p>
                         <p className="text-xs xs:text-sm text-gray-600">
-                          {method.id === 'standard' ? t('checkout.shippingDays.standard') : 
-                           method.id === 'express' ? t('checkout.shippingDays.express') : 
-                           t('checkout.shippingDays.overnight')}
+                          {method.id === 'standard' ? t('checkout.shippingDays.standard') :
+                            method.id === 'express' ? t('checkout.shippingDays.express') :
+                              t('checkout.shippingDays.overnight')}
                         </p>
                       </div>
                       <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">
@@ -519,13 +555,13 @@ function CheckoutPageContent() {
                         onClick={() => setAppliedPromo(null)}
                         className="text-sm text-gray-900 hover:text-gray-700 font-medium"
                       >
-                        Remove
+                        {t('checkout.remove')}
                       </button>
                     </div>
                   ) : (
                     <div className="flex gap-2">
                       <Input
-                        placeholder="Enter promo code"
+                        placeholder={t('checkout.enterPromoPlaceholder')}
                         value={promoCode}
                         onChange={(e) => {
                           setPromoCode(e.target.value);
@@ -539,7 +575,7 @@ function CheckoutPageContent() {
                         disabled={!promoCode}
                         className="border-[#009744] text-[#009744] hover:bg-[#009744]/10"
                       >
-                        Apply
+                        {t('checkout.applyCode')}
                       </Button>
                     </div>
                   )}
@@ -563,7 +599,7 @@ function CheckoutPageContent() {
                     <textarea
                       value={giftMessage}
                       onChange={(e) => setGiftMessage(e.target.value)}
-                      placeholder="Add a gift message..."
+                      placeholder={t('checkout.giftPlaceholder')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744]"
                       rows={3}
                     />
@@ -578,7 +614,7 @@ function CheckoutPageContent() {
                     />
                     <div>
                       <p className="font-semibold text-gray-800">{t('checkout.subscribe')}</p>
-                      <p className="text-sm text-gray-600">Get 10% off your next order</p>
+                      <p className="text-sm text-gray-600">{t('checkout.getDiscount')}</p>
                     </div>
                   </label>
                 </CardContent>
@@ -671,7 +707,7 @@ function CheckoutPageContent() {
 
                 {appliedPromo && (
                   <div className="flex justify-between text-[#009744] font-semibold">
-                    <span>Discount ({appliedPromo.code})</span>
+                    <span>{t('checkout.discount')} ({appliedPromo.code})</span>
                     <span>-{formatCurrency(discountAmount)}</span>
                   </div>
                 )}
