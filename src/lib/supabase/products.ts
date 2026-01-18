@@ -66,7 +66,31 @@ export async function getProducts(options?: {
         return [];
     }
 
-    return (data || []) as ProductWithVariants[];
+    const products = (data || []) as ProductWithVariants[];
+
+    // Ensure images are public URLs (convert storage paths to public URLs)
+    const mapped = products.map((p) => {
+        const images = Array.isArray(p.images)
+            ? p.images
+                  .map((img: string) => {
+                      if (!img) return null;
+                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                          return img;
+                      }
+                      try {
+                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                          return publicUrl;
+                      } catch (e) {
+                          return null;
+                      }
+                  })
+                  .filter((x): x is string => Boolean(x))
+            : [];
+
+        return { ...p, images };
+    });
+
+    return mapped;
 }
 
 // Get single product by slug
@@ -89,7 +113,27 @@ export async function getProductBySlug(slug: string): Promise<ProductWithVariant
         return null;
     }
 
-    return data as ProductWithVariants;
+    const product = data as ProductWithVariants;
+    if (product) {
+        const images = Array.isArray(product.images)
+            ? product.images
+                  .map((img: string) => {
+                      if (!img) return null;
+                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                          return img;
+                      }
+                      try {
+                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                          return publicUrl;
+                      } catch (e) {
+                          return null;
+                      }
+                  })
+                  .filter((x): x is string => Boolean(x))
+            : [];
+        return { ...product, images } as ProductWithVariants;
+    }
+    return null;
 }
 
 // Get product by ID
@@ -111,7 +155,27 @@ export async function getProductById(id: string): Promise<ProductWithVariants | 
         return null;
     }
 
-    return data as ProductWithVariants;
+    const product = data as ProductWithVariants;
+    if (product) {
+        const images = Array.isArray(product.images)
+            ? product.images
+                  .map((img: string) => {
+                      if (!img) return null;
+                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                          return img;
+                      }
+                      try {
+                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                          return publicUrl;
+                      } catch (e) {
+                          return null;
+                      }
+                  })
+                  .filter((x): x is string => Boolean(x))
+            : [];
+        return { ...product, images } as ProductWithVariants;
+    }
+    return null;
 }
 
 // Search products
@@ -147,11 +211,11 @@ export async function searchProducts(
     // Filter by Category
     if (filters?.categories && filters.categories.length > 0) {
         // We need to fetch category IDs for these slugs/names
-        // This is tricky in one query if we only have names. 
+        // This is tricky in one query if we only have names.
         // Assuming filters.categories passes names, we'd need a join filter.
         // Supabase postgrest-js complex filtering:
         // .filter('category.name', 'in', `(${filters.categories.join(',')})`)
-        // NOTE: The UI passes category NAMES (e.g. "Spices"). 
+        // NOTE: The UI passes category NAMES (e.g. "Spices").
         // We should really pass slugs, but sticking to UI convention:
         // Let's filter on the joined category table.
         // However, Supabase select with nested filter is weird.
@@ -160,7 +224,7 @@ export async function searchProducts(
         // dbQuery = dbQuery.select('..., category!inner(name)')
 
         // Let's try to map names to IDs first? No, easier to rely on UI passing valid data.
-        // But UI sends "Spices". 
+        // But UI sends "Spices".
         // Let's assume we filter client side for complex relations OR update UI to send slugs.
         // User wants "100% functionality".
         // Robust way:

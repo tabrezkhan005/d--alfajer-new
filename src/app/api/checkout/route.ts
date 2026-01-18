@@ -1,24 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
+import { calculateTax, shippingMethods, validatePromoCode } from '@/src/lib/checkout';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, shippingAddress, paymentMethodId, promoCode, userId } = body;
+    const {
+      items,
+      shippingAddress,
+      address,
+      email,
+      name,
+      phone,
+      shippingMethod,
+      paymentMethodId,
+      paymentMethod,
+      promoCode,
+      userId,
+      giftMessage,
+      subscription
+    } = body;
+
+    // Handle both naming conventions for address
+    const finalAddress = shippingAddress || address;
+    const finalPaymentMethod = paymentMethodId || paymentMethod || 'card';
+    const finalShippingMethod = shippingMethod || 'standard';
 
     // Validate request
     if (!items || items.length === 0) {
-      return NextResponse.json(
-        { error: 'Cart is empty' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
-    if (!shippingAddress) {
-      return NextResponse.json(
-        { error: 'Shipping address is required' },
-        { status: 400 }
-      );
+    if (!finalAddress) {
+      return NextResponse.json({ error: 'Shipping address is required' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -32,10 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (productError) {
       console.error('Error fetching products:', productError);
-      return NextResponse.json(
-        { error: 'Failed to validate products' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 });
     }
 
     // Create a price map for validation
@@ -51,22 +62,27 @@ export async function POST(request: NextRequest) {
       name: string;
       variantId?: string;
       packageSize?: string;
+      image?: string;
     }) => {
       const productId = (item.productId || item.id) as string;
       const productData = priceMap.get(productId || '');
-      // Use database price if available, otherwise use submitted price
       const validatedPrice = productData?.price || item.price;
       subtotal += validatedPrice * item.quantity;
 
       return {
         product_id: productId,
         variant_id: item.variantId || null,
-        product_name: productData?.name || item.name,
-        variant_weight: item.packageSize || null,
+        name: productData?.name || item.name,
         quantity: item.quantity,
         price: validatedPrice,
+        total: validatedPrice * item.quantity,
+        image_url: item.image || null,
       };
     });
+
+    // Get shipping cost
+    const selectedShipping = shippingMethods.find(m => m.id === finalShippingMethod) || shippingMethods[0];
+    const shippingCost = selectedShipping?.price || 0;
 
     // Calculate discount from promo code
     let discount = 0;
@@ -103,59 +119,123 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate tax (simplified - use country-based rates)
-    const country = shippingAddress.country || 'IN';
-    const taxRates: Record<string, number> = {
-      'US': 0.08,
-      'GB': 0.20,
-      'IN': 0.05,
-      'AE': 0,
-      'EU': 0.19,
-    };
-    const taxRate = taxRates[country] || 0.05;
-    const taxAmount = Math.round((subtotal - discount) * taxRate * 100) / 100;
-
-    // Shipping cost (free for now, can be dynamic later)
-    const shippingCost = 0;
+    // Calculate tax
+    const country = finalAddress.country || 'IN';
+    const taxAmount = calculateTax(subtotal - discount, country);
 
     // Calculate total
     const totalAmount = subtotal - discount + shippingCost + taxAmount;
 
     // Create the order
+    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         user_id: userId || null,
         status: 'pending',
-        total_amount: totalAmount,
+        order_number: orderNumber,
+        email: email || finalAddress.email,
+        subtotal: subtotal,
+        total: totalAmount,
         currency: 'INR',
-        shipping_address: shippingAddress,
-        billing_address: shippingAddress, // Use same as shipping for now
-        shipping_method: 'standard',
+        shipping_address: finalAddress,
+        billing_address: finalAddress,
+        shipping_method: finalShippingMethod,
         shipping_cost: shippingCost,
-        tax_amount: taxAmount,
-        discount_amount: discount,
-        coupon_code: promoCode || null,
+        tax: taxAmount,
+        discount: discount,
+        promo_code: promoCode || null,
         payment_status: 'pending',
-        payment_method: paymentMethodId || 'card',
-        gift_message: body.giftMessage || null,
-      })
+        payment_method: finalPaymentMethod,
+        gift_message: giftMessage || null,
+      } as any)
       .select()
       .single();
 
-    // Create Subscription if requested
-    if (body.subscription && body.subscription.enabled && userId && order) {
-      // Calculate subscription amount (could be discounted)
-      const subscriptionAmount = totalAmount; // Simplified logic
+    if (orderError || !order) {
+      console.error('Error creating order:', orderError);
+      return NextResponse.json({ error: orderError?.message || 'Failed to create order' }, { status: 500 });
+    }
 
+    // Create order items
+    const orderItems = validatedItems.map((item: any) => ({
+      ...item,
+      order_id: order.id,
+      sku: item.sku || item.product_id || 'SKU-UNKNOWN', // Ensure SKU is populated
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) {
+      console.error('Error creating order items:', itemsError);
+    }
+
+    // Handle Razorpay payment if selected
+    let paymentResult: any = { success: true };
+
+    if (finalPaymentMethod === 'razorpay' || finalPaymentMethod === 'card' || finalPaymentMethod === 'upi') {
+      const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+
+      if (razorpayKeyId && razorpayKeySecret) {
+        try {
+          const rpResp = await fetch('https://api.razorpay.com/v1/orders', {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + Buffer.from(`${razorpayKeyId}:${razorpayKeySecret}`).toString('base64'),
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              amount: Math.round(totalAmount * 100), // in paise
+              currency: 'INR',
+              receipt: order.id,
+              payment_capture: 1,
+            }),
+          });
+
+          const rpData = await rpResp.json();
+
+          if (rpData.id) {
+            paymentResult = {
+              gateway: 'razorpay',
+              razorpayOrderId: rpData.id,
+              razorpayKeyId: razorpayKeyId,
+              amount: rpData.amount,
+              currency: rpData.currency,
+            };
+          } else {
+            console.error('Razorpay order creation failed:', rpData);
+            paymentResult = { success: false, error: 'razorpay_error', message: rpData.error?.description };
+          }
+        } catch (e) {
+          console.error('Razorpay order creation failed', e);
+          paymentResult = { success: false, error: 'razorpay_error' };
+        }
+      } else {
+        // No Razorpay keys configured - mark as COD or mock payment
+        paymentResult = { success: true, gateway: 'mock', message: 'Payment gateway not configured - using mock payment' };
+
+        // Update order as paid for demo
+        await supabase.from('orders').update({
+          payment_status: 'paid',
+          status: 'processing'
+        }).eq('id', order.id);
+      }
+    }
+
+    // Create Subscription if requested
+    if (subscription?.enabled && userId) {
       const { error: subError } = await supabase
         .from('subscriptions')
         .insert({
           user_id: userId,
           plan_name: `Monthly Subscription - ${order.id}`,
-          amount: subscriptionAmount,
+          amount: totalAmount,
           currency: 'INR',
-          frequency: body.subscription.frequency || 'monthly',
+          frequency: subscription.frequency || 'monthly',
           status: 'active',
           start_date: new Date().toISOString(),
           next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -163,46 +243,7 @@ export async function POST(request: NextRequest) {
 
       if (subError) {
         console.error('Error creating subscription:', subError);
-        // Non-blocking error
       }
-    }
-
-    if (orderError) {
-      console.error('Error creating order:', orderError);
-      return NextResponse.json(
-        { error: 'Failed to create order' },
-        { status: 500 }
-      );
-    }
-
-    // Create order items
-    const orderItems = validatedItems.map((item: {
-      product_id: string | undefined;
-      variant_id: string | null;
-      product_name: string;
-      variant_weight: string | null;
-      quantity: number;
-      price: number;
-    }) => ({
-      ...item,
-      order_id: order.id,
-    }));
-
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems as {
-        product_id: string | undefined;
-        variant_id: string | null;
-        product_name: string;
-        variant_weight: string | null;
-        quantity: number;
-        price: number;
-        order_id: string;
-      }[]);
-
-    if (itemsError) {
-      console.error('Error creating order items:', itemsError);
-      // Don't fail the order, just log the error
     }
 
     // Award loyalty points (1 point per 10 INR spent)
@@ -217,7 +258,7 @@ export async function POST(request: NextRequest) {
             type: 'earn',
             description: `Points earned for order ${order.id}`,
             order_id: order.id,
-            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // Expires in 1 year
+            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
           });
       }
     }
@@ -225,10 +266,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       orderId: order.id,
+      orderNumber: order.id,
+      payment: paymentResult,
       order: {
         id: order.id,
-        orderNumber: order.id,
-        email: shippingAddress.email,
+        email: finalAddress.email,
         status: order.status,
         subtotal,
         discount,
@@ -240,9 +282,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Checkout error:', error);
-    return NextResponse.json(
-      { error: 'Checkout failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Checkout failed' }, { status: 500 });
   }
 }

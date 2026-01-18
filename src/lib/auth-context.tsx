@@ -10,6 +10,7 @@ export interface User {
   email: string;
   phone?: string;
   address?: string;
+  country?: string;
 }
 
 interface AuthContextType {
@@ -19,7 +20,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<{ error?: string }>;
+  signup: (name: string, email: string, password: string, country: string) => Promise<{ error?: string }>;
   isLoading: boolean;
 }
 
@@ -42,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: supabaseUser.email || "",
       phone: supabaseUser.user_metadata?.phone || undefined,
       address: supabaseUser.user_metadata?.address || undefined,
+      country: supabaseUser.user_metadata?.country || undefined,
     };
   };
 
@@ -100,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (name: string, email: string, password: string): Promise<{ error?: string }> => {
+  const signup = async (name: string, email: string, password: string, country: string): Promise<{ error?: string }> => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -109,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             name,
+            country,
           },
         },
       });
@@ -126,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: email,
           first_name: nameParts[0] || null,
           last_name: nameParts.slice(1).join(" ") || null,
+          country: country,
         });
       }
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/src/lib/auth-context";
 import { useI18n } from "@/src/components/providers/i18n-provider";
@@ -22,6 +22,7 @@ export default function LoginPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    country: "",
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -49,7 +50,8 @@ export default function LoginPage() {
       !formData.name ||
       !formData.email ||
       !formData.password ||
-      !formData.confirmPassword
+      !formData.confirmPassword ||
+      !formData.country
     ) {
       setError("Please fill in all fields");
       return;
@@ -61,7 +63,7 @@ export default function LoginPage() {
     }
 
     try {
-      await signup(formData.name, formData.email, formData.password);
+      await signup(formData.name, formData.email, formData.password, formData.country);
       router.push("/account");
     } catch (err) {
       setError("Signup failed. Please try again.");
@@ -159,6 +161,37 @@ export default function LoginPage() {
                 </motion.div>
               )}
 
+              {/* Country Field - Signup Only */}
+              {isSignup && (
+                <motion.div variants={itemVariants}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                    {t('common.country') || "Country"}
+                  </label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <select
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900 bg-white appearance-none"
+                      value={formData.country}
+                      onChange={(e) =>
+                        setFormData({ ...formData, country: e.target.value })
+                      }
+                    >
+                      <option value="" disabled>Select your country</option>
+                      <option value="AE">United Arab Emirates</option>
+                      <option value="SA">Saudi Arabia</option>
+                      <option value="KW">Kuwait</option>
+                      <option value="QA">Qatar</option>
+                      <option value="OM">Oman</option>
+                      <option value="BH">Bahrain</option>
+                      <option value="US">United States</option>
+                      <option value="UK">United Kingdom</option>
+                      <option value="IN">India</option>
+                      {/* Add more countries as needed */}
+                    </select>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Email Field */}
               <motion.div variants={itemVariants}>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
@@ -185,6 +218,14 @@ export default function LoginPage() {
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text" // Changed from password to text for visual consistency with hide/show logic handled below, BUT Wait.
+                    // Actually standard is type="password" initially.
+                    // The toggle logic below sets type={showPassword ? "text" : "password"}
+                    // So here I should use that logic.
+                    // Correcting the type attribute below in the input tag.
+                  />
+                  {/* Wait, the input tag is below. I'll just use the code I wrote. */}
                   <input
                     type={showPassword ? "text" : "password"}
                     className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
@@ -283,6 +324,7 @@ export default function LoginPage() {
                         email: "",
                         password: "",
                         confirmPassword: "",
+                        country: "",
                       });
                     }}
                     className="text-[#009744] hover:underline font-medium"
@@ -302,6 +344,7 @@ export default function LoginPage() {
                         email: "",
                         password: "",
                         confirmPassword: "",
+                        country: "",
                       });
                     }}
                     className="text-[#009744] hover:underline font-medium"

@@ -26,10 +26,16 @@ export async function createProduct(product: {
 }): Promise<Product | null> {
     const supabase = createClient();
 
+    const { description, ingredients, allergen_info, ...rest } = product;
+
     const { data, error } = await supabase
         .from("products")
         .insert({
-            ...product,
+            ...rest,
+            short_description: description || '',
+            long_description: product.long_description || description || '', // Populate long_description
+            ingredients: ingredients ? ingredients.split(',').map(s => s.trim()) : [],
+            allergen_info: allergen_info ? allergen_info.split(',').map(s => s.trim()) : [],
             is_active: product.is_active ?? true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -38,7 +44,7 @@ export async function createProduct(product: {
         .single();
 
     if (error) {
-        console.error("Error creating product:", error);
+        console.error("Error creating product:", JSON.stringify(error, null, 2)); // improved logging
         return null;
     }
 
@@ -48,16 +54,31 @@ export async function createProduct(product: {
 // Update a product (admin)
 export async function updateProduct(
     productId: string,
-    updates: Partial<Product>
+    updates: any
 ): Promise<boolean> {
     const supabase = createClient();
 
+    const { description, ingredients, allergen_info, ...rest } = updates;
+
+    const dbUpdates: any = { ...rest };
+
+    if (description !== undefined) dbUpdates.short_description = description;
+    if (ingredients !== undefined) {
+        dbUpdates.ingredients = typeof ingredients === 'string'
+            ? ingredients.split(',').map((s: string) => s.trim())
+            : ingredients;
+    }
+    if (allergen_info !== undefined) {
+        dbUpdates.allergen_info = typeof allergen_info === 'string'
+            ? allergen_info.split(',').map((s: string) => s.trim())
+            : allergen_info;
+    }
+
+    dbUpdates.updated_at = new Date().toISOString();
+
     const { error } = await supabase
         .from("products")
-        .update({
-            ...updates,
-            updated_at: new Date().toISOString(),
-        })
+        .update(dbUpdates)
         .eq("id", productId);
 
     if (error) {
@@ -93,17 +114,25 @@ export async function createVariant(variant: {
     price: number;
     compare_at_price?: number;
     stock_quantity?: number;
+    size?: string;
 }): Promise<ProductVariant | null> {
     const supabase = createClient();
 
+    const { compare_at_price, stock_quantity, size, ...rest } = variant;
+
     const { data, error } = await supabase
         .from("product_variants")
-        .insert(variant)
+        .insert({
+            ...rest,
+            original_price: compare_at_price,
+            stock: stock_quantity,
+            size: size || 'Standard',
+        } as any)
         .select()
         .single();
 
     if (error) {
-        console.error("Error creating variant:", error);
+        console.error("Error creating variant:", JSON.stringify(error, null, 2));
         return null;
     }
 
@@ -178,7 +207,8 @@ export async function getAdminProducts(): Promise<(Product & { variants: Product
         .from("products")
         .select(`
       *,
-      variants:product_variants(*)
+      variants:product_variants(*),
+      category:categories(*)
     `)
         .order("created_at", { ascending: false });
 
@@ -187,7 +217,90 @@ export async function getAdminProducts(): Promise<(Product & { variants: Product
         return [];
     }
 
-    return (data || []) as (Product & { variants: ProductVariant[] })[];
+    // Normalize image paths to public URLs (handles both stored paths and already public URLs)
+    const products = (data || []) as (Product & { variants: ProductVariant[] })[];
+    const mapped = products.map((p) => {
+        const imgs = Array.isArray(p.images)
+            ? p.images
+                  .map((img: string) => {
+                      if (!img) return null;
+                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                          return img;
+                      }
+                      try {
+                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                          return publicUrl;
+                      } catch (e) {
+                          return null;
+                      }
+                  })
+                  .filter(Boolean)
+            : [];
+
+        return {
+            ...p,
+            images: imgs,
+        } as Product & { variants: ProductVariant[] };
+    });
+
+    return mapped;
+}
+
+// Category management (admin)
+export async function createCategory(category: {
+    name: string;
+    slug: string;
+    description?: string | null;
+    image_url?: string | null;
+    parent_id?: string | null;
+}): Promise<Database["public"]["Tables"]["categories"]["Row"] | null> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from("categories")
+        .insert({
+            ...category,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error creating category:", error);
+        return null;
+    }
+    return data;
+}
+
+export async function updateCategory(categoryId: string, updates: Partial<Database["public"]["Tables"]["categories"]["Update"]>): Promise<boolean> {
+    const supabase = createClient();
+    const { error } = await supabase
+        .from("categories")
+        .update({
+            ...updates,
+            updated_at: new Date().toISOString(),
+        })
+        .eq("id", categoryId);
+
+    if (error) {
+        console.error("Error updating category:", error);
+        return false;
+    }
+    return true;
+}
+
+export async function deleteCategory(categoryId: string): Promise<boolean> {
+    const supabase = createClient();
+    const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", categoryId);
+
+    if (error) {
+        console.error("Error deleting category:", error);
+        return false;
+    }
+    return true;
 }
 
 // Upload product image to storage
@@ -263,11 +376,11 @@ export async function getDashboardStats() {
         // Recent orders
         supabase.from('orders')
             .select(`
-                id, 
-                user_id, 
-                total_amount, 
-                status, 
-                created_at, 
+                id,
+                user_id,
+                total_amount,
+                status,
+                created_at,
                 customers:customers!orders_user_id_fkey(first_name, last_name, email)
             `)
             .order('created_at', { ascending: false })
@@ -322,4 +435,309 @@ export async function getSalesChartData() {
     });
 
     return Object.entries(chartData).map(([date, amount]) => ({ name: date, total: amount }));
+}
+
+// --- Categories ---
+export async function getAdminCategories() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name");
+
+  if (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
+  return data;
+}
+
+// --- Customers ---
+export async function getCustomers() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching customers:", error);
+    return [];
+  }
+  return data;
+}
+
+// --- Coupons ---
+export async function getCoupons() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("coupons")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching coupons:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function createCoupon(coupon: any) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("coupons")
+    .insert({
+        ...coupon,
+        created_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating coupon:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function updateCoupon(id: string, updates: any) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("coupons")
+    .update(updates)
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating coupon:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteCoupon(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("coupons")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting coupon:", error);
+    return false;
+  }
+  return true;
+}
+
+// --- Banners ---
+export async function getBanners() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("banners")
+    .select("*")
+    .order("display_order");
+
+  if (error) {
+    console.error("Error fetching banners:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function createBanner(banner: any) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("banners")
+    .insert({
+        ...banner,
+        updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating banner:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function updateBanner(id: string, updates: any) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("banners")
+    .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating banner:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteBanner(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("banners")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting banner:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function uploadBannerImage(file: File): Promise<string | null> {
+    const supabase = createClient();
+    const fileExt = file.name.split(".").pop();
+    const fileName = `banners/${Date.now()}.${fileExt}`;
+
+    // Using product-images bucket effectively as a general media bucket
+    const { error } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file);
+
+    if (error) {
+        console.error("Error uploading banner image:", error);
+        return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+
+    return publicUrl;
+}
+
+
+// --- Announcements ---
+export async function getAnnouncements() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("announcements")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching announcements:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function createAnnouncement(announcement: any) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("announcements")
+    .insert({
+        ...announcement,
+        updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating announcement:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function updateAnnouncement(id: string, updates: any) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("announcements")
+    .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating announcement:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteAnnouncement(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("announcements")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting announcement:", error);
+    return false;
+  }
+  return true;
+}
+
+// --- Email Campaigns ---
+export async function getEmailCampaigns() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("email_campaigns")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching campaigns:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function createEmailCampaign(campaign: any) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("email_campaigns")
+    .insert({
+        ...campaign,
+        updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating campaign:", error);
+    return null;
+  }
+  return data;
+}
+
+export async function updateEmailCampaign(id: string, updates: any) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("email_campaigns")
+    .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating campaign:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteEmailCampaign(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("email_campaigns")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting campaign:", error);
+    return false;
+  }
 }

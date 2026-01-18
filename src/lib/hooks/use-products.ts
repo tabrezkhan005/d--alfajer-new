@@ -56,8 +56,28 @@ export function transformProduct(dbProduct: ProductWithVariants) {
             carbs: string;
             fiber: string;
         } | null,
-        ingredients: dbProduct.ingredients ? dbProduct.ingredients.split(',').map(i => i.trim()) : [],
-        allergenInfo: dbProduct.allergen_info ? dbProduct.allergen_info.split(',').map(i => i.trim()) : [],
+        // Normalize ingredients: accept string (comma-separated) or array from DB
+        ingredients: (() => {
+            const ingredientsRaw = dbProduct.ingredients;
+            if (Array.isArray(ingredientsRaw)) {
+                return ingredientsRaw.map((i: unknown) => String(i).trim()).filter(Boolean);
+            }
+            if (typeof ingredientsRaw === "string" && ingredientsRaw.length > 0) {
+                return ingredientsRaw.split(",").map(i => i.trim()).filter(Boolean);
+            }
+            return [];
+        })(),
+        // Normalize allergen info: accept string (comma-separated) or array from DB
+        allergenInfo: (() => {
+            const allergenRaw = dbProduct.allergen_info;
+            if (Array.isArray(allergenRaw)) {
+                return allergenRaw.map((a: unknown) => String(a).trim()).filter(Boolean);
+            }
+            if (typeof allergenRaw === "string" && allergenRaw.length > 0) {
+                return allergenRaw.split(",").map(a => a.trim()).filter(Boolean);
+            }
+            return [];
+        })(),
     };
 }
 

@@ -31,7 +31,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/logo/nifajer-logo.png" />
       </head>
-      <body className="antialiased overflow-x-hidden w-full">
+      <body className="antialiased overflow-x-hidden w-full" suppressHydrationWarning>
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <DynamicFavicon />
           <AnnouncementBar />

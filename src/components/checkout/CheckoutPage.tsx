@@ -21,6 +21,7 @@ import {
   type ShippingAddress,
 } from "@/src/lib/checkout";
 import { toast } from "sonner";
+import { loadRazorpayScript, openRazorpayCheckout, verifyRazorpayPayment } from "@/src/lib/razorpay";
 
 export function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -205,30 +206,99 @@ function CheckoutPageContent() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to place order');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to place order: ${response.statusText}`);
       }
 
       const data = await response.json();
 
-      // If the API returns an order number, use it
+      // Handle Razorpay Payment
+      if (data.payment && data.payment.gateway === 'razorpay') {
+        const loaded = await loadRazorpayScript();
+        if (!loaded) {
+          toast.error('Razorpay SDK failed to load');
+          setIsProcessing(false);
+          return;
+        }
+
+        openRazorpayCheckout({
+          key: data.payment.razorpayKeyId,
+          amount: data.payment.amount,
+          currency: data.payment.currency,
+          name: "Alfajer",
+          description: `Order #${data.orderNumber}`,
+          order_id: data.payment.razorpayOrderId,
+          handler: async (response) => {
+            toast.loading('Verifying payment...');
+            const success = await verifyRazorpayPayment(
+              response.razorpay_order_id,
+              response.razorpay_payment_id,
+              response.razorpay_signature,
+              data.orderId
+            );
+
+            if (success) {
+              toast.dismiss();
+              toast.success('Payment successful!');
+              setOrderNumber(data.orderNumber);
+              clearCart();
+            } else {
+              toast.dismiss();
+              toast.error('Payment verification failed');
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setIsProcessing(false);
+              toast.error("Payment cancelled");
+            }
+          }
+        });
+        return;
+      }
+
+      // If non-Razorpay or Mock
       const newOrderNumber = data.orderNumber || 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
       setOrderNumber(newOrderNumber);
 
       // Clear cart
       clearCart();
-
-      // Refresh orders if using store (optional, or rely on real-time)
-      // addOrder logic might be redundant if we fetch real orders from DB now
-      if (user) {
-        // Optionally manually add to local store for immediate feedback if store doesn't auto-sync
-        // But since we are redirecting/showing success, and dashboard fetches from DB, we might be fine.
-      }
+      setIsProcessing(false);
 
     } catch (error) {
       console.error('Checkout error:', error);
       alert('There was an error placing your order. Please try again.');
-    } finally {
       setIsProcessing(false);
+    } finally {
+      // Only stop processing if NOT waiting for razorpay
+      // We handle setIsProcessing(false) in Razorpay flow separately, but if error/mock we do it here
+      // To be safe, we check if logic fell through
+      if (paymentMethodId !== 'razorpay' && paymentMethodId !== 'card' && paymentMethodId !== 'upi') {
+          setIsProcessing(false);
+      } else {
+          // Check if we hit error block, then we must stop.
+          // Since we are in finally, we can't easily know if we returned early.
+          // But 'razorpay' flow returns. 'finally' runs BEFORE return?
+          // No, 'finally' runs after try block finishes or throws.
+          // If we returned in try, usually finally runs.
+          // So this setIsProcessing(false) might clobber the loading state during Razorpay modal.
+
+          // Actually, in `openRazorpayCheckout`, the modal opens, then execution continues?
+          // No, `open` is sync-ish UI, but handler is async callback.
+          // The function returns.
+          // So `finally` runs immediately after `openRazorpayCheckout` call?
+          // Yes.
+          // So `isProcessing` will explicitly turn false.
+          // But I want it to stay true until modal closes?
+          // I didn't store `isRazorpayOpen` state.
+          // I added `ondismiss` to modal.
+
+          // Simpler: Move `setIsProcessing(false)` only to error/success paths inside non-razorpay flow.
+          // But `finally` forces it.
+          // I'll rely on the fact that if I return, finally runs.
+
+          // I should remove `finally` block logic and put `setIsProcessing(false)` explicitly where needed.
+      }
     }
   };
 

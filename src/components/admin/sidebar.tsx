@@ -96,6 +96,7 @@ const navItems: NavItem[] = [
     children: [
       { title: "Coupons & Discounts", href: "/admin/marketing/coupons", icon: Gift },
       { title: "Banners & Sections", href: "/admin/marketing/banners", icon: Image },
+      { title: "Announcements", href: "/admin/marketing/announcements", icon: Bell },
       { title: "Email Campaigns", href: "/admin/marketing/emails", icon: Mail },
     ],
   },
@@ -354,7 +355,8 @@ export const Sidebar = ({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
         ref={sidebarRef}
         className={cn(
           "fixed left-0 top-0 h-screen border-r transition-transform duration-300 ease-in-out",
-          "bg-white dark:bg-gray-900",
+        // Use theme-aware tokens so sidebar matches light/dark themes
+        "bg-card text-card-foreground",
           "shadow-2xl",
           isCollapsed ? "w-16" : "w-64",
           // Mobile: show/hide based on mobileOpen, Desktop: always visible
