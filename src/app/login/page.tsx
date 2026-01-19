@@ -219,14 +219,6 @@ export default function LoginPage() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
-                    type="text" // Changed from password to text for visual consistency with hide/show logic handled below, BUT Wait.
-                    // Actually standard is type="password" initially.
-                    // The toggle logic below sets type={showPassword ? "text" : "password"}
-                    // So here I should use that logic.
-                    // Correcting the type attribute below in the input tag.
-                  />
-                  {/* Wait, the input tag is below. I'll just use the code I wrote. */}
-                  <input
                     type={showPassword ? "text" : "password"}
                     className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009744] focus:border-transparent outline-none transition text-gray-900"
                     placeholder={t('auth.passwordPlaceholder')}

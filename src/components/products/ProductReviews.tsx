@@ -1,88 +1,123 @@
 "use client";
 
-import { useState } from "react";
-import { Star, ThumbsUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Star, ThumbsUp, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
+import { Input } from "@/src/components/ui/input";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Label } from "@/src/components/ui/label";
 import { useI18n } from "@/src/components/providers/i18n-provider";
-
-interface Review {
-  id: string;
-  author: string;
-  rating: number;
-  title: string;
-  comment: string;
-  verified: boolean;
-  helpful: number;
-  date: string;
-}
+import { getProductReviews, createReview, type ProductReview } from "@/src/lib/supabase/reviews";
+import { useAuth } from "@/src/lib/auth-context";
+import { toast } from "sonner";
 
 interface ProductReviewsProps {
   productId: string;
 }
 
-const mockReviews: Review[] = [
-  {
-    id: '1',
-    author: 'John Doe',
-    rating: 5,
-    title: 'Excellent quality!',
-    comment: 'This chilli powder is amazing. Great color, rich flavor, and perfect heat level. Arrived well packaged.',
-    verified: true,
-    helpful: 24,
-    date: '2024-01-10',
-  },
-  {
-    id: '2',
-    author: 'Jane Smith',
-    rating: 4,
-    title: 'Good value for money',
-    comment: 'Good product quality. A bit pricey compared to local brands but the taste is superior.',
-    verified: true,
-    helpful: 18,
-    date: '2024-01-05',
-  },
-  {
-    id: '3',
-    author: 'Mike Johnson',
-    rating: 5,
-    title: 'Will buy again',
-    comment: 'Very fresh and authentic. This is what real Kashmiri chilli powder should taste like.',
-    verified: true,
-    helpful: 31,
-    date: '2023-12-28',
-  },
-];
-
 export function ProductReviews({ productId }: ProductReviewsProps) {
   const { t } = useI18n();
-  const [sortBy, setSortBy] = useState<'helpful' | 'recent' | 'rating'>('helpful');
+  const { user } = useAuth();
+
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [sortBy, setSortBy] = useState<'helpful' | 'recent' | 'rating'>('recent');
   const [filterRating, setFilterRating] = useState<number | null>(null);
 
-  const filteredReviews = mockReviews
+  // Form State
+  const [showForm, setShowForm] = useState(false);
+  const [formRating, setFormRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true);
+      try {
+        const data = await getProductReviews(productId);
+        setReviews(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    load();
+  }, [productId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("You must be logged in to review");
+      return;
+    }
+
+    if (!comment.trim()) {
+      toast.error("Please write a comment");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createReview({
+        product_id: productId,
+        customer_id: user.id,
+        user_name: user.name || user.email?.split('@')[0] || "Customer",
+        user_email: user.email,
+        rating: formRating,
+        title: title || undefined,
+        comment,
+        is_verified_purchase: false // Advanced: check orders to verify
+      });
+      toast.success("Review submitted! It will appear after approval.");
+      setShowForm(false);
+      setTitle("");
+      setComment("");
+      setFormRating(5);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Filter and Sort logic
+  const filteredReviews = reviews
     .filter(review => !filterRating || review.rating === filterRating)
     .sort((a, b) => {
       switch (sortBy) {
         case 'helpful':
-          return b.helpful - a.helpful;
-        case 'recent':
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
+          return (Number(b.helpful_count) || 0) - (Number(a.helpful_count) || 0);
         case 'rating':
           return b.rating - a.rating;
+        case 'recent':
         default:
-          return 0;
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
       }
     });
 
-  // Calculate rating distribution
-  const ratingDistribution = [5, 4, 3, 2, 1].map(rating => ({
-    rating,
-    count: mockReviews.filter(r => r.rating === rating).length,
-    percentage: (mockReviews.filter(r => r.rating === rating).length / mockReviews.length) * 100,
-  }));
+  const ratingDistribution = [5, 4, 3, 2, 1].map(rating => {
+    const count = reviews.filter(r => r.rating === rating).length;
+    return {
+       rating,
+       count,
+       percentage: reviews.length > 0 ? (count / reviews.length) * 100 : 0
+    };
+  });
 
-  const avgRating = (mockReviews.reduce((sum, r) => sum + r.rating, 0) / mockReviews.length).toFixed(1);
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : "0.0";
+
+  if (isLoading) {
+    return <div className="text-center py-8"><Loader2 className="animate-spin mx-auto" /></div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -104,7 +139,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                 />
               ))}
             </div>
-            <p className="text-sm text-gray-600">{mockReviews.length} {t('product.reviews')}</p>
+            <p className="text-sm text-gray-600">{reviews.length} {t('product.reviews') || 'Reviews'}</p>
           </CardContent>
         </Card>
 
@@ -153,67 +188,137 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
         >
-          <option value="helpful">Most Helpful</option>
           <option value="recent">Most Recent</option>
+          <option value="helpful">Most Helpful</option>
           <option value="rating">Highest Rating</option>
         </select>
       </div>
 
+      {/* Write Review Section */}
+      {!showForm ? (
+        <Button size="lg" className="w-full" onClick={() => setShowForm(true)}>
+          {t('product.writeReview') || 'Write a Review'}
+        </Button>
+      ) : (
+        <Card className="border-2 border-[#009744]/20">
+            <CardContent className="pt-6 space-y-4">
+               {user ? (
+                   <form onSubmit={handleSubmit} className="space-y-4">
+                       <h4 className="font-bold text-lg">Write your review</h4>
+                       <div className="space-y-2">
+                           <Label>Rating</Label>
+                           <div className="flex gap-2">
+                               {[1, 2, 3, 4, 5].map(star => (
+                                   <button
+                                      key={star}
+                                      type="button"
+                                      onClick={() => setFormRating(star)}
+                                      className="focus:outline-none"
+                                   >
+                                       <Star
+                                          size={24}
+                                          className={star <= formRating ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                                       />
+                                   </button>
+                               ))}
+                           </div>
+                       </div>
+
+                       <div className="space-y-2">
+                           <Label>Title (Optional)</Label>
+                           <Input
+                              value={title}
+                              onChange={e => setTitle(e.target.value)}
+                              placeholder="Review title"
+                           />
+                       </div>
+
+                       <div className="space-y-2">
+                           <Label>Review</Label>
+                           <Textarea
+                              value={comment}
+                              onChange={e => setComment(e.target.value)}
+                              placeholder="Tell us what you liked or disliked..."
+                              required
+                           />
+                       </div>
+
+                       <div className="flex gap-2 justify-end">
+                           <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                           <Button type="submit" disabled={isSubmitting}>
+                               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                               Submit Review
+                           </Button>
+                       </div>
+                   </form>
+               ) : (
+                   <div className="text-center py-6">
+                       <p className="mb-4 text-gray-600">Please log in to write a review.</p>
+                       <Button asChild>
+                           <Link href="/login">Log In</Link>
+                       </Button>
+                       <Button variant="ghost" className="ml-2" onClick={() => setShowForm(false)}>Cancel</Button>
+                   </div>
+               )}
+            </CardContent>
+        </Card>
+      )}
+
       {/* Reviews List */}
       <div className="space-y-4">
-        {filteredReviews.map((review) => (
-          <Card key={review.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="flex gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={16}
-                          className={
-                            i < review.rating
-                              ? "fill-amber-400 text-amber-400"
-                              : "text-gray-300"
-                          }
-                        />
-                      ))}
+        {filteredReviews.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No reviews yet. Be the first to review!</p>
+        ) : (
+            filteredReviews.map((review) => (
+            <Card key={review.id}>
+                <CardContent className="pt-6">
+                <div className="flex justify-between items-start mb-3">
+                    <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                            key={i}
+                            size={16}
+                            className={
+                                i < review.rating
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-gray-300"
+                            }
+                            />
+                        ))}
+                        </div>
+                        {review.is_verified_purchase && (
+                        <Badge variant="outline" className="text-xs border-green-200 bg-green-50 text-green-700">
+                            ✓ Verified Purchase
+                        </Badge>
+                        )}
                     </div>
-                    {review.verified && (
-                      <Badge variant="outline" className="text-xs">
-                        ✓ Verified
-                      </Badge>
-                    )}
-                  </div>
-                  <h4 className="font-semibold">{review.title}</h4>
-                  <p className="text-sm text-gray-600">
-                    {review.author} • {new Date(review.date).toLocaleDateString()}
-                  </p>
+                    <h4 className="font-semibold">{review.title}</h4>
+                    <p className="text-sm text-gray-600">
+                        {review.user_name || "Anonymous"} • {review.created_at ? new Date(review.created_at).toLocaleDateString() : ""}
+                    </p>
+                    </div>
                 </div>
-              </div>
 
-              <p className="text-gray-700 mb-4">{review.comment}</p>
+                <p className="text-gray-700 mb-4">{review.comment}</p>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <ThumbsUp size={16} />
-                Helpful ({review.helpful})
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    disabled
+                >
+                    <ThumbsUp size={16} />
+                    Helpful ({review.helpful_count || 0})
+                </Button>
+                </CardContent>
+            </Card>
+            ))
+        )}
       </div>
-
-      {/* Write Review */}
-      <Button size="lg" className="w-full">
-        Write a Review
-      </Button>
     </div>
   );
 }

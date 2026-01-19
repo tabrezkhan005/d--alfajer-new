@@ -18,144 +18,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sr
 import { cn } from "@/src/lib/utils";
 import { ProductModal } from "./ProductModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { useProducts, type TransformedProduct } from "@/src/lib/hooks/use-products";
-
-// Product name translation mapping
-const productNameMap: Record<string, string> = {
-  "1": "productName.kashmirilRedChilliPowder",
-  "2": "productName.kashmirilPureWhiteHoney",
-  "3": "productName.kashmirilSaffron",
-  "4": "productName.himalayaShilajit",
-};
-
-interface Product {
-  id: string;
-  name: string;
-  image: string;
-  images?: string[];
-  videos?: string[];
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  rating: number;
-  reviews: number;
-  packageSize: string;
-  origin: string;
-  description: string;
-  certifications: string[];
-  inStock: boolean;
-  onSale: boolean;
-  badge?: "SALE" | "HOT" | "NEW";
-  slug: string;
-}
-
-// Products data from images folder
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "productName.kashmirilRedChilliPowder",
-    image: "/images/products/chillipowder/chillipowder_main.jpeg",
-    images: [
-      "/images/products/chillipowder/chillipowder_main.jpeg",
-      "/images/products/chillipowder/chillipowder_1.jpeg",
-      "/images/products/chillipowder/chillipowder_2.jpeg",
-      "/images/products/chillipowder/chillipowder_3.jpeg",
-      "/images/products/chillipowder/chillipowder4.jpeg",
-      "/images/products/chillipowder/chillipowder5.jpeg",
-      "/images/products/chillipowder/chillipowder6.jpeg",
-      "/images/products/chillipowder/chillipowder7.jpeg",
-    ],
-    price: 24.99,
-    originalPrice: 29.99,
-    discount: 17,
-    rating: 4.8,
-    reviews: 156,
-    packageSize: "250g",
-    origin: "India",
-    certifications: ["Organic", "Non-GMO", "Gluten-Free"],
-    inStock: true,
-    onSale: true,
-    badge: "SALE",
-    description: "Our Kashmiri Red Chilli Powder is made from the finest chillies, ground to perfection. It adds a vibrant red color and a moderate heat to your dishes.",
-    slug: "kashmiri-red-chilli-powder",
-  },
-  {
-    id: "2",
-    name: "productName.kashmirilPureWhiteHoney",
-    image: "/images/products/honey/honey_main.jpeg",
-    images: [
-      "/images/products/honey/honey_main.jpeg",
-      "/images/products/honey/honey1.jpeg",
-      "/images/products/honey/honey2.jpeg",
-      "/images/products/honey/honey3.jpeg",
-      "/images/products/honey/honey5.jpeg",
-    ],
-    videos: [
-      "/images/products/honey/honey4.mp4",
-    ],
-    price: 89.99,
-    originalPrice: 109.99,
-    discount: 18,
-    rating: 4.9,
-    reviews: 289,
-    packageSize: "500g",
-    origin: "UAE",
-    certifications: ["Organic", "Raw and unprocessed", "Pure"],
-    inStock: true,
-    onSale: true,
-    badge: "HOT",
-    description: "Our Kashmiri Pure White Honey is harvested from the pristine valleys of Kashmir. It is 100% natural, raw, and unprocessed, known for its unique taste and health benefits.",
-    slug: "kashmiri-pure-white-honey",
-  },
-  {
-    id: "3",
-    name: "productName.kashmirilSaffron",
-    image: "/images/products/kashmirtea/kashmir_main.jpeg",
-    images: [
-      "/images/products/kashmirtea/kashmir_main.jpeg",
-      "/images/products/kashmirtea/kashmir1.jpeg",
-      "/images/products/kashmirtea/kashmir2.jpeg",
-      "/images/products/kashmirtea/kashmir3.jpeg",
-    ],
-    price: 149.99,
-    originalPrice: 179.99,
-    rating: 4.9,
-    reviews: 198,
-    packageSize: "1g",
-    origin: "Kashmir, India",
-    certifications: ["Organic", "Non-GMO"],
-    inStock: true,
-    onSale: true,
-    badge: "SALE",
-    description: "Known as the 'Red Gold', our Kashmiri Saffron is handpicked and carefully dried to preserve its aroma and color. Perfect for biryanis, desserts, and health tonics.",
-    slug: "kashmiri-saffron",
-  },
-  {
-    id: "4",
-    name: "productName.himalayaShilajit",
-    image: "/images/products/shirajit/shilajit_main.jpeg",
-    images: [
-      "/images/products/shirajit/shilajit_main.jpeg",
-      "/images/products/shirajit/shilajit1.jpeg",
-      "/images/products/shirajit/shilajit2.jpeg",
-      "/images/products/shirajit/shilajit3.jpeg",
-      "/images/products/shirajit/shilajit4.jpeg",
-    ],
-    price: 149.99,
-    originalPrice: 179.99,
-    discount: 17,
-    rating: 4.9,
-    reviews: 234,
-    packageSize: "50g",
-    origin: "Himalayas",
-    certifications: ["Organic", "Pure", "Authentic"],
-    inStock: true,
-    onSale: true,
-    badge: "HOT",
-    description: "Our Shilajit is sourced from the high altitudes of the Himalayas. It is a potent substance known for its rejuvenating properties and ability to boost energy levels.",
-    slug: "himalaya-shilajit",
-  },
-];
+import { useProducts, useCategories, type TransformedProduct } from "@/src/lib/hooks/use-products";
 
 interface FilterState {
   priceRange: [number, number];
@@ -170,35 +33,8 @@ export function ProductListing() {
   const { t, formatCurrency, convertCurrency, currency } = useI18n();
 
   // Fetch products from Supabase
-  const { products: dbProducts, loading: loadingProducts } = useProducts();
-
-  // Combine database products with mock products (fallback)
-  const allProducts: Product[] = useMemo(() => {
-    if (dbProducts.length > 0) {
-      // Transform database products to Product interface
-      return dbProducts.map(p => ({
-        id: p.id,
-        name: p.name,
-        image: p.image,
-        images: p.images,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        discount: p.discount,
-        rating: p.rating,
-        reviews: p.reviews,
-        packageSize: p.packageSize,
-        origin: p.origin,
-        description: p.description,
-        certifications: p.certifications,
-        inStock: p.inStock,
-        onSale: p.onSale,
-        badge: p.badge,
-        slug: p.slug,
-      }));
-    }
-    // Fallback to mock data if no database products
-    return mockProducts;
-  }, [dbProducts]);
+  const { products: allProducts, loading, error } = useProducts();
+  const { categories } = useCategories();
 
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 10000],
@@ -211,16 +47,32 @@ export function ProductListing() {
 
   const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<string>("featured");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<TransformedProduct | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const handleProductClick = (product: Product) => {
+  const handleProductClick = (product: TransformedProduct) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
-  // Auto-apply filters
+  // Get unique values for filters
+  const uniqueOrigins = useMemo(() => {
+    const origins = new Set(allProducts.map(p => p.origin).filter(Boolean));
+    return Array.from(origins);
+  }, [allProducts]);
+
+  const uniqueCertifications = useMemo(() => {
+    const certs = new Set(allProducts.flatMap(p => p.certifications || []));
+    return Array.from(certs);
+  }, [allProducts]);
+
+  const uniquePackageSizes = useMemo(() => {
+    const sizes = new Set(allProducts.map(p => p.packageSize).filter(s => s && s !== "N/A"));
+    return Array.from(sizes);
+  }, [allProducts]);
+
+  // Filter products
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       // Price filter
@@ -241,7 +93,7 @@ export function ProductListing() {
       // Certifications filter
       if (filters.certifications.length > 0) {
         const hasCertification = filters.certifications.some((cert) =>
-          product.certifications.includes(cert)
+          (product.certifications || []).includes(cert)
         );
         if (!hasCertification) return false;
       }
@@ -253,6 +105,23 @@ export function ProductListing() {
       return true;
     });
   }, [filters, allProducts]);
+
+  // Sort products
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    switch (sortBy) {
+      case "price-low":
+        return sorted.sort((a, b) => a.price - b.price);
+      case "price-high":
+        return sorted.sort((a, b) => b.price - a.price);
+      case "rating":
+        return sorted.sort((a, b) => b.rating - a.rating);
+      case "newest":
+        return sorted; // Already sorted by created_at desc from API
+      default:
+        return sorted;
+    }
+  }, [filteredProducts, sortBy]);
 
   const handlePriceRangeChange = (values: number[]) => {
     const newRange = [values[0], values[1]] as [number, number];
@@ -286,35 +155,24 @@ export function ProductListing() {
 
   const resetFilters = () => {
     setFilters({
-      priceRange: [0, 200],
+      priceRange: [0, 10000],
       packageSizes: [],
       origins: [],
       certifications: [],
       inStockOnly: false,
       onSaleOnly: false,
     });
-    setPriceInputs([0, 200]);
+    setPriceInputs([0, 10000]);
     setIsFilterOpen(false);
   };
 
-  const packageSizes = ["50g", "250g", "500g"];
-  const origins = ["India", "UAE", "Kashmir, India", "Himalayas"];
   const originKeys: { [key: string]: string } = {
     "India": "filter.origin.india",
     "UAE": "filter.origin.uae",
     "Kashmir, India": "filter.origin.kashmirIndia",
     "Himalayas": "filter.origin.himalayas",
   };
-  const certifications = [
-    "Organic",
-    "Non-GMO",
-    "Gluten-Free",
-    "Pure",
-    "Raw and unprocessed",
-    "Premium Grade",
-    "Traditional",
-    "Authentic",
-  ];
+
   const certificationKeys: { [key: string]: string } = {
     "Organic": "filter.certification.organic",
     "Non-GMO": "filter.certification.nonGMO",
@@ -353,36 +211,36 @@ export function ProductListing() {
             value={filters.priceRange}
             onValueChange={handlePriceRangeChange}
             min={0}
-            max={200}
-            step={5}
+            max={10000}
+            step={100}
             className="w-full [&_[role=slider]]:bg-[#009744] [&_[role=slider]]:border-[#009744] [&>div>div]:bg-[#009744]"
           />
           <div className="flex gap-3">
             <div className="flex-1">
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.min')}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
                 <Input
                   type="number"
                   value={priceInputs[0]}
                   onChange={(e) => handlePriceInputChange(0, e.target.value)}
-                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-8 text-sm"
                   min={0}
-                  max={200}
+                  max={10000}
                 />
               </div>
             </div>
             <div className="flex-1">
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.max')}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">AED</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
                 <Input
                   type="number"
                   value={priceInputs[1]}
                   onChange={(e) => handlePriceInputChange(1, e.target.value)}
-                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-12 text-sm"
+                  className="border-gray-300 focus:border-[#009744] focus:ring-[#009744] pl-8 text-sm"
                   min={0}
-                  max={200}
+                  max={10000}
                 />
               </div>
             </div>
@@ -391,93 +249,99 @@ export function ProductListing() {
       </div>
 
       {/* Package Size */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          {t('filter.packageSize')}
-        </Label>
-        <div className="space-y-2.5">
-          {packageSizes.map((size) => {
-            const count = allProducts.filter((p) => p.packageSize === size).length;
-            return (
-              <div key={size} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`size-${size}`}
-                  checked={filters.packageSizes.includes(size)}
-                  onCheckedChange={() => toggleFilter("packageSizes", size)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                />
-                <Label
-                  htmlFor={`size-${size}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{size}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
+      {uniquePackageSizes.length > 0 && (
+        <div className="space-y-3">
+          <Label className="text-base font-bold text-gray-900 font-poppins">
+            {t('filter.packageSize')}
+          </Label>
+          <div className="space-y-2.5">
+            {uniquePackageSizes.map((size) => {
+              const count = allProducts.filter((p) => p.packageSize === size).length;
+              return (
+                <div key={size} className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id={`size-${size}`}
+                    checked={filters.packageSizes.includes(size)}
+                    onCheckedChange={() => toggleFilter("packageSizes", size)}
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                  />
+                  <Label
+                    htmlFor={`size-${size}`}
+                    className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    <span className="font-medium">{size}</span>
+                    <span className="text-gray-400 text-xs font-normal">({count})</span>
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Origin */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          {t('filter.origin')}
-        </Label>
-        <div className="space-y-2.5">
-          {origins.map((origin) => {
-            const count = allProducts.filter((p) => p.origin === origin).length;
-            return (
-              <div key={origin} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`origin-${origin}`}
-                  checked={filters.origins.includes(origin)}
-                  onCheckedChange={() => toggleFilter("origins", origin)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                />
-                <Label
-                  htmlFor={`origin-${origin}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{originKeys[origin] ? t(originKeys[origin]) : origin}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
+      {uniqueOrigins.length > 0 && (
+        <div className="space-y-3">
+          <Label className="text-base font-bold text-gray-900 font-poppins">
+            {t('filter.origin')}
+          </Label>
+          <div className="space-y-2.5">
+            {uniqueOrigins.map((origin) => {
+              const count = allProducts.filter((p) => p.origin === origin).length;
+              return (
+                <div key={origin} className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id={`origin-${origin}`}
+                    checked={filters.origins.includes(origin)}
+                    onCheckedChange={() => toggleFilter("origins", origin)}
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                  />
+                  <Label
+                    htmlFor={`origin-${origin}`}
+                    className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    <span className="font-medium">{originKeys[origin] ? t(originKeys[origin]) : origin}</span>
+                    <span className="text-gray-400 text-xs font-normal">({count})</span>
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Certifications */}
-      <div className="space-y-3">
-        <Label className="text-base font-bold text-gray-900 font-poppins">
-          {t('filter.certification')}
-        </Label>
-        <div className="space-y-2.5">
-          {certifications.map((cert) => {
-            const count = allProducts.filter((p) =>
-              p.certifications.includes(cert)
-            ).length;
-            return (
-              <div key={cert} className="flex items-center space-x-3 group/item">
-                <Checkbox
-                  id={`cert-${cert}`}
-                  checked={filters.certifications.includes(cert)}
-                  onCheckedChange={() => toggleFilter("certifications", cert)}
-                  className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
-                />
-                <Label
-                  htmlFor={`cert-${cert}`}
-                  className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
-                >
-                  <span className="font-medium">{certificationKeys[cert] ? t(certificationKeys[cert]) : cert}</span>
-                  <span className="text-gray-400 text-xs font-normal">({count})</span>
-                </Label>
-              </div>
-            );
-          })}
+      {uniqueCertifications.length > 0 && (
+        <div className="space-y-3">
+          <Label className="text-base font-bold text-gray-900 font-poppins">
+            {t('filter.certification')}
+          </Label>
+          <div className="space-y-2.5">
+            {uniqueCertifications.map((cert) => {
+              const count = allProducts.filter((p) =>
+                (p.certifications || []).includes(cert)
+              ).length;
+              return (
+                <div key={cert} className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id={`cert-${cert}`}
+                    checked={filters.certifications.includes(cert)}
+                    onCheckedChange={() => toggleFilter("certifications", cert)}
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                  />
+                  <Label
+                    htmlFor={`cert-${cert}`}
+                    className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    <span className="font-medium">{certificationKeys[cert] ? t(certificationKeys[cert]) : cert}</span>
+                    <span className="text-gray-400 text-xs font-normal">({count})</span>
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Availability */}
       <div className="space-y-3">
@@ -521,6 +385,46 @@ export function ProductListing() {
       </div>
     </>
   );
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="h-12 w-12 animate-spin text-[#009744] mb-4" />
+            <p className="text-gray-600 font-medium">Loading products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-24 bg-white rounded-3xl border border-gray-100">
+            <div className="max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">
+                Failed to load products
+              </h3>
+              <p className="text-base text-gray-600 mb-8 font-body">
+                {error}
+              </p>
+              <Button
+                onClick={() => window.location.reload()}
+                className="bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full px-8 py-3 font-poppins"
+              >
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden">
@@ -623,13 +527,13 @@ export function ProductListing() {
             {/* Results count */}
             <div className="mb-6 sm:mb-8 flex items-center justify-between">
               <p className="text-xs sm:text-sm text-gray-600 font-body">
-                {t('common.showing')} <span className="font-semibold text-gray-900">{filteredProducts.length}</span> {t('common.of')}{" "}
+                {t('common.showing')} <span className="font-semibold text-gray-900">{sortedProducts.length}</span> {t('common.of')}{" "}
                 <span className="font-semibold text-gray-900">{allProducts.length}</span> {t('common.products')}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-              {filteredProducts.map((product) => (
+              {sortedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} onProductClick={handleProductClick} />
               ))}
             </div>
@@ -641,24 +545,8 @@ export function ProductListing() {
               onOpenChange={setIsModalOpen}
             />
 
-            {/* View All Products Button */}
-            {filteredProducts.length > 0 && (
-              <div className="mt-12 sm:mt-16 md:mt-20 flex justify-center">
-                <Button
-                  size="lg"
-                  className="group relative bg-[#009744] hover:bg-[#2E763B] text-white px-8 sm:px-16 py-6 sm:py-8 text-sm sm:text-base md:text-lg font-bold rounded-full shadow-[0_10px_20px_-5px_rgba(0,151,68,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(0,151,68,0.4)] transition-all duration-500 font-poppins overflow-hidden border-2 border-white/10"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
-                    {t('productCategory.loadMore')}
-                    <Plus className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </Button>
-              </div>
-            )}
-
             {/* No Results */}
-            {filteredProducts.length === 0 && (
+            {sortedProducts.length === 0 && !loading && (
               <div className="text-center py-24 bg-white rounded-3xl border border-gray-100">
                 <div className="max-w-md mx-auto">
                   <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -686,7 +574,7 @@ export function ProductListing() {
   );
 }
 
-function ProductCard({ product, onProductClick }: { product: Product; onProductClick: (product: Product) => void }) {
+function ProductCard({ product, onProductClick }: { product: TransformedProduct; onProductClick: (product: TransformedProduct) => void }) {
   const router = useRouter();
   const { formatCurrency, convertCurrency, currency, t } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
@@ -717,9 +605,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Clear cart to ensure only this product is in checkout
     clearCart();
-    // Add only this product to cart
     addItem({
       id: product.id,
       name: product.name,
@@ -853,7 +739,7 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
 
         {/* Title */}
         <h3 className="text-sm xs:text-base sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] xs:min-h-[3rem] leading-snug font-poppins">
-          {productNameMap[product.id] ? t(productNameMap[product.id]) : product.name}
+          {product.name}
         </h3>
 
         {/* Package Size */}
@@ -894,22 +780,25 @@ function ProductCard({ product, onProductClick }: { product: Product; onProductC
             ) : isInCart ? (
               <>
                 <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addMore')}</span>
-                <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.more')}</span>
+                <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.addMore')}</span>
               </>
             ) : (
               <>
                 <Plus className="h-2.5 xs:h-3 sm:h-3.5 md:h-5 w-2.5 xs:w-3 sm:w-3.5 md:w-5 shrink-0 group-hover/btn:rotate-90 transition-transform" />
-                <span className="whitespace-nowrap hidden xs:inline text-[10px] sm:text-sm">{t('product.addToCart')}</span>
-                <span className="whitespace-nowrap xs:hidden text-[10px]">{t('product.add')}</span>
+                <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.addToCart')}</span>
               </>
             )}
           </Button>
           <Button
-            className="flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg group/btn font-poppins h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4 bg-[#D1515A] hover:bg-[#B83E45] text-white flex items-center justify-center"
+            variant="outline"
+            className={cn(
+              "flex-1 font-bold rounded-full transition-all shadow-md hover:shadow-lg font-poppins",
+              "h-9 xs:h-10 sm:h-10 md:h-12 text-xs xs:text-sm sm:text-sm px-2 xs:px-3 sm:px-4",
+              "border-[#009744] text-[#009744] hover:bg-[#009744] hover:text-white"
+            )}
             onClick={handleBuyNow}
           >
-            <span className="whitespace-nowrap">{t('product.buyNow')}</span>
+            <span className="whitespace-nowrap text-[10px] xs:text-xs sm:text-sm">{t('product.buyNow')}</span>
           </Button>
         </div>
       </CardFooter>

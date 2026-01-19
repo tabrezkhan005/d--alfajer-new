@@ -85,9 +85,9 @@ export default function DashboardPage() {
       )
     },
     {
-      key: "total_amount",
+      key: "total",
       header: "Total",
-      render: (row: any) => formatCurrency(row.total_amount),
+      render: (row: any) => formatCurrency(row.total),
     },
     {
       key: "status",

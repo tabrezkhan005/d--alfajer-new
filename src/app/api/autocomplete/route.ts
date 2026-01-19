@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockProductsWithVariants } from '@/src/lib/products';
+import { createClient } from '@/src/lib/supabase/server';
 
 const SYNONYMS: Record<string, string[]> = {
   spice: ['chilli', 'pepper', 'powder', 'masala'],
@@ -18,25 +18,33 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ suggestions: [] });
     }
 
+    const supabase = await createClient();
+
+    // Search products from database
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('name, short_description, category:categories(name)')
+      .eq('is_active', true)
+      .or(`name.ilike.%${query}%,short_description.ilike.%${query}%`)
+      .limit(limit);
+
+    if (error) {
+      console.error('Autocomplete search error:', error);
+      return NextResponse.json({ suggestions: [] });
+    }
+
     // Get matching product names
-    const productMatches = mockProductsWithVariants
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.shortDescription.toLowerCase().includes(query) ||
-          p.ingredients.some((i) => i.toLowerCase().includes(query))
-      )
-      .map((p) => p.name)
-      .slice(0, limit);
+    const productMatches = products?.map((p: any) => p.name) || [];
 
     // Get matching categories
     const categoryMatches = Array.from(
       new Set(
-        mockProductsWithVariants
-          .filter((p) => p.category.toLowerCase().includes(query))
-          .map((p) => p.category)
+        products
+          ?.filter((p: any) => p.category?.name?.toLowerCase().includes(query))
+          .map((p: any) => p.category?.name)
+          .filter(Boolean) || []
       )
-    ).slice(0, limit / 2);
+    ).slice(0, Math.ceil(limit / 2));
 
     // Get synonyms
     const synonymMatches: string[] = [];
@@ -51,7 +59,7 @@ export async function GET(request: NextRequest) {
       ...new Set([
         ...productMatches,
         ...categoryMatches,
-        ...synonymMatches.slice(0, limit / 3),
+        ...synonymMatches.slice(0, Math.ceil(limit / 3)),
       ]),
     ].slice(0, limit);
 

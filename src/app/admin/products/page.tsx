@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Plus, Edit, Trash2, Eye, Loader2, RefreshCw } from "lucide-react";
 import { DataTable } from "@/src/components/admin/data-table";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { formatCurrency } from "@/src/lib/utils";
-import { getAdminProducts, deleteProduct } from "@/src/lib/supabase/admin";
-import type { Database } from "@/src/lib/supabase/database.types";
+import {
+  getAdminProducts,
+  deleteProduct,
+  type AdminProductWithVariants,
+} from "@/src/lib/supabase/admin-products";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,10 +33,6 @@ import {
 } from "@/src/components/ui/alert-dialog";
 import { toast } from "sonner";
 
-type Product = Database["public"]["Tables"]["products"]["Row"];
-type ProductVariant = Database["public"]["Tables"]["product_variants"]["Row"];
-type ProductWithVariants = Product & { variants: ProductVariant[] };
-
 const getStatusBadge = (isActive: boolean) => {
   return isActive ? (
     <Badge variant="default" className="capitalize">
@@ -46,27 +46,26 @@ const getStatusBadge = (isActive: boolean) => {
 };
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<ProductWithVariants[]>([]);
+  const [products, setProducts] = useState<AdminProductWithVariants[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch products from Supabase
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setLoading(true);
-        const data = await getAdminProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to load products");
-      } finally {
-        setLoading(false);
-      }
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await getAdminProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to load products");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
 
@@ -78,12 +77,13 @@ export default function ProductsPage() {
   const confirmDelete = async () => {
     if (productToDelete) {
       setDeleting(true);
-      const success = await deleteProduct(productToDelete);
 
-      if (success) {
-        setProducts(products.filter((p) => p.id !== productToDelete));
+      try {
+        await deleteProduct(productToDelete);
+        setProducts((prev) => prev.filter((p) => p.id !== productToDelete));
         toast.success("Product deleted successfully");
-      } else {
+      } catch (error) {
+        console.error("Delete error:", error);
         toast.error("Failed to delete product");
       }
 
@@ -93,40 +93,37 @@ export default function ProductsPage() {
     }
   };
 
-  const getStock = (product: ProductWithVariants) => {
-    if (!product.variants || product.variants.length === 0) return 0;
-    return product.variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0);
-  };
-
-  const getPrice = (product: ProductWithVariants) => {
-    if (product.variants && product.variants.length > 0) {
-      return product.variants[0].price;
-    }
-    return product.base_price || 0;
-  };
-
   const columns = [
     {
       key: "image",
       header: "Image",
-      render: (row: ProductWithVariants) => (
-        <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center overflow-hidden">
-          {row.images && row.images[0] ? (
-            <img src={row.images[0]} alt={row.name} className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-xs text-muted-foreground">IMG</span>
-          )}
-        </div>
-      ),
+      render: (row: AdminProductWithVariants) => {
+        const imageUrl = row.images && row.images[0] ? row.images[0] : null;
+        return (
+          <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center overflow-hidden">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={row.name}
+                width={40}
+                height={40}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-xs text-muted-foreground">IMG</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "name",
       header: "Product Name",
-      render: (row: ProductWithVariants) => (
+      render: (row: AdminProductWithVariants) => (
         <div>
           <div className="font-medium">{row.name}</div>
           <div className="text-xs text-muted-foreground">
-            {row.variants?.length || 0} variant(s)
+            {row.category?.name || "Uncategorized"}
           </div>
         </div>
       ),
@@ -134,16 +131,23 @@ export default function ProductsPage() {
     {
       key: "price",
       header: "Price",
-      render: (row: ProductWithVariants) => formatCurrency(getPrice(row)),
+      render: (row: AdminProductWithVariants) => {
+        const primaryVariant = row.variants?.[0];
+        const price = primaryVariant?.price || row.base_price || 0;
+        return formatCurrency(price);
+      },
     },
     {
       key: "stock",
       header: "Stock",
-      render: (row: ProductWithVariants) => {
-        const stock = getStock(row);
+      render: (row: AdminProductWithVariants) => {
+        const totalStock = row.variants?.reduce(
+          (sum, v) => sum + (v.stock_quantity || 0),
+          0
+        ) || 0;
         return (
-          <span className={stock === 0 ? "text-red-600 font-medium" : ""}>
-            {stock} units
+          <span className={totalStock === 0 ? "text-red-600 font-medium" : ""}>
+            {totalStock} units
           </span>
         );
       },
@@ -151,12 +155,12 @@ export default function ProductsPage() {
     {
       key: "status",
       header: "Status",
-      render: (row: ProductWithVariants) => getStatusBadge(row.is_active ?? false),
+      render: (row: AdminProductWithVariants) => getStatusBadge(row.is_active ?? false),
     },
     {
       key: "actions",
       header: "Actions",
-      render: (row: ProductWithVariants) => (
+      render: (row: AdminProductWithVariants) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -209,23 +213,44 @@ export default function ProductsPage() {
             Manage your product catalog and inventory
           </p>
         </div>
-        <Button asChild className="w-full sm:w-auto">
-          <Link href="/admin/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="text-sm sm:text-base">Add Product</span>
-          </Link>
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={fetchProducts} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          <Button asChild className="flex-1 sm:flex-none">
+            <Link href="/admin/products/new">
+              <Plus className="mr-2 h-4 w-4" />
+              <span className="text-sm sm:text-base">Add Product</span>
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <DataTable
-        data={products}
-        columns={columns}
-        searchKey="name"
-        selectable
-        onSelectionChange={(selected) => {
-          console.log("Selected products:", selected);
-        }}
-      />
+      {products.length === 0 ? (
+        <div className="text-center py-12 border rounded-lg bg-muted/10">
+          <h3 className="text-lg font-semibold mb-2">No products yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Get started by adding your first product
+          </p>
+          <Button asChild>
+            <Link href="/admin/products/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <DataTable
+          data={products}
+          columns={columns}
+          searchKey="name"
+          selectable
+          onSelectionChange={(selected) => {
+            console.log("Selected products:", selected);
+          }}
+        />
+      )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

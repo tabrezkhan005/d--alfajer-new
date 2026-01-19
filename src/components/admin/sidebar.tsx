@@ -39,6 +39,7 @@ import {
   Moon,
   Sun,
   Bell,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { Button } from "@/src/components/ui/button";
@@ -78,7 +79,7 @@ const navItems: NavItem[] = [
     children: [
       { title: "All Orders", href: "/admin/orders", icon: List },
       { title: "Pending Orders", href: "/admin/orders?status=pending", icon: Clock },
-      { title: "Returns & Refunds", href: "/admin/orders/returns", icon: RotateCcw },
+      { title: "Returns & Refunds", href: "/admin/orders?status=return_requested", icon: RotateCcw },
     ],
   },
   {
@@ -87,6 +88,7 @@ const navItems: NavItem[] = [
     icon: Users,
     children: [
       { title: "Customer List", href: "/admin/customers", icon: List },
+      { title: "Reviews", href: "/admin/reviews", icon: MessageSquare },
     ],
   },
   {

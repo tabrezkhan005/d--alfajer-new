@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Premium Dry Fruits & Spices",
   description: "100% authentic premium dry fruits and spices delivered worldwide",
   icons: {
-    icon: "/images/logo/nifajer-logo.png",
+    icon: "/images/alfajerlogo.jpeg",
   },
 };
 
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/images/logo/nifajer-logo.png" />
+        <link rel="icon" href="/images/alfajerlogo.jpeg" />
       </head>
       <body className="antialiased overflow-x-hidden w-full" suppressHydrationWarning>
         <Providers attribute="class" defaultTheme="system" enableSystem>

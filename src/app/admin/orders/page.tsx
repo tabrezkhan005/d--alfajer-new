@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Eye, Loader2, Filter, Download } from "lucide-react";
 import { DataTable } from "@/src/components/admin/data-table";
 import { Button } from "@/src/components/ui/button";
@@ -55,9 +56,10 @@ const escapeCSV = (field: any) => {
 };
 
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get("status") || "all");
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   // Fetch orders from Supabase
@@ -124,7 +126,7 @@ export default function OrdersPage() {
           escapeCSV(new Date(order.created_at || '').toLocaleDateString()),
           escapeCSV(name),
           escapeCSV(email),
-          escapeCSV(order.total_amount),
+          escapeCSV(order.total),
           escapeCSV(order.status),
           escapeCSV(order.items?.length || 0)
         ].join(',');
@@ -174,7 +176,7 @@ export default function OrdersPage() {
       key: "total",
       header: "Total",
       render: (row: OrderWithItems) => (
-        <span className="font-medium">{formatCurrency(row.total_amount)}</span>
+        <span className="font-medium">{formatCurrency(row.total || 0)}</span>
       ),
     },
     {
@@ -199,6 +201,9 @@ export default function OrdersPage() {
             <SelectItem value="shipped">Shipped</SelectItem>
             <SelectItem value="delivered">Delivered</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="return_requested">Return Requested</SelectItem>
+            <SelectItem value="returned">Returned</SelectItem>
+            <SelectItem value="return_rejected">Return Rejected</SelectItem>
           </SelectContent>
         </Select>
       ),
@@ -256,6 +261,9 @@ export default function OrdersPage() {
               <SelectItem value="shipped">Shipped</SelectItem>
               <SelectItem value="delivered">Delivered</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="return_requested">Return Requested</SelectItem>
+              <SelectItem value="returned">Returned</SelectItem>
+              <SelectItem value="return_rejected">Return Rejected</SelectItem>
             </SelectContent>
           </Select>
         </div>

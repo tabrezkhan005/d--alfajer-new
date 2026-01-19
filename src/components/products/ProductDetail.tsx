@@ -11,15 +11,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/ta
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useWishlistStore } from "@/src/lib/wishlist-store";
-import { mockProductsWithVariants } from "@/src/lib/products";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { ProductReviews } from "./ProductReviews";
+
+interface RelatedProduct {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+}
 
 interface ProductDetailProps {
   productId?: string;
   initialProduct?: any;
+  relatedProducts?: RelatedProduct[];
 }
 
-export function ProductDetail({ productId, initialProduct }: ProductDetailProps) {
+export function ProductDetail({ productId, initialProduct, relatedProducts = [] }: ProductDetailProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -45,18 +57,18 @@ export function ProductDetail({ productId, initialProduct }: ProductDetailProps)
     );
   }
 
-  return <ProductDetailContent productId={productId} initialProduct={initialProduct} />;
+  return <ProductDetailContent productId={productId} initialProduct={initialProduct} relatedProducts={relatedProducts} />;
 }
 
-function ProductDetailContent({ productId, initialProduct }: ProductDetailProps) {
+function ProductDetailContent({ productId, initialProduct, relatedProducts = [] }: ProductDetailProps) {
   const router = useRouter();
   const { t, formatCurrency } = useI18n();
   const { addItem } = useCartStore();
   const { isInWishlist, toggleWishlist } = useWishlistStore();
 
   const product = useMemo(
-    () => initialProduct || mockProductsWithVariants.find((p) => p.id === productId),
-    [productId, initialProduct]
+    () => initialProduct,
+    [initialProduct]
   );
 
   const [selectedVariantId, setSelectedVariantId] = useState(
@@ -399,15 +411,14 @@ function ProductDetailContent({ productId, initialProduct }: ProductDetailProps)
           </div>
         </div>
 
-        {/* Tabs Section */}
         <div className="border-t border-gray-200 pt-12">
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-white border-b border-gray-200 rounded-none h-auto p-0">
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 bg-white border-b border-gray-200 rounded-none h-auto p-0">
               <TabsTrigger
-                value="description"
+                value="details"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
-                {t('product.description')}
+                {t('product.details') || 'Details'}
               </TabsTrigger>
               <TabsTrigger
                 value="nutrition"
@@ -416,21 +427,27 @@ function ProductDetailContent({ productId, initialProduct }: ProductDetailProps)
                 {t('product.nutrition')}
               </TabsTrigger>
               <TabsTrigger
+                value="allergens"
+                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
+              >
+                {t('product.allergens') || 'Allergens'}
+              </TabsTrigger>
+              <TabsTrigger
                 value="reviews"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
-                {t('product.reviews')}
+                {t('product.reviews')} ({product.reviews})
               </TabsTrigger>
               <TabsTrigger
-                value="shipping"
+                value="wholesale"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
-                {t('product.shipping')}
+                {t('product.wholesale') || 'Wholesale'}
               </TabsTrigger>
             </TabsList>
 
-            {/* Description Tab */}
-            <TabsContent value="description" className="py-8 space-y-8">
+            {/* Details Tab (was Description) */}
+            <TabsContent value="details" className="py-8 space-y-8">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('product.aboutProduct')}</h3>
                 <p className="text-gray-700 leading-relaxed text-lg">{t(product.longDescription)}</p>
@@ -508,148 +525,104 @@ function ProductDetailContent({ productId, initialProduct }: ProductDetailProps)
             </TabsContent>
 
             {/* Reviews Tab */}
-            <TabsContent value="reviews" className="py-8 space-y-8">
+            {/* Allergens Tab */}
+            <TabsContent value="allergens" className="py-8 space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.customerReviews')}</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.allergens') || 'Allergens'}</h3>
               </div>
-
-              {/* Rating Summary */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-green-50 to-white p-6 rounded-lg border border-gray-200 text-center">
-                  <div className="text-5xl font-bold text-gray-900 mb-2">{product.rating}</div>
-                  <div className="flex justify-center mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={20}
-                        className={
-                          i < Math.floor(product.rating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "text-gray-300"
-                        }
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 font-medium">{product.reviews} {t('product.customerReviewsCount')}</p>
-                </div>
-              </div>
-
-              {/* Sample Reviews */}
-              <div className="space-y-4">
-                {[
-                  { author: t('review.johnDoe'), rating: 5, title: t('review.excellentQuality'), comment: t('review.greatColor') },
-                  { author: t('review.janeSmith'), rating: 4, title: t('review.greatQualityPricey'), comment: t('review.goodProductQuality') },
-                ].map((review, idx) => (
-                  <div key={idx} className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex gap-1 mb-2">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              size={16}
-                              className={
-                                i < review.rating
-                                  ? "fill-amber-400 text-amber-400"
-                                  : "text-gray-300"
-                              }
-                            />
-                          ))}
-                        </div>
-                        <h4 className="font-bold text-gray-900">{review.title}</h4>
-                      </div>
+              {(product.allergenInfo && product.allergenInfo.length > 0) ? (
+                 <div className="bg-red-50 p-6 rounded-lg border border-red-100">
+                    <div className="flex items-start gap-4">
+                       <AlertCircle className="text-red-600 mt-1" />
+                       <div>
+                          <h4 className="font-bold text-red-900 mb-2">Contains the following allergens:</h4>
+                          <ul className="list-disc pl-5 space-y-1 text-red-800">
+                             {product.allergenInfo.map((a: string) => <li key={a} className="capitalize">{a}</li>)}
+                          </ul>
+                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-medium mb-2">{review.author}</p>
-                    <p className="text-gray-700">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  size="lg"
-                  className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 rounded-lg"
-                >
-                  {t('product.writeReview')}
-                </Button>
-              </motion.div>
+                 </div>
+              ) : (
+                 <div className="bg-green-50 p-6 rounded-lg border border-green-100 flex items-center gap-4">
+                    <Check className="text-green-600" />
+                    <p className="text-green-800 font-medium">No common allergens listed.</p>
+                 </div>
+              )}
             </TabsContent>
 
-            {/* Shipping Tab */}
-            <TabsContent value="shipping" className="py-8 space-y-6">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.shippingInfo')}</h3>
-              </div>
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="py-8 space-y-8">
+              <ProductReviews productId={product.id} />
+            </TabsContent>
 
-              <div className="space-y-4">
-                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">{t('product.standardShipping')}</h4>
-                  <p className="text-gray-700">{t('product.standardShipping')}</p>
-                </div>
-                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">{t('product.expressShipping')}</h4>
-                  <p className="text-gray-700">{t('product.expressShipping')}</p>
-                </div>
-                <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-lg border-l-4 border-[#009744]">
-                  <h4 className="font-bold text-gray-900 mb-2">{t('product.overnightShipping')}</h4>
-                  <p className="text-gray-700">{t('product.overnightShipping')}</p>
-                </div>
-              </div>
+            {/* Wholesale Tab */}
+            <TabsContent value="wholesale" className="py-8 space-y-6">
+               <div className="bg-gray-50 p-8 rounded-lg text-center">
+                  <Truck className="mx-auto h-12 w-12 text-[#009744] mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('product.wholesale') || 'Wholesale Inquiries'}</h3>
+                  <p className="text-gray-600 mb-6 max-w-lg mx-auto">
+                     Interested in buying in bulk? We offer competitive wholesale pricing for restaurants, retailers, and distributors.
+                  </p>
+                  <Button className="bg-[#009744] hover:bg-[#007A37]">Contact Wholesale Team</Button>
+               </div>
             </TabsContent>
           </Tabs>
         </div>
 
         {/* Related Products Section */}
-        <div className="border-t border-gray-200 mt-16 pt-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('product.relatedProducts')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {mockProductsWithVariants.filter(p => p.id !== productId).slice(0, 4).map((relatedProduct) => (
-              <motion.div
-                key={relatedProduct.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-                whileHover={{ y: -4 }}
-              >
-                <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                  <Image
-                    src={relatedProduct.image}
-                    alt={relatedProduct.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
-                    {relatedProduct.name}
-                  </h3>
-                  <div className="flex items-center gap-1 mb-3">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={14}
-                          className={i < Math.floor(relatedProduct.rating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                        />
-                      ))}
+        {relatedProducts.length > 0 && (
+          <div className="border-t border-gray-200 mt-16 pt-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('product.relatedProducts')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.filter(p => p.id !== productId).slice(0, 4).map((relatedProduct) => (
+                <motion.div
+                  key={relatedProduct.id}
+                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                  whileHover={{ y: -4 }}
+                  onClick={() => router.push(`/products/${relatedProduct.slug}`)}
+                >
+                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                    <Image
+                      src={relatedProduct.image || "/images/placeholder.jpg"}
+                      alt={relatedProduct.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+                      {relatedProduct.name}
+                    </h3>
+                    <div className="flex items-center gap-1 mb-3">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            size={14}
+                            className={i < Math.floor(relatedProduct.rating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-600">({relatedProduct.reviews})</span>
                     </div>
-                    <span className="text-xs text-gray-600">({relatedProduct.reviews})</span>
+                    <div className="flex items-baseline gap-2 mb-4">
+                      <span className="font-bold text-gray-900">{formatCurrency(relatedProduct.price)}</span>
+                      {relatedProduct.originalPrice && (
+                        <span className="text-sm text-gray-400 line-through">{formatCurrency(relatedProduct.originalPrice)}</span>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold"
+                    >
+                      {t('product.viewDetails')}
+                    </Button>
                   </div>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="font-bold text-gray-900">{formatCurrency(relatedProduct.price)}</span>
-                    {relatedProduct.originalPrice && (
-                      <span className="text-sm text-gray-400 line-through">{formatCurrency(relatedProduct.originalPrice)}</span>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    className="w-full bg-[#009744] hover:bg-[#007A37] text-white font-semibold"
-                  >
-                    {t('product.viewDetails')}
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

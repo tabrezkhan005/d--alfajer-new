@@ -367,8 +367,8 @@ export async function getDashboardStats() {
     ] = await Promise.all([
         // Total orders
         supabase.from('orders').select('*', { count: 'exact', head: true }),
-        // Revenue (sum total_amount)
-        supabase.from('orders').select('total_amount').neq('status', 'cancelled'),
+        // Revenue (sum total)
+        supabase.from('orders').select('total').neq('status', 'cancelled'),
         // Active products
         supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true),
         // Total customers
@@ -378,22 +378,22 @@ export async function getDashboardStats() {
             .select(`
                 id,
                 user_id,
-                total_amount,
+                total,
                 status,
                 created_at,
-                customers:customers!orders_user_id_fkey(first_name, last_name, email)
+                email
             `)
             .order('created_at', { ascending: false })
             .limit(5),
-        // Low stock products (less than 10)
+        // Low stock products (less than 10) - use 'stock' column which is the actual DB column
         supabase.from('product_variants')
-            .select('product_id, stock_quantity, products(id, name, slug)')
-            .lt('stock_quantity', 10)
+            .select('product_id, stock, products(id, name, slug)')
+            .lt('stock', 10)
             .limit(5)
     ]);
 
     // Calculate total revenue
-    const totalRevenue = revenueData?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0;
+    const totalRevenue = (revenueData as any[])?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
 
     // Calculate growth (mock logic for now as we don't have historical data easily accessible without complex queries)
     const stats = {
@@ -402,11 +402,11 @@ export async function getDashboardStats() {
         activeProducts: { value: productsCount || 0, change: 0 },
         activeCustomers: { value: customersCount || 0, change: 0 },
         recentOrders: recentOrders || [],
-        lowStockProducts: lowStockProducts?.map(p => ({
+        lowStockProducts: (lowStockProducts as any[])?.map(p => ({
             id: p.product_id,
             name: p.products?.name,
             slug: p.products?.slug,
-            stock: p.stock_quantity
+            stock: p.stock
         })) || []
     };
 
@@ -421,17 +421,17 @@ export async function getSalesChartData() {
 
     const { data: orders } = await supabase
         .from('orders')
-        .select('created_at, total_amount')
+        .select('created_at, total')
         .gte('created_at', sevenDaysAgo.toISOString())
         .neq('status', 'cancelled')
         .order('created_at');
 
     // Group by day
     const chartData: Record<string, number> = {};
-    orders?.forEach(order => {
+    (orders as any[])?.forEach(order => {
         if (!order.created_at) return;
         const date = new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        chartData[date] = (chartData[date] || 0) + order.total_amount;
+        chartData[date] = (chartData[date] || 0) + (order.total || 0);
     });
 
     return Object.entries(chartData).map(([date, amount]) => ({ name: date, total: amount }));
@@ -627,17 +627,24 @@ export async function getAnnouncements() {
     console.error("Error fetching announcements:", error);
     return [];
   }
-  return data;
+  return data.map((item: any) => ({ ...item, content: item.message }));
 }
 
 export async function createAnnouncement(announcement: any) {
   const supabase = createClient();
+
+  const payload = {
+      message: announcement.content,
+      link_url: announcement.link_url || null,
+      start_date: announcement.start_date || null,
+      end_date: announcement.end_date || null,
+      is_active: announcement.is_active,
+      updated_at: new Date().toISOString()
+  };
+
   const { data, error } = await supabase
     .from("announcements")
-    .insert({
-        ...announcement,
-        updated_at: new Date().toISOString()
-    })
+    .insert(payload)
     .select()
     .single();
 
@@ -645,17 +652,25 @@ export async function createAnnouncement(announcement: any) {
     console.error("Error creating announcement:", error);
     return null;
   }
-  return data;
+  return { ...data, content: data.message };
 }
 
 export async function updateAnnouncement(id: string, updates: any) {
   const supabase = createClient();
+
+  const payload: any = {
+      updated_at: new Date().toISOString()
+  };
+
+  if (updates.content !== undefined) payload.message = updates.content;
+  if (updates.link_url !== undefined) payload.link_url = updates.link_url || null;
+  if (updates.start_date !== undefined) payload.start_date = updates.start_date || null;
+  if (updates.end_date !== undefined) payload.end_date = updates.end_date || null;
+  if (updates.is_active !== undefined) payload.is_active = updates.is_active;
+
   const { error } = await supabase
     .from("announcements")
-    .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-    })
+    .update(payload)
     .eq("id", id);
 
   if (error) {

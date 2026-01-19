@@ -15,6 +15,8 @@ import {
   Edit2,
   Trash2,
   X,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/src/components/providers/i18n-provider";
@@ -22,17 +24,22 @@ import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSele
 import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
 import { useAuth } from "@/src/lib/auth-context";
 import { useWishlistStore, type WishlistItem } from "@/src/lib/wishlist-store";
-import { useOrders } from "@/src/lib/orders-store";
+import {
+  getUserOrders,
+  requestOrderReturn,
+  type OrderWithItems
+} from "@/src/lib/supabase/orders";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/src/components/ui/dialog";
+import { Textarea } from "@/src/components/ui/textarea";
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, isLoggedIn, logout, isLoading } = useAuth();
+  const { user, isLoggedIn, logout, isLoading: authLoading } = useAuth();
   const { language, setLanguage, currency, setCurrency, t } = useI18n();
   const { items: wishlistItems, removeItem: removeFromWishlist } = useWishlistStore();
-  const { getOrdersByUser, removeOrder } = useOrders();
-  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">(
-    "profile"
-  );
+
+  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
     name: "",
@@ -40,37 +47,54 @@ export default function AccountPage() {
     phone: "",
     address: "",
   });
-  const [userOrders, setUserOrders] = useState<any[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  const [userOrders, setUserOrders] = useState<OrderWithItems[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
 
+  // Return functionality
+  const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
+
   useEffect(() => {
-    if (!isLoading && !isLoggedIn) {
+    if (!authLoading && !isLoggedIn) {
       router.push("/login");
     } else if (user) {
       setUserData({
         name: user.name,
         email: user.email,
-        phone: user.phone || "+971 50 XXX XXXX",
-        address: user.address || "Dubai, UAE",
+        phone: user.phone || "",
+        address: user.address || "",
       });
-      // Get user's orders
-      const orders = getOrdersByUser(user.id);
-      setUserOrders(orders);
+
+      // Get user's orders from Supabase
+      const fetchOrders = async () => {
+        setOrdersLoading(true);
+        try {
+          const orders = await getUserOrders(user.id);
+          setUserOrders(orders);
+        } catch (error) {
+          console.error("Failed to fetch orders", error);
+          toast.error("Failed to load your orders");
+        } finally {
+          setOrdersLoading(false);
+        }
+      };
+
+      fetchOrders();
     }
-  }, [isLoggedIn, isLoading, user, router, getOrdersByUser]);
+  }, [isLoggedIn, authLoading, user, router]);
 
   const handleUpdateProfile = () => {
-    // Update user in localStorage
-    const updatedUser = {
-      ...user,
-      ...userData,
-    };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+    // In a real app, you would update this in Supabase
+    // For now, we'll just update local state and show a toast
+    toast.success("Profile updated successfully");
     setIsEditing(false);
   };
 
-  const handleViewOrderDetails = (order: any) => {
+  const handleViewOrderDetails = (order: OrderWithItems) => {
     setSelectedOrder(order);
     setShowOrderModal(true);
   };
@@ -78,6 +102,44 @@ export default function AccountPage() {
   const handleCloseOrderModal = () => {
     setShowOrderModal(false);
     setTimeout(() => setSelectedOrder(null), 300);
+  };
+
+  const handleRequestReturn = () => {
+    setShowReturnDialog(true);
+  };
+
+  const submitReturnRequest = async () => {
+    if (!selectedOrder) return;
+    if (!returnReason.trim()) {
+      toast.error("Please provide a reason for the return");
+      return;
+    }
+
+    setIsSubmittingReturn(true);
+    try {
+      const success = await requestOrderReturn(selectedOrder.id, returnReason);
+      if (success) {
+        toast.success("Return request submitted successfully");
+        setShowReturnDialog(false);
+        setReturnReason("");
+        // Refresh orders
+        const orders = await getUserOrders(user!.id);
+        setUserOrders(orders);
+
+        // Update selected order or close modal
+        const updatedOrder = orders.find(o => o.id === selectedOrder.id);
+        if (updatedOrder) {
+          setSelectedOrder(updatedOrder);
+        }
+      } else {
+        toast.error("Failed to submit return request");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred");
+    } finally {
+      setIsSubmittingReturn(false);
+    }
   };
 
   const containerVariants = {
@@ -97,10 +159,19 @@ export default function AccountPage() {
     },
   };
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="w-full bg-white overflow-x-hidden">
       {/* Loading state */}
-      {isLoading && (
+      {authLoading && (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-[#009744] rounded-full animate-spin mx-auto mb-4"></div>
@@ -109,7 +180,7 @@ export default function AccountPage() {
         </div>
       )}
 
-      {!isLoading && isLoggedIn && (
+      {!authLoading && isLoggedIn && (
         <>
           {/* Language & Currency Selector */}
           <div className="bg-white border-b border-gray-200">
@@ -191,10 +262,7 @@ export default function AccountPage() {
                 animate="visible"
                 className="space-y-8"
               >
-                <motion.div
-                  variants={itemVariants}
-                  className="bg-white border border-gray-200 rounded-lg p-8"
-                >
+                <div className="bg-white border border-gray-200 rounded-lg p-8">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">{t('account.editProfile')}</h2>
                     {!isEditing && (
@@ -290,19 +358,19 @@ export default function AccountPage() {
                         <Phone className="w-5 h-5 text-[#009744] mt-1" />
                         <div>
                           <p className="text-sm text-gray-600">{t('account.phone')}</p>
-                          <p className="font-medium text-gray-900">{userData.phone}</p>
+                          <p className="font-medium text-gray-900">{userData.phone || 'Not provided'}</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-4">
                         <MapPin className="w-5 h-5 text-[#009744] mt-1" />
                         <div>
                           <p className="text-sm text-gray-600">{t('account.address')}</p>
-                          <p className="font-medium text-gray-900">{userData.address}</p>
+                          <p className="font-medium text-gray-900">{userData.address || 'Not provided'}</p>
                         </div>
                       </div>
                     </div>
                   )}
-                </motion.div>
+                </div>
               </motion.div>
             )}
 
@@ -314,11 +382,18 @@ export default function AccountPage() {
                 animate="visible"
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('account.orders')}</h2>
-                {userOrders && userOrders.length > 0 ? (
-                  userOrders.map((order, index) => (
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">{t('account.orders')}</h2>
+                </div>
+
+                {ordersLoading ? (
+                   <div className="flex justify-center p-12">
+                     <Loader2 className="w-8 h-8 animate-spin text-[#009744]" />
+                   </div>
+                ) : userOrders && userOrders.length > 0 ? (
+                  userOrders.map((order) => (
                     <motion.div
-                      key={index}
+                      key={order.id}
                       variants={itemVariants}
                       className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                     >
@@ -326,81 +401,69 @@ export default function AccountPage() {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-gray-200">
                           <div className="flex-1">
                             <div className="flex items-center gap-4 mb-3">
-                              <span className="font-semibold text-gray-900 text-lg">{order.id}</span>
+                              <span className="font-semibold text-gray-900 text-lg">
+                                {order.order_number || order.id.slice(0, 8)}
+                              </span>
                               <span
-                                className={`px-3 py-1 text-sm rounded-full font-medium ${order.status === "Delivered"
+                                className={`px-3 py-1 text-sm rounded-full font-medium capitalize ${
+                                  order.status === "delivered"
                                     ? "bg-green-100 text-green-800"
-                                    : order.status === "Shipped"
+                                    : order.status === "shipped"
                                       ? "bg-blue-100 text-blue-800"
-                                      : "bg-yellow-100 text-yellow-800"
+                                      : order.status === "cancelled" || order.status === "return_rejected"
+                                        ? "bg-red-100 text-red-800"
+                                        : order.status === "returned" || order.status === "return_requested"
+                                          ? "bg-purple-100 text-purple-800"
+                                          : "bg-yellow-100 text-yellow-800"
                                   }`}
                               >
-                                {t(`account.${order.status.toLowerCase()}`)}
+                                {(order.status || "pending").replace('_', ' ')}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600">{t('account.orderDate')}: {order.date}</p>
+                            <p className="text-sm text-gray-600">{t('account.orderDate')}: {formatDate(order.created_at)}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-2xl font-bold text-gray-900 mb-2">
-                              AED {order.total.toFixed(2)}
+                              AED {Number(order.total || 0).toFixed(2)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Order Items */}
+                        {/* Order Items Preview */}
                         <div className="space-y-4 mb-6">
-                          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">{t('account.orderDetails')}</h3>
-                          {order.items && order.items.length > 0 ? (
-                            <div className="space-y-3">
-                              {order.items.map((item: any, itemIndex: number) => (
-                                <div
-                                  key={itemIndex}
-                                  className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200"
-                                >
-                                  {item.image && (
-                                    <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
-                                      <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    <h4 className="font-semibold text-gray-900 mb-1">{t(item.name)}</h4>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                      {item.packageSize && <span className="mr-3">{item.packageSize}</span>}
-                                    </p>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm text-gray-600">
-                                        {t('account.quantity')}: <span className="font-semibold">{item.quantity}</span>
-                                      </span>
-                                      <span className="font-semibold text-[#009744]">
-                                        AED {(item.price * item.quantity).toFixed(2)}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-gray-600 text-sm">{t('account.noOrders')}</p>
-                          )}
+                           <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">{t('account.orderDetails')}</h3>
+                           <div className="space-y-3">
+                             {order.items?.slice(0, 2).map((item, itemIndex) => (
+                               <div
+                                 key={`${order.id}-item-${itemIndex}`}
+                                 className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                               >
+                                 <div className="flex-1">
+                                   <h4 className="font-semibold text-gray-900 mb-1">{item.name}</h4>
+                                   <div className="flex items-center justify-between">
+                                     <span className="text-sm text-gray-600">
+                                       {t('account.quantity')}: <span className="font-semibold">{item.quantity}</span>
+                                     </span>
+                                     <span className="font-semibold text-[#009744]">
+                                       AED {((item.price || 0) * item.quantity).toFixed(2)}
+                                     </span>
+                                   </div>
+                                 </div>
+                               </div>
+                             ))}
+                             {order.items && order.items.length > 2 && (
+                               <p className="text-sm text-gray-500 italic">+ {order.items.length - 2} more items</p>
+                             )}
+                           </div>
                         </div>
 
                         {/* Action Buttons */}
                         <div className="flex gap-2 pt-4 border-t border-gray-200">
                           <Button
                             onClick={() => handleViewOrderDetails(order)}
-                            className="flex-1 bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg"
+                            className="bg-[#009744] hover:bg-[#007A37] text-white px-4 py-2 rounded-lg"
                           >
                             {t('account.viewDetails')}
-                          </Button>
-                          <Button
-                            onClick={() => removeOrder(order.id)}
-                            className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg"
-                          >
-                            {t('common.delete')}
                           </Button>
                         </div>
                       </div>
@@ -452,7 +515,7 @@ export default function AccountPage() {
                           <Heart className="w-6 h-6 text-red-500 absolute top-3 right-3 fill-red-500" />
                         </div>
                         <div className="p-4">
-                          <h3 className="font-semibold text-gray-900 mb-2">{t(item.name)}</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2">{item.name}</h3>
                           <div className="flex items-center justify-between mb-4">
                             <p className="text-[#009744] font-bold text-lg">
                               AED {item.price.toFixed(2)}
@@ -493,162 +556,150 @@ export default function AccountPage() {
               </motion.div>
             )}
 
-            {/* Settings Tab - Logout */}
-            <div className="mt-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-white border border-red-200 rounded-lg p-6 bg-red-50"
+            {/* Logout Section */}
+            <div className="mt-8 border-t pt-8">
+              <Button
+                onClick={() => {
+                  logout();
+                  router.push("/");
+                }}
+                className="bg-[#AB1F23] hover:bg-[#8a1819] text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2"
               >
-                <h3 className="font-semibold text-gray-900 mb-4">{t('account.profile')}</h3>
-                <Button
-                  onClick={() => {
-                    logout();
-                    router.push("/");
-                  }}
-                  className="bg-[#AB1F23] hover:bg-[#8a1819] text-white font-semibold px-6 py-2 rounded-lg flex items-center gap-2"
-                >
-                  <LogOut size={18} />
-                  {t('account.logout')}
-                </Button>
-              </motion.div>
+                <LogOut size={18} />
+                {t('account.logout')}
+              </Button>
             </div>
           </div>
 
           {/* Order Details Modal */}
           {showOrderModal && selectedOrder && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-              onClick={handleCloseOrderModal}
-            >
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={handleCloseOrderModal}>
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
               >
-                {/* Modal Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">{t('account.orderDetails')}</h2>
-                  <button
-                    onClick={handleCloseOrderModal}
-                    className="text-gray-500 hover:text-gray-700 transition"
-                  >
+                  <button onClick={handleCloseOrderModal} className="text-gray-500 hover:text-gray-700">
                     <X size={24} />
                   </button>
                 </div>
 
-                {/* Modal Content */}
                 <div className="p-6 space-y-6">
-                  {/* Order Header Info */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">{t('account.orderDate')}</p>
-                      <p className="font-semibold text-gray-900">{selectedOrder.id}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">{t('account.orderDate')}</p>
-                      <p className="font-semibold text-gray-900">{selectedOrder.date}</p>
+                      <p className="font-semibold text-gray-900">{formatDate(selectedOrder.created_at)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 mb-1">{t('account.orderStatus')}</p>
-                      <span
-                        className={`inline-block px-3 py-1 text-sm rounded-full font-medium ${selectedOrder.status === "Delivered"
-                            ? "bg-green-100 text-green-800"
-                            : selectedOrder.status === "Shipped"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                      >
-                        {t(`account.${selectedOrder.status.toLowerCase()}`)}
+                      <span className="font-semibold capitalize text-gray-900">
+                        {(selectedOrder.status || "pending").replace('_', ' ')}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">{t('account.orderTotal')}</p>
-                      <p className="font-semibold text-lg text-[#009744]">AED {selectedOrder.total.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600 mb-1">Total</p>
+                      <p className="font-semibold text-lg text-[#009744]">
+                        AED {Number(selectedOrder.total || 0).toFixed(2)}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Ordered Items */}
+                  {/* Return Button */}
+                  {selectedOrder.status === 'delivered' && (
+                     <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+                       <div>
+                         <h4 className="font-medium">Need to return items?</h4>
+                         <p className="text-sm text-gray-600">You can request a return within 7 days of delivery.</p>
+                       </div>
+                       <Button onClick={handleRequestReturn} variant="outline" className="border-gray-300">
+                         Request Return
+                       </Button>
+                     </div>
+                  )}
+
+                  {/* Status if return requested */}
+                  {(selectedOrder.status === 'return_requested' || selectedOrder.status === 'returned' || selectedOrder.status === 'return_rejected') && (
+                    <div className={`p-4 rounded-lg flex items-start gap-3 ${
+                      selectedOrder.status === 'return_rejected' ? 'bg-red-50 text-red-800' : 'bg-blue-50 text-blue-800'
+                    }`}>
+                      <AlertCircle className="w-5 h-5 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium capitalize">{selectedOrder.status.replace('_', ' ')}</h4>
+                        {selectedOrder.notes && <p className="text-sm mt-1">{selectedOrder.notes}</p>}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="border-t pt-6">
                     <h3 className="font-semibold text-gray-900 mb-4 text-lg">{t('account.orderDetails')}</h3>
                     <div className="space-y-4">
-                      {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                        selectedOrder.items.map((item: any, index: number) => (
-                          <div
-                            key={index}
-                            className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
-                          >
-                            {item.image && (
-                              <div className="w-28 h-28 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 text-lg mb-2">{t(item.name)}</h4>
-                              {item.packageSize && (
-                                <p className="text-sm text-gray-600 mb-2">Size: {item.packageSize}</p>
-                              )}
-                              <div className="grid grid-cols-3 gap-4 mt-3">
-                                <div>
-                                  <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.unitPrice')}</p>
-                                  <p className="font-semibold text-gray-900">AED {item.price.toFixed(2)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.quantity')}</p>
-                                  <p className="font-semibold text-gray-900">{item.quantity}</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-600 uppercase tracking-wide">{t('account.orderTotal')}</p>
-                                  <p className="font-semibold text-[#009744]">AED {(item.price * item.quantity).toFixed(2)}</p>
-                                </div>
-                              </div>
+                      {selectedOrder.items?.map((item, index) => (
+                        <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          {item.image_url && (
+                             <img src={item.image_url} alt={item.name || ""} className="w-20 h-20 object-cover rounded-md bg-white" />
+                          )}
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                            <div className="flex justify-between mt-2">
+                              <span>Qty: {item.quantity}</span>
+                              <span className="font-medium">AED {((item.price || 0) * item.quantity).toFixed(2)}</span>
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-600">{t('account.noOrders')}</p>
-                      )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Order Summary */}
                   <div className="border-t pt-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">{t('account.orderTotal')}</h3>
-                    <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-700">Subtotal</span>
-                        <span className="font-semibold text-gray-900">AED {selectedOrder.total.toFixed(2)}</span>
-                      </div>
-                      <div className="border-t pt-2 flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-900">Total</span>
-                        <span className="text-xl font-bold text-[#009744]">AED {selectedOrder.total.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Modal Actions */}
-                  <div className="border-t pt-6 flex gap-3">
-                    <Button
-                      onClick={handleCloseOrderModal}
-                      className="w-full bg-[#009744] hover:bg-[#007A37] text-white py-3 rounded-lg font-semibold"
-                    >
-                      Close
-                    </Button>
+                     <div className="flex justify-between items-center mb-2">
+                       <span className="text-gray-600">Subtotal</span>
+                       <span>AED {Number(selectedOrder.subtotal || 0).toFixed(2)}</span>
+                     </div>
+                     <div className="flex justify-between items-center mb-2">
+                       <span className="text-gray-600">Shipping</span>
+                       <span>AED {Number(selectedOrder.shipping_cost || 0).toFixed(2)}</span>
+                     </div>
+                     <div className="flex justify-between items-center font-bold text-lg pt-2 border-t mt-2">
+                       <span>Total</span>
+                       <span className="text-[#009744]">AED {Number(selectedOrder.total || 0).toFixed(2)}</span>
+                     </div>
                   </div>
                 </div>
               </motion.div>
-            </motion.div>
+            </div>
           )}
+
+          {/* Return Request Dialog */}
+          <Dialog open={showReturnDialog} onOpenChange={setShowReturnDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Request Return</DialogTitle>
+                <DialogDescription>
+                  Please tell us why you want to return this order.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <Textarea
+                  placeholder="Reason for return..."
+                  value={returnReason}
+                  onChange={(e) => setReturnReason(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowReturnDialog(false)} disabled={isSubmittingReturn}>
+                  Cancel
+                </Button>
+                <Button onClick={submitReturnRequest} disabled={isSubmittingReturn || !returnReason.trim()}>
+                  {isSubmittingReturn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Submit Request
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

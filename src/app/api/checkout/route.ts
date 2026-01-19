@@ -87,25 +87,31 @@ export async function POST(request: NextRequest) {
     // Calculate discount from promo code
     let discount = 0;
     if (promoCode) {
-      const { data: coupon } = await supabase
+      const { data: couponData } = await supabase
         .from('coupons')
         .select('*')
         .eq('code', promoCode.toUpperCase())
         .eq('is_active', true)
         .single();
 
+      // Cast to any to work with actual database schema (types may be out of sync)
+      const coupon = couponData as any;
       if (coupon) {
         const now = new Date();
-        const startDate = coupon.start_date ? new Date(coupon.start_date) : null;
-        const endDate = coupon.end_date ? new Date(coupon.end_date) : null;
+        const startDate = coupon.valid_from ? new Date(coupon.valid_from) : null;
+        const endDate = coupon.valid_until ? new Date(coupon.valid_until) : null;
 
         const isValidDate = (!startDate || now >= startDate) && (!endDate || now <= endDate);
-        const isUnderLimit = !coupon.usage_limit || (coupon.usage_count || 0) < coupon.usage_limit;
-        const meetsMinimum = !coupon.min_cart_value || subtotal >= coupon.min_cart_value;
+        const isUnderLimit = !coupon.usage_limit || (coupon.used_count || 0) < coupon.usage_limit;
+        const meetsMinimum = !coupon.min_order_value || subtotal >= coupon.min_order_value;
 
         if (isValidDate && isUnderLimit && meetsMinimum) {
           if (coupon.discount_type === 'percentage') {
             discount = Math.round((subtotal * coupon.discount_value) / 100 * 100) / 100;
+            // Apply max_discount limit if set
+            if (coupon.max_discount && discount > coupon.max_discount) {
+              discount = coupon.max_discount;
+            }
           } else {
             discount = coupon.discount_value;
           }
@@ -113,7 +119,7 @@ export async function POST(request: NextRequest) {
           // Increment usage count
           await supabase
             .from('coupons')
-            .update({ usage_count: (coupon.usage_count || 0) + 1 })
+            .update({ used_count: (coupon.used_count || 0) + 1 } as any)
             .eq('id', coupon.id);
         }
       }

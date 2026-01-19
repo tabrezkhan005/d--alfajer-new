@@ -17,7 +17,7 @@ function Footer() {
           <div className="sm:col-span-2 md:col-span-1 space-y-2 sm:space-y-3">
             <Link href="/" className="inline-block">
               <Image
-                src="/images/logo/nifajer-logo.png"
+                src="/images/alfajerlogo.jpeg"
                 alt="Al Fajer Mart"
                 width={80}
                 height={26}

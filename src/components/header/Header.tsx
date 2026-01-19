@@ -144,7 +144,7 @@ export function Header() {
             <Link href="/" aria-label="Home" className="shrink-0">
               <div ref={logoRef} className="flex items-center transition-transform">
                 <Image
-                  src="/images/logo/nifajer-logo.png"
+                  src="/images/alfajerlogo.jpeg"
                   alt="Al Fajer Mart"
                   width={isScrolled ? 80 : 110}
                   height={isScrolled ? 25 : 35}

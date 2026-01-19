@@ -12,7 +12,7 @@ import { Badge } from "@/src/components/ui/badge";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { useAuth } from "@/src/lib/auth-context";
-import { useOrders } from "@/src/lib/orders-store";
+
 import {
   shippingMethods,
   paymentMethods,
@@ -53,7 +53,7 @@ function CheckoutPageContent() {
   const { t, formatCurrency, convertCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
   const { user } = useAuth();
-  const { addOrder } = useOrders();
+
 
   // Handle product from Buy Now button
   useEffect(() => {

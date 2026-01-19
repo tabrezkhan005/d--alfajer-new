@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockProductsWithVariants, searchProducts, filterProducts, type SearchFilters } from '@/src/lib/products';
+import { createClient } from '@/src/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,70 +15,107 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    let results = mockProductsWithVariants;
+    const supabase = await createClient();
+
+    // Build the query
+    let dbQuery = supabase
+      .from('products')
+      .select(`
+        *,
+        variants:product_variants(*),
+        category:categories(*)
+      `)
+      .eq('is_active', true);
 
     // Full-text search
     if (query) {
-      results = searchProducts(query, results);
+      dbQuery = dbQuery.or(`name.ilike.%${query}%,short_description.ilike.%${query}%,long_description.ilike.%${query}%`);
     }
 
-    // Apply filters
-    const filters: Partial<SearchFilters> = {};
-
-    if (minPrice || maxPrice) {
-      filters.priceRange = [
-        parseFloat(minPrice || '0'),
-        parseFloat(maxPrice || '999999'),
-      ];
-    }
-
+    // Category filter
     if (category) {
-      filters.categories = [category];
+      const { data: categoryData } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', category)
+        .single();
+
+      if (categoryData) {
+        dbQuery = dbQuery.eq('category_id', categoryData.id);
+      }
     }
 
-    if (certifications.length > 0) {
-      filters.certifications = certifications;
+    // Price filters
+    if (minPrice) {
+      dbQuery = dbQuery.gte('base_price', parseFloat(minPrice));
+    }
+    if (maxPrice) {
+      dbQuery = dbQuery.lte('base_price', parseFloat(maxPrice));
     }
 
+    // Origin filter
     if (origins.length > 0) {
-      filters.origins = origins;
+      dbQuery = dbQuery.in('origin', origins);
     }
 
-    if (inStock) {
-      filters.inStockOnly = true;
-    }
-
+    // On sale filter
     if (onSale) {
-      filters.onSaleOnly = true;
+      dbQuery = dbQuery.eq('is_on_sale', true);
     }
 
-    results = filterProducts(results, filters);
+    // Certifications filter (array contains)
+    if (certifications.length > 0) {
+      dbQuery = dbQuery.contains('certifications', certifications);
+    }
 
-    // Pagination
-    const total = results.length;
-    const paginatedResults = results.slice(offset, offset + limit);
+    // Execute query
+    const { data: products, error, count } = await dbQuery
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
-    // Prepare response with facets
+    if (error) {
+      console.error('Search error:', error);
+      return NextResponse.json(
+        { error: 'Search failed' },
+        { status: 500 }
+      );
+    }
+
+    // Filter by stock if needed (post-query since it's on variants)
+    let results = products || [];
+    if (inStock) {
+      results = results.filter((p: any) => {
+        const totalStock = (p.variants || []).reduce((sum: number, v: any) => sum + (v.stock_quantity || 0), 0);
+        return totalStock > 0;
+      });
+    }
+
+    // Get facets for the response
+    const { data: allProducts } = await supabase
+      .from('products')
+      .select('origin, certifications, base_price, category:categories(name)')
+      .eq('is_active', true);
+
     const facets = {
-      categories: Array.from(new Set(results.map((p) => p.category))),
-      origins: Array.from(new Set(results.map((p) => p.origin))),
+      categories: Array.from(new Set((allProducts || []).map((p: any) => p.category?.name).filter(Boolean))),
+      origins: Array.from(new Set((allProducts || []).map((p: any) => p.origin).filter(Boolean))),
       certifications: Array.from(
-        new Set(results.flatMap((p) => p.certifications))
+        new Set((allProducts || []).flatMap((p: any) => p.certifications || []))
       ),
       priceRange: {
-        min: Math.min(...results.map((p) => p.price)),
-        max: Math.max(...results.map((p) => p.price)),
+        min: Math.min(...(allProducts || []).map((p: any) => p.base_price || 0)),
+        max: Math.max(...(allProducts || []).map((p: any) => p.base_price || 0)),
       },
     };
 
     return NextResponse.json({
       success: true,
-      data: paginatedResults,
+      data: results,
       pagination: {
-        total,
+        total: results.length,
         limit,
         offset,
-        pages: Math.ceil(total / limit),
+        pages: Math.ceil(results.length / limit),
       },
       facets,
       query,

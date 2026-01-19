@@ -77,8 +77,16 @@ function transformProduct(dbProduct: any) {
             carbs: "0g",
             fiber: "0g"
         },
-        ingredients: dbProduct.ingredients ? dbProduct.ingredients.split(',').map((i: string) => i.trim()) : [],
-        allergenInfo: dbProduct.allergen_info ? dbProduct.allergen_info.split(',').map((i: string) => i.trim()) : [],
+        ingredients: dbProduct.ingredients
+            ? (typeof dbProduct.ingredients === 'string'
+                ? dbProduct.ingredients.split(',').map((i: string) => i.trim())
+                : Array.isArray(dbProduct.ingredients) ? dbProduct.ingredients : [])
+            : [],
+        allergenInfo: dbProduct.allergen_info
+            ? (typeof dbProduct.allergen_info === 'string'
+                ? dbProduct.allergen_info.split(',').map((i: string) => i.trim())
+                : Array.isArray(dbProduct.allergen_info) ? dbProduct.allergen_info : [])
+            : [],
     };
 }
 

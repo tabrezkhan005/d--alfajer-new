@@ -46,14 +46,14 @@ export default function InventoryPage() {
 
       products.forEach(p => {
         if (p.variants && p.variants.length > 0) {
-            p.variants.forEach(v => {
+            p.variants.forEach((v: any) => {
                 inventoryItems.push({
                     id: v.id,
                     productId: p.id,
                     productName: p.name,
                     variantName: v.weight || "Standard",
                     sku: v.sku,
-                    currentStock: v.stock_quantity || 0,
+                    currentStock: v.stock_quantity ?? v.stock ?? 0,
                     price: v.price,
                     image: p.images?.[0]
                 });
