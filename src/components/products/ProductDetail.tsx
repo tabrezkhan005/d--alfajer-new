@@ -165,6 +165,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 fill
                 className="object-cover"
                 priority
+                unoptimized
               />
               {product.badge && (
                 <motion.div
@@ -197,6 +198,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                     alt={`${product.name || "Product"}-${idx}`}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </motion.button>
               ))}
@@ -531,22 +533,22 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('product.allergens') || 'Allergens'}</h3>
               </div>
               {(product.allergenInfo && product.allergenInfo.length > 0) ? (
-                 <div className="bg-red-50 p-6 rounded-lg border border-red-100">
-                    <div className="flex items-start gap-4">
-                       <AlertCircle className="text-red-600 mt-1" />
-                       <div>
-                          <h4 className="font-bold text-red-900 mb-2">Contains the following allergens:</h4>
-                          <ul className="list-disc pl-5 space-y-1 text-red-800">
-                             {product.allergenInfo.map((a: string) => <li key={a} className="capitalize">{a}</li>)}
-                          </ul>
-                       </div>
+                <div className="bg-red-50 p-6 rounded-lg border border-red-100">
+                  <div className="flex items-start gap-4">
+                    <AlertCircle className="text-red-600 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-red-900 mb-2">Contains the following allergens:</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-red-800">
+                        {product.allergenInfo.map((a: string) => <li key={a} className="capitalize">{a}</li>)}
+                      </ul>
                     </div>
-                 </div>
+                  </div>
+                </div>
               ) : (
-                 <div className="bg-green-50 p-6 rounded-lg border border-green-100 flex items-center gap-4">
-                    <Check className="text-green-600" />
-                    <p className="text-green-800 font-medium">No common allergens listed.</p>
-                 </div>
+                <div className="bg-green-50 p-6 rounded-lg border border-green-100 flex items-center gap-4">
+                  <Check className="text-green-600" />
+                  <p className="text-green-800 font-medium">No common allergens listed.</p>
+                </div>
               )}
             </TabsContent>
 
@@ -557,14 +559,14 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
 
             {/* Wholesale Tab */}
             <TabsContent value="wholesale" className="py-8 space-y-6">
-               <div className="bg-gray-50 p-8 rounded-lg text-center">
-                  <Truck className="mx-auto h-12 w-12 text-[#009744] mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('product.wholesale') || 'Wholesale Inquiries'}</h3>
-                  <p className="text-gray-600 mb-6 max-w-lg mx-auto">
-                     Interested in buying in bulk? We offer competitive wholesale pricing for restaurants, retailers, and distributors.
-                  </p>
-                  <Button className="bg-[#009744] hover:bg-[#007A37]">Contact Wholesale Team</Button>
-               </div>
+              <div className="bg-gray-50 p-8 rounded-lg text-center">
+                <Truck className="mx-auto h-12 w-12 text-[#009744] mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('product.wholesale') || 'Wholesale Inquiries'}</h3>
+                <p className="text-gray-600 mb-6 max-w-lg mx-auto">
+                  Interested in buying in bulk? We offer competitive wholesale pricing for restaurants, retailers, and distributors.
+                </p>
+                <Button className="bg-[#009744] hover:bg-[#007A37]">Contact Wholesale Team</Button>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
@@ -587,6 +589,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                       alt={relatedProduct.name}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      unoptimized
                     />
                   </div>
                   <div className="p-4">

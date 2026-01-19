@@ -23,6 +23,26 @@ const getProduct = cache(async (slug: string) => {
         .eq("slug", slug)
         .eq("is_active", true)
         .single();
+
+    // Transform storage paths to public URLs
+    if (data && data.images) {
+        const transformedImages = Array.isArray(data.images)
+            ? data.images.map((img: string) => {
+                if (!img) return null;
+                if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                    return img;
+                }
+                try {
+                    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(img);
+                    return urlData.publicUrl;
+                } catch (e) {
+                    return null;
+                }
+            }).filter(Boolean)
+            : [];
+        return { ...data, images: transformedImages };
+    }
+
     return data;
 });
 
