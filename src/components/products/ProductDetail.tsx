@@ -452,7 +452,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
             <TabsContent value="details" className="py-8 space-y-8">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('product.aboutProduct')}</h3>
-                <p className="text-gray-700 leading-relaxed text-lg">{t(product.longDescription)}</p>
+                <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">{t(product.longDescription)}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
