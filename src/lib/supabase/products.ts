@@ -9,7 +9,7 @@ type Category = Database["public"]["Tables"]["categories"]["Row"];
 
 export interface ProductWithVariants extends Product {
     variants: ProductVariant[];
-    category: Category | null;
+    category: Category | null; 
 }
 
 // Get all products with variants and category

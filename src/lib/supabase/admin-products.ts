@@ -79,34 +79,37 @@ export async function createProduct(productData: {
 }): Promise<Product> {
     const supabase = createClient();
 
+    // Convert arrays to comma-separated strings for text columns
+    const ingredientsText = productData.ingredients?.join(', ') || null;
+    const allergenInfoText = productData.allergen_info?.join(', ') || null;
+
     const { data, error } = await supabase
         .from("products")
         .insert({
             name: productData.name,
             slug: productData.slug,
-            short_description: productData.short_description || "",
+            description: productData.short_description || "",
             long_description: productData.long_description || "",
             category_id: productData.category_id || null,
             base_price: productData.base_price,
             original_price: productData.original_price || productData.base_price,
             origin: productData.origin || null,
             certifications: productData.certifications || [],
-            allergen_info: productData.allergen_info || [],
-            ingredients: productData.ingredients || [],
+            allergen_info: allergenInfoText,
+            ingredients: ingredientsText,
             nutrition_facts: productData.nutrition_facts || {},
             is_active: productData.is_active ?? true,
-            is_on_sale: productData.is_on_sale ?? false,
             badge: productData.badge || null,
             images: productData.images || [],
             rating: 0,
-            reviews_count: 0,
+            review_count: 0,
         })
         .select()
         .single();
 
     if (error) {
-        console.error("Error creating product:", error);
-        throw error;
+        console.error("Error creating product:", JSON.stringify(error, null, 2));
+        throw new Error(error.message || "Failed to create product");
     }
 
     return data;
@@ -136,19 +139,37 @@ export async function updateProduct(
 ): Promise<Product> {
     const supabase = createClient();
 
+    // Build the update object with correct column names
+    const updateData: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+    };
+
+    if (productData.name !== undefined) updateData.name = productData.name;
+    if (productData.slug !== undefined) updateData.slug = productData.slug;
+    if (productData.short_description !== undefined) updateData.description = productData.short_description;
+    if (productData.long_description !== undefined) updateData.long_description = productData.long_description;
+    if (productData.category_id !== undefined) updateData.category_id = productData.category_id;
+    if (productData.base_price !== undefined) updateData.base_price = productData.base_price;
+    if (productData.original_price !== undefined) updateData.original_price = productData.original_price;
+    if (productData.origin !== undefined) updateData.origin = productData.origin;
+    if (productData.certifications !== undefined) updateData.certifications = productData.certifications;
+    if (productData.allergen_info !== undefined) updateData.allergen_info = productData.allergen_info.join(', ');
+    if (productData.ingredients !== undefined) updateData.ingredients = productData.ingredients.join(', ');
+    if (productData.nutrition_facts !== undefined) updateData.nutrition_facts = productData.nutrition_facts;
+    if (productData.is_active !== undefined) updateData.is_active = productData.is_active;
+    if (productData.badge !== undefined) updateData.badge = productData.badge;
+    if (productData.images !== undefined) updateData.images = productData.images;
+
     const { data, error } = await supabase
         .from("products")
-        .update({
-            ...productData,
-            updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq("id", id)
         .select()
         .single();
 
     if (error) {
-        console.error("Error updating product:", error);
-        throw error;
+        console.error("Error updating product:", JSON.stringify(error, null, 2));
+        throw new Error(error.message || "Failed to update product");
     }
 
     return data;
