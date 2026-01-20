@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { useWishlistStore } from "@/src/lib/wishlist-store";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { useAuth } from "@/src/lib/auth-context";
 import { motion } from "framer-motion";
 
 export default function WishlistPage() {
   const { items, removeItem, getTotalItems } = useWishlistStore();
   const { addItem } = useCartStore();
   const { t, formatCurrency } = useI18n();
+  const { user, isLoggedIn } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -23,6 +25,71 @@ export default function WishlistPage() {
 
   if (!isMounted) {
     return null;
+  }
+
+  // Show login prompt if user is not logged in
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-white">
+        {/* Breadcrumb */}
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-[#009744] transition-colors">
+                {t("common.home")}
+              </Link>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-900 font-medium">{t("product.wishlist")}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Login Required Section */}
+        <div className="max-w-7xl mx-auto px-4 py-12 pt-16 sm:pt-20 lg:pt-24">
+          <div className="text-center py-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <div className="flex justify-center">
+                <div className="relative">
+                  <Heart size={80} className="text-gray-200" />
+                  <Lock size={40} className="absolute bottom-0 right-0 bg-white rounded-full p-1.5 text-[#AB1F23]" />
+                </div>
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  Access Your Wishlist
+                </h2>
+                <p className="text-gray-600 mb-8 max-w-md mx-auto text-lg">
+                  Sign in to your account to view and manage your wishlist. Save your favorite products and get notified about price changes.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/login">
+                  <Button className="bg-[#009744] hover:bg-[#007A37] text-white font-semibold h-12 px-8 rounded-lg">
+                    Sign In to Your Account
+                    <ArrowRight size={20} className="ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/products">
+                  <Button variant="outline" className="border-2 border-gray-300 hover:border-[#009744] text-gray-900 font-semibold h-12 px-8 rounded-lg">
+                    Continue Shopping
+                  </Button>
+                </Link>
+              </div>
+              <p className="text-gray-600 mt-8">
+                Don't have an account?{" "}
+                <Link href="/login" className="text-[#009744] hover:underline font-semibold">
+                  Create one now
+                </Link>
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleAddToCart = (item: typeof items[0]) => {

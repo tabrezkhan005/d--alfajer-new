@@ -187,15 +187,6 @@ export function WhyChooseUs() {
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-6 sm:mt-8 md:mt-12 lg:mt-16 xl:mt-24 flex flex-col md:flex-row items-center justify-between border-t border-slate-200 pt-4 sm:pt-6 md:pt-8 lg:pt-12 gap-3 sm:gap-4 md:gap-0 px-2 sm:px-0"
-        >
-        </motion.div>
       </div>
     </section>
   );
