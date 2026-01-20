@@ -765,7 +765,7 @@ function CheckoutPageContent() {
                       <p className="text-gray-700">{t('checkout.qty')}: {item.quantity}</p>
                     </div>
                     <p className="font-semibold text-gray-900">
-                      {formatCurrency(item.price * item.quantity)}
+                      {formatCurrency(convertCurrency(item.price * item.quantity, 'INR'))}
                     </p>
                   </div>
                 ))}
@@ -775,13 +775,13 @@ function CheckoutPageContent() {
               <div className="space-y-2 border-t pt-4 text-gray-900">
                 <div className="flex justify-between text-gray-900">
                   <span className="text-gray-900">{t('checkout.subtotal')}</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(convertCurrency(subtotal, 'INR'))}</span>
                 </div>
 
                 {appliedPromo && (
                   <div className="flex justify-between text-[#009744] font-semibold">
                     <span>{t('checkout.discount')} ({appliedPromo.code})</span>
-                    <span>-{formatCurrency(discountAmount)}</span>
+                    <span>-{formatCurrency(convertCurrency(discountAmount, 'INR'))}</span>
                   </div>
                 )}
 
@@ -791,19 +791,19 @@ function CheckoutPageContent() {
                     <span className="font-semibold text-gray-900">
                       {selectedShippingMethod.price === 0
                         ? t('checkout.free')
-                        : formatCurrency(selectedShippingMethod.price)}
+                        : formatCurrency(convertCurrency(selectedShippingMethod.price, 'INR'))}
                     </span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-gray-900">
                   <span className="text-gray-900">{t('cart.tax')}</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(tax)}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(convertCurrency(tax, 'INR'))}</span>
                 </div>
 
                 <div className="flex justify-between text-lg font-bold border-t pt-2 text-gray-900">
                   <span className="text-gray-900">{t('cart.total')}</span>
-                  <span className="text-[#009744] font-bold">{formatCurrency(total)}</span>
+                  <span className="text-[#009744] font-bold">{formatCurrency(convertCurrency(total, 'INR'))}</span>
                 </div>
               </div>
             </CardContent>

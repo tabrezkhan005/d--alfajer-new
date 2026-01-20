@@ -106,7 +106,7 @@ export function CartSheet() {
               <div className="px-6 py-5 space-y-4 bg-gray-50/50">
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.subtotal')}</span>
-                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice, 'AED'))}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice, 'INR'))}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.shipping')}</span>
@@ -114,17 +114,17 @@ export function CartSheet() {
                     "font-medium",
                     shipping === 0 ? "text-[#009744]" : "text-gray-900"
                   )}>
-                    {shipping === 0 ? t('cart.free') : formatCurrency(convertCurrency(shipping, 'AED'))}
+                    {shipping === 0 ? t('cart.free') : formatCurrency(convertCurrency(shipping, 'INR'))}
                   </span>
                 </div>
                 {shipping > 0 && (
                   <div className="bg-[#009744]/10 rounded-lg p-3 text-sm text-[#009744] font-body">
-                    {t('cart.add_more_pre')} <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'AED'))}</span> {t('cart.add_more_post')}
+                    {t('cart.add_more_pre')} <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'INR'))}</span> {t('cart.add_more_post')}
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
                   <span>{t('cart.total')}</span>
-                  <span>{formatCurrency(convertCurrency(finalTotal, 'AED'))}</span>
+                  <span>{formatCurrency(convertCurrency(finalTotal, 'INR'))}</span>
                 </div>
               </div>
 
@@ -224,11 +224,11 @@ function CartItemCard({
 
           <div className="text-right">
             <p className="font-bold text-gray-900 font-heading">
-              {formatCurrency(convertCurrency(item.price * item.quantity, 'AED'))}
+              {formatCurrency(convertCurrency(item.price * item.quantity, 'INR'))}
             </p>
             {item.quantity > 1 && (
               <p className="text-xs text-gray-500 font-body">
-                {formatCurrency(convertCurrency(item.price, 'AED'))} {t('cart.each')}
+                {formatCurrency(convertCurrency(item.price, 'INR'))} {t('cart.each')}
               </p>
             )}
           </div>
