@@ -49,7 +49,7 @@ export function Header() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-40 flex items-center h-20 backdrop-blur-md border-b"
+        className="fixed top-6 xs:top-7 sm:top-8 md:top-9 left-0 right-0 z-40 flex items-center h-20 backdrop-blur-md border-b"
         style={{
           backgroundColor: "#FFFFFF",
           borderColor: "#E5E7EB",
@@ -62,8 +62,8 @@ export function Header() {
             <Link href="/" aria-label="Home" className="shrink-0 flex items-center">
               <div className="relative flex items-center justify-center rounded-full"
                 style={{
-                  width: "clamp(60px, 12vw, 80px)",
-                  height: "clamp(60px, 12vw, 80px)",
+                  width: "clamp(50px, 10vw, 70px)",
+                  height: "clamp(50px, 10vw, 70px)",
                   backgroundColor: "#f0f0f0",
                   border: "2px solid #e5e7eb",
                 }}>
@@ -71,10 +71,10 @@ export function Header() {
                   src="/images/alfajernewlogo.jpeg"
                   alt="Al Fajer Mart"
                   width={110}
-                  height={35}
+                  height={25}
                   className="object-contain"
                   style={{
-                    width: "clamp(48px, 10vw, 64px)",
+                    width: "clamp(40px, 8vw, 56px)",
                     height: "auto",
                   }}
                   priority
