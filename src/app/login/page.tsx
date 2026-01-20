@@ -35,7 +35,11 @@ export default function LoginPage() {
     }
 
     try {
-      await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
       router.push("/account");
     } catch (err) {
       setError("Login failed. Please try again.");
@@ -63,7 +67,11 @@ export default function LoginPage() {
     }
 
     try {
-      await signup(formData.name, formData.email, formData.password, formData.country);
+      const result = await signup(formData.name, formData.email, formData.password, formData.country);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
       router.push("/account");
     } catch (err) {
       setError("Signup failed. Please try again.");
