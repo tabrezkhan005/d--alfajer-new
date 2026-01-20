@@ -143,19 +143,26 @@ export function Header() {
           <div className="flex items-center gap-1 xs:gap-2 sm:gap-4 flex-1 justify-start min-w-0">
             <Link href="/" aria-label="Home" className="shrink-0">
               <div ref={logoRef} className="flex items-center transition-transform">
-                <Image
-                  src="/images/alfajerlogo.jpeg"
-                  alt="Al Fajer Mart"
-                  width={isScrolled ? 80 : 110}
-                  height={isScrolled ? 25 : 35}
-                  className="object-contain"
+                <div className="relative flex items-center justify-center rounded-full transition-all"
                   style={{
-                    width: isScrolled ? "clamp(70px, 15vw, 90px)" : "clamp(90px, 18vw, 120px)",
-                    height: "auto",
-                    maxHeight: isScrolled ? "clamp(24px, 6vw, 30px)" : "clamp(32px, 8vw, 40px)",
-                  }}
-                  priority
-                />
+                    width: isScrolled ? "clamp(44px, 10vw, 56px)" : "clamp(60px, 12vw, 80px)",
+                    height: isScrolled ? "clamp(44px, 10vw, 56px)" : "clamp(60px, 12vw, 80px)",
+                    backgroundColor: "#f0f0f0",
+                    border: "2px solid #e5e7eb",
+                  }}>
+                  <Image
+                    src="/images/alfajerlogo.jpeg"
+                    alt="Al Fajer Mart"
+                    width={isScrolled ? 80 : 110}
+                    height={isScrolled ? 25 : 35}
+                    className="object-contain"
+                    style={{
+                      width: isScrolled ? "clamp(32px, 8vw, 48px)" : "clamp(48px, 10vw, 64px)",
+                      height: "auto",
+                    }}
+                    priority
+                  />
+                </div>
               </div>
             </Link>
 

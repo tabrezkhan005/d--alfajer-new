@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Heart, Truck, CheckCircle2, Star, Play, ArrowRight, Shield, Award, Headphones, Check, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Carousel,
@@ -135,7 +136,7 @@ export function HeroSection() {
   const slide = heroSlides[current];
 
   return (
-    <section className="relative w-full overflow-hidden bg-black pt-32 xs:pt-36 sm:pt-40 md:pt-44 lg:pt-48" style={{ minHeight: "100dvh" }}>
+    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100dvh", paddingTop: "0" }}>
       {/* ---------------- BACKGROUND CAROUSEL ---------------- */}
       <div className="absolute inset-0 z-0 h-full w-full">
         <Carousel
@@ -206,7 +207,7 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center w-full pt-20 sm:pt-24 lg:pt-32">
+      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(120px, 15vw, 160px)" }}>
         <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
@@ -266,24 +267,28 @@ export function HeroSection() {
                   </motion.div>
 
                   <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
-                    <Button
-                      size="lg"
-                      className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
-                    >
-                      <span className="relative z-10 flex items-center gap-2 sm:gap-2 justify-center">
-                        {t('hero.cta')}
-                        <ArrowRight className="h-4 sm:h-4 w-4 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-2 justify-center w-full sm:w-auto"
-                    >
-                      {t('hero.story')}
-                      <Play className="h-4 sm:h-4 w-4 sm:w-4 fill-white" />
-                    </Button>
+                    <Link href="/shop">
+                      <Button
+                        size="lg"
+                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
+                      >
+                        <span className="relative z-10 flex items-center gap-2 sm:gap-2 justify-center">
+                          {t('hero.cta')}
+                          <ArrowRight className="h-4 sm:h-4 w-4 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                      </Button>
+                    </Link>
+                    <Link href="/about">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-2 justify-center w-full sm:w-auto"
+                      >
+                        {t('hero.story')}
+                        <Play className="h-4 sm:h-4 w-4 sm:w-4 fill-white" />
+                      </Button>
+                    </Link>
                   </motion.div>
                 </motion.div>
             ) : (
@@ -328,22 +333,26 @@ export function HeroSection() {
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 sm:gap-5 pt-4 sm:pt-6">
-                      <Button
-                        size="lg"
-                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-full transition-all duration-500 w-full sm:w-auto"
-                      >
-                        <span className="flex items-center gap-2 sm:gap-3 justify-center">
-                          {t('hero.cta')}
-                          <ArrowRight className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 transition-transform group-hover:translate-x-1" />
-                        </span>
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md w-full sm:w-auto"
-                      >
-                        {t('hero.story')}
-                      </Button>
+                      <Link href="/shop">
+                        <Button
+                          size="lg"
+                          className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-full transition-all duration-500 w-full sm:w-auto"
+                        >
+                          <span className="flex items-center gap-2 sm:gap-3 justify-center">
+                            {t('hero.cta')}
+                            <ArrowRight className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 transition-transform group-hover:translate-x-1" />
+                          </span>
+                        </Button>
+                      </Link>
+                      <Link href="/about">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md w-full sm:w-auto"
+                        >
+                          {t('hero.story')}
+                        </Button>
+                      </Link>
                     </motion.div>
                   </div>
 
