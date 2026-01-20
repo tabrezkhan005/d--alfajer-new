@@ -52,10 +52,6 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      toast.error("You must be logged in to review");
-      return;
-    }
 
     if (!comment.trim()) {
       toast.error("Please write a comment");
@@ -64,21 +60,28 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
 
     setIsSubmitting(true);
     try {
+      const userEmail = user?.email || "guest@example.com";
+      const userName = user?.name || document.getElementById('guest-name')?.value || "Anonymous";
+      
       await createReview({
         product_id: productId,
-        customer_id: user.id,
-        user_name: user.name || user.email?.split('@')[0] || "Customer",
-        user_email: user.email,
+        customer_id: user?.id || `guest_${Date.now()}`,
+        user_name: userName,
+        user_email: userEmail,
         rating: formRating,
         title: title || undefined,
         comment,
-        is_verified_purchase: false // Advanced: check orders to verify
+        is_verified_purchase: !!user // Only verified if logged in
       });
       toast.success("Review submitted! It will appear after approval.");
       setShowForm(false);
       setTitle("");
       setComment("");
       setFormRating(5);
+      
+      // Reload reviews
+      const data = await getProductReviews(productId);
+      setReviews(data);
     } catch (error) {
       console.error(error);
       toast.error("Failed to submit review");
@@ -204,64 +207,66 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       ) : (
         <Card className="border-2 border-[#009744]/20">
             <CardContent className="pt-6 space-y-4">
-               {user ? (
-                   <form onSubmit={handleSubmit} className="space-y-4">
-                       <h4 className="font-bold text-lg">Write your review</h4>
-                       <div className="space-y-2">
-                           <Label>Rating</Label>
-                           <div className="flex gap-2">
-                               {[1, 2, 3, 4, 5].map(star => (
-                                   <button
-                                      key={star}
-                                      type="button"
-                                      onClick={() => setFormRating(star)}
-                                      className="focus:outline-none"
-                                   >
-                                       <Star
-                                          size={24}
-                                          className={star <= formRating ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                                       />
-                                   </button>
-                               ))}
-                           </div>
-                       </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                   <h4 className="font-bold text-lg">Write your review</h4>
+                   
+                   {!user && (
+                     <div className="space-y-2">
+                       <Label>Your Name</Label>
+                       <Input
+                         id="guest-name"
+                         placeholder="Enter your name"
+                         required
+                       />
+                     </div>
+                   )}
 
-                       <div className="space-y-2">
-                           <Label>Title (Optional)</Label>
-                           <Input
-                              value={title}
-                              onChange={e => setTitle(e.target.value)}
-                              placeholder="Review title"
-                           />
+                   <div className="space-y-2">
+                       <Label>Rating</Label>
+                       <div className="flex gap-2">
+                           {[1, 2, 3, 4, 5].map(star => (
+                               <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setFormRating(star)}
+                                  className="focus:outline-none"
+                               >
+                                   <Star
+                                      size={24}
+                                      className={star <= formRating ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                                   />
+                               </button>
+                           ))}
                        </div>
-
-                       <div className="space-y-2">
-                           <Label>Review</Label>
-                           <Textarea
-                              value={comment}
-                              onChange={e => setComment(e.target.value)}
-                              placeholder="Tell us what you liked or disliked..."
-                              required
-                           />
-                       </div>
-
-                       <div className="flex gap-2 justify-end">
-                           <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-                           <Button type="submit" disabled={isSubmitting}>
-                               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                               Submit Review
-                           </Button>
-                       </div>
-                   </form>
-               ) : (
-                   <div className="text-center py-6">
-                       <p className="mb-4 text-gray-600">Please log in to write a review.</p>
-                       <Button asChild>
-                           <Link href="/login">Log In</Link>
-                       </Button>
-                       <Button variant="ghost" className="ml-2" onClick={() => setShowForm(false)}>Cancel</Button>
                    </div>
-               )}
+
+                   <div className="space-y-2">
+                       <Label>Title (Optional)</Label>
+                       <Input
+                          value={title}
+                          onChange={e => setTitle(e.target.value)}
+                          placeholder="Review title"
+                       />
+                   </div>
+
+                   <div className="space-y-2">
+                       <Label>Review</Label>
+                       <Textarea
+                          value={comment}
+                          onChange={e => setComment(e.target.value)}
+                          placeholder="Tell us what you liked or disliked..."
+                          required
+                       />
+                   </div>
+
+                   <div className="flex gap-2 justify-end">
+                       <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                       <Button type="submit" disabled={isSubmitting}>
+                           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                           Submit Review
+                       </Button>
+                   </div>
+                </form>
             </CardContent>
         </Card>
       )}

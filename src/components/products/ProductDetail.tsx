@@ -317,6 +317,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                   size="sm"
                   className="h-12 w-12 rounded-none hover:bg-gray-100"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
                 >
                   <Minus size={18} className="text-gray-900" />
                 </Button>
@@ -327,11 +328,21 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                   variant="ghost"
                   size="sm"
                   className="h-12 w-12 rounded-none hover:bg-gray-100 border-l border-gray-300"
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => {
+                    if (selectedVariant && quantity < selectedVariant.stock) {
+                      setQuantity(quantity + 1);
+                    }
+                  }}
+                  disabled={!selectedVariant || quantity >= selectedVariant.stock}
                 >
                   <Plus size={18} className="text-gray-900" />
                 </Button>
               </div>
+              {selectedVariant && (
+                <p className="text-xs text-gray-600">
+                  {selectedVariant.stock - quantity} {t('common.itemsLeft') || 'items left in stock'}
+                </p>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -419,7 +430,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
 
         <div className="border-t border-gray-200 pt-12">
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 bg-white border-b border-gray-200 rounded-none h-auto p-0">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-white border-b border-gray-200 rounded-none h-auto p-0">
               <TabsTrigger
                 value="details"
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
@@ -437,12 +448,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
               >
                 {t('product.allergens') || 'Allergens'}
-              </TabsTrigger>
-              <TabsTrigger
-                value="reviews"
-                className="text-gray-900 font-semibold py-4 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-[#009744] data-[state=active]:bg-transparent data-[state=active]:text-[#009744] hover:text-[#009744] transition-colors"
-              >
-                {t('product.reviews')} ({product.reviews})
               </TabsTrigger>
               <TabsTrigger
                 value="wholesale"
@@ -530,7 +535,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               </div>
             </TabsContent>
 
-            {/* Reviews Tab */}
             {/* Allergens Tab */}
             <TabsContent value="allergens" className="py-8 space-y-6">
               <div>
@@ -556,11 +560,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               )}
             </TabsContent>
 
-            {/* Reviews Tab */}
-            <TabsContent value="reviews" className="py-8 space-y-8">
-              <ProductReviews productId={product.id} />
-            </TabsContent>
-
             {/* Wholesale Tab */}
             <TabsContent value="wholesale" className="py-8 space-y-6">
               <div className="bg-gray-50 p-8 rounded-lg text-center">
@@ -573,6 +572,12 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               </div>
             </TabsContent>
           </Tabs>
+        </div>
+
+        {/* Reviews Section - Below Tabs */}
+        <div className="border-t border-gray-200 mt-16 pt-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('product.customerReviews') || 'Customer Reviews'}</h2>
+          <ProductReviews productId={product.id} />
         </div>
 
         {/* Related Products Section */}
