@@ -107,25 +107,15 @@ export default function SupportPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
+      <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12 md:py-16 pt-16 sm:pt-20 lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
+            transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Headset className="h-6 sm:h-7 md:h-8 w-6 sm:w-7 md:w-8 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white/20 px-2 sm:px-3 py-1 rounded-full">{t("support.here_to_help")}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight">
-              {t("support.customer_support")}
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("support.customer_support")}</h1>
+            <p className="text-lg text-white/90 max-w-2xl">
               {t("support.hero_description")}
             </p>
           </motion.div>

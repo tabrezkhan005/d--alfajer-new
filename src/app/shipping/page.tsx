@@ -42,25 +42,15 @@ export default function ShippingPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-20 sm:pt-24 md:pt-28 lg:pt-32">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+      <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12 md:py-16 pt-16 sm:pt-20 lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
+            transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center gap-3 mb-4">
-              <Truck className="h-8 w-8" />
-              <span className="text-sm font-semibold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">{t('shipping.fastReliable')}</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              {t('shipping.title')}
-            </h1>
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('shipping.title')}</h1>
+            <p className="text-lg text-white/90 max-w-2xl">
               {t('shipping.description')}
             </p>
           </motion.div>

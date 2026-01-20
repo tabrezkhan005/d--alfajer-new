@@ -42,26 +42,16 @@ export default function ReturnsPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-16 xs:pt-18 sm:pt-20 lg:pt-24">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-48 xs:w-56 sm:w-64 md:w-80 lg:w-96 h-48 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-12 xs:py-14 sm:py-16 md:py-20 lg:py-28">
+      <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12 md:py-16 pt-16 sm:pt-20 lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
+            transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 mb-3 xs:mb-4">
-              <RotateCcw className="h-6 xs:h-7 sm:h-8 md:h-8 w-6 xs:w-7 sm:w-8 md:w-8 flex-shrink-0" />
-              <span className="text-xs xs:text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white/20 px-2 xs:px-2.5 sm:px-3 py-1 rounded-full">{t('returns.satisfaction')}</span>
-            </div>
-            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 xs:mb-3.5 sm:mb-4 leading-tight">
-              {t('returns.title')}
-            </h1>
-            <p className="text-sm xs:text-base sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed">
-              {t('returns.description')}
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("returns.title")}</h1>
+            <p className="text-lg text-white/90 max-w-2xl">
+              {t("returns.description")}
             </p>
           </motion.div>
         </div>
