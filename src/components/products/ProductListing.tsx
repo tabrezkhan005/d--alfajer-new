@@ -430,19 +430,19 @@ export function ProductListing() {
     <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden">
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 w-full">
         {/* Header */}
-        <div className="mb-8 sm:mb-10 md:mb-14">
+        <div className="mb-8 sm:mb-10 md:mb-14 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-5 font-heading">
             <span className="text-[#AB1F23]">{t('productCategory.title')}</span>{" "}
             <span className="text-[#009744]">{t('productCategory.titleSpan')}</span>
           </h2>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-            <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+          <div className="flex flex-col items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-2 sm:gap-3 justify-center">
               <div className="h-6 sm:h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden sm:block flex-shrink-0" />
               <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                 {t('productCategory.subtitle')}
               </p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap justify-center w-full">
               {/* Mobile: Sort by and Filters side by side */}
               <div className="flex items-center gap-2 w-full sm:w-auto lg:hidden">
                 <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body whitespace-nowrap">{t('common.sort')}:</span>
@@ -515,21 +515,42 @@ export function ProductListing() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
-          {/* Filter Sidebar - Hidden on mobile, visible on desktop */}
-          <aside className="hidden lg:block w-72 flex-shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
+          {/* Filter Sidebar - Always visible */}
+          <aside className="w-full lg:w-72 flex-shrink-0">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-brand">
               {renderFilterContent()}
             </div>
           </aside>
 
           {/* Products Grid */}
           <div className="flex-1">
-            {/* Results count */}
-            <div className="mb-6 sm:mb-8 flex items-center justify-between">
+            {/* Results count and Sort By on same line */}
+            <div className="mb-6 sm:mb-8 flex items-center justify-between flex-wrap gap-4">
               <p className="text-xs sm:text-sm text-gray-600 font-body">
                 {t('common.showing')} <span className="font-semibold text-gray-900">{sortedProducts.length}</span> {t('common.of')}{" "}
                 <span className="font-semibold text-gray-900">{allProducts.length}</span> {t('common.products')}
               </p>
+              <div className="hidden lg:flex items-center gap-2 sm:gap-3">
+                <span className="text-xs sm:text-sm text-gray-900 font-semibold font-body">{t('common.sort')}:</span>
+                <div className="relative group">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none px-3 py-2 pr-8 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#009744] bg-white text-xs sm:text-sm font-semibold font-poppins text-gray-900 cursor-pointer hover:border-[#009744] transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
+                    <option value="featured">{t('sort.featured')}</option>
+                    <option value="price-low">{t('sort.priceLow')}</option>
+                    <option value="price-high">{t('sort.priceHigh')}</option>
+                    <option value="rating">{t('sort.rating')}</option>
+                    <option value="newest">{t('sort.newest')}</option>
+                  </select>
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-[#009744] transition-colors">
+                    <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
