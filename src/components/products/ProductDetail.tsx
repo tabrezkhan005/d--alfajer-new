@@ -62,7 +62,7 @@ export function ProductDetail({ productId, initialProduct, relatedProducts = [] 
 
 function ProductDetailContent({ productId, initialProduct, relatedProducts = [] }: ProductDetailProps) {
   const router = useRouter();
-  const { t, formatCurrency } = useI18n();
+  const { t, formatCurrency, convertCurrency, currency } = useI18n();
   const { addItem } = useCartStore();
   const { isInWishlist, toggleWishlist } = useWishlistStore();
 
@@ -92,8 +92,12 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
   const selectedVariant = product.variants?.find(
     (v: { id: string; price: number; originalPrice?: number; stock: number }) => v.id === selectedVariantId
   );
-  const displayPrice = selectedVariant?.price || product.price;
-  const displayOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
+  const rawPrice = selectedVariant?.price || product.price;
+  const rawOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
+  
+  // Convert prices based on current currency (prices in DB are in INR)
+  const displayPrice = convertCurrency(rawPrice, 'INR');
+  const displayOriginalPrice = rawOriginalPrice ? convertCurrency(rawOriginalPrice, 'INR') : undefined;
 
   const handleAddToCart = () => {
     if (selectedVariant) {
@@ -280,8 +284,8 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               <label className="block text-sm font-semibold text-gray-900">
                 {t('product.selectVariant')}
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {(product.variants || []).map((variant: { id: string; size: string; price: number; stock: number }) => (
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-3">
+                {(product.variants || []).slice(0, 1).map((variant: { id: string; size: string; price: number; stock: number }) => (
                   <motion.button
                     key={variant.id}
                     onClick={() => setSelectedVariantId(variant.id)}
@@ -295,7 +299,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                   >
                     <div className="font-semibold">{variant.size}</div>
                     <div className="text-xs opacity-80 mt-1">
-                      {formatCurrency(variant.price)}
+                      {formatCurrency(convertCurrency(variant.price, 'INR'))}
                     </div>
                   </motion.button>
                 ))}

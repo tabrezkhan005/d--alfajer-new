@@ -151,7 +151,7 @@ export function Header() {
                     border: "2px solid #e5e7eb",
                   }}>
                   <Image
-                    src="/images/alfajerlogo.jpeg"
+                    src="/images/alfajernewlogo.jpeg"
                     alt="Al Fajer Mart"
                     width={isScrolled ? 80 : 110}
                     height={isScrolled ? 25 : 35}

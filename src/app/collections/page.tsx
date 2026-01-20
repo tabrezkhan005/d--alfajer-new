@@ -1,15 +1,62 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Leaf, Sparkles, Heart, Star, Grid3x3 } from "lucide-react";
 import { Newsletter } from "@/src/components/newsletter/Newsletter";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
 import { CurrencySelector } from "@/src/components/announcement-bar/CurrencySelector";
+import { getCategories } from "@/src/lib/supabase/products";
 
 export default function CollectionsPage() {
   const { language, setLanguage, currency, setCurrency, t } = useI18n();
+  const [collections, setCollections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await getCategories();
+        // Map categories to collection format with icons and colors
+        const mappedCollections = categories.map((cat, index) => {
+          const icons = [Sparkles, Leaf, Heart, Star];
+          const colors = [
+            "from-orange-500/20 to-red-500/20",
+            "from-amber-500/20 to-yellow-500/20",
+            "from-yellow-500/20 to-orange-500/20",
+            "from-[#009744]/20 to-green-500/20",
+          ];
+          const accents = [
+            "text-orange-600",
+            "text-amber-600",
+            "text-yellow-600",
+            "text-[#009744]",
+          ];
+
+          return {
+            id: cat.id,
+            name: cat.name,
+            titleKey: cat.name,
+            descriptionKey: `collections.${cat.name.toLowerCase()}_desc`,
+            icon: icons[index % icons.length],
+            color: colors[index % colors.length],
+            accent: accents[index % accents.length],
+          };
+        });
+        setCollections(mappedCollections);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        setCollections([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.3 } },
@@ -19,41 +66,6 @@ export default function CollectionsPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
-
-  const collections = [
-    {
-      id: 1,
-      titleKey: "collections.spices_title",
-      descriptionKey: "collections.spices_desc",
-      icon: Sparkles,
-      color: "from-orange-500/20 to-red-500/20",
-      accent: "text-orange-600",
-    },
-    {
-      id: 2,
-      titleKey: "collections.dryfruits_title",
-      descriptionKey: "collections.dryfruits_desc",
-      icon: Leaf,
-      color: "from-amber-500/20 to-yellow-500/20",
-      accent: "text-amber-600",
-    },
-    {
-      id: 3,
-      titleKey: "collections.honey_title",
-      descriptionKey: "collections.honey_desc",
-      icon: Heart,
-      color: "from-yellow-500/20 to-orange-500/20",
-      accent: "text-yellow-600",
-    },
-    {
-      id: 4,
-      titleKey: "collections.premium_title",
-      descriptionKey: "collections.premium_desc",
-      icon: Star,
-      color: "from-[#009744]/20 to-green-500/20",
-      accent: "text-[#009744]",
-    },
-  ];
 
   return (
     <div className="w-full bg-white overflow-x-hidden">

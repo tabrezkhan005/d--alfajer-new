@@ -124,7 +124,7 @@ interface ProductModalProps {
 
 export function ProductModal({ product, open, onOpenChange }: ProductModalProps) {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, formatCurrency, convertCurrency, currency } = useI18n();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
@@ -361,11 +361,11 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             {/* Price */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#009744] font-heading tracking-tight">
-                AED {product.price.toFixed(2)}
+                {formatCurrency(convertCurrency(product.price, 'INR'))}
               </span>
               {product.originalPrice && (
                 <span className="text-lg sm:text-xl text-gray-400 line-through font-body decoration-gray-300">
-                  AED {product.originalPrice.toFixed(2)}
+                  {formatCurrency(convertCurrency(product.originalPrice, 'INR'))}
                 </span>
               )}
             </div>
