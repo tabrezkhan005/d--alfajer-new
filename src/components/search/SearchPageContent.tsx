@@ -58,10 +58,12 @@ function SearchPageContentInner() {
   const { addItem } = useCartStore();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  const categoryFromUrl = searchParams.get("category") || "";
 
   const [products, setProducts] = useState<ProductWithVariants[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [categoryInitialized, setCategoryInitialized] = useState(false);
 
   // Static options for now (could be fetched from DB facets)
   const allOrigins = ["Kashmir, India", "UAE", "Himalayas", "India"];
@@ -85,6 +87,21 @@ function SearchPageContentInner() {
       setAvailableCategories(cats.map(c => c.name));
     });
   }, []);
+
+  // Apply category from URL once categories are loaded
+  useEffect(() => {
+    if (categoryFromUrl && availableCategories.length > 0 && !categoryInitialized) {
+      // Find matching category by name (case-insensitive)
+      const matchedCategory = availableCategories.find(
+        cat => cat.toLowerCase() === categoryFromUrl.toLowerCase() ||
+          cat.toLowerCase().replace(/[&\s]+/g, '-') === categoryFromUrl.toLowerCase().replace(/[&\s]+/g, '-')
+      );
+      if (matchedCategory) {
+        setFilters(f => ({ ...f, categories: [matchedCategory] }));
+      }
+      setCategoryInitialized(true);
+    }
+  }, [categoryFromUrl, availableCategories, categoryInitialized]);
 
   // Fetch products when query or filters change
   useEffect(() => {
@@ -116,7 +133,7 @@ function SearchPageContentInner() {
   }, [query, filters, sortBy]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-36 sm:pt-40 lg:pt-12">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-white via-white to-[#009744]/5 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-6 xs:py-7 sm:py-8 md:py-10 lg:py-12">
@@ -127,6 +144,8 @@ function SearchPageContentInner() {
                   <span className="text-gray-900">{t('search.resultsFor')}</span>
                   <span className="text-[#009744]"> {query}</span>
                 </>
+              ) : categoryFromUrl || filters.categories?.length ? (
+                <span className="text-[#009744]">{filters.categories?.[0] || categoryFromUrl}</span>
               ) : (
                 <span className="text-gray-900">{t('common.allProducts') || 'All Products'}</span>
               )}

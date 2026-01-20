@@ -20,56 +20,64 @@ interface ExquisiteCollectionProps {
   categories?: Category[];
 }
 
-const defaultCategories: Category[] = [
-  {
-    id: "1",
-    name: "Premium Dry Fruits",
-    image: "/images/hero/hero2.png",
-  },
-  {
-    id: "2",
-    name: "Nuts & Seeds",
-    image: "/images/hero/hero3.png",
-  },
-  {
-    id: "3",
-    name: "Authentic Spices",
-    image: "/images/hero/hero4.png",
-  },
-  {
-    id: "4",
-    name: "Kashmiri Saffron",
-    image: "/images/hero/hero5.png",
-  },
-  {
-    id: "5",
-    name: "Spice Blends",
-    image: "/images/hero/hero3.png",
-  },
-  {
-    id: "6",
-    name: "Exotic Chilies",
-    image: "/images/hero/hero5.png",
-  },
-];
+// Default images to use when categories are fetched from DB
+const categoryImages: { [key: string]: string } = {
+  "Dry Fruits": "/images/hero/hero2.png",
+  "Nuts": "/images/hero/hero3.png",
+  "Seeds": "/images/hero/hero3.png",
+  "Spices": "/images/hero/hero4.png",
+  "Gift Packs": "/images/hero/hero2.png",
+  "Honey & Spreads": "/images/hero/hero5.png",
+  "Mixes": "/images/hero/hero3.png",
+  "Organic": "/images/hero/hero4.png",
+  "Tea & Beverages": "/images/hero/hero5.png",
+};
+
+const defaultImage = "/images/hero/hero2.png";
+
+import { getCategories } from "@/src/lib/supabase/products";
 
 export function ExquisiteCollection({
   title = "Explore Our Exquisite Collection",
   subtitle = "Carefully curated premium dry fruits, nuts & spices",
-  categories = defaultCategories,
+  categories: propCategories,
 }: ExquisiteCollectionProps) {
   const { t } = useI18n();
-  
-  // Category name to translation key mapping
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // Fetch categories from database on mount
+  React.useEffect(() => {
+    if (propCategories) {
+      setCategories(propCategories);
+      setIsLoading(false);
+      return;
+    }
+
+    getCategories().then(cats => {
+      const mappedCategories = cats.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        image: categoryImages[cat.name] || defaultImage,
+      }));
+      setCategories(mappedCategories);
+      setIsLoading(false);
+    });
+  }, [propCategories]);
+
+  // Category name to translation key mapping (for dynamic DB categories)
   const categoryKeyMap: { [key: string]: string } = {
-    "Premium Dry Fruits": "productCategory.premiumDryFruits",
-    "Nuts & Seeds": "productCategory.nutsSeeds",
-    "Authentic Spices": "productCategory.authenticSpices",
-    "Kashmiri Saffron": "productCategory.kashmirisaffron",
-    "Spice Blends": "productCategory.spiceBlends",
-    "Exotic Chilies": "productCategory.exoticChilies",
+    "Dry Fruits": "productCategory.dryFruits",
+    "Nuts": "productCategory.nuts",
+    "Seeds": "productCategory.seeds",
+    "Spices": "productCategory.spices",
+    "Gift Packs": "productCategory.giftPacks",
+    "Honey & Spreads": "productCategory.honeySpreads",
+    "Mixes": "productCategory.mixes",
+    "Organic": "productCategory.organic",
+    "Tea & Beverages": "productCategory.teaBeverages",
   };
-  
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -116,21 +124,21 @@ export function ExquisiteCollection({
     <section className="w-full py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 xl:py-28 bg-white overflow-x-hidden">
       <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
-            <div className="text-center mb-6 xs:mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-2.5 xs:space-y-3 sm:space-y-6">
-              <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
-                <span className="text-[#AB1F23]">{t('collection.exploreOur')}</span>{" "}
-                <span className="text-[#009744]">{t('collection.exquisiteTitle')}</span>
-              </h2>
-              {subtitle && (
-                <div className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-3 px-2 xs:px-3 sm:px-0">
-                  <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
-                  <p className="text-sm xs:text-base sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
-                    {t('collection.subtitle')}
-                  </p>
-                  <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
-                </div>
-              )}
+        <div className="text-center mb-6 xs:mb-8 sm:mb-12 md:mb-14 lg:mb-20 space-y-2.5 xs:space-y-3 sm:space-y-6">
+          <h2 className="text-lg xs:text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-heading">
+            <span className="text-[#AB1F23]">{t('collection.exploreOur')}</span>{" "}
+            <span className="text-[#009744]">{t('collection.exquisiteTitle')}</span>
+          </h2>
+          {subtitle && (
+            <div className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-3 px-2 xs:px-3 sm:px-0">
+              <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
+              <p className="text-sm xs:text-base sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
+                {t('collection.subtitle')}
+              </p>
+              <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
             </div>
+          )}
+        </div>
 
         {/* Carousel Container */}
         <div className="relative group">
@@ -177,71 +185,75 @@ export function ExquisiteCollection({
               WebkitOverflowScrolling: "touch",
             }}
           >
-            {categories.map((category) => (
-              <Link key={category.id} href={`/search?q=${encodeURIComponent(category.name)}`}>
-                <motion.div
-                  className="flex-shrink-0 w-[90vw] sm:w-[calc(50vw-20px)] md:w-[calc(33.333vw-16px)] lg:w-[340px] snap-start"
-                  onMouseEnter={() => setHoveredCard(category.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  whileHover={{ y: -8 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                >
-                  <div
-                    className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`View ${category.name}`}
+            {categories.map((category) => {
+              // Convert category name to slug for URL (matches database category names)
+              const categorySlug = category.name;
+              return (
+                <Link key={category.id} href={`/search?category=${encodeURIComponent(categorySlug)}`}>
+                  <motion.div
+                    className="flex-shrink-0 w-[90vw] sm:w-[calc(50vw-20px)] md:w-[calc(33.333vw-16px)] lg:w-[340px] snap-start"
+                    onMouseEnter={() => setHoveredCard(category.id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    whileHover={{ y: -8 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                  {/* Image */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <motion.img
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                      animate={{
-                        scale: hoveredCard === category.id ? 1.08 : 1,
-                      }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    />
-                    {/* Overlay with brand green gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-colors duration-300" />
-                  </div>
+                    <div
+                      className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`View ${category.name}`}
+                    >
+                      {/* Image */}
+                      <div className="absolute inset-0 overflow-hidden">
+                        <motion.img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                          animate={{
+                            scale: hoveredCard === category.id ? 1.08 : 1,
+                          }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                        />
+                        {/* Overlay with brand green gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-colors duration-300" />
+                      </div>
 
-                  {/* Content */}
-                  <div className="absolute inset-0 flex items-end p-4 sm:p-5 md:p-7">
-                    <div className="w-full">
-                      <motion.h3
-                        className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight font-heading"
-                        animate={{
-                          y: hoveredCard === category.id ? -4 : 0,
-                        }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {t(categoryKeyMap[category.name] || `productCategory.${category.name}`)}
-                      </motion.h3>
-
-                      <AnimatePresence>
-                        {hoveredCard === category.id && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            transition={{ duration: 0.2 }}
-                            className="mt-3 md:mt-4"
+                      {/* Content */}
+                      <div className="absolute inset-0 flex items-end p-4 sm:p-5 md:p-7">
+                        <div className="w-full">
+                          <motion.h3
+                            className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight font-heading"
+                            animate={{
+                              y: hoveredCard === category.id ? -4 : 0,
+                            }}
+                            transition={{ duration: 0.3 }}
                           >
-                            <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
-                              {t('collection.exploreCollection')}
-                              <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
-                            </span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                            {t(categoryKeyMap[category.name] || `productCategory.${category.name}`)}
+                          </motion.h3>
+
+                          <AnimatePresence>
+                            {hoveredCard === category.id && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                transition={{ duration: 0.2 }}
+                                className="mt-3 md:mt-4"
+                              >
+                                <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
+                                  {t('collection.exploreCollection')}
+                                  <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
+                                </span>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
-            </Link>
-            ))}
+                  </motion.div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

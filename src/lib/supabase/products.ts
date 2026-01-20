@@ -9,7 +9,7 @@ type Category = Database["public"]["Tables"]["categories"]["Row"];
 
 export interface ProductWithVariants extends Product {
     variants: ProductVariant[];
-    category: Category | null; 
+    category: Category | null;
 }
 
 // Get all products with variants and category
@@ -72,19 +72,19 @@ export async function getProducts(options?: {
     const mapped = products.map((p) => {
         const images = Array.isArray(p.images)
             ? p.images
-                  .map((img: string) => {
-                      if (!img) return null;
-                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
-                          return img;
-                      }
-                      try {
-                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
-                          return publicUrl;
-                      } catch (e) {
-                          return null;
-                      }
-                  })
-                  .filter((x): x is string => Boolean(x))
+                .map((img: string) => {
+                    if (!img) return null;
+                    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                        return img;
+                    }
+                    try {
+                        const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                        return publicUrl;
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter((x): x is string => Boolean(x))
             : [];
 
         return { ...p, images };
@@ -117,19 +117,19 @@ export async function getProductBySlug(slug: string): Promise<ProductWithVariant
     if (product) {
         const images = Array.isArray(product.images)
             ? product.images
-                  .map((img: string) => {
-                      if (!img) return null;
-                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
-                          return img;
-                      }
-                      try {
-                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
-                          return publicUrl;
-                      } catch (e) {
-                          return null;
-                      }
-                  })
-                  .filter((x): x is string => Boolean(x))
+                .map((img: string) => {
+                    if (!img) return null;
+                    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                        return img;
+                    }
+                    try {
+                        const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                        return publicUrl;
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter((x): x is string => Boolean(x))
             : [];
         return { ...product, images } as ProductWithVariants;
     }
@@ -159,19 +159,19 @@ export async function getProductById(id: string): Promise<ProductWithVariants | 
     if (product) {
         const images = Array.isArray(product.images)
             ? product.images
-                  .map((img: string) => {
-                      if (!img) return null;
-                      if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
-                          return img;
-                      }
-                      try {
-                          const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
-                          return publicUrl;
-                      } catch (e) {
-                          return null;
-                      }
-                  })
-                  .filter((x): x is string => Boolean(x))
+                .map((img: string) => {
+                    if (!img) return null;
+                    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                        return img;
+                    }
+                    try {
+                        const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                        return publicUrl;
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter((x): x is string => Boolean(x))
             : [];
         return { ...product, images } as ProductWithVariants;
     }
@@ -297,7 +297,29 @@ export async function searchProducts(
         results = results.filter(p => p.variants.some(v => (v.stock_quantity || 0) > 0));
     }
 
-    return results;
+    // Ensure images are public URLs (convert storage paths to public URLs)
+    const mapped = results.map((p) => {
+        const images = Array.isArray(p.images)
+            ? p.images
+                .map((img: string) => {
+                    if (!img) return null;
+                    if (typeof img === "string" && (img.startsWith("http://") || img.startsWith("https://"))) {
+                        return img;
+                    }
+                    try {
+                        const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+                        return publicUrl;
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter((x): x is string => Boolean(x))
+            : [];
+
+        return { ...p, images };
+    });
+
+    return mapped;
 }
 
 // Get all categories

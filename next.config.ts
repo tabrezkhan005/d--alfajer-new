@@ -4,18 +4,17 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
+    unoptimized: true, // Bypass Next.js image optimization for external URLs
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.supabase.co",
-      },
-      {
-        protocol: "https",
         hostname: "ijchxbtovluwlrdbwrqb.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
