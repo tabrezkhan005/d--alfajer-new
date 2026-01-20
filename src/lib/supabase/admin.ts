@@ -627,14 +627,14 @@ export async function getAnnouncements() {
     console.error("Error fetching announcements:", error);
     return [];
   }
-  return data.map((item: any) => ({ ...item, content: item.message }));
+  return data;
 }
 
 export async function createAnnouncement(announcement: any) {
   const supabase = createClient();
 
   const payload = {
-      message: announcement.content,
+      content: announcement.content,
       link_url: announcement.link_url || null,
       start_date: announcement.start_date || null,
       end_date: announcement.end_date || null,
@@ -644,7 +644,7 @@ export async function createAnnouncement(announcement: any) {
 
   const { data, error } = await supabase
     .from("announcements")
-    .insert(payload)
+    .insert(payload as any)
     .select()
     .single();
 
@@ -652,7 +652,7 @@ export async function createAnnouncement(announcement: any) {
     console.error("Error creating announcement:", error);
     return null;
   }
-  return { ...data, content: data.message };
+  return data;
 }
 
 export async function updateAnnouncement(id: string, updates: any) {
@@ -662,7 +662,7 @@ export async function updateAnnouncement(id: string, updates: any) {
       updated_at: new Date().toISOString()
   };
 
-  if (updates.content !== undefined) payload.message = updates.content;
+  if (updates.content !== undefined) payload.content = updates.content;
   if (updates.link_url !== undefined) payload.link_url = updates.link_url || null;
   if (updates.start_date !== undefined) payload.start_date = updates.start_date || null;
   if (updates.end_date !== undefined) payload.end_date = updates.end_date || null;

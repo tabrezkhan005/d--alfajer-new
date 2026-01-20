@@ -43,7 +43,7 @@ export default function CustomersPage() {
       try {
         setLoading(true);
         const data = await getCustomers();
-        setCustomers(data || []);
+        setCustomers((data as unknown as Customer[]) || []);
       } catch (error) {
         console.error("Error fetching customers:", error);
         toast.error("Failed to load customers");
