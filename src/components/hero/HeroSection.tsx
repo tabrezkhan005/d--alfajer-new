@@ -208,7 +208,7 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(100px, 8vw, 140px)" }}>
+      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(180px, 20vw, 280px)", paddingBottom: "clamp(60px, 15vw, 120px)" }}>
         <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (

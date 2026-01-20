@@ -56,84 +56,70 @@ export function Header() {
         }}
       >
         <div className="relative mx-auto flex w-full max-w-[1920px] items-center justify-between px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex-[0.3] hidden lg:block" />
-
-          <div className="flex items-center gap-1 xs:gap-2 sm:gap-4 flex-1 justify-start min-w-0">
-            <Link href="/" aria-label="Home" className="shrink-0 flex items-center">
-              <div className="relative flex items-center justify-center rounded-full"
+          {/* Logo - Left */}
+          <Link href="/" aria-label="Home" className="shrink-0 flex items-center">
+            <div className="relative flex items-center justify-center rounded-full"
+              style={{
+                width: "clamp(50px, 10vw, 70px)",
+                height: "clamp(50px, 10vw, 70px)",
+                backgroundColor: "#f0f0f0",
+                border: "2px solid #e5e7eb",
+              }}>
+              <Image
+                src="/images/alfajernewlogo.jpeg"
+                alt="Al Fajer Mart"
+                width={110}
+                height={25}
+                className="object-contain"
                 style={{
-                  width: "clamp(50px, 10vw, 70px)",
-                  height: "clamp(50px, 10vw, 70px)",
-                  backgroundColor: "#f0f0f0",
-                  border: "2px solid #e5e7eb",
-                }}>
-                <Image
-                  src="/images/alfajernewlogo.jpeg"
-                  alt="Al Fajer Mart"
-                  width={110}
-                  height={25}
-                  className="object-contain"
-                  style={{
-                    width: "clamp(40px, 8vw, 56px)",
-                    height: "auto",
-                  }}
-                  priority
-                />
-              </div>
-            </Link>
-
-            <div className="hidden md:flex items-center w-full max-w-[400px]">
-              <form
-                className="relative w-full flex items-center"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const query = formData.get("search") as string;
-                  console.log("Search submitted:", query);
+                  width: "clamp(40px, 8vw, 56px)",
+                  height: "auto",
                 }}
-              >
-                <Input
-                  type="search"
-                  name="search"
-                  placeholder={t('common.search') + " for organic products, dry fruits, honey..."}
-                  className="
-                    h-12 pl-6 pr-24 rounded-full
-                    bg-white border-2 border-gray-200
-                    text-sm
-                    focus-visible:ring-2 focus-visible:ring-[#009744]/40 focus-visible:border-[#009744]
-                    transition-all duration-200
-                    w-full
-                  "
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="absolute right-2 h-8 w-8 rounded-full bg-[#009744] hover:bg-[#2E763B] text-white transition-colors shadow-sm"
-                  aria-label="Search"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </form>
+                priority
+              />
             </div>
+          </Link>
+
+          {/* Search Bar - Center (hidden on mobile) */}
+          <div className="hidden md:flex items-center justify-center flex-1 mx-4 lg:mx-6">
+            <form
+              className="relative w-full max-w-md flex items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const query = formData.get("search") as string;
+                console.log("Search submitted:", query);
+              }}
+            >
+              <Input
+                type="search"
+                name="search"
+                placeholder="Search for organic products, dry fruits..."
+                className="
+                  h-12 pl-6 pr-24 rounded-full
+                  bg-white border-2 border-gray-200
+                  text-sm
+                  focus-visible:ring-2 focus-visible:ring-[#009744]/40 focus-visible:border-[#009744]
+                  transition-all duration-200
+                  w-full
+                "
+              />
+              <Button
+                type="submit"
+                size="icon"
+                className="absolute right-2 h-8 w-8 rounded-full bg-[#009744] hover:bg-[#2E763B] text-white transition-colors shadow-sm"
+                aria-label="Search"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </form>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-1 justify-end">
+          {/* Right Actions - Support, Wishlist, Login, Cart */}
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
             {/* Desktop: Actions */}
             <div className="hidden lg:flex items-center gap-3 lg:gap-4">
-              {/* Language Switcher */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-1 px-2 text-gray-700 hover:text-[#009744] hover:bg-transparent">
-                    <span className="text-xs md:text-sm font-medium uppercase">{language}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer">English</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">العربية</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage('hi')} className="cursor-pointer">हिंदी</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
+              {/* Support */}
               <div className="group relative flex items-center">
                 <Link href="/support" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                   <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
@@ -145,6 +131,7 @@ export function Header() {
                 </Link>
               </div>
 
+              {/* Wishlist */}
               <div className="group relative flex items-center">
                 <Link href="/wishlist" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                   <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
@@ -154,6 +141,7 @@ export function Header() {
                 </Link>
               </div>
 
+              {/* Login/Account */}
               {isLoggedIn ? (
                 <div className="group relative">
                   <Link href="/account" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
