@@ -208,7 +208,7 @@ export function HeroSection() {
       />
 
       {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(120px, 15vw, 160px)" }}>
+      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(100px, 8vw, 140px)" }}>
         <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             {slide.showBanner && current === 0 ? (
@@ -227,29 +227,29 @@ export function HeroSection() {
                     </span>
                   </motion.div>
 
-                  <div className="text-center mb-4 sm:mb-6">
-                    <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] font-heading mb-1 sm:mb-2 drop-shadow-2xl px-2">
+                  <div className="text-center mb-2 xs:mb-3 sm:mb-4 md:mb-6">
+                    <motion.h1 variants={itemVariants} className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white leading-[1.05] font-heading mb-0.5 xs:mb-1 sm:mb-2 drop-shadow-2xl px-2">
                       {t('hero.mainTitle')}
                     </motion.h1>
-                    <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] font-heading mb-3 sm:mb-4 drop-shadow-2xl px-2">
+                    <motion.h1 variants={itemVariants} className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.05] font-heading mb-2 xs:mb-2.5 sm:mb-3 md:mb-4 drop-shadow-2xl px-2">
                       <span className="text-white">{t('hero.mainSubtitle')}</span>
                     </motion.h1>
-                    <motion.p variants={itemVariants} className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-4 sm:mb-6 px-3 sm:px-4">
+                    <motion.p variants={itemVariants} className="text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">
                       {t('hero.mainDescription')}
                     </motion.p>
                   </div>
 
-                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6 px-2 sm:px-4">
+                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 mb-2.5 xs:mb-3.5 sm:mb-4 md:mb-6 px-2 xs:px-2.5 sm:px-4">
                     {[
                       { icon: "/images/icons/fresh_6643364.png", labelKey: "hero.box1Label", descKey: "hero.box1Desc", color: "#009744" },
                       { icon: "/images/icons/green-logistics_9402143.png", labelKey: "hero.box2Label", descKey: "hero.box2Desc", color: "#FFD700" },
                       { icon: "/images/icons/organic_4497598.png", labelKey: "hero.box3Label", descKey: "hero.box3Desc", color: "#009744" },
                       { icon: "/images/icons/Rating-Five-Star--Streamline-Ultimate.png", labelKey: "hero.box4Label", descKey: "hero.box4Desc", color: "#AB1F23" }
                     ].map((feat, idx) => (
-                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-xl sm:rounded-2xl p-2 sm:p-4 transition-all duration-500 cursor-default">
-                        <div className="flex justify-center mb-2 sm:mb-3">
+                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-lg xs:rounded-xl sm:rounded-2xl p-1.5 xs:p-2 sm:p-3 md:p-4 transition-all duration-500 cursor-default">
+                        <div className="flex justify-center mb-1 xs:mb-1.5 sm:mb-2 md:mb-3">
                           <div
-                            className="h-8 sm:h-12 w-8 sm:w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 overflow-hidden"
+                            className="h-6 xs:h-7 sm:h-10 md:h-12 w-6 xs:w-7 sm:w-10 md:w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 overflow-hidden"
                             style={{ backgroundColor: `${feat.color}20` }}
                           >
                             <Image
@@ -257,25 +257,25 @@ export function HeroSection() {
                               alt={t(feat.labelKey)}
                               width={32}
                               height={32}
-                              className="h-6 w-6 sm:h-8 sm:w-8 object-contain"
+                              className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 object-contain"
                             />
                           </div>
                         </div>
-                        <div className="text-[10px] sm:text-sm md:text-base text-white font-bold font-poppins mb-0.5">{t(feat.labelKey)}</div>
-                        <div className="text-white/60 text-[8px] sm:text-xs font-body tracking-tight">{t(feat.descKey)}</div>
+                        <div className="text-[8px] xs:text-[9px] sm:text-xs md:text-sm text-white font-bold font-poppins mb-0.5">{t(feat.labelKey)}</div>
+                        <div className="text-white/60 text-[7px] xs:text-[8px] sm:text-xs font-body tracking-tight leading-tight">{t(feat.descKey)}</div>
                       </div>
                     ))}
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
+                  <motion.div variants={itemVariants} className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 px-2 xs:px-2.5 sm:px-4">
                     <Link href="/shop">
                       <Button
                         size="lg"
-                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
+                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-4 xs:px-5 sm:px-7 md:px-8 py-3 xs:py-3.5 sm:py-4 md:py-5 text-[11px] xs:text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
                       >
-                        <span className="relative z-10 flex items-center gap-2 sm:gap-2 justify-center">
+                        <span className="relative z-10 flex items-center gap-1.5 xs:gap-2 sm:gap-2 justify-center">
                           {t('hero.cta')}
-                          <ArrowRight className="h-4 sm:h-4 w-4 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                          <ArrowRight className="h-3 xs:h-3.5 sm:h-4 w-3 xs:w-3.5 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                       </Button>
@@ -284,10 +284,10 @@ export function HeroSection() {
                       <Button
                         size="lg"
                         variant="outline"
-                        className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-6 sm:px-8 py-5 sm:py-6 text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-2 sm:gap-2 justify-center w-full sm:w-auto"
+                        className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-4 xs:px-5 sm:px-7 md:px-8 py-3 xs:py-3.5 sm:py-4 md:py-5 text-[11px] xs:text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-1.5 xs:gap-2 sm:gap-2 justify-center w-full sm:w-auto"
                       >
                         {t('hero.story')}
-                        <Play className="h-4 sm:h-4 w-4 sm:w-4 fill-white" />
+                        <Play className="h-3 xs:h-3.5 sm:h-4 w-3 xs:w-3.5 sm:w-4 fill-white" />
                       </Button>
                     </Link>
                   </motion.div>
