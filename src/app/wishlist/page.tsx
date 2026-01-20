@@ -45,7 +45,7 @@ export default function WishlistPage() {
         </div>
 
         {/* Login Required Section */}
-        <div className="max-w-7xl mx-auto px-4 py-12 pt-16 sm:pt-20 lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4 py-8 pt-8 sm:pt-12 lg:pt-14">
           <div className="text-center py-20">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -74,7 +74,7 @@ export default function WishlistPage() {
                   </Button>
                 </Link>
                 <Link href="/products">
-                  <Button variant="outline" className="border-2 border-gray-300 hover:border-[#009744] text-gray-900 font-semibold h-12 px-8 rounded-lg">
+                  <Button className="bg-white hover:bg-gray-50 border-2 border-white text-gray-900 font-semibold h-12 px-8 rounded-lg">
                     Continue Shopping
                   </Button>
                 </Link>
@@ -119,9 +119,9 @@ export default function WishlistPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12 pt-16 sm:pt-20 lg:pt-24">
+      <div className="max-w-7xl mx-auto px-4 py-8 pt-8 sm:pt-12 lg:pt-14">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <Heart size={32} className="text-[#AB1F23] fill-[#AB1F23]" />
             <h1 className="text-4xl font-bold text-gray-900">{t("product.wishlist")}</h1>

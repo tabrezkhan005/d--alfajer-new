@@ -89,11 +89,11 @@ export default function CollectionsPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-40 xs:pt-44 sm:pt-48 md:pt-52 lg:pt-56">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-20 xs:pt-24 sm:pt-28 md:pt-32 lg:pt-36">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-64 xs:w-72 sm:w-80 md:w-96 h-64 xs:h-72 sm:h-80 md:h-96 bg-white rounded-full blur-3xl"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-12 xs:py-14 sm:py-16 md:py-20 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-6 xs:py-8 sm:py-10 md:py-12 lg:py-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,7 +115,7 @@ export default function CollectionsPage() {
       </div>
 
       {/* Collections Grid */}
-      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-4 xs:py-6 sm:py-8 md:py-10 lg:py-12">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -151,7 +151,7 @@ export default function CollectionsPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-12 xs:mt-14 sm:mt-16 md:mt-18 lg:mt-20 bg-gradient-to-r from-[#009744] via-[#00a852] to-[#006b2f] rounded-2xl p-5 xs:p-6 sm:p-8 md:p-10 lg:p-12 text-white relative overflow-hidden"
+          className="mt-6 xs:mt-8 sm:mt-10 md:mt-12 lg:mt-14 bg-gradient-to-r from-[#009744] via-[#00a852] to-[#006b2f] rounded-2xl p-5 xs:p-6 sm:p-8 md:p-10 lg:p-12 text-white relative overflow-hidden"
         >
           <div className="absolute inset-0 opacity-10">
             <div className="absolute bottom-0 right-0 w-48 xs:w-56 sm:w-64 h-48 xs:h-56 sm:h-64 bg-white rounded-full blur-3xl"></div>
