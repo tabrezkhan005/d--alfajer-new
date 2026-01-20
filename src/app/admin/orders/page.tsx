@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Eye, Loader2, Filter, Download } from "lucide-react";
@@ -55,7 +55,7 @@ const escapeCSV = (field: any) => {
   return stringField;
 };
 
-export default function OrdersPage() {
+function OrdersContent() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [loading, setLoading] = useState(true);
@@ -286,3 +286,17 @@ export default function OrdersPage() {
     </div>
   );
 }
+
+ export default function OrdersPage() {
+   return (
+     <Suspense
+       fallback={
+         <div className="flex items-center justify-center h-96">
+           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+         </div>
+       }
+     >
+       <OrdersContent />
+     </Suspense>
+   );
+ }

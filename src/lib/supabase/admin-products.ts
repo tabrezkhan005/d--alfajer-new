@@ -103,7 +103,7 @@ export async function createProduct(productData: {
             images: productData.images || [],
             rating: 0,
             review_count: 0,
-        })
+        } as any)
         .select()
         .single();
 

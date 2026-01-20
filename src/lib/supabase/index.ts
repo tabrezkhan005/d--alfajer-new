@@ -22,7 +22,7 @@ export {
     getOrderById,
     getAllOrders,
     updateOrderStatus,
-    updateTrackingId,
+    updateTrackingNumber,
     getOrderStats,
     type OrderWithItems,
 } from "./orders";

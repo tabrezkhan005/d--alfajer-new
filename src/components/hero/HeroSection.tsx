@@ -175,11 +175,12 @@ export function HeroSection() {
                         transition={{ duration: 10, ease: "linear" }}
                         className="absolute inset-0"
                       >
-                        <img
+                        <Image
                           src={s.src}
                           alt={s.title}
-                          className="h-full w-full object-cover object-center"
-                          loading={i === 0 ? "eager" : "lazy"}
+                          fill
+                          className="object-cover object-center"
+                          priority={i === 0}
                         />
                       </motion.div>
                       <div
