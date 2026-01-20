@@ -756,7 +756,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'whychoose.title': 'Crafting Excellence',
     'whychoose.subtitle': 'In Every Detail.',
     'whychoose.description': 'We are committed to providing the most exquisite dates and nuts, combining traditional heritage with modern excellence.',
-    'whychoose.difference': 'The Al Fajr Difference',
+    'whychoose.difference': 'The Al Fajer Difference',
     'whychoose.feature1Title': 'Premium Quality',
     'whychoose.feature1Desc': 'We source only the finest hand-picked dates and premium nuts from the most fertile regions, ensuring unparalleled quality.',
     'whychoose.feature2Title': '100% Natural',
@@ -771,7 +771,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'whychoose.feature6Desc': 'We ensure our products reach you in their freshest state through our optimized supply chain and fresh storage.',
 
     // Newsletter
-    'newsletter.journal': 'The Al Fajr Journal',
+    'newsletter.journal': 'The Al Fajer Journal',
     'newsletter.title': 'Curated Wisdom, Delivered.',
     'newsletter.subtitle': 'Join our community for exclusive harvest updates, seasonal collections, and the philosophy of premium dates.',
     'newsletter.placeholder': 'your@email.com',

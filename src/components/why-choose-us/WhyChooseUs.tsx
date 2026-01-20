@@ -111,10 +111,11 @@ export function WhyChooseUs() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center md:justify-start gap-1.5 xs:gap-2 md:gap-3 mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
+            className="flex items-center justify-center gap-1.5 xs:gap-2 md:gap-3 mb-1.5 xs:mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-0"
           >
             <span className="w-2 xs:w-3 sm:w-6 md:w-12 h-[1px] bg-primary" />
             <span className="text-primary font-medium tracking-[0.3em] uppercase text-xs xs:text-sm sm:text-[8px] md:text-[9px] lg:text-[10px] flex-shrink-0">{t('whychoose.difference')}</span>
+            <span className="w-2 xs:w-3 sm:w-6 md:w-12 h-[1px] bg-primary" />
           </motion.div>
 
           <motion.h2
@@ -122,7 +123,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-base xs:text-lg sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-heading font-light text-slate-900 leading-[1.15] mb-1.5 xs:mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0"
+            className="text-base xs:text-lg sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-heading font-light text-slate-900 leading-[1.15] mb-1.5 xs:mb-2 sm:mb-4 md:mb-8 px-2 sm:px-0 text-center"
           >
             {t('whychoose.title')} <br />
             <span className="italic font-serif text-primary">{t('whychoose.subtitle')}</span>
@@ -133,7 +134,7 @@ export function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-slate-500 text-sm xs:text-base sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl border-l border-slate-200 pl-1.5 xs:pl-2 sm:pl-4 md:pl-8 ml-0 md:ml-1 px-2 sm:px-0"
+            className="text-slate-500 text-sm xs:text-base sm:text-xs md:text-sm lg:text-base font-body leading-relaxed max-w-2xl mx-auto text-center px-2 sm:px-0"
           >
             {t('whychoose.description')}
           </motion.p>
