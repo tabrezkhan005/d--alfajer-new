@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
+import { createCustomer } from "@/src/app/actions";
 
 export interface User {
   id: string;
@@ -85,12 +86,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Create customer record if doesn't exist
       if (data.user) {
-        await supabase.from("customers").upsert({
-          id: data.user.id,
-          email: data.user.email!,
-          first_name: data.user.user_metadata?.name?.split(" ")[0] || null,
-          last_name: data.user.user_metadata?.name?.split(" ").slice(1).join(" ") || null,
-        }, { onConflict: "id" });
+        // Use server action to bypass RLS
+        await createCustomer(
+          data.user.id,
+          data.user.email!,
+          data.user.user_metadata?.name || data.user.email?.split("@")[0] || "User",
+          data.user.user_metadata?.country || "AE" // Default or existing
+        );
       }
 
       setIsLoading(false);
@@ -123,14 +125,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Create customer record
       if (data.user) {
-        const nameParts = name.split(" ");
-        await supabase.from("customers").insert({
-          id: data.user.id,
-          email: email,
-          first_name: nameParts[0] || null,
-          last_name: nameParts.slice(1).join(" ") || null,
-          country: country,
-        });
+        // Use server action to bypass RLS
+        await createCustomer(data.user.id, email, name, country);
       }
 
       setIsLoading(false);
