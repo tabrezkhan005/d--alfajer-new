@@ -107,7 +107,7 @@ export default function SupportPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-40 sm:pt-44 md:pt-48 lg:pt-52 xl:pt-56">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-48 sm:w-64 md:w-80 lg:w-96 h-48 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
         </div>

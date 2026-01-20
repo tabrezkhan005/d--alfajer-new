@@ -108,7 +108,7 @@ export default function FAQPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-40 xs:pt-44 sm:pt-48 md:pt-52 lg:pt-56">
+      <div className="bg-gradient-to-br from-[#009744] via-[#00a852] to-[#006b2f] text-white relative overflow-hidden pt-20 xs:pt-24 sm:pt-28 md:pt-32 lg:pt-36">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-48 xs:w-56 sm:w-64 md:w-80 lg:w-96 h-48 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-white rounded-full blur-3xl"></div>
         </div>

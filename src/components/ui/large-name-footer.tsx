@@ -11,7 +11,7 @@ function Footer() {
   const { t } = useI18n();
   return (
     <footer className="w-full bg-gray-50 border-t border-gray-200 overflow-x-hidden">
-      <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
+      <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 md:py-8 lg:py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-6 lg:gap-8 xl:gap-12">
           {/* Brand Column */}
           <div className="sm:col-span-2 md:col-span-1 space-y-2 sm:space-y-3">
@@ -104,14 +104,6 @@ function Footer() {
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
-                  href="/contact"
-                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
-                >
-                  {t('footer.contactUs')}
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/returns"
                   className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
@@ -170,7 +162,7 @@ function Footer() {
         </div>
 
         {/* Large Brand Text */}
-        <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-16 pt-6 sm:pt-8 md:pt-10 lg:pt-12 border-t border-gray-200">
+        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10 pt-4 sm:pt-6 md:pt-8 lg:pt-10 border-t border-gray-200">
           <div className="flex items-center justify-center px-2">
             <h1
               className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold select-none font-secondary tracking-tight leading-tight sm:leading-none bg-gradient-to-b from-[#009744] via-[#099042] via-[#128A40] via-[#1C833F] via-[#257D3D] to-[#2E763B] text-transparent bg-clip-text"
@@ -181,7 +173,7 @@ function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 pt-4 sm:pt-6 md:pt-8 border-t border-gray-200">
+        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10 pt-3 sm:pt-4 md:pt-6 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 px-2">
             <p className="text-xs sm:text-sm md:text-sm lg:text-sm text-gray-600 text-center sm:text-left">
               {t('footer.copyright')}
