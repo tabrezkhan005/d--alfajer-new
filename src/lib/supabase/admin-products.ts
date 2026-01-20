@@ -315,6 +315,128 @@ export async function deleteProductImage(imageUrl: string): Promise<void> {
     }
 }
 
+// Get all variants for a product
+export async function getProductVariants(productId: string): Promise<ProductVariant[]> {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", productId)
+        .order("price", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching variants:", error);
+        throw error;
+    }
+
+    return data || [];
+}
+
+// Bulk update or create variants for a product
+export async function updateOrCreateVariants(
+    productId: string,
+    variants: Array<{
+        id?: string;
+        sku: string;
+        size: string;
+        weight: string;
+        display_name: string;
+        price: number;
+        original_price?: number;
+        stock_quantity: number;
+        is_default?: boolean;
+    }>
+): Promise<ProductVariant[]> {
+    const supabase = createClient();
+    const results: ProductVariant[] = [];
+
+    for (const variant of variants) {
+        // Prepare common data object
+        const variantData = {
+            sku: variant.sku,
+            size: variant.size,
+            weight: variant.weight,
+            display_name: variant.display_name,
+            price: variant.price,
+            original_price: variant.original_price === undefined ? null : variant.original_price,
+            stock_quantity: variant.stock_quantity,
+            is_default: variant.is_default ?? false,
+            updated_at: new Date().toISOString(),
+        };
+
+        if (variant.id) {
+            // Update existing variant by ID
+            const { data, error } = await supabase
+                .from("product_variants")
+                .update(variantData)
+                .eq("id", variant.id)
+                .select();
+
+            if (error) {
+                console.error("Error updating variant by ID:", JSON.stringify(error, null, 2));
+                throw error;
+            }
+
+            if (data && data.length > 0) {
+                results.push(data[0]);
+                continue;
+            } else {
+                 console.warn(`Variant with ID ${variant.id} not found, falling back to create/upsert.`);
+                 // Fall through to create logic below
+            }
+        }
+
+        // Create logic (or fallback from update)
+        // First, check if a variant with this SKU already exists
+        if (variant.sku) {
+             const { data: existingVariant } = await supabase
+                .from("product_variants")
+                .select("id")
+                .eq("sku", variant.sku)
+                .maybeSingle();
+
+             if (existingVariant) {
+                 // Update the existing variant using its ID
+                 const { data: updatedData, error: updateError } = await supabase
+                    .from("product_variants")
+                    .update({
+                        ...variantData,
+                        product_id: productId // Ensure ownership
+                    })
+                    .eq("id", existingVariant.id)
+                    .select()
+                    .single();
+
+                 if (updateError) {
+                     console.error("Error updating existing variant by SKU:", JSON.stringify(updateError, null, 2));
+                     throw updateError;
+                 }
+                 results.push(updatedData);
+                 continue;
+             }
+        }
+
+        // If no existing variant with this SKU, insert new one
+        const { data: newData, error: insertError } = await supabase
+            .from("product_variants")
+            .insert({
+                product_id: productId,
+                ...variantData
+            })
+            .select()
+            .single();
+
+        if (insertError) {
+             console.error("Error creating variant:", JSON.stringify(insertError, null, 2));
+             throw insertError;
+        }
+        results.push(newData);
+    }
+
+    return results;
+}
+
 // Get all categories
 export async function getAdminCategories(): Promise<Category[]> {
     const supabase = createClient();
@@ -330,4 +452,35 @@ export async function getAdminCategories(): Promise<Category[]> {
     }
 
     return data || [];
+}
+
+// Create a new category
+export async function createCategory(categoryData: {
+    name: string;
+    description?: string;
+}): Promise<Category> {
+    const supabase = createClient();
+
+    // Generate slug from name
+    const slug = categoryData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+    const { data, error } = await supabase
+        .from("categories")
+        .insert({
+            name: categoryData.name,
+            slug: slug,
+            description: categoryData.description || null,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error creating category:", error);
+        throw error;
+    }
+
+    return data;
 }

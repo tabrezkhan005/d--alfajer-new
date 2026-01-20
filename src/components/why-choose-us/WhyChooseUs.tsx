@@ -85,9 +85,6 @@ export function WhyChooseUs() {
       `}
     >
       <div className="relative">
-        <span className="text-xs xs:text-sm sm:text-[7px] md:text-[8px] lg:text-[10px] font-bold tracking-widest text-primary/40 block mb-1 xs:mb-1.5 sm:mb-2 md:mb-3 lg:mb-6 transition-transform duration-500 group-hover:translate-x-1">
-          {feature.number}
-        </span>
         <h3 className="text-sm xs:text-base sm:text-sm md:text-base lg:text-lg xl:text-xl font-heading font-medium text-slate-900 mb-1 xs:mb-1.5 sm:mb-2 md:mb-3 lg:mb-4 tracking-tight">
           {feature.title}
         </h3>

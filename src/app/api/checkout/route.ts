@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
 
     // Validate product prices from database
     const productIds = items.map((item: { productId?: string; id?: string }) => item.productId || item.id);
+    const variantIds = items.map((item: { variantId?: string }) => item.variantId).filter(Boolean);
+
+    // Fetch products
     const { data: products, error: productError } = await supabase
       .from('products')
       .select('id, base_price, name')
@@ -49,8 +52,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 });
     }
 
+    // Fetch variants if needed
+    let variants: any[] = [];
+    if (variantIds.length > 0) {
+        const { data: variantsData, error: variantError } = await supabase
+            .from('product_variants')
+            .select('id, price, product_id, size')
+            .in('id', variantIds);
+
+        if (variantError) {
+             console.error('Error fetching variants:', variantError);
+             // We won't block, but validation might fail if strict
+        } else {
+            variants = variantsData || [];
+        }
+    }
+
     // Create a price map for validation
-    const priceMap = new Map(products?.map(p => [p.id, { price: p.base_price, name: p.name }]) || []);
+    // Map: ProductID -> Product Data
+    const productMap = new Map(products?.map(p => [p.id, p]) || []);
+    // Map: VariantID -> Variant Data
+    const variantMap = new Map(variants.map(v => [v.id, v]));
 
     // Calculate totals with validated prices
     let subtotal = 0;
@@ -65,14 +87,27 @@ export async function POST(request: NextRequest) {
       image?: string;
     }) => {
       const productId = (item.productId || item.id) as string;
-      const productData = priceMap.get(productId || '');
-      const validatedPrice = productData?.price || item.price;
+      const productData = productMap.get(productId || '');
+      const variantData = item.variantId ? variantMap.get(item.variantId) : null;
+
+      // Prioritize variant price, then product base price, then item price (fallback/trust client for custom items if valid)
+      // Ideally we trust DB prices.
+      let validatedPrice = item.price;
+      let name = item.name;
+
+      if (variantData) {
+          validatedPrice = variantData.price || 0;
+      } else if (productData) {
+          validatedPrice = productData.base_price || 0;
+          name = productData.name;
+      }
+
       subtotal += validatedPrice * item.quantity;
 
       return {
         product_id: productId,
         variant_id: item.variantId || null,
-        name: productData?.name || item.name,
+        name: name,
         quantity: item.quantity,
         price: validatedPrice,
         total: validatedPrice * item.quantity,

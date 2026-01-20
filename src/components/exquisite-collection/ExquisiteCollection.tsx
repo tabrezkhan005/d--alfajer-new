@@ -43,40 +43,35 @@ export function ExquisiteCollection({
   categories: propCategories,
 }: ExquisiteCollectionProps) {
   const { t } = useI18n();
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const categories: Category[] = [
+    {
+      id: "shilajit",
+      name: "Shilajit",
+      image: "/images/hero/shilajit.png",
+    },
+    {
+      id: "saffron",
+      name: "Saffron",
+      image: "/images/hero/hero4.png",
+    },
+    {
+      id: "dry-fruits",
+      name: "Premium Dry Fruits",
+      // Using existing mapping or explicit path
+      image: "/images/hero/hero2.png",
+    },
+    {
+      id: "spices",
+      name: "Authentic Spices",
+      // Using existing mapping or explicit path
+      image: "/images/hero/hero5.png",
+    },
+  ];
 
-  // Fetch categories from database on mount
-  React.useEffect(() => {
-    if (propCategories) {
-      setCategories(propCategories);
-      setIsLoading(false);
-      return;
-    }
-
-    getCategories().then(cats => {
-      const mappedCategories = cats.map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        image: categoryImages[cat.name] || defaultImage,
-      }));
-      setCategories(mappedCategories);
-      setIsLoading(false);
-    });
-  }, [propCategories]);
-
-  // Category name to translation key mapping (for dynamic DB categories)
-  const categoryKeyMap: { [key: string]: string } = {
-    "Dry Fruits": "productCategory.dryFruits",
-    "Nuts": "productCategory.nuts",
-    "Seeds": "productCategory.seeds",
-    "Spices": "productCategory.spices",
-    "Gift Packs": "productCategory.giftPacks",
-    "Honey & Spreads": "productCategory.honeySpreads",
-    "Mixes": "productCategory.mixes",
-    "Organic": "productCategory.organic",
-    "Tea & Beverages": "productCategory.teaBeverages",
-  };
+  /*
+     Removed DB fetching logic to enforce strictly these 4 items as requested.
+     If dynamic fetching is needed again, restore the useEffect and getCategories call.
+  */
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -95,6 +90,9 @@ export function ExquisiteCollection({
     checkScrollability();
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
+      // Check immediately and after a short delay to ensure layout is ready
+      checkScrollability();
+      setTimeout(checkScrollability, 100);
       scrollContainer.addEventListener("scroll", checkScrollability);
     }
     window.addEventListener("resize", checkScrollability);
@@ -120,6 +118,31 @@ export function ExquisiteCollection({
     }
   };
 
+  // Category name to translation key mapping (for dynamic DB categories)
+  const categoryKeyMap: { [key: string]: string } = {
+    "Dry Fruits": "productCategory.premiumDryFruits",
+    "Nuts": "productCategory.nutsSeeds",
+    "Seeds": "productCategory.nutsSeeds",
+    "Spices": "productCategory.authenticSpices",
+    "Gift Packs": "productCategory.giftPacks",
+    "Honey & Spreads": "productCategory.honeySpreads",
+    "Mixes": "productCategory.mixes",
+    "Organic": "productCategory.organic",
+    "Tea & Beverages": "productCategory.teaBeverages",
+  };
+
+  // Helper function to get translated category name with fallback
+  // We can just return the name directly since these are hardcoded, or keep using translation if keys exist
+  const getCategoryName = (categoryName: string): string => {
+     // Check for specific keys for our new items
+     if (categoryName === "Shilajit") return t('productCategory.shilajit') === 'productCategory.shilajit' ? "Pure Shilajit" : t('productCategory.shilajit');
+     if (categoryName === "Saffron") return t('productCategory.saffron') === 'productCategory.saffron' ? "Premium Saffron" : t('productCategory.saffron');
+
+     const translationKey = categoryKeyMap[categoryName] || `productCategory.${categoryName.replace(/\s+/g, '')}`;
+     const translated = t(translationKey);
+     return translated === translationKey ? categoryName : translated;
+  };
+
   return (
     <section className="w-full py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20 xl:py-28 bg-white overflow-x-hidden">
       <div className="container mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
@@ -141,49 +164,13 @@ export function ExquisiteCollection({
         </div>
 
         {/* Carousel Container */}
-        <div className="relative group">
-          {/* Left Arrow - Desktop Only */}
-          <button
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className={cn(
-              "hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 md:w-12 h-10 md:h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
-              canScrollLeft
-                ? "opacity-0 group-hover:opacity-100 hover:scale-110 hover:shadow-xl hover:border-[#009744] hover:bg-[#009744]/5"
-                : "opacity-0 cursor-not-allowed",
-              "-translate-x-1/2"
-            )}
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="w-4 md:w-5 h-4 md:h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
-          </button>
+        <div className="relative group flex justify-center">
+          {/* Centered Flex Container for Items instead of full scroll if limited items */}
 
-          {/* Right Arrow - Desktop Only */}
-          <button
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className={cn(
-              "hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-10 md:w-12 h-10 md:h-12 rounded-full bg-white border border-gray-200 shadow-lg transition-all duration-300",
-              canScrollRight
-                ? "opacity-0 group-hover:opacity-100 hover:scale-110 hover:shadow-xl hover:border-[#009744] hover:bg-[#009744]/5"
-                : "opacity-0 cursor-not-allowed",
-              "translate-x-1/2"
-            )}
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="w-4 md:w-5 h-4 md:h-5 text-gray-700 group-hover:text-[#009744] transition-colors" />
-          </button>
-
-          {/* Scrollable Container */}
+          {/* Scrollable Container - Adjusted to center items since there are only 4 */}
           <div
             ref={scrollContainerRef}
-            onScroll={checkScrollability}
-            className="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-3 sm:pb-4"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-              WebkitOverflowScrolling: "touch",
-            }}
+            className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 pb-3 sm:pb-4"
           >
             {categories.map((category) => {
               // Convert category name to slug for URL (matches database category names)
@@ -191,7 +178,7 @@ export function ExquisiteCollection({
               return (
                 <Link key={category.id} href={`/search?category=${encodeURIComponent(categorySlug)}`}>
                   <motion.div
-                    className="flex-shrink-0 w-[90vw] sm:w-[calc(50vw-20px)] md:w-[calc(33.333vw-16px)] lg:w-[340px] snap-start"
+                    className="flex-shrink-0 w-full xs:w-[calc(50vw-24px)] sm:w-[300px] md:w-[320px] lg:w-[340px]"
                     onMouseEnter={() => setHoveredCard(category.id)}
                     onMouseLeave={() => setHoveredCard(null)}
                     whileHover={{ y: -8 }}
@@ -228,7 +215,7 @@ export function ExquisiteCollection({
                             }}
                             transition={{ duration: 0.3 }}
                           >
-                            {t(categoryKeyMap[category.name] || `productCategory.${category.name}`)}
+                            {getCategoryName(category.name)}
                           </motion.h3>
 
                           <AnimatePresence>

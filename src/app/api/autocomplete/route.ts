@@ -20,20 +20,20 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Search products from database
+    // Search products from database with full product data
     const { data: products, error } = await supabase
       .from('products')
-      .select('name, short_description, category:categories(name)')
+      .select('id, name, slug, image_url, base_price, short_description, category:categories(name)')
       .eq('is_active', true)
       .or(`name.ilike.%${query}%,short_description.ilike.%${query}%`)
       .limit(limit);
 
     if (error) {
       console.error('Autocomplete search error:', error);
-      return NextResponse.json({ suggestions: [] });
+      return NextResponse.json({ suggestions: [], products: [] });
     }
 
-    // Get matching product names
+    // Get matching product names (for text suggestions)
     const productMatches = products?.map((p: any) => p.name) || [];
 
     // Get matching categories
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Combine and deduplicate
+    // Combine and deduplicate text suggestions
     const allSuggestions = [
       ...new Set([
         ...productMatches,
@@ -63,9 +63,20 @@ export async function GET(request: NextRequest) {
       ]),
     ].slice(0, limit);
 
+    // Format products for recommendations
+    const productRecommendations = (products || []).slice(0, 6).map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      image: p.image_url,
+      price: p.base_price,
+      category: p.category?.name || '',
+    }));
+
     return NextResponse.json({
       query,
       suggestions: allSuggestions,
+      products: productRecommendations,
     });
   } catch (error) {
     console.error('Autocomplete error:', error);

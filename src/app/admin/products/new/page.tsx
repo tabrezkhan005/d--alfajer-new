@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Upload, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, Loader2, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -16,6 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/src/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
@@ -23,8 +31,10 @@ import { toast } from "sonner";
 import {
   createProduct,
   createProductVariant,
+  updateOrCreateVariants,
   uploadProductImage,
   getAdminCategories,
+  createCategory,
 } from "@/src/lib/supabase/admin-products";
 
 // Local origins fallback
@@ -64,6 +74,11 @@ export default function NewProductPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
+  // New category dialog state
+  const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+
   // Form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -90,6 +105,80 @@ export default function NewProductPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+  // Size Variants
+  interface SizeVariant {
+    id?: string;
+    size: string;
+    weight: string;
+    display_name: string;
+    price: number | "";
+    original_price: number | "";
+    stock_quantity: number | "";
+    sku: string;
+    is_default: boolean;
+  }
+
+  const commonSizes = ["50g", "100g", "200g", "250g", "400g", "500g", "1kg", "2kg"];
+
+  const [variants, setVariants] = useState<SizeVariant[]>([
+    {
+      size: "100g",
+      weight: "100g",
+      display_name: "100g",
+      price: "",
+      original_price: "",
+      stock_quantity: 0,
+      sku: "",
+      is_default: true,
+    },
+  ]);
+
+  const addVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      {
+        size: "",
+        weight: "",
+        display_name: "",
+        price: "",
+        original_price: "",
+        stock_quantity: 0,
+        sku: "",
+        is_default: false,
+      },
+    ]);
+  };
+
+  const removeVariant = (index: number) => {
+    if (variants.length === 1) {
+      toast.error("At least one size variant is required");
+      return;
+    }
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateVariant = (index: number, field: keyof SizeVariant, value: string | number | boolean) => {
+    setVariants((prev) =>
+      prev.map((v, i) => {
+        if (i !== index) return v;
+        const updated = { ...v, [field]: value };
+        // Auto-sync size, weight, and display_name when size changes
+        if (field === "size") {
+          updated.weight = value as string;
+          updated.display_name = value as string;
+        }
+        return updated;
+      })
+    );
+  };
+
+  const setDefaultVariant = (index: number) => {
+    setVariants((prev) =>
+      prev.map((v, i) => ({ ...v, is_default: i === index }))
+    );
+  };
+
+
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -104,6 +193,29 @@ export default function NewProductPage() {
     }
     fetchCategories();
   }, []);
+
+  // Handle creating a new category inline
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error("Category name is required");
+      return;
+    }
+
+    setIsCreatingCategory(true);
+    try {
+      const newCategory = await createCategory({ name: newCategoryName.trim() });
+      setCategories(prev => [...prev, newCategory].sort((a, b) => a.name.localeCompare(b.name)));
+      setCategoryId(newCategory.id);
+      setShowNewCategoryDialog(false);
+      setNewCategoryName("");
+      toast.success(`Category "${newCategory.name}" created`);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      toast.error("Failed to create category");
+    } finally {
+      setIsCreatingCategory(false);
+    }
+  };
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -140,10 +252,41 @@ export default function NewProductPage() {
       return;
     }
 
-    if (!basePrice || basePrice <= 0) {
-      toast.error("Valid price is required");
+    // Validate variants - check if size exists and either price or original_price is provided
+    const validVariants = variants.filter((v) => {
+      const hasPrice = v.price !== "" && v.price !== undefined && v.price !== null;
+      const hasOriginalPrice = v.original_price !== "" && v.original_price !== undefined && v.original_price !== null;
+      return v.size && (hasPrice || hasOriginalPrice);
+    });
+
+    if (validVariants.length === 0) {
+      toast.error("At least one size variant with a price is required");
       return;
     }
+
+    // Process variants to ensure price is set
+    const processedVariants = variants.map(v => {
+      const price = (v.price !== "" && v.price !== undefined && v.price !== null)
+        ? v.price
+        : v.original_price;
+
+      // If original_price is not set, it defaults to price (logic handled in DB or display usually, but here we can keep it as is or sync)
+      // If existing logic relies on v.original_price being optional, we just ensure v.price is set.
+      return {
+        ...v,
+        price: price,
+        // If original_price is empty, we can leave it empty or set to price.
+        // Based on user request: "if i do not have sale price i want the original price only for 499" (implying NO strikethrough).
+        // If they enter Original: 499, Sale: [Empty] -> Price: 499, Original: 499 (or empty? If empty, no strikethrough).
+        // If they enter Original: 499, Sale: 399 -> Price: 399, Original: 499.
+        original_price: v.original_price
+      };
+    });
+
+    // Get the default variant's price as base price
+    const defaultVariant = processedVariants.find((v) => v.is_default) || processedVariants[0];
+    const basePrice = Number(defaultVariant.price) || 0;
+    const originalPrice = defaultVariant.original_price ? Number(defaultVariant.original_price) : basePrice;
 
     setIsSaving(true);
 
@@ -157,8 +300,8 @@ export default function NewProductPage() {
         short_description: description,
         long_description: longDescription,
         category_id: categoryId || undefined,
-        base_price: Number(basePrice),
-        original_price: originalPrice ? Number(originalPrice) : Number(basePrice),
+        base_price: basePrice,
+        original_price: originalPrice,
         origin: origin || undefined,
         certifications,
         ingredients: ingredients.split(',').map(s => s.trim()).filter(Boolean),
@@ -192,17 +335,19 @@ export default function NewProductPage() {
         await updateProduct(product.id, { images: uploadedImageUrls });
       }
 
-      // Create a default variant
-      if (sku || stock) {
-        await createProductVariant({
-          product_id: product.id,
-          sku: sku || `${product.id.slice(0, 8)}-default`,
-          weight: packageSize || "N/A",
-          price: Number(basePrice),
-          compare_at_price: originalPrice ? Number(originalPrice) : undefined,
-          stock_quantity: Number(stock) || 0,
-        });
-      }
+      // Create all size variants
+      const variantsToCreate = processedVariants.map((v, idx) => ({
+        sku: v.sku || `${product.id.slice(0, 8)}-${v.size.replace(/\s+/g, "-").toLowerCase()}`,
+        size: v.size,
+        weight: v.weight || v.size,
+        display_name: v.display_name || v.size,
+        price: Number(v.price) || 0,
+        original_price: v.original_price ? Number(v.original_price) : undefined,
+        stock_quantity: Number(v.stock_quantity) || 0,
+        is_default: v.is_default,
+      }));
+
+      await updateOrCreateVariants(product.id, variantsToCreate);
 
       toast.success("Product created successfully!");
       router.push("/admin/products");
@@ -234,7 +379,7 @@ export default function NewProductPage() {
         <Tabs defaultValue="general" className="space-y-6">
           <TabsList className="flex-wrap">
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="pricing">Pricing</TabsTrigger>
+            <TabsTrigger value="sizes">Sizes & Pricing</TabsTrigger>
             <TabsTrigger value="inventory">Inventory</TabsTrigger>
             <TabsTrigger value="images">Images</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
@@ -287,18 +432,30 @@ export default function NewProductPage() {
                         Loading categories...
                       </div>
                     ) : (
-                      <Select onValueChange={(v) => setCategoryId(v)}>
-                        <SelectTrigger id="category">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-2">
+                        <Select value={categoryId} onValueChange={(v) => setCategoryId(v)}>
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => setShowNewCategoryDialog(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add New Category
+                        </Button>
+                      </div>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -324,46 +481,191 @@ export default function NewProductPage() {
             </Card>
           </TabsContent>
 
-          {/* Pricing Tab */}
-          <TabsContent value="pricing" className="space-y-6">
+          {/* Sizes & Pricing Tab */}
+          <TabsContent value="sizes" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Pricing</CardTitle>
-                <CardDescription>Set product pricing</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Sale Price (Current) *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      value={basePrice}
-                      onChange={(e) => setBasePrice(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0.00"
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      The price customers will pay
-                    </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Size Variants</CardTitle>
+                    <CardDescription>
+                      Add different sizes for your product with individual prices (e.g., 100g, 400g, 1kg)
+                    </CardDescription>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="original-price">Original Price (Before discount)</Label>
-                    <Input
-                      id="original-price"
-                      type="number"
-                      step="0.01"
-                      value={originalPrice}
-                      onChange={(e) => setOriginalPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0.00"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Leave empty if no discount
-                    </p>
+                  <Button type="button" onClick={addVariant} variant="outline" size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Size
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Quick Add Common Sizes */}
+                <div className="space-y-2">
+                  <Label>Quick Add Common Sizes</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {commonSizes.map((size) => (
+                      <Button
+                        key={size}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const exists = variants.some((v) => v.size === size);
+                          if (exists) {
+                            toast.error(`Size ${size} already exists`);
+                            return;
+                          }
+                          setVariants((prev) => [
+                            ...prev,
+                            {
+                              size,
+                              weight: size,
+                              display_name: size,
+                              price: "",
+                              original_price: "",
+                              stock_quantity: 0,
+                              sku: "",
+                              is_default: prev.length === 0,
+                            },
+                          ]);
+                        }}
+                        className="text-xs"
+                      >
+                        + {size}
+                      </Button>
+                    ))}
                   </div>
                 </div>
+
                 <Separator />
+
+                {/* Variant Cards */}
+                <div className="space-y-4">
+                  {variants.map((variant, index) => (
+                    <div
+                      key={index}
+                      className={`border rounded-lg p-4 space-y-4 ${
+                        variant.is_default ? "border-green-500 bg-green-50/50" : "border-gray-200"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">
+                            Size Variant #{index + 1}
+                          </span>
+                          {variant.is_default && (
+                            <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">
+                              Default
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!variant.is_default && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDefaultVariant(index)}
+                              className="text-xs"
+                            >
+                              Set as Default
+                            </Button>
+                          )}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeVariant(index)}
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label>Size / Weight *</Label>
+                          <Input
+                            value={variant.size}
+                            onChange={(e) => updateVariant(index, "size", e.target.value)}
+                            placeholder="e.g., 100g, 1kg"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Sale Price (₹)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.price}
+                            onChange={(e) =>
+                              updateVariant(
+                                index,
+                                "price",
+                                e.target.value === "" ? "" : Number(e.target.value)
+                              )
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Original Price (₹)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.original_price}
+                            onChange={(e) =>
+                              updateVariant(
+                                index,
+                                "original_price",
+                                e.target.value === "" ? "" : Number(e.target.value)
+                              )
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Stock Qty</Label>
+                          <Input
+                            type="number"
+                            value={variant.stock_quantity}
+                            onChange={(e) =>
+                              updateVariant(
+                                index,
+                                "stock_quantity",
+                                e.target.value === "" ? "" : Number(e.target.value)
+                              )
+                            }
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>SKU (optional)</Label>
+                          <Input
+                            value={variant.sku}
+                            onChange={(e) => updateVariant(index, "sku", e.target.value)}
+                            placeholder="Auto-generated if empty"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Display Name</Label>
+                          <Input
+                            value={variant.display_name}
+                            onChange={(e) => updateVariant(index, "display_name", e.target.value)}
+                            placeholder="e.g., 100g Pack"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                {/* Badge Selection */}
                 <div className="space-y-2">
                   <Label htmlFor="badge">Product Badge</Label>
                   <Select value={badge || "none"} onValueChange={(v) => setBadge(v === "none" ? "" : v as "SALE" | "HOT" | "NEW" | "")}>
@@ -382,39 +684,7 @@ export default function NewProductPage() {
             </Card>
           </TabsContent>
 
-          {/* Inventory Tab */}
-          <TabsContent value="inventory" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Inventory</CardTitle>
-                <CardDescription>Manage stock levels</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="stock">Stock Quantity *</Label>
-                    <Input
-                      id="stock"
-                      type="number"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="packageSize">Package Size</Label>
-                    <Input
-                      id="packageSize"
-                      value={packageSize}
-                      onChange={(e) => setPackageSize(e.target.value)}
-                      placeholder="e.g., 250g, 500ml, 1kg"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           {/* Images Tab */}
           <TabsContent value="images" className="space-y-6">
@@ -586,6 +856,61 @@ export default function NewProductPage() {
           </Button>
         </div>
       </form>
+
+      {/* New Category Dialog */}
+      <Dialog open={showNewCategoryDialog} onOpenChange={setShowNewCategoryDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Category</DialogTitle>
+            <DialogDescription>
+              Add a new category for your products. You can add more details later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="newCategoryName">Category Name</Label>
+              <Input
+                id="newCategoryName"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="e.g., Dry Fruits, Spices, Nuts"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleCreateCategory();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowNewCategoryDialog(false);
+                setNewCategoryName("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCreateCategory}
+              disabled={isCreatingCategory || !newCategoryName.trim()}
+            >
+              {isCreatingCategory ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Category"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

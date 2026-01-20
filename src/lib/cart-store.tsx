@@ -3,7 +3,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 
 export interface CartItem {
-  id: string;
+  id: string; // Unique ID (e.g. productId-variantId)
+  productId?: string;
+  variantId?: string;
   name: string;
   image: string;
   price: number;
@@ -15,7 +17,7 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (item: Omit<CartItem, 'quantity'>, openCart?: boolean) => void;
+  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }, openCart?: boolean) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -24,6 +26,7 @@ interface CartContextType {
   toggleCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  isInCart: (productId: string, variantId?: string) => boolean;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -54,15 +57,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [items, isHydrated]);
 
-  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, shouldOpenCart = true) => {
+  const addItem = useCallback((item: Omit<CartItem, 'quantity'> & { quantity?: number }, shouldOpenCart = true) => {
     setItems((current) => {
       const existingItem = current.find((i) => i.id === item.id);
+      const qtyToAdd = item.quantity || 1;
       if (existingItem) {
         return current.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id ? { ...i, quantity: i.quantity + qtyToAdd } : i
         );
       }
-      return [...current, { ...item, quantity: 1 }];
+      return [...current, { ...item, quantity: qtyToAdd }];
     });
     if (shouldOpenCart) {
       setIsOpen(true);
@@ -99,6 +103,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return items.reduce((total, item) => total + item.price * item.quantity, 0);
   }, [items]);
 
+  const isInCart = useCallback((productId: string, variantId?: string) => {
+    return items.some(item => {
+        if (variantId) {
+            return item.variantId === variantId || item.id.includes(variantId);
+        }
+        // If no variantId specified, checks if ANY variant of product is in cart
+        return item.productId === productId || item.id.startsWith(productId);
+    });
+  }, [items]);
+
   const value: CartContextType = {
     items,
     isOpen,
@@ -111,6 +125,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     toggleCart,
     getTotalItems,
     getTotalPrice,
+    isInCart,
   };
 
   return (

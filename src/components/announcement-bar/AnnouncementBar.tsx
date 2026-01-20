@@ -25,15 +25,15 @@ export const AnnouncementBar = ({
   messages = announcementMessageKeys,
 }: AnnouncementBarProps) => {
   const pathname = usePathname();
-  
+
   // Don't show on admin pages
   const isAdminPage = pathname?.startsWith("/admin");
-  
+
   // Skip rendering on admin pages entirely
   if (isAdminPage) {
     return null;
   }
-  
+
   return <AnnouncementBarContent messageKeys={messages as string[]} />;
 };
 
@@ -45,24 +45,33 @@ const AnnouncementBarContent = ({
   const { language, currency, setLanguage, setCurrency, isLoading, t } = useI18n();
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Initial animation on mount
+  // Initial animation on mount - only run once
   useEffect(() => {
-    if (!barRef.current || !isMounted) return;
+    if (!barRef.current || !isMounted || hasAnimated) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     if (prefersReducedMotion) {
-      gsap.set(barRef.current, { opacity: 1, y: 0 });
+      // For reduced motion, just show it immediately
+      if (barRef.current) {
+        barRef.current.style.transform = "translateY(0)";
+        barRef.current.style.opacity = "1";
+        barRef.current.style.backgroundColor = "#2E763B";
+        barRef.current.style.color = "#FEFEFE";
+      }
+      setHasAnimated(true);
       return;
     }
 
+    // Animate in
     gsap.fromTo(
       barRef.current,
       { y: "-100%", opacity: 0 },
@@ -71,9 +80,22 @@ const AnnouncementBarContent = ({
         opacity: 1,
         duration: 0.6,
         ease: "power3.out",
+        onComplete: () => {
+          // After animation, set inline styles to keep it visible
+          if (barRef.current) {
+            barRef.current.style.transform = "translateY(0)";
+            barRef.current.style.opacity = "1";
+            // Clear GSAP transforms but preserve background color
+            gsap.set(barRef.current, { clearProps: "transform,opacity" });
+            // Ensure background color is preserved
+            barRef.current.style.backgroundColor = "#2E763B";
+            barRef.current.style.color = "#FEFEFE";
+          }
+          setHasAnimated(true);
+        }
       }
     );
-}, [isMounted]);
+  }, [isMounted, hasAnimated]);
 
   // Message rotation animation
   useEffect(() => {
@@ -114,6 +136,7 @@ const AnnouncementBarContent = ({
 
   // Update body padding when bar is visible
   useEffect(() => {
+    if (!isMounted) return;
     // Only add minimal padding on mobile to account for fixed bar height
     let paddingTop = "0px";
     if (window.innerWidth < 640) {
@@ -123,28 +146,28 @@ const AnnouncementBarContent = ({
     return () => {
       document.body.style.paddingTop = "0px";
     };
-  }, []);
+  }, [isMounted]);
 
-  if (isLoading || !isMounted) {
-    return null;
-  }
-
+  // Always render, but show default content if loading
   const currentMessageKey = messageKeys[currentMessageIndex] || messageKeys[0];
-  const currentMessage = t(currentMessageKey);
+  const currentMessage = isLoading
+    ? (messageKeys[0] || 'announcement.shipping')
+    : (t(currentMessageKey) || messageKeys[0] || '');
   const currencySymbol = CURRENCIES[currency]?.symbol || '₹';
 
-    return (
-      <div
-        ref={barRef}
-        className="fixed top-0 left-0 right-0 z-30 h-6 xs:h-7 sm:h-8 md:h-9 w-full overflow-x-auto overflow-y-hidden"
-        style={{
-          backgroundColor: "#2E763B",
-          color: "#FEFEFE",
-          transform: "translateY(-100%)",
-        }}
-        role="banner"
-        aria-label="Announcement"
-      >
+  // Initial state: hidden until animation completes
+  const initialStyle = hasAnimated
+    ? { transform: "translateY(0)", opacity: 1, backgroundColor: "#2E763B", color: "#FEFEFE" }
+    : { transform: "translateY(-100%)", opacity: 0, backgroundColor: "#2E763B", color: "#FEFEFE" };
+
+  return (
+    <div
+      ref={barRef}
+      className="fixed top-0 left-0 right-0 z-30 h-6 xs:h-7 sm:h-8 md:h-9 w-full overflow-x-auto overflow-y-hidden"
+      style={initialStyle}
+      role="banner"
+      aria-label="Announcement"
+    >
         <div className="mx-auto flex h-full w-full max-w-full lg:max-w-[1920px] items-center justify-between px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-8 gap-1 xs:gap-1.5 sm:gap-3">
           {/* Message Section - Centered */}
           <div className="flex-1 flex items-center justify-center min-w-0">

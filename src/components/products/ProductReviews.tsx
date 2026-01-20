@@ -61,8 +61,8 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
     setIsSubmitting(true);
     try {
       const userEmail = user?.email || "guest@example.com";
-      const userName = user?.name || document.getElementById('guest-name')?.value || "Anonymous";
-      
+      const userName = user?.name || (document.getElementById('guest-name') as HTMLInputElement)?.value || "Anonymous";
+
       await createReview({
         product_id: productId,
         customer_id: user?.id || `guest_${Date.now()}`,
@@ -78,7 +78,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       setTitle("");
       setComment("");
       setFormRating(5);
-      
+
       // Reload reviews
       const data = await getProductReviews(productId);
       setReviews(data);
@@ -209,7 +209,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             <CardContent className="pt-6 space-y-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
                    <h4 className="font-bold text-lg">Write your review</h4>
-                   
+
                    {!user && (
                      <div className="space-y-2">
                        <Label>Your Name</Label>

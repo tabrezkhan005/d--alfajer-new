@@ -130,11 +130,29 @@ export default function ProductsPage() {
     },
     {
       key: "price",
-      header: "Price",
+      header: "Price & Sizes",
       render: (row: AdminProductWithVariants) => {
-        const primaryVariant = row.variants?.[0];
-        const price = primaryVariant?.price || row.base_price || 0;
-        return formatCurrency(price);
+        const variantCount = row.variants?.length || 0;
+        if (variantCount === 0) {
+          return formatCurrency(row.base_price || 0);
+        }
+        const prices = row.variants?.map((v) => v.price || 0).sort((a, b) => a - b) || [];
+        const minPrice = prices[0] || row.base_price || 0;
+        const maxPrice = prices[prices.length - 1] || row.base_price || 0;
+
+        return (
+          <div>
+            <div className="font-medium">
+              {minPrice === maxPrice
+                ? formatCurrency(minPrice)
+                : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`
+              }
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {variantCount} {variantCount === 1 ? "size" : "sizes"}
+            </div>
+          </div>
+        );
       },
     },
     {

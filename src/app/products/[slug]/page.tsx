@@ -83,11 +83,13 @@ function transformProduct(dbProduct: any) {
         variants: dbProduct.variants?.map((v: any) => ({
             id: v.id,
             weight: v.weight,
-            size: v.weight,
+            size: v.size || v.weight,
+            display_name: v.display_name || v.size || v.weight,
             price: v.price,
-            originalPrice: v.compare_at_price || undefined,
+            originalPrice: v.compare_at_price || v.original_price || undefined,
             stock: v.stock_quantity || 0,
             sku: v.sku,
+            is_default: v.is_default,
         })) || [],
         nutritionFacts: dbProduct.nutrition_facts || {
             servingSize: "100g",

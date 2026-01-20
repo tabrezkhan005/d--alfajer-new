@@ -250,6 +250,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'All Products',
     'common.name': 'Name',
     'common.email': 'Email',
+    'common.close': 'Close',
+    'common.applyFilters': 'Apply Filters',
 
     // Categories
     'category.spices': 'Spices',
@@ -1035,6 +1037,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'جميع المنتجات',
     'common.name': 'الاسم',
     'common.email': 'البريد الإلكتروني',
+    'common.close': 'إغلاق',
+    'common.applyFilters': 'تطبيق الفلاتر',
 
     // Categories
     'category.spices': 'التوابل',
@@ -1904,6 +1908,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.allProducts': 'सभी उत्पाद',
     'common.name': 'नाम',
     'common.email': 'ईमेल',
+    'common.close': 'बंद करें',
+    'common.applyFilters': 'फिल्टर लागू करें',
 
     // Categories
     'category.spices': 'मसाले',

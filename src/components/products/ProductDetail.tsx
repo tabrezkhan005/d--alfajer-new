@@ -94,24 +94,24 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
   );
   const rawPrice = selectedVariant?.price || product.price;
   const rawOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
-  
+
   // Convert prices based on current currency (prices in DB are in INR)
   const displayPrice = convertCurrency(rawPrice, 'INR');
   const displayOriginalPrice = rawOriginalPrice ? convertCurrency(rawOriginalPrice, 'INR') : undefined;
 
   const handleAddToCart = () => {
     if (selectedVariant) {
-      // Add item quantity times
-      for (let i = 0; i < quantity; i++) {
-        addItem({
-          id: `${product.id}-${selectedVariant.id}-${Date.now()}-${i}`,
-          name: `${product.name} - ${selectedVariant.size}`,
-          image: product.image,
-          price: selectedVariant.price,
-          originalPrice: selectedVariant.originalPrice,
-          packageSize: selectedVariant.size,
-        });
-      }
+      addItem({
+        id: `${product.id}-${selectedVariant.id}`,
+        productId: product.id,
+        variantId: selectedVariant.id,
+        name: `${product.name} - ${selectedVariant.size}`,
+        image: product.image,
+        price: selectedVariant.price,
+        originalPrice: selectedVariant.originalPrice,
+        packageSize: selectedVariant.size,
+        quantity: quantity
+      });
       setQuantity(1);
     }
   };
@@ -245,13 +245,13 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 <span className="text-4xl font-bold text-gray-900">
                   {formatCurrency(displayPrice)}
                 </span>
-                {displayOriginalPrice && (
+                {displayOriginalPrice && displayOriginalPrice > displayPrice && (
                   <span className="text-xl text-gray-400 line-through">
                     {formatCurrency(displayOriginalPrice)}
                   </span>
                 )}
               </div>
-              {displayOriginalPrice && (
+              {displayOriginalPrice && displayOriginalPrice > displayPrice && (
                 <div className="flex items-center gap-2">
                   <Badge className="bg-[#AB1F23] hover:bg-[#8B1819] text-white">
                     {t('product.discount')} {Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)}%
@@ -279,32 +279,34 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               )}
             </div>
 
-            {/* Variant Selection */}
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-900">
-                {t('product.selectVariant')}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-1 gap-3">
-                {(product.variants || []).slice(0, 1).map((variant: { id: string; size: string; price: number; stock: number }) => (
-                  <motion.button
-                    key={variant.id}
-                    onClick={() => setSelectedVariantId(variant.id)}
-                    className={`p-4 rounded-lg border-2 text-sm font-medium transition-all ${selectedVariantId === variant.id
-                      ? "border-[#009744] bg-[#009744] text-white"
-                      : "border-gray-200 bg-white text-gray-900 hover:border-[#009744]"
-                      } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-                    disabled={variant.stock === 0}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="font-semibold">{variant.size}</div>
-                    <div className="text-xs opacity-80 mt-1">
-                      {formatCurrency(convertCurrency(variant.price, 'INR'))}
-                    </div>
-                  </motion.button>
-                ))}
+            {/* Size / Variant Selection */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-900">
+                  {t('product.selectSize') || 'Select Size'}
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {product.variants.map((variant: { id: string; size: string; weight?: string; display_name?: string; price: number; stock: number }) => (
+                    <motion.button
+                      key={variant.id}
+                      onClick={() => setSelectedVariantId(variant.id)}
+                      className={`px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all ${selectedVariantId === variant.id
+                        ? "border-[#009744] bg-[#009744] text-white shadow-lg"
+                        : "border-gray-200 bg-white text-gray-900 hover:border-[#009744] hover:bg-green-50"
+                        } ${variant.stock === 0 ? "opacity-50 cursor-not-allowed line-through" : ""}`}
+                      disabled={variant.stock === 0}
+                      whileHover={{ scale: variant.stock > 0 ? 1.03 : 1 }}
+                      whileTap={{ scale: variant.stock > 0 ? 0.97 : 1 }}
+                    >
+                      <div className="font-semibold">{variant.display_name || variant.size || variant.weight}</div>
+                      <div className={`text-xs mt-1 ${selectedVariantId === variant.id ? "text-white/80" : "text-gray-500"}`}>
+                        {formatCurrency(convertCurrency(variant.price, 'INR'))}
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quantity Selector */}
             <div className="space-y-3">

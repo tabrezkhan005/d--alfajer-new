@@ -58,26 +58,46 @@ function CheckoutPageContent() {
   // Handle product from Buy Now button
   useEffect(() => {
     const productId = searchParams.get('product');
+    const variantId = searchParams.get('variant');
+
     if (productId && items.length === 0) {
       const fetchProduct = async () => {
         try {
-          // Dynamic import to avoid circular dependencies if any, or just use the client directly
+          // Dynamic import to avoid circular dependencies
           const { getSupabaseClient } = await import("@/src/lib/supabase/client");
           const supabase = getSupabaseClient();
           const { data: product, error } = await supabase
             .from('products')
-            .select('*')
+            .select('*, variants:product_variants(*)')
             .eq('id', productId)
             .single();
 
           if (product && !error) {
-            addItem({
-              id: product.id,
-              name: product.name,
-              price: product.base_price || 0,
-              image: product.images?.[0] || '/images/placeholder.png',
-              packageSize: 'Standard',
-            }, false);
+            let selectedVariant: any = null;
+            if (variantId && product.variants) {
+                selectedVariant = product.variants.find((v: any) => v.id === variantId);
+            }
+
+            if (selectedVariant) {
+                 addItem({
+                  id: `${product.id}-${selectedVariant.id}`,
+                  productId: product.id,
+                  variantId: selectedVariant.id,
+                  name: `${product.name} - ${selectedVariant.size || selectedVariant.weight}`,
+                  price: selectedVariant.price,
+                  image: product.images?.[0] || '/images/placeholder.png',
+                  packageSize: selectedVariant.size || selectedVariant.weight || 'Standard',
+                }, false);
+            } else {
+                addItem({
+                  id: product.id,
+                  productId: product.id,
+                  name: product.name,
+                  price: product.base_price || 0,
+                  image: product.images?.[0] || '/images/placeholder.png',
+                  packageSize: 'Standard',
+                }, false);
+            }
           }
         } catch (error) {
           console.error("Error fetching product for buy now:", error);
