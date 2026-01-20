@@ -125,20 +125,20 @@ export function Header() {
                   <div className="h-8 w-8 rounded-full bg-[#009744] flex items-center justify-center shrink-0">
                     <Phone className="h-5 w-5 text-white" />
                   </div>
-                  <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                    {t('header.support')}
-                  </span>
                 </Link>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+                  {t('header.support')}
+                </span>
               </div>
 
               {/* Wishlist */}
               <div className="group relative flex items-center">
                 <Link href="/wishlist" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                   <Heart className="h-5 md:h-6 w-5 md:w-6 text-gray-600 group-hover:text-pink-500 transition-colors" />
-                  <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                    {t('product.wishlist')}
-                  </span>
                 </Link>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+                  {t('product.wishlist')}
+                </span>
               </div>
 
               {/* Login/Account */}
@@ -168,10 +168,10 @@ export function Header() {
                     className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
                   >
                     <User className="h-5 md:h-6 w-5 md:w-6 text-gray-600" />
-                    <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
-                      Login
-                    </span>
                   </Link>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+                    Login
+                  </span>
                 </div>
               )}
             </div>
