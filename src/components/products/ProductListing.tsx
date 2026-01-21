@@ -3,11 +3,12 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, X, Eye, Plus, Heart, Star, Check, Loader2 } from "lucide-react";
 import { useCartStore } from "@/src/lib/cart-store";
 import { useWishlistStore } from "@/src/lib/wishlist-store";
 import { useI18n } from "@/src/components/providers/i18n-provider";
+import { CURRENCIES } from "@/src/lib/i18n";
 import { Button } from "@/src/components/ui/button";
 import { Checkbox } from "@/src/components/ui/checkbox";
 import { Slider } from "@/src/components/ui/slider";
@@ -26,25 +27,69 @@ interface FilterState {
   packageSizes: string[];
   origins: string[];
   certifications: string[];
+  categories: string[];
   inStockOnly: boolean;
   onSaleOnly: boolean;
 }
 
 export function ProductListing() {
   const { t, formatCurrency, convertCurrency, currency } = useI18n();
+  const searchParams = useSearchParams();
 
   // Fetch products from Supabase
   const { products: allProducts, loading, error } = useProducts();
   const { categories } = useCategories();
+
+  // Get category from URL if present
+  const categoryFromUrl = searchParams?.get('category') || '';
+
+  // Define specific categories to show in filter (main product categories)
+  const allowedCategories = useMemo(() => {
+    const mainCategories = [
+      "Dry Fruits",
+      "Spices",
+      "Saffron",
+      "Shilajit",
+      "Nuts",
+      "Seeds",
+      "Honey & Spreads",
+      "Tea & Beverages",
+      "Gift Packs",
+      "Organic"
+    ];
+    // Only show categories that exist in the database and have products
+    return categories
+      .filter(cat => mainCategories.includes(cat.name))
+      .map(cat => cat.name)
+      .filter(catName => allProducts.some(p => p.category === catName));
+  }, [categories, allProducts]);
 
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 10000],
     packageSizes: [],
     origins: [],
     certifications: [],
+    categories: [],
     inStockOnly: false,
     onSaleOnly: false,
   });
+
+  // Initialize category filter from URL
+  useEffect(() => {
+    if (categoryFromUrl && categories.length > 0) {
+      // Find matching category by name
+      const matchedCategory = categories.find(
+        cat => cat.name.toLowerCase() === categoryFromUrl.toLowerCase() ||
+          cat.name.toLowerCase().replace(/[&\s]+/g, '-') === categoryFromUrl.toLowerCase().replace(/[&\s]+/g, '-')
+      );
+      if (matchedCategory && !filters.categories.includes(matchedCategory.name)) {
+        setFilters(prev => ({
+          ...prev,
+          categories: [matchedCategory.name]
+        }));
+      }
+    }
+  }, [categoryFromUrl, categories]);
 
   const [priceInputs, setPriceInputs] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<string>("featured");
@@ -76,6 +121,11 @@ export function ProductListing() {
   // Filter products
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
+      // Category filter
+      if (filters.categories.length > 0 && !filters.categories.includes(product.category)) {
+        return false;
+      }
+
       // Price filter
       if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) {
         return false;
@@ -142,7 +192,7 @@ export function ProductListing() {
   };
 
   const toggleFilter = (
-    type: "packageSizes" | "origins" | "certifications",
+    type: "packageSizes" | "origins" | "certifications" | "categories",
     value: string
   ) => {
     setFilters((prev) => {
@@ -160,6 +210,7 @@ export function ProductListing() {
       packageSizes: [],
       origins: [],
       certifications: [],
+      categories: [],
       inStockOnly: false,
       onSaleOnly: false,
     });
@@ -220,7 +271,9 @@ export function ProductListing() {
             <div className="flex-1">
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.min')}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                  {CURRENCIES[currency]?.symbol || '₹'}
+                </span>
                 <Input
                   type="number"
                   value={priceInputs[0]}
@@ -234,7 +287,9 @@ export function ProductListing() {
             <div className="flex-1">
               <Label className="text-xs text-gray-500 mb-1.5 block uppercase tracking-wide">{t('filter.max')}</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+                  {CURRENCIES[currency]?.symbol || '₹'}
+                </span>
                 <Input
                   type="number"
                   value={priceInputs[1]}
@@ -248,6 +303,52 @@ export function ProductListing() {
           </div>
         </div>
       </div>
+
+      {/* Category Filter */}
+      {allowedCategories.length > 0 && (
+        <div className="space-y-3">
+          <Label className="text-base font-bold text-gray-900 font-poppins">
+            {t('filter.category')}
+          </Label>
+          <div className="space-y-2.5">
+            {allowedCategories.map((categoryName) => {
+              const count = allProducts.filter((p) => p.category === categoryName).length;
+              const categoryKeyMap: { [key: string]: string } = {
+                "Dry Fruits": "productCategory.premiumDryFruits",
+                "Nuts": "productCategory.nutsSeeds",
+                "Seeds": "productCategory.nutsSeeds",
+                "Spices": "productCategory.authenticSpices",
+                "Gift Packs": "productCategory.giftPacks",
+                "Honey & Spreads": "productCategory.honeySpreads",
+                "Tea & Beverages": "productCategory.teaBeverages",
+                "Organic": "productCategory.organic",
+                "Saffron": "productCategory.saffron",
+                "Shilajit": "productCategory.shilajit",
+              };
+              const translationKey = categoryKeyMap[categoryName] || `productCategory.${categoryName.replace(/\s+/g, '')}`;
+              const translated = t(translationKey);
+              const displayName = translated === translationKey ? categoryName : translated;
+              return (
+                <div key={categoryName} className="flex items-center space-x-3 group/item">
+                  <Checkbox
+                    id={`category-${categoryName}`}
+                    checked={filters.categories.includes(categoryName)}
+                    onCheckedChange={() => toggleFilter("categories", categoryName)}
+                    className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
+                  />
+                  <Label
+                    htmlFor={`category-${categoryName}`}
+                    className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
+                  >
+                    <span className="font-medium">{displayName}</span>
+                    <span className="text-gray-400 text-xs font-normal">({count})</span>
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Package Size */}
       {uniquePackageSizes.length > 0 && (
@@ -428,7 +529,7 @@ export function ProductListing() {
   }
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden">
+    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden pt-28 sm:pt-32 md:pt-36 lg:pt-40">
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 w-full">
         {/* Header */}
         <div className="mb-8 sm:mb-10 md:mb-14 text-center">
@@ -511,7 +612,7 @@ export function ProductListing() {
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-start">
           {/* Filter Sidebar - Hidden on mobile, visible on desktop - Sticky */}
           <aside className="hidden lg:block w-full lg:w-72 flex-shrink-0">
-            <div className="sticky top-28 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            <div className="sticky top-32 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-9rem)] overflow-y-auto">
               {renderFilterContent()}
             </div>
           </aside>

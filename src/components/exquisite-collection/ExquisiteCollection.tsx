@@ -165,12 +165,11 @@ export function ExquisiteCollection({
 
         {/* Carousel Container */}
         <div className="relative group flex justify-center">
-          {/* Centered Flex Container for Items instead of full scroll if limited items */}
-
-          {/* Scrollable Container - Adjusted to center items since there are only 4 */}
+          {/* Scrollable Container - Horizontal scroll on mobile, centered wrap on desktop */}
           <div
             ref={scrollContainerRef}
-            className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 pb-3 sm:pb-4"
+            className="flex sm:flex-wrap sm:justify-center gap-4 sm:gap-6 md:gap-8 pb-3 sm:pb-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 xs:px-3 sm:px-0"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {categories.map((category) => {
               // Convert category name to slug for URL (matches database category names)
@@ -178,14 +177,14 @@ export function ExquisiteCollection({
               return (
                 <Link key={category.id} href={`/search?category=${encodeURIComponent(categorySlug)}`}>
                   <motion.div
-                    className="flex-shrink-0 w-full xs:w-[calc(50vw-24px)] sm:w-[300px] md:w-[320px] lg:w-[340px]"
+                    className="flex-shrink-0 w-[85vw] xs:w-[calc(50vw-24px)] sm:w-[300px] md:w-[320px] lg:w-[340px] snap-center"
                     onMouseEnter={() => setHoveredCard(category.id)}
                     onMouseLeave={() => setHoveredCard(null)}
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                   >
                     <div
-                      className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
+                      className="relative h-[280px] xs:h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
                       role="button"
                       tabIndex={0}
                       aria-label={`View ${category.name}`}

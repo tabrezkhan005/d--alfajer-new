@@ -123,6 +123,23 @@ export async function getAllOrders(options?: {
     return (data || []) as unknown as OrderWithItems[];
 }
 
+// Update order tracking number
+export async function updateOrderTrackingNumber(orderId: string, trackingNumber: string): Promise<boolean> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+        .from("orders")
+        .update({ tracking_number: trackingNumber })
+        .eq("id", orderId);
+
+    if (error) {
+        console.error("Error updating tracking number:", error);
+        return false;
+    }
+
+    return true;
+}
+
 // Update order status (admin)
 export async function updateOrderStatus(orderId: string, status: string): Promise<boolean> {
     const supabase = createClient();

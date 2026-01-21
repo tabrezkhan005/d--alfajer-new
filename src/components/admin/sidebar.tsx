@@ -103,9 +103,22 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    title: "Shiprocket",
+    href: "/admin/shiprocket",
+    icon: Truck,
+    children: [
+      { title: "Dashboard", href: "/admin/shiprocket", icon: LayoutDashboard },
+      { title: "All Shipments", href: "/admin/shiprocket/shipments", icon: Package },
+      { title: "Serviceability", href: "/admin/shiprocket/serviceability", icon: Search },
+      { title: "Rate Calculator", href: "/admin/shiprocket/rate-calculator", icon: DollarSign },
+      { title: "Request Pickup", href: "/admin/shiprocket/pickup", icon: Truck },
+      { title: "Return Orders", href: "/admin/shiprocket/returns", icon: RotateCcw },
+    ],
+  },
+  {
     title: "Shipping & Tax",
     href: "/admin/shipping",
-    icon: Truck,
+    icon: MapPin,
     children: [
       { title: "Shipping Zones", href: "/admin/shipping/zones", icon: MapPin },
       { title: "Delivery Charges", href: "/admin/shipping/charges", icon: DollarSign },
@@ -158,6 +171,7 @@ const navItems: NavItem[] = [
     icon: Settings,
     children: [
       { title: "Store Settings", href: "/admin/settings/store", icon: Settings },
+      { title: "Shiprocket", href: "/admin/settings/shiprocket", icon: Truck },
       { title: "Notifications", href: "/admin/settings/notifications", icon: Mail },
       { title: "Roles & Permissions", href: "/admin/settings/roles", icon: Shield },
       { title: "Security", href: "/admin/settings/security", icon: Shield },

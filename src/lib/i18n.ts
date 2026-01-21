@@ -2621,7 +2621,9 @@ export function t(key: string, lang: Language = 'en'): string {
 
 export function formatCurrency(amount: number, currency: Currency = 'INR'): string {
   const currencyInfo = CURRENCIES[currency];
-  return `${currencyInfo.symbol}${amount.toFixed(2)}`;
+  // Remove unnecessary decimals for whole numbers
+  const formattedAmount = amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2);
+  return `${currencyInfo.symbol}${formattedAmount}`;
 }
 
 export function convertCurrency(amount: number, fromCurrency: Currency = 'INR', toCurrency: Currency = 'INR'): number {

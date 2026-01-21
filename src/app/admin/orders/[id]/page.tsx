@@ -2,12 +2,12 @@
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Package, Truck, CheckCircle2, Clock, Loader2, Printer, RefreshCw } from "lucide-react";
+import { ArrowLeft, Package, Truck, CheckCircle2, Clock, Loader2, Printer, RefreshCw, ExternalLink } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
-import { getOrderById, updateOrderStatus, type OrderWithItems } from "@/src/lib/supabase/orders";
+import { getOrderById, updateOrderStatus, updateOrderTrackingNumber, type OrderWithItems } from "@/src/lib/supabase/orders";
 import { formatCurrency } from "@/src/lib/utils";
 import {
   Select,
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/src/components/ui/select";
 import { toast } from "sonner";
+import { getShiprocketTrackingURL } from "@/src/lib/shiprocket-client";
 
 const formatLongDate = (dateString: string | null) => {
   if (!dateString) return "N/A";
@@ -68,6 +69,8 @@ export default function OrderDetailPage({
   const [order, setOrder] = useState<OrderWithItems | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [creatingShipment, setCreatingShipment] = useState(false);
+  const [shiprocketConfig, setShiprocketConfig] = useState<any>(null);
 
   useEffect(() => {
     async function fetchOrder() {
@@ -84,6 +87,25 @@ export default function OrderDetailPage({
     }
 
     fetchOrder();
+
+    // Load Shiprocket config
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("shiprocket_config");
+      if (saved) {
+        try {
+          const config = JSON.parse(saved);
+          // Check if token is expired
+          if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
+            // Token expired, need to re-authenticate
+            setShiprocketConfig({ ...config, token: undefined });
+          } else {
+            setShiprocketConfig(config);
+          }
+        } catch (e) {
+          console.error("Failed to parse Shiprocket config:", e);
+        }
+      }
+    }
   }, [id]);
 
   const handleStatusChange = async (newStatus: string) => {
@@ -104,6 +126,99 @@ export default function OrderDetailPage({
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleCreateShipment = async () => {
+    if (!order || !shiprocketConfig?.token) {
+      toast.error("Please configure Shiprocket settings first");
+      return;
+    }
+
+    setCreatingShipment(true);
+    try {
+      const shippingAddress = order.shipping_address as {
+        firstName?: string;
+        lastName?: string;
+        email?: string;
+        phone?: string;
+        address?: string;
+        city?: string;
+        state?: string;
+        zip?: string;
+        country?: string;
+      } | null;
+
+      if (!shippingAddress) {
+        toast.error("Shipping address is missing");
+        return;
+      }
+
+      // Prepare shipment data
+      const shipmentData = {
+        order_id: order.order_number || order.id,
+        order_date: new Date(order.created_at || Date.now()).toISOString().split('T')[0],
+        pickup_location: shiprocketConfig.pickupLocation || "Primary",
+        billing_customer_name: shippingAddress.firstName || "",
+        billing_last_name: shippingAddress.lastName || "",
+        billing_address: shippingAddress.address || "",
+        billing_city: shippingAddress.city || "",
+        billing_pincode: shippingAddress.zip || "",
+        billing_state: shippingAddress.state || "",
+        billing_country: shippingAddress.country || "India",
+        billing_email: shippingAddress.email || order.email || "",
+        billing_phone: shippingAddress.phone || "",
+        shipping_is_billing: true,
+        order_items: (order.items || []).map((item) => ({
+          name: item.name || "Product",
+          sku: item.sku || item.product_id || "SKU001",
+          units: item.quantity,
+          selling_price: Number(item.price) || 0,
+        })),
+        payment_method: order.payment_method === "cod" ? "COD" : "Prepaid",
+        sub_total: order.subtotal || 0,
+        weight: 0.5, // Default weight, can be calculated from items
+      };
+
+      const response = await fetch("/api/shiprocket/shipment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: shiprocketConfig.token,
+          shipmentData,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create shipment");
+      }
+
+      const result = await response.json();
+
+      if (result.shipment_id && result.awb_code) {
+        // Update order with tracking number
+        await updateOrderTrackingNumber(order.id, result.awb_code);
+        await updateOrderStatus(order.id, "shipped");
+
+        toast.success(`Shipment created! AWB: ${result.awb_code}`);
+
+        // Update local order state
+        setOrder({
+          ...order,
+          tracking_number: result.awb_code,
+          status: "shipped",
+        });
+      } else {
+        throw new Error(result.message || "Shipment creation failed");
+      }
+    } catch (error: any) {
+      console.error("Create shipment error:", error);
+      toast.error(error.message || "Failed to create shipment");
+    } finally {
+      setCreatingShipment(false);
+    }
   };
 
   if (loading) {
@@ -254,6 +369,80 @@ export default function OrderDetailPage({
             </CardContent>
           </Card>
 
+          {/* Shiprocket Integration */}
+          {shiprocketConfig?.token && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Shiprocket Shipping
+                </CardTitle>
+                <CardDescription>
+                  Create and manage shipments through Shiprocket
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {order.tracking_number ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium">Tracking Number</p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {order.tracking_number}
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                      >
+                        <a
+                          href={getShiprocketTrackingURL(order.tracking_number)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Track
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Create a shipment in Shiprocket for this order
+                    </p>
+                    <Button
+                      onClick={handleCreateShipment}
+                      disabled={creatingShipment || order.status === "cancelled"}
+                      className="w-full"
+                    >
+                      {creatingShipment ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating Shipment...
+                        </>
+                      ) : (
+                        <>
+                          <Truck className="mr-2 h-4 w-4" />
+                          Create Shiprocket Shipment
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+                {!shiprocketConfig?.token && (
+                  <p className="text-xs text-muted-foreground">
+                    <Link href="/admin/settings/shiprocket" className="text-primary underline">
+                      Configure Shiprocket
+                    </Link>{" "}
+                    to enable shipping automation
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Payment Info */}
           {order.payment_method && (
             <Card>
@@ -272,9 +461,27 @@ export default function OrderDetailPage({
                   </Badge>
                 </div>
                 {order.tracking_number && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Tracking Number</span>
-                    <span className="font-mono text-xs">{order.tracking_number}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs">{order.tracking_number}</span>
+                      {shiprocketConfig?.token && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2"
+                          asChild
+                        >
+                          <a
+                            href={getShiprocketTrackingURL(order.tracking_number)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
               </CardContent>

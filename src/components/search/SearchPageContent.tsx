@@ -133,7 +133,7 @@ function SearchPageContentInner() {
   }, [query, filters, sortBy]);
 
   return (
-    <div className="min-h-screen bg-white pt-36 sm:pt-40 lg:pt-12">
+    <div className="min-h-screen bg-white pt-28 sm:pt-32 md:pt-36 lg:pt-40">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-white via-white to-[#009744]/5 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-6 xs:py-7 sm:py-8 md:py-10 lg:py-12">
