@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingBag, Sparkles, Check } from "lucide-react";
@@ -92,7 +93,9 @@ export default function ShopPage() {
 
       {/* Products */}
       <div className="bg-gray-50 py-12 sm:py-16 lg:py-20">
-        <ProductListing />
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>
+          <ProductListing />
+        </Suspense>
       </div>
 
       {/* Newsletter */}

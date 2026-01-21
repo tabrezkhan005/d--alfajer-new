@@ -129,7 +129,7 @@ export async function updateOrderTrackingNumber(orderId: string, trackingNumber:
 
     const { error } = await supabase
         .from("orders")
-        .update({ tracking_number: trackingNumber })
+        .update({ tracking_number: trackingNumber } as any)
         .eq("id", orderId);
 
     if (error) {
@@ -169,7 +169,7 @@ export async function updateTrackingNumber(orderId: string, trackingNumber: stri
         .update({
             tracking_number: trackingNumber,
             updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq("id", orderId);
 
     if (error) {

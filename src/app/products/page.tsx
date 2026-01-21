@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProductListing } from "@/src/components/products";
@@ -15,7 +16,7 @@ const itemVariants = {
 
 export default function ProductsPage() {
   const { language, setLanguage, currency, setCurrency, t } = useI18n();
-  
+
   return (
     <div className="w-full bg-white overflow-x-hidden">
       {/* Language & Currency Selector */}
@@ -61,7 +62,9 @@ export default function ProductsPage() {
         initial="hidden"
         animate="visible"
       >
-        <ProductListing />
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>
+          <ProductListing />
+        </Suspense>
       </motion.div>
 
       {/* Newsletter */}

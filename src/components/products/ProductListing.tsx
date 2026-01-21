@@ -61,7 +61,7 @@ export function ProductListing() {
     return categories
       .filter(cat => mainCategories.includes(cat.name))
       .map(cat => cat.name)
-      .filter(catName => allProducts.some(p => p.category === catName));
+      .filter(catName => allProducts.some(p => p.category?.name === catName));
   }, [categories, allProducts]);
 
   const [filters, setFilters] = useState<FilterState>({
@@ -122,7 +122,7 @@ export function ProductListing() {
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       // Category filter
-      if (filters.categories.length > 0 && !filters.categories.includes(product.category)) {
+      if (filters.categories.length > 0 && !filters.categories.includes(product.category?.name || "")) {
         return false;
       }
 
@@ -312,7 +312,7 @@ export function ProductListing() {
           </Label>
           <div className="space-y-2.5">
             {allowedCategories.map((categoryName) => {
-              const count = allProducts.filter((p) => p.category === categoryName).length;
+              const count = allProducts.filter((p) => p.category?.name === categoryName).length;
               const categoryKeyMap: { [key: string]: string } = {
                 "Dry Fruits": "productCategory.premiumDryFruits",
                 "Nuts": "productCategory.nutsSeeds",

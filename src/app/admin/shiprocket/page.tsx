@@ -189,38 +189,38 @@ export default function ShiprocketDashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-          <Link href="/admin/shiprocket/serviceability">
+        <Link href="/admin/shiprocket/serviceability">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-base">Serviceability Check</CardTitle>
               <CardDescription>Check if courier can deliver</CardDescription>
             </CardHeader>
-          </Link>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-          <Link href="/admin/shiprocket/rate-calculator">
+          </Card>
+        </Link>
+        <Link href="/admin/shiprocket/rate-calculator">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-base">Rate Calculator</CardTitle>
               <CardDescription>Calculate shipping rates</CardDescription>
             </CardHeader>
-          </Link>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-          <Link href="/admin/shiprocket/pickup">
+          </Card>
+        </Link>
+        <Link href="/admin/shiprocket/pickup">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-base">Request Pickup</CardTitle>
               <CardDescription>Schedule package pickup</CardDescription>
             </CardHeader>
-          </Link>
-        </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" asChild>
-          <Link href="/admin/shiprocket/returns">
+          </Card>
+        </Link>
+        <Link href="/admin/shiprocket/returns">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-base">Return Orders</CardTitle>
               <CardDescription>Manage return shipments</CardDescription>
             </CardHeader>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
       </div>
 
       {/* Recent Shipments */}

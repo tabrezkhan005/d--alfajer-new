@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { HeroSection } from "@/src/components/hero/HeroSection";
 import { ExquisiteCollection } from "@/src/components/exquisite-collection";
 import { ProductListing } from "@/src/components/products";
@@ -9,7 +10,9 @@ export default function Home() {
     <div className="w-full overflow-x-hidden">
       <HeroSection />
       <ExquisiteCollection />
-      <ProductListing />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>
+        <ProductListing />
+      </Suspense>
       <WhyChooseUs />
       <Newsletter />
     </div>
