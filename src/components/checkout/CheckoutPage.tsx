@@ -126,6 +126,7 @@ function CheckoutPageContent() {
   const [subscribe, setSubscribe] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState<number>(5);
 
   // Get selected shipping method
   const selectedShippingMethod = shippingMethods.find(
@@ -186,6 +187,27 @@ function CheckoutPageContent() {
       shippingAddress.country
     );
   }, [shippingAddress]);
+
+  // Auto-redirect countdown effect - MUST be before any conditional returns
+  useEffect(() => {
+    if (orderNumber) {
+      // Reset countdown when order is placed
+      setRedirectCountdown(5);
+      
+      const timer = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            router.push('/');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [orderNumber, router]);
 
   // Handle proceed
   const handleProceed = () => {
@@ -248,23 +270,37 @@ function CheckoutPageContent() {
           name: "Alfajer",
           description: `Order #${data.orderNumber}`,
           order_id: data.payment.razorpayOrderId,
+          prefill: {
+            name: shippingAddress.firstName ? `${shippingAddress.firstName} ${shippingAddress.lastName || ''}`.trim() : undefined,
+            email: shippingAddress.email || undefined,
+            contact: shippingAddress.phone || undefined,
+          },
           handler: async (response) => {
-            toast.loading('Verifying payment...');
-            const success = await verifyRazorpayPayment(
-              response.razorpay_order_id,
-              response.razorpay_payment_id,
-              response.razorpay_signature,
-              data.orderId
-            );
+            try {
+              toast.loading('Verifying payment...');
+              const result = await verifyRazorpayPayment(
+                response.razorpay_order_id,
+                response.razorpay_payment_id,
+                response.razorpay_signature,
+                data.orderId
+              );
 
-            if (success) {
+              if (result.success) {
+                toast.dismiss();
+                toast.success('Payment successful!');
+                setOrderNumber(data.orderNumber);
+                clearCart();
+                setIsProcessing(false);
+              } else {
+                toast.dismiss();
+                toast.error(result.error || 'Payment verification failed. Please contact support if payment was deducted.');
+                setIsProcessing(false);
+              }
+            } catch (error: any) {
               toast.dismiss();
-              toast.success('Payment successful!');
-              setOrderNumber(data.orderNumber);
-              clearCart();
-            } else {
-              toast.dismiss();
-              toast.error('Payment verification failed');
+              console.error('Payment handler error:', error);
+              toast.error('An error occurred during payment verification. Please contact support.');
+              setIsProcessing(false);
             }
           },
           modal: {
@@ -357,8 +393,12 @@ function CheckoutPageContent() {
             </CardContent>
           </Card>
 
-          <p className="text-xs xs:text-sm text-gray-700 mb-4 xs:mb-5 sm:mb-6">
+          <p className="text-xs xs:text-sm text-gray-700 mb-2 xs:mb-3">
             {t('checkout.confirmationEmail')}
+          </p>
+
+          <p className="text-xs xs:text-sm text-gray-600 mb-4 xs:mb-5 sm:mb-6">
+            Redirecting to home page in <span className="font-bold text-[#009744]">{redirectCountdown}</span> {redirectCountdown === 1 ? 'second' : 'seconds'}...
           </p>
 
           <Button
@@ -366,7 +406,7 @@ function CheckoutPageContent() {
             className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
             onClick={() => router.push('/')}
           >
-            {t('checkout.continueShopping')}
+            {t('checkout.continueShopping')} {redirectCountdown > 0 && `(${redirectCountdown}s)`}
           </Button>
         </div>
       </div>

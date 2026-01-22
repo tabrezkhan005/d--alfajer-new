@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     if (!result) {
       return NextResponse.json(
-        { error: "Failed to create shipment" },
+        { error: "Failed to create shipment - no response from Shiprocket" },
         { status: 500 }
       );
     }
@@ -31,9 +31,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Shiprocket shipment creation error:", error);
+    // Return the actual error message from Shiprocket
+    const errorMessage = error.message || "Internal server error";
+    const statusCode = error.message?.includes("required") ? 400 : 500;
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     );
   }
 }

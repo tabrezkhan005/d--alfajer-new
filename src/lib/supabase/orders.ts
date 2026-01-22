@@ -13,7 +13,8 @@ export interface OrderWithItems {
     shipping_cost: number | null;
     tax: number | null;
     discount: number | null;
-    total: number | null;
+    total_amount: number | null; // Database column name
+    total?: number | null; // Alias for backward compatibility
     currency: string | null;
     shipping_address: Record<string, unknown> | null;
     billing_address: Record<string, unknown> | null;
@@ -82,7 +83,13 @@ export async function getOrderById(orderId: string): Promise<OrderWithItems | nu
         return null;
     }
 
-    return data as unknown as OrderWithItems;
+    // Map total_amount to total for backward compatibility
+    const mappedData = data ? {
+        ...data,
+        total: (data as any).total_amount || (data as any).total,
+    } : null;
+
+    return mappedData as unknown as OrderWithItems;
 }
 
 // Get all orders (admin)
@@ -120,7 +127,13 @@ export async function getAllOrders(options?: {
         return [];
     }
 
-    return (data || []) as unknown as OrderWithItems[];
+    // Map total_amount to total for backward compatibility
+    const mappedData = (data || []).map((order: any) => ({
+        ...order,
+        total: order.total_amount || order.total, // Add total alias
+    }));
+
+    return mappedData as unknown as OrderWithItems[];
 }
 
 // Update order tracking number

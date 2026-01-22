@@ -163,9 +163,12 @@ function Footer() {
 
         {/* Large Brand Text */}
         <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10 pt-4 sm:pt-6 md:pt-8 lg:pt-10 border-t border-gray-200">
-          <div className="flex items-center justify-center px-2 pb-2 sm:pb-3 md:pb-4 lg:pb-6">
+          <div className="flex items-center justify-center px-2 pb-6 sm:pb-7 md:pb-8 lg:pb-10 xl:pb-12">
             <h1
-              className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold select-none font-secondary tracking-tight leading-[1.1] bg-gradient-to-b from-[#009744] via-[#099042] via-[#128A40] via-[#1C833F] via-[#257D3D] to-[#2E763B] text-transparent bg-clip-text"
+              className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold select-none font-secondary tracking-tight leading-[1.15] text-transparent bg-clip-text"
+              style={{
+                backgroundImage: 'linear-gradient(to bottom, #009744, #099042, #128A40, #1C833F, #257D3D, #2E763B)'
+              }}
             >
               {t('footer.brand')}.
             </h1>

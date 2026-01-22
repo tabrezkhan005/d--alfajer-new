@@ -21,12 +21,14 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     // Search products from database with full product data
+    // Sanitize query to prevent injection (Supabase handles this, but be safe)
+    const sanitizedQuery = query.replace(/[%_]/g, ''); // Remove wildcards that could cause issues
     const { data: products, error } = await supabase
       .from('products')
       .select('id, name, slug, image_url, base_price, short_description, category:categories(name)')
       .eq('is_active', true)
-      .or(`name.ilike.%${query}%,short_description.ilike.%${query}%`)
-      .limit(limit);
+      .or(`name.ilike.%${sanitizedQuery}%,short_description.ilike.%${sanitizedQuery}%`)
+      .limit(Math.min(limit, 50)); // Cap limit to prevent abuse
 
     if (error) {
       console.error('Autocomplete search error:', error);

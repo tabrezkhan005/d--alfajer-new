@@ -5,9 +5,12 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
+    // Shiprocket requires email and password authentication
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { 
+          error: "Shiprocket authentication requires email and password. Please provide both credentials."
+        },
         { status: 400 }
       );
     }

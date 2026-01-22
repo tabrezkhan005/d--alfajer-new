@@ -35,19 +35,13 @@ export async function GET(request: NextRequest) {
       result = await getAllShipments(token, params);
     }
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "Failed to fetch shipments" },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Get shipments error:", error);
+    const statusCode = error.message?.includes("401") || error.message?.includes("Authentication") ? 401 : 500;
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
+      { error: error.message || "Failed to fetch shipments" },
+      { status: statusCode }
     );
   }
 }

@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 
@@ -12,6 +12,7 @@ interface Category {
   id: string;
   name: string;
   image: string;
+  comingSoon?: boolean;
 }
 
 interface ExquisiteCollectionProps {
@@ -66,6 +67,12 @@ export function ExquisiteCollection({
       // Using existing mapping or explicit path
       image: "/images/hero/hero5.png",
     },
+    {
+      id: "combo",
+      name: "Combo",
+      image: "/images/hero/hero2.png",
+      comingSoon: true,
+    },
   ];
 
   /*
@@ -73,50 +80,7 @@ export function ExquisiteCollection({
      If dynamic fetching is needed again, restore the useEffect and getCategories call.
   */
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-
-  const checkScrollability = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  useEffect(() => {
-    checkScrollability();
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      // Check immediately and after a short delay to ensure layout is ready
-      checkScrollability();
-      setTimeout(checkScrollability, 100);
-      scrollContainer.addEventListener("scroll", checkScrollability);
-    }
-    window.addEventListener("resize", checkScrollability);
-    return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener("scroll", checkScrollability);
-      }
-      window.removeEventListener("resize", checkScrollability);
-    };
-  }, []);
-
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400;
-      const newScrollLeft =
-        scrollContainerRef.current.scrollLeft +
-        (direction === "left" ? -scrollAmount : scrollAmount);
-
-      scrollContainerRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: "smooth",
-      });
-    }
-  };
 
   // Category name to translation key mapping (for dynamic DB categories)
   const categoryKeyMap: { [key: string]: string } = {
@@ -137,6 +101,7 @@ export function ExquisiteCollection({
      // Check for specific keys for our new items
      if (categoryName === "Shilajit") return t('productCategory.shilajit') === 'productCategory.shilajit' ? "Pure Shilajit" : t('productCategory.shilajit');
      if (categoryName === "Saffron") return t('productCategory.saffron') === 'productCategory.saffron' ? "Premium Saffron" : t('productCategory.saffron');
+     if (categoryName === "Combo") return "Combo";
 
      const translationKey = categoryKeyMap[categoryName] || `productCategory.${categoryName.replace(/\s+/g, '')}`;
      const translated = t(translationKey);
@@ -154,89 +119,120 @@ export function ExquisiteCollection({
           </h2>
           {subtitle && (
             <div className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-3 px-2 xs:px-3 sm:px-0">
-              <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
+              <div className="hidden sm:block h-px w-4 xs:w-5 sm:w-8 bg-[#AB1F23]/20" />
               <p className="text-sm xs:text-base sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                 {t('collection.subtitle')}
               </p>
-              <div className="hidden sm:block h-[1px] w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
+              <div className="hidden sm:block h-px w-4 xs:w-5 sm:w-8 bg-[#009744]/20" />
             </div>
           )}
         </div>
 
         {/* Carousel Container */}
         <div className="relative group flex justify-center">
-          {/* Scrollable Container - Horizontal scroll on mobile, centered wrap on desktop */}
-          <div
-            ref={scrollContainerRef}
-            className="flex sm:flex-wrap sm:justify-center gap-4 sm:gap-6 md:gap-8 pb-3 sm:pb-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2 xs:px-3 sm:px-0"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
+          {/* Collection Cards - One line on all screens */}
+          <div className="flex gap-4 sm:gap-6 md:gap-8 justify-center items-center flex-wrap sm:flex-nowrap px-2 xs:px-3 sm:px-0">
             {categories.map((category) => {
-              // Convert category name to slug for URL (matches database category names)
-              const categorySlug = category.name;
-              return (
-                <Link key={category.id} href={`/search?category=${encodeURIComponent(categorySlug)}`}>
-                  <motion.div
-                    className="flex-shrink-0 w-[85vw] xs:w-[calc(50vw-24px)] sm:w-[300px] md:w-[320px] lg:w-[340px] snap-center"
-                    onMouseEnter={() => setHoveredCard(category.id)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    whileHover={{ y: -8 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+              // Map category names to database category names
+              const categoryNameMap: { [key: string]: string } = {
+                "Shilajit": "Shilajit",
+                "Saffron": "Saffron",
+                "Premium Dry Fruits": "Dry Fruits",
+                "Authentic Spices": "Spices",
+                "Combo": "Combo",
+              };
+              const dbCategoryName = categoryNameMap[category.name] || category.name;
+              
+              // For coming soon items, don't make them clickable
+              const cardContent = (
+                <motion.div
+                  className="shrink-0 w-[85vw] xs:w-[calc(50vw-24px)] sm:w-[280px] md:w-[300px] lg:w-[320px] xl:w-[340px]"
+                  onMouseEnter={() => setHoveredCard(category.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  whileHover={category.comingSoon ? {} : { y: -8 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <div
+                    className={`relative h-[280px] xs:h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden ${category.comingSoon ? '' : 'cursor-pointer group/card'} bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300 ${category.comingSoon ? 'opacity-75' : ''}`}
+                    role={category.comingSoon ? undefined : "button"}
+                    tabIndex={category.comingSoon ? undefined : 0}
+                    aria-label={category.comingSoon ? `${category.name} - Coming Soon` : `View ${category.name}`}
                   >
-                    <div
-                      className="relative h-[280px] xs:h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden cursor-pointer group/card bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300"
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`View ${category.name}`}
-                    >
-                      {/* Image */}
-                      <div className="absolute inset-0 overflow-hidden">
-                        <motion.img
-                          src={category.image}
-                          alt={category.name}
-                          className="w-full h-full object-cover"
-                          animate={{
-                            scale: hoveredCard === category.id ? 1.08 : 1,
-                          }}
-                          transition={{ duration: 0.6, ease: "easeOut" }}
-                        />
-                        {/* Overlay with brand green gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-colors duration-300" />
+                    {/* Image */}
+                    <div className="absolute inset-0 overflow-hidden">
+                      <motion.img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                        animate={{
+                          scale: hoveredCard === category.id && !category.comingSoon ? 1.08 : 1,
+                        }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        onError={(e) => {
+                          // Fallback to default image if category image fails to load
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== defaultImage) {
+                            target.src = defaultImage;
+                          }
+                        }}
+                      />
+                      {/* Overlay with brand green gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-colors duration-300" />
+                    </div>
+
+                    {/* Coming Soon Badge */}
+                    {category.comingSoon && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <span className="inline-flex items-center bg-[#009744] text-white text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                          Coming Soon
+                        </span>
                       </div>
+                    )}
 
-                      {/* Content */}
-                      <div className="absolute inset-0 flex items-end p-4 sm:p-5 md:p-7">
-                        <div className="w-full">
-                          <motion.h3
-                            className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight font-heading"
-                            animate={{
-                              y: hoveredCard === category.id ? -4 : 0,
-                            }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            {getCategoryName(category.name)}
-                          </motion.h3>
+                    {/* Content */}
+                    <div className="absolute inset-0 flex items-end p-4 sm:p-5 md:p-7">
+                      <div className="w-full">
+                        <motion.h3
+                          className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight font-heading"
+                          animate={{
+                            y: hoveredCard === category.id && !category.comingSoon ? -4 : 0,
+                          }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {getCategoryName(category.name)}
+                        </motion.h3>
 
-                          <AnimatePresence>
-                            {hoveredCard === category.id && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="mt-3 md:mt-4"
-                              >
-                                <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
-                                  {t('collection.exploreCollection')}
-                                  <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
-                                </span>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
+                        <AnimatePresence>
+                          {hoveredCard === category.id && !category.comingSoon && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              transition={{ duration: 0.2 }}
+                              className="mt-3 md:mt-4"
+                            >
+                              <span className="inline-flex items-center text-[#009744] text-xs md:text-sm font-semibold font-poppins group-hover/card:text-[#2E763B] transition-colors duration-300 bg-white/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full">
+                                {t('collection.exploreCollection')}
+                                <ChevronRight className="ml-1 w-3 md:w-4 h-3 md:h-4" />
+                              </span>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
+                </motion.div>
+              );
+
+              // If coming soon, don't wrap in Link
+              if (category.comingSoon) {
+                return <React.Fragment key={category.id}>{cardContent}</React.Fragment>;
+              }
+
+              // Otherwise, wrap in Link to products page with category filter
+              return (
+                <Link key={category.id} href={`/products?category=${encodeURIComponent(dbCategoryName)}`}>
+                  {cardContent}
                 </Link>
               );
             })}

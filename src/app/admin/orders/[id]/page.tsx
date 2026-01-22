@@ -89,14 +89,33 @@ export default function OrderDetailPage({
     fetchOrder();
 
     // Load Shiprocket config
-    if (typeof window !== "undefined") {
+    const loadShiprocketConfig = async () => {
+      if (typeof window === "undefined") return;
+      
+      // First check localStorage
       const saved = localStorage.getItem("shiprocket_config");
       if (saved) {
         try {
           const config = JSON.parse(saved);
           // Check if token is expired
           if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
-            // Token expired, need to re-authenticate
+            // Token expired, try to refresh
+            try {
+              const response = await fetch("/api/shiprocket/auth", { method: "POST" });
+              if (response.ok) {
+                const { token } = await response.json();
+                const updatedConfig = {
+                  ...config,
+                  token,
+                  tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+                };
+                localStorage.setItem("shiprocket_config", JSON.stringify(updatedConfig));
+                setShiprocketConfig(updatedConfig);
+                return;
+              }
+            } catch (error) {
+              console.error("Failed to refresh token:", error);
+            }
             setShiprocketConfig({ ...config, token: undefined });
           } else {
             setShiprocketConfig(config);
@@ -105,7 +124,32 @@ export default function OrderDetailPage({
           console.error("Failed to parse Shiprocket config:", e);
         }
       }
-    }
+      
+      // If no config in localStorage, try to get token from API (for API key setup)
+      if (!saved || !JSON.parse(saved || "{}").token) {
+        try {
+          const response = await fetch("/api/shiprocket/auth", { method: "POST" });
+          if (response.ok) {
+            const { token } = await response.json();
+            if (token) {
+              const config = {
+                email: "",
+                password: "",
+                token,
+                tokenExpiry: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year for API key
+                pickupLocation: "",
+              };
+              localStorage.setItem("shiprocket_config", JSON.stringify(config));
+              setShiprocketConfig(config);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to get Shiprocket token:", error);
+        }
+      }
+    };
+    
+    loadShiprocketConfig();
   }, [id]);
 
   const handleStatusChange = async (newStatus: string) => {
@@ -134,6 +178,13 @@ export default function OrderDetailPage({
       return;
     }
 
+    // Validate that order has items
+    const orderItems = order.items || [];
+    if (orderItems.length === 0) {
+      toast.error("Cannot create shipment: This order has no items. Please add items to the order first.");
+      return;
+    }
+
     setCreatingShipment(true);
     try {
       const shippingAddress = order.shipping_address as {
@@ -150,6 +201,38 @@ export default function OrderDetailPage({
 
       if (!shippingAddress) {
         toast.error("Shipping address is missing");
+        setCreatingShipment(false);
+        return;
+      }
+
+      // Validate required address fields
+      if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.zip || !shippingAddress.state) {
+        toast.error("Please ensure shipping address has complete details (address, city, pincode, state)");
+        setCreatingShipment(false);
+        return;
+      }
+
+      // Prepare order items for Shiprocket
+      const shiprocketItems = orderItems.map((item: any) => {
+        const price = Number(item.price) || Number(item.price_at_purchase) || 0;
+        const quantity = item.quantity || 1;
+        
+        return {
+          name: item.name || "Product",
+          sku: item.sku || item.product_id || "SKU001",
+          units: quantity,
+          selling_price: price,
+        };
+      });
+
+      // Calculate total weight (default 0.5kg per item if not specified)
+      const totalWeight = orderItems.reduce((sum: number, item: any) => {
+        return sum + (item.weight || 0.5) * (item.quantity || 1);
+      }, 0) || 0.5;
+
+      // Validate required address fields
+      if (!shippingAddress.zip || !shippingAddress.city || !shippingAddress.state) {
+        toast.error("Complete shipping address is required (pincode, city, state)");
         return;
       }
 
@@ -157,7 +240,7 @@ export default function OrderDetailPage({
       const shipmentData = {
         order_id: order.order_number || order.id,
         order_date: new Date(order.created_at || Date.now()).toISOString().split('T')[0],
-        pickup_location: shiprocketConfig.pickupLocation || "Primary",
+        pickup_location: shiprocketConfig.pickupLocation || process.env.NEXT_PUBLIC_SHIPROCKET_PICKUP_LOCATION || "Primary",
         billing_customer_name: shippingAddress.firstName || "",
         billing_last_name: shippingAddress.lastName || "",
         billing_address: shippingAddress.address || "",
@@ -168,15 +251,10 @@ export default function OrderDetailPage({
         billing_email: shippingAddress.email || order.email || "",
         billing_phone: shippingAddress.phone || "",
         shipping_is_billing: true,
-        order_items: (order.items || []).map((item) => ({
-          name: item.name || "Product",
-          sku: item.sku || item.product_id || "SKU001",
-          units: item.quantity,
-          selling_price: Number(item.price) || 0,
-        })),
+        order_items: shiprocketItems,
         payment_method: order.payment_method === "cod" ? "COD" : "Prepaid",
-        sub_total: order.subtotal || 0,
-        weight: 0.5, // Default weight, can be calculated from items
+        sub_total: Number(order.subtotal) || 0,
+        weight: totalWeight,
       };
 
       const response = await fetch("/api/shiprocket/shipment", {
@@ -191,8 +269,10 @@ export default function OrderDetailPage({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create shipment");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || `Failed to create shipment (Status: ${response.status})`;
+        console.error("Shiprocket API error:", errorData);
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -211,11 +291,14 @@ export default function OrderDetailPage({
           status: "shipped",
         });
       } else {
-        throw new Error(result.message || "Shipment creation failed");
+        const errorMsg = result.message || result.error || "Shipment creation failed - no shipment ID returned";
+        console.error("Shiprocket response:", result);
+        throw new Error(errorMsg);
       }
     } catch (error: any) {
       console.error("Create shipment error:", error);
-      toast.error(error.message || "Failed to create shipment");
+      const errorMessage = error.message || "Failed to create shipment";
+      toast.error(errorMessage);
     } finally {
       setCreatingShipment(false);
     }
@@ -256,11 +339,16 @@ export default function OrderDetailPage({
   } | null;
 
   const orderItems = order.items || [];
-  const subtotal = order.subtotal || orderItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+  // Use subtotal from database, or calculate from items if not available
+  const subtotal = order.subtotal || (orderItems.length > 0 ? orderItems.reduce((sum: number, item: any) => {
+    const itemTotal = (Number(item.price) || Number(item.price_at_purchase) || 0) * (item.quantity || 0);
+    return sum + itemTotal;
+  }, 0) : 0);
   const shipping = order.shipping_cost || 0;
   const tax = order.tax || 0;
   const discount = order.discount || 0;
-  const total = order.total || 0;
+  // Use total_amount from database, fallback to calculated total
+  const total = order.total_amount || order.total || (subtotal - discount + shipping + tax);
 
   return (
     <div className="space-y-6">

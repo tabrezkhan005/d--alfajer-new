@@ -27,9 +27,10 @@ export async function GET(request: NextRequest) {
       `)
       .eq('is_active', true);
 
-    // Full-text search
+    // Full-text search - sanitize query
     if (query) {
-      dbQuery = dbQuery.or(`name.ilike.%${query}%,short_description.ilike.%${query}%,long_description.ilike.%${query}%`);
+      const sanitizedQuery = query.replace(/[%_]/g, ''); // Remove wildcards
+      dbQuery = dbQuery.or(`name.ilike.%${sanitizedQuery}%,short_description.ilike.%${sanitizedQuery}%,long_description.ilike.%${sanitizedQuery}%`);
     }
 
     // Category filter

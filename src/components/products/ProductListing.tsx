@@ -43,25 +43,24 @@ export function ProductListing() {
   // Get category from URL if present
   const categoryFromUrl = searchParams?.get('category') || '';
 
-  // Define specific categories to show in filter (main product categories)
+  // Only show categories that exist in the database and have products
   const allowedCategories = useMemo(() => {
-    const mainCategories = [
-      "Dry Fruits",
-      "Spices",
-      "Saffron",
-      "Shilajit",
-      "Nuts",
-      "Seeds",
-      "Honey & Spreads",
-      "Tea & Beverages",
-      "Gift Packs",
-      "Organic"
-    ];
-    // Only show categories that exist in the database and have products
+    // Get unique category names from products that actually exist
+    const categoriesWithProducts = new Set(
+      allProducts
+        .map(p => p.category?.name)
+        .filter((name): name is string => Boolean(name))
+    );
+    
+    // Return categories from database that have products
     return categories
-      .filter(cat => mainCategories.includes(cat.name))
-      .map(cat => cat.name)
-      .filter(catName => allProducts.some(p => p.category?.name === catName));
+      .filter(cat => categoriesWithProducts.has(cat.name))
+      .map(cat => ({
+        name: cat.name,
+        id: cat.id,
+        count: allProducts.filter(p => p.category?.name === cat.name).length
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [categories, allProducts]);
 
   const [filters, setFilters] = useState<FilterState>({
@@ -241,7 +240,7 @@ export function ProductListing() {
       {/* Filter Header */}
       <div className="flex items-center justify-between pb-5 border-b border-gray-100">
         <div className="flex items-center gap-2.5">
-          <Filter className="h-5 w-5 text-[#009744] flex-shrink-0" />
+          <Filter className="h-5 w-5 text-[#009744] shrink-0" />
           <h3 className="text-lg font-bold text-gray-900 font-poppins">Filters</h3>
         </div>
         <button
@@ -311,8 +310,7 @@ export function ProductListing() {
             {t('filter.category')}
           </Label>
           <div className="space-y-2.5">
-            {allowedCategories.map((categoryName) => {
-              const count = allProducts.filter((p) => p.category?.name === categoryName).length;
+            {allowedCategories.map((category) => {
               const categoryKeyMap: { [key: string]: string } = {
                 "Dry Fruits": "productCategory.premiumDryFruits",
                 "Nuts": "productCategory.nutsSeeds",
@@ -325,23 +323,23 @@ export function ProductListing() {
                 "Saffron": "productCategory.saffron",
                 "Shilajit": "productCategory.shilajit",
               };
-              const translationKey = categoryKeyMap[categoryName] || `productCategory.${categoryName.replace(/\s+/g, '')}`;
+              const translationKey = categoryKeyMap[category.name] || `productCategory.${category.name.replace(/\s+/g, '')}`;
               const translated = t(translationKey);
-              const displayName = translated === translationKey ? categoryName : translated;
+              const displayName = translated === translationKey ? category.name : translated;
               return (
-                <div key={categoryName} className="flex items-center space-x-3 group/item">
+                <div key={category.id || category.name} className="flex items-center space-x-3 group/item">
                   <Checkbox
-                    id={`category-${categoryName}`}
-                    checked={filters.categories.includes(categoryName)}
-                    onCheckedChange={() => toggleFilter("categories", categoryName)}
+                    id={`category-${category.id || category.name}`}
+                    checked={filters.categories.includes(category.name)}
+                    onCheckedChange={() => toggleFilter("categories", category.name)}
                     className="border-gray-300 data-[state=checked]:bg-[#009744] data-[state=checked]:border-[#009744] rounded h-4 w-4"
                   />
                   <Label
-                    htmlFor={`category-${categoryName}`}
+                    htmlFor={`category-${category.id || category.name}`}
                     className="text-sm text-gray-700 cursor-pointer flex-1 flex items-center justify-between group-hover/item:text-gray-900 transition-colors font-body"
                   >
                     <span className="font-medium">{displayName}</span>
-                    <span className="text-gray-400 text-xs font-normal">({count})</span>
+                    <span className="text-gray-400 text-xs font-normal">({category.count})</span>
                   </Label>
                 </div>
               );
@@ -539,7 +537,7 @@ export function ProductListing() {
           </h2>
           <div className="flex flex-col items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-2 sm:gap-3 justify-center">
-              <div className="h-6 sm:h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden sm:block flex-shrink-0" />
+              <div className="h-6 sm:h-8 w-[2px] bg-gradient-to-b from-[#AB1F23] to-[#009744] rounded-full hidden sm:block shrink-0" />
               <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl font-body italic tracking-wide">
                 {t('productCategory.subtitle')}
               </p>
@@ -611,7 +609,7 @@ export function ProductListing() {
 
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-start">
           {/* Filter Sidebar - Hidden on mobile, visible on desktop - Sticky */}
-          <aside className="hidden lg:block w-full lg:w-72 flex-shrink-0">
+          <aside className="hidden lg:block w-full lg:w-72 shrink-0">
             <div className="sticky top-32 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-9rem)] overflow-y-auto">
               {renderFilterContent()}
             </div>
@@ -726,6 +724,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
        setIsAdding(true);
        addItem({
         id: product.id,
+        productId: product.id, // Always set productId for products without variants
         name: product.name,
         image: product.image,
         price: Number(product.price),
@@ -930,7 +929,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
       </CardContent>
 
 
-      <CardFooter className="p-2.5 xs:p-3 sm:p-4 md:p-5 pt-0 sm:pt-0 sm:mt-auto flex-shrink-0 flex flex-col gap-1.5 xs:gap-2 w-full">
+      <CardFooter className="p-2.5 xs:p-3 sm:p-4 md:p-5 pt-0 sm:pt-0 sm:mt-auto shrink-0 flex flex-col gap-1.5 xs:gap-2 w-full">
         <div className="flex gap-1 xs:gap-1.5 sm:gap-2 w-full">
           <Button
             className={cn(

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
 import { calculateTax, shippingMethods, validatePromoCode } from '@/src/lib/checkout';
+// Note: Shiprocket shipment creation is done manually from admin panel
+// Automatic creation disabled for security (requires email/password credentials)
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,18 +40,88 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Validate product prices from database
-    const productIds = items.map((item: { productId?: string; id?: string }) => item.productId || item.id);
-    const variantIds = items.map((item: { variantId?: string }) => item.variantId).filter(Boolean);
+    // Extract product IDs - handle both productId field and composite IDs (productId-variantId)
+    const productIds: string[] = items
+      .map((item: { productId?: string; id?: string; variantId?: string }): string | null => {
+        // First try productId field (most reliable)
+        if (item.productId) {
+          return item.productId;
+        }
+        // If no productId, use id field
+        if (item.id) {
+          // If id is composite (productId-variantId format), extract the product ID part
+          // Format: productId-variantId where both are UUIDs
+          // UUID format: 8-4-4-4-12 (5 parts, 36 chars total)
+          // Composite format: productId-variantId (would be ~73 chars: 36 + 1 + 36)
+          if (item.id.includes('-') && item.id.length > 36) {
+            // Split by '-' and check if we have more than 5 parts (a UUID has 5 parts)
+            const parts = item.id.split('-');
+            // If we have exactly 10 parts (2 UUIDs), take first 5
+            // If we have more, it might be a different format
+            if (parts.length === 10) {
+              // Two UUIDs: take first 5 parts for productId
+              return parts.slice(0, 5).join('-');
+            } else if (parts.length > 5) {
+              // More than one UUID, try to extract first UUID
+              // UUID parts: 8, 4, 4, 4, 12
+              return parts.slice(0, 5).join('-');
+            }
+          }
+          // If it's exactly 36 chars or less, it's likely just a product ID
+          return item.id;
+        }
+        return null;
+      })
+      .filter((id: string | null): id is string => id !== null && id !== undefined); // Filter out null/undefined
+    
+    if (productIds.length === 0) {
+      console.error('No valid product IDs found in items:', JSON.stringify(items, null, 2));
+      return NextResponse.json({ error: 'No valid products found in cart' }, { status: 400 });
+    }
+
+    // Remove duplicates
+    const uniqueProductIds: string[] = Array.from(new Set(productIds));
+    console.log('Extracted product IDs:', uniqueProductIds);
+
+    const variantIds: string[] = items
+      .map((item: { variantId?: string }) => item.variantId)
+      .filter((id: string | undefined): id is string => Boolean(id));
 
     // Fetch products
     const { data: products, error: productError } = await supabase
       .from('products')
       .select('id, base_price, name')
-      .in('id', productIds);
+      .in('id', uniqueProductIds);
 
     if (productError) {
       console.error('Error fetching products:', productError);
-      return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 });
+      console.error('Product IDs attempted:', uniqueProductIds);
+      return NextResponse.json({ 
+        error: 'Failed to validate products', 
+        details: productError.message 
+      }, { status: 500 });
+    }
+
+    if (!products || products.length === 0) {
+      console.error('No products found for IDs:', uniqueProductIds);
+      console.error('Items sent:', JSON.stringify(items, null, 2));
+      return NextResponse.json({ 
+        error: 'One or more products not found in database',
+        details: `Products with IDs ${uniqueProductIds.join(', ')} not found. Please refresh your cart and try again.`
+      }, { status: 404 });
+    }
+
+    // Check if all requested products were found
+    const foundProductIds = new Set(products.map(p => p.id));
+    const missingProductIds = uniqueProductIds.filter(id => !foundProductIds.has(id));
+    
+    if (missingProductIds.length > 0) {
+      console.error('Some products not found:', missingProductIds);
+      console.error('Found products:', Array.from(foundProductIds));
+      return NextResponse.json({ 
+        error: 'One or more products not found in database',
+        details: `The following products are no longer available: ${missingProductIds.join(', ')}. Please remove them from your cart and try again.`
+      }, { status: 404 });
     }
 
     // Fetch variants if needed
@@ -178,7 +250,7 @@ export async function POST(request: NextRequest) {
         order_number: orderNumber,
         email: email || finalAddress.email,
         subtotal: subtotal,
-        total: totalAmount,
+        total_amount: totalAmount, // Use total_amount instead of total
         currency: 'INR',
         shipping_address: finalAddress,
         billing_address: finalAddress,
@@ -199,11 +271,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: orderError?.message || 'Failed to create order' }, { status: 500 });
     }
 
-    // Create order items
+    // Create order items - map to correct database schema
     const orderItems = validatedItems.map((item: any) => ({
-      ...item,
       order_id: order.id,
-      sku: item.sku || item.product_id || 'SKU-UNKNOWN', // Ensure SKU is populated
+      product_id: item.product_id,
+      variant_id: item.variant_id || null,
+      name: item.name,
+      sku: item.sku || item.product_id || 'SKU-UNKNOWN',
+      image_url: item.image_url || null,
+      quantity: item.quantity,
+      price: item.price, // Price per unit
+      price_at_purchase: item.price, // Also set price_at_purchase for compatibility
+      total: item.total, // Total for this line item
     }));
 
     const { error: itemsError } = await supabase
@@ -212,6 +291,15 @@ export async function POST(request: NextRequest) {
 
     if (itemsError) {
       console.error('Error creating order items:', itemsError);
+      console.error('Order items data:', JSON.stringify(orderItems, null, 2));
+      // If order items fail, we should still return success but log the error
+      // The order exists but items might be missing - admin can manually add them
+      console.warn('Order created but order items insertion failed. Order ID:', order.id);
+      return NextResponse.json({ 
+        error: 'Order created but items failed to save', 
+        details: itemsError.message,
+        orderId: order.id 
+      }, { status: 500 });
     }
 
     // Handle Razorpay payment if selected
@@ -303,6 +391,11 @@ export async function POST(request: NextRequest) {
           });
       }
     }
+
+    // Note: Automatic Shiprocket shipment creation is disabled
+    // Shiprocket requires email/password authentication which should not be stored server-side
+    // Admin must create shipments manually from the order detail page in the admin panel
+    // This is the secure approach and gives admin control over when shipments are created
 
     return NextResponse.json({
       success: true,

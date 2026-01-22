@@ -13,18 +13,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const locations = await getShiprocketPickupLocations(token);
-
-    if (!locations) {
+    try {
+      const locations = await getShiprocketPickupLocations(token);
+      return NextResponse.json(locations);
+    } catch (error: any) {
+      console.error("Shiprocket pickup locations error:", error);
       return NextResponse.json(
-        { error: "Failed to fetch pickup locations" },
-        { status: 500 }
+        { error: error.message || "Failed to fetch pickup locations" },
+        { status: error.message?.includes("401") || error.message?.includes("Authentication") ? 401 : 500 }
       );
     }
-
-    return NextResponse.json(locations);
   } catch (error: any) {
-    console.error("Shiprocket pickup locations error:", error);
+    console.error("Shiprocket pickup locations route error:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

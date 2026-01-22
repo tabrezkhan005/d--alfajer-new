@@ -46,17 +46,51 @@ export default function ServiceabilityPage() {
       return;
     }
 
+    // Check if token is expired and refresh if needed
+    let tokenToUse = config.token;
+    if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
+      toast.info("Token expired, refreshing...");
+      try {
+        const refreshResponse = await fetch("/api/shiprocket/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: config.email,
+            password: config.password,
+          }),
+        });
+        
+        if (refreshResponse.ok) {
+          const { token } = await refreshResponse.json();
+          tokenToUse = token;
+          const updatedConfig = {
+            ...config,
+            token,
+            tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConfig));
+          setConfig(updatedConfig);
+        } else {
+          toast.error("Failed to refresh token. Please reconfigure Shiprocket.");
+          return;
+        }
+      } catch (error) {
+        toast.error("Failed to refresh token. Please reconfigure Shiprocket.");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/shiprocket/serviceability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: config.token,
-          pickup_pincode: pickupPincode,
-          delivery_pincode: deliveryPincode,
+          token: tokenToUse,
+          pickup_postcode: pickupPincode,
+          delivery_postcode: deliveryPincode,
           weight: parseFloat(weight),
-          ...(codType === "COD" && codAmount && { cod: parseFloat(codAmount) }),
+          cod: codType === "COD" && codAmount ? parseFloat(codAmount) : 0, // Always include cod (0 for Prepaid)
           cod_type: codType,
         }),
       });
@@ -70,12 +104,113 @@ export default function ServiceabilityPage() {
           toast.warning("No couriers available for this route");
         }
       } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to check serviceability");
+        // Try to parse JSON error, fallback to text
+        let errorMessage = `Failed to check serviceability (Status: ${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorData.errors || errorMessage;
+          
+          // If errorData has nested errors, extract them
+          if (errorData.errors && typeof errorData.errors === 'object') {
+            const errorStrings = Object.entries(errorData.errors).map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return `${key}: ${value.join(', ')}`;
+              }
+              return `${key}: ${value}`;
+            });
+            if (errorStrings.length > 0) {
+              errorMessage = errorStrings.join('; ') || errorMessage;
+            }
+          }
+          
+          console.error("Serviceability API error:", {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData
+          });
+        } catch (parseError) {
+          // If JSON parsing fails, try to get text response
+          try {
+            const textResponse = await response.text();
+            if (textResponse) {
+              errorMessage = textResponse;
+            }
+            console.error("Serviceability API error (non-JSON):", {
+              status: response.status,
+              statusText: response.statusText,
+              response: textResponse
+            });
+          } catch (textError) {
+            console.error("Serviceability API error (no response body):", {
+              status: response.status,
+              statusText: response.statusText
+            });
+          }
+        }
+        toast.error(errorMessage);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Serviceability check error:", error);
-      toast.error("Failed to check serviceability");
+      const errorMessage = error.message || "Failed to check serviceability. Please check your network connection and try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Test Shiprocket connection
+  const testConnection = async () => {
+    if (!config?.token) {
+      toast.error("Please configure Shiprocket first");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Check if token is expired and refresh if needed
+      let tokenToUse = config.token;
+      if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
+        if (config.email && config.password) {
+          const refreshResponse = await fetch("/api/shiprocket/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: config.email,
+              password: config.password,
+            }),
+          });
+          
+          if (refreshResponse.ok) {
+            const { token } = await refreshResponse.json();
+            tokenToUse = token;
+            const updatedConfig = {
+              ...config,
+              token,
+              tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConfig));
+            setConfig(updatedConfig);
+          }
+        }
+      }
+
+      // Try to get pickup locations as a connection test
+      const response = await fetch(`/api/shiprocket/pickup-locations?token=${encodeURIComponent(tokenToUse)}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        toast.success("Shiprocket connection is working!");
+      } else {
+        const error = await response.json();
+        toast.error(error.error || "Shiprocket connection failed. Please check your credentials.");
+      }
+    } catch (error: any) {
+      console.error("Connection test error:", error);
+      toast.error(error.message || "Failed to connect to Shiprocket");
     } finally {
       setLoading(false);
     }
@@ -194,23 +329,34 @@ export default function ServiceabilityPage() {
               </div>
             )}
 
-            <Button
-              onClick={handleCheckServiceability}
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking...
-                </>
-              ) : (
-                <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Check Serviceability
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleCheckServiceability}
+                disabled={loading || !pickupPincode || !deliveryPincode || !weight}
+                className="flex-1"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Check Serviceability
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={testConnection}
+                disabled={loading}
+                variant="outline"
+                title="Test Shiprocket connection"
+                className="shrink-0"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

@@ -236,9 +236,9 @@ export default function ShiprocketDashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {recentShipments.map((shipment: any) => (
+              {recentShipments.map((shipment: any, index: number) => (
                 <div
-                  key={shipment.shipment_id}
+                  key={shipment.shipment_id || shipment.order_id || shipment.id || `shipment-${index}`}
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex-1">

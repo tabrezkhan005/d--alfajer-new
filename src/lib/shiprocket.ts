@@ -101,7 +101,14 @@ export interface ShiprocketTrackingResponse {
 }
 
 // Get authentication token from Shiprocket
+// Shiprocket uses token-based authentication - you must authenticate with email/password to get a token
+// Tokens expire after 24 hours and need to be refreshed
 export async function getShiprocketToken(email: string, password: string): Promise<{ token: string } | { error: string }> {
+  // Shiprocket requires email and password to get a token
+  if (!email || !password) {
+    return { error: "Shiprocket requires email and password for authentication. Please provide both credentials." };
+  }
+
   try {
     const response = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
       method: "POST",
@@ -137,6 +144,15 @@ export async function createShiprocketShipment(
   shipmentData: CreateShipmentRequest
 ): Promise<ShiprocketShipmentResponse | null> {
   try {
+    // Validate required fields
+    if (!shipmentData.order_items || shipmentData.order_items.length === 0) {
+      throw new Error("Order items are required to create a shipment");
+    }
+
+    if (!shipmentData.billing_pincode || !shipmentData.billing_city || !shipmentData.billing_state) {
+      throw new Error("Complete address details (pincode, city, state) are required");
+    }
+
     const response = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
       method: "POST",
       headers: {
@@ -149,13 +165,17 @@ export async function createShiprocketShipment(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Failed to create shipment");
+      // Provide more detailed error message
+      const errorMessage = data.message || data.error || `Shiprocket API error (Status: ${response.status})`;
+      const errorDetails = data.errors ? JSON.stringify(data.errors) : '';
+      throw new Error(errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage);
     }
 
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Shiprocket shipment creation error:", error);
-    return null;
+    // Re-throw to allow caller to handle the error
+    throw error;
   }
 }
 
@@ -222,27 +242,32 @@ export async function getShiprocketPickupLocations(token: string) {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch pickup locations");
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.message || errorData.error || `Failed to fetch pickup locations (Status: ${response.status})`;
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Shiprocket pickup locations error:", error);
-    return null;
+    throw error; // Re-throw to get better error messages
   }
 }
 
 // Serviceability Check - Check if courier can deliver
 export interface ServiceabilityRequest {
-  pickup_pincode: string;
-  delivery_pincode: string;
+  pickup_pincode?: string; // For backward compatibility
+  delivery_pincode?: string; // For backward compatibility
+  pickup_postcode?: string; // Shiprocket API expects this
+  delivery_postcode?: string; // Shiprocket API expects this
   weight: number;
-  cod?: number; // COD amount
+  cod: number; // COD amount (required, use 0 for Prepaid)
   cod_type?: string; // COD or Prepaid
 }
 
@@ -264,13 +289,29 @@ export async function checkServiceability(
   request: ServiceabilityRequest
 ): Promise<ServiceabilityResponse | null> {
   try {
+    // Support both pincode and postcode for backward compatibility
+    const pickupPostcode = request.pickup_postcode || request.pickup_pincode;
+    const deliveryPostcode = request.delivery_postcode || request.delivery_pincode;
+    
+    // Validate required fields
+    if (!pickupPostcode || !deliveryPostcode || !request.weight) {
+      throw new Error("pickup_postcode, delivery_postcode, and weight are required");
+    }
+
+    // COD is required by Shiprocket API (use 0 for Prepaid)
+    const codAmount = request.cod !== undefined ? request.cod : 0;
+
     const params = new URLSearchParams({
-      pickup_pincode: request.pickup_pincode,
-      delivery_pincode: request.delivery_pincode,
+      pickup_postcode: pickupPostcode,
+      delivery_postcode: deliveryPostcode,
       weight: request.weight.toString(),
-      ...(request.cod && { cod: request.cod.toString() }),
-      ...(request.cod_type && { cod_type: request.cod_type }),
+      cod: codAmount.toString(), // Always include cod (0 for Prepaid)
     });
+
+    // Add optional cod_type parameter
+    if (request.cod_type) {
+      params.append("cod_type", request.cod_type);
+    }
 
     const response = await fetch(
       `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?${params.toString()}`,
@@ -278,19 +319,77 @@ export async function checkServiceability(
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to check serviceability");
+    // Try to parse JSON response
+    let data: any;
+    let responseText: string = "";
+    
+    try {
+      responseText = await response.text();
+      if (responseText) {
+        data = JSON.parse(responseText);
+      } else {
+        data = {};
+      }
+    } catch (parseError) {
+      // If JSON parsing fails, create error with response text
+      throw new Error(`Invalid JSON response from Shiprocket: ${responseText || response.statusText || 'No response body'}`);
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+      // Provide detailed error message from Shiprocket
+      let errorMessage = data.message || data.error || `Shiprocket API error (Status: ${response.status})`;
+      
+      // Handle specific error cases
+      if (response.status === 401) {
+        errorMessage = "Authentication failed. Please check your Shiprocket credentials or API key. Token may be expired.";
+      } else if (response.status === 400) {
+        errorMessage = data.message || data.error || "Invalid request parameters. Please check pickup_pincode, delivery_pincode, and weight.";
+      } else if (response.status === 404) {
+        errorMessage = "Serviceability endpoint not found. Please check the Shiprocket API version.";
+      } else if (response.status >= 500) {
+        errorMessage = "Shiprocket server error. Please try again later.";
+      }
+      
+      // Handle errors object
+      if (data.errors) {
+        let errorDetails = "";
+        if (Array.isArray(data.errors)) {
+          errorDetails = data.errors.join(", ");
+        } else if (typeof data.errors === 'object') {
+          errorDetails = Object.entries(data.errors)
+            .map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return `${key}: ${value.join(', ')}`;
+              }
+              return `${key}: ${value}`;
+            })
+            .join('; ');
+        } else {
+          errorDetails = String(data.errors);
+        }
+        if (errorDetails) {
+          errorMessage = `${errorMessage}: ${errorDetails}`;
+        }
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    // Check if response has expected structure
+    if (!data || (data.status !== undefined && data.status !== 200 && data.status !== 1)) {
+      throw new Error(data.message || data.error || "Invalid response from Shiprocket API");
+    }
+
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Shiprocket serviceability error:", error);
-    return null;
+    // Re-throw to allow caller to handle the error
+    throw error;
   }
 }
 
@@ -519,19 +618,28 @@ export async function getAllShipments(
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch shipments");
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.message || errorData.error || `Failed to fetch shipments (Status: ${response.status})`;
+
+      // If 401, it's an authentication error
+      if (response.status === 401) {
+        throw new Error(`Authentication failed: ${errorMessage}. Please check your API key or credentials.`);
+      }
+
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Shiprocket get shipments error:", error);
-    return null;
+    throw error; // Re-throw to preserve error message
   }
 }
 
@@ -547,19 +655,27 @@ export async function getShipmentDetails(
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch shipment details");
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.message || errorData.error || `Failed to fetch shipment details (Status: ${response.status})`;
+
+      if (response.status === 401) {
+        throw new Error(`Authentication failed: ${errorMessage}. Please check your API key or credentials.`);
+      }
+
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Shiprocket get shipment details error:", error);
-    return null;
+    throw error; // Re-throw to preserve error message
   }
 }
 

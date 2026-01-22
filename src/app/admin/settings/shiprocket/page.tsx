@@ -93,6 +93,7 @@ export default function ShiprocketSettingsPage() {
   const handleTestConnection = async () => {
     setTestingConnection(true);
     try {
+      // Get token (from API key or email/password)
       const response = await fetch("/api/shiprocket/auth", {
         method: "POST",
         headers: {
@@ -111,15 +112,39 @@ export default function ShiprocketSettingsPage() {
 
       const { token } = await response.json();
 
+      if (!token) {
+        throw new Error("No token received from Shiprocket");
+      }
+
       // Try to fetch pickup locations to verify connection
       const locationsResponse = await fetch(
-        `/api/shiprocket/pickup-locations?token=${token}`
+        `/api/shiprocket/pickup-locations?token=${encodeURIComponent(token)}`
       );
 
       if (locationsResponse.ok) {
+        const locationsData = await locationsResponse.json();
         toast.success("Connection successful! Shiprocket is properly configured.");
+
+        // Save token if not already saved
+        if (!config.token || config.token !== token) {
+          const configToSave: ShiprocketConfig = {
+            ...config,
+            token,
+            tokenExpiry: Date.now() + 24 * 60 * 60 * 1000, // 24 hours - tokens expire
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+          setConfig(configToSave);
+        }
       } else {
-        throw new Error("Failed to fetch pickup locations");
+        const errorData = await locationsResponse.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || `Failed to fetch pickup locations (Status: ${locationsResponse.status})`;
+
+        // If it's a 401, the token might be invalid
+        if (locationsResponse.status === 401) {
+          throw new Error(`Authentication failed: ${errorMessage}. Please check your API key or credentials.`);
+        }
+
+        throw new Error(errorMessage);
       }
     } catch (error: any) {
       console.error("Test connection error:", error);
@@ -154,23 +179,16 @@ export default function ShiprocketSettingsPage() {
       <Alert>
         <Package className="h-4 w-4" />
         <AlertDescription>
-          <strong>Setup Instructions:</strong>
-          <ol className="list-decimal list-inside mt-2 space-y-1 text-sm">
-            <li>Log in to your Shiprocket account at{" "}
-              <a
-                href="https://app.shiprocket.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                app.shiprocket.in
-              </a>
-            </li>
-            <li>Go to Settings → API Settings to verify your API access</li>
-            <li>Enter your Shiprocket email and password below</li>
-            <li>Click "Test Connection" to verify your credentials</li>
-            <li>Click "Save Settings" to store your configuration</li>
-          </ol>
+          <div>
+            <strong>Setup Instructions:</strong>
+            <ol className="list-decimal list-inside mt-2 space-y-1 text-sm">
+              <li>Go to Shiprocket Dashboard → Settings → API → Create API User</li>
+              <li>Enter your Shiprocket API user email and password below</li>
+              <li>Click "Test Connection" to verify your credentials</li>
+              <li>Click "Save Settings" to store your configuration</li>
+              <li className="text-muted-foreground mt-2">Note: Tokens expire after 24 hours and will be automatically refreshed when needed</li>
+            </ol>
+          </div>
         </AlertDescription>
       </Alert>
 

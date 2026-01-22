@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Eye, Loader2, Filter, Download } from "lucide-react";
+import { Eye, Loader2, Filter, Download, RefreshCw } from "lucide-react";
 import { DataTable } from "@/src/components/admin/data-table";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
@@ -63,21 +63,41 @@ function OrdersContent() {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   // Fetch orders from Supabase
-  useEffect(() => {
-    async function fetchOrders() {
-      try {
-        setLoading(true);
-        const data = await getAllOrders({ status: statusFilter });
-        setOrders(data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        toast.error("Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllOrders({ status: statusFilter });
+      // Sort by created_at descending to show newest first
+      const sortedData = [...data].sort((a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        return dateB - dateA;
+      });
+      setOrders(sortedData);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to load orders");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchOrders();
+  }, [statusFilter]);
+
+  // Refresh orders when page becomes visible (handles new orders)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchOrders();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [statusFilter]);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -126,7 +146,7 @@ function OrdersContent() {
           escapeCSV(new Date(order.created_at || '').toLocaleDateString()),
           escapeCSV(name),
           escapeCSV(email),
-          escapeCSV(order.total),
+          escapeCSV(order.total_amount || order.total || 0),
           escapeCSV(order.status),
           escapeCSV(order.items?.length || 0)
         ].join(',');
@@ -175,9 +195,13 @@ function OrdersContent() {
     {
       key: "total",
       header: "Total",
-      render: (row: OrderWithItems) => (
-        <span className="font-medium">{formatCurrency(row.total || 0)}</span>
-      ),
+      render: (row: OrderWithItems) => {
+        // Use total_amount from database, fallback to total for backward compatibility
+        const total = row.total_amount || row.total || 0;
+        return (
+          <span className="font-medium">{formatCurrency(total)}</span>
+        );
+      },
     },
     {
       key: "status",
@@ -245,6 +269,16 @@ function OrdersContent() {
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchOrders} 
+            disabled={loading}
+            className="h-9 sm:h-10"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
           <Button variant="outline" size="sm" onClick={handleExportCSV} className="h-9 sm:h-10">
             <Download className="mr-2 h-4 w-4" />
             Export CSV
