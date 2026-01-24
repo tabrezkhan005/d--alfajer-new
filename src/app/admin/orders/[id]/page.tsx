@@ -92,61 +92,84 @@ export default function OrderDetailPage({
     const loadShiprocketConfig = async () => {
       if (typeof window === "undefined") return;
 
-      // First check localStorage
-      const saved = localStorage.getItem("shiprocket_config");
-      if (saved) {
-        try {
-          const config = JSON.parse(saved);
+      let config: any = null;
 
-          // Ensure pickupLocation defaults to "Primary" if not set
-          if (!config.pickupLocation) {
-            config.pickupLocation = "Primary";
-          }
+      // 1. Try Supabase User Metadata (Persistent)
+      try {
+         const { createClient } = await import("@/src/lib/supabase/client");
+         const supabase = createClient();
+         const { data: { user } } = await supabase.auth.getUser();
+         if (user?.user_metadata?.shiprocket_config) {
+             config = user.user_metadata.shiprocket_config;
+         }
+      } catch (e) { console.error("Error loading config from metadata", e); }
 
-          // Check if token is expired
-          if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
-            // Token expired, try to refresh using saved credentials
-            if (config.email && config.password) {
-              try {
-                const response = await fetch("/api/shiprocket/auth", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    email: config.email,
-                    password: config.password,
-                  }),
-                });
-                if (response.ok) {
-                  const { token } = await response.json();
-                  const updatedConfig = {
-                    ...config,
-                    token,
-                    tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
-                    pickupLocation: config.pickupLocation || "Primary",
-                  };
-                  localStorage.setItem("shiprocket_config", JSON.stringify(updatedConfig));
-                  setShiprocketConfig(updatedConfig);
-                  return;
-                }
-              } catch (error) {
-                console.error("Failed to refresh token:", error);
-              }
-            }
-            // Token expired and couldn't refresh
-            setShiprocketConfig({ ...config, token: undefined });
-          } else {
-            setShiprocketConfig(config);
+      // 2. Fallback to LocalStorage
+      if (!config) {
+        const saved = localStorage.getItem("shiprocket_config");
+        if (saved) {
+          try {
+            config = JSON.parse(saved);
+          } catch (e) {
+            console.error("Failed to parse saved config:", e);
           }
-        } catch (e) {
-          console.error("Failed to parse Shiprocket config:", e);
         }
       }
 
-      // If no config in localStorage, try using environment variables
+      // 3. Process Config (Validate & Refresh)
+      if (config) {
+          if (!config.pickupLocation) config.pickupLocation = "Primary";
+
+          // Check expiry
+          if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
+             if (config.email && config.password) {
+                try {
+                  const response = await fetch("/api/shiprocket/auth", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: config.email,
+                      password: config.password,
+                    }),
+                  });
+                  if (response.ok) {
+                    const { token } = await response.json();
+                    const updatedConfig = {
+                      ...config,
+                      token,
+                      tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+                      pickupLocation: config.pickupLocation || "Primary",
+                    };
+
+                    // Save updated config to both storage and metadata
+                    localStorage.setItem("shiprocket_config", JSON.stringify(updatedConfig));
+
+                    try {
+                      const { createClient } = await import("@/src/lib/supabase/client");
+                      const supabase = createClient();
+                      await supabase.auth.updateUser({ data: { shiprocket_config: updatedConfig } });
+                    } catch (e) { console.error("Failed to update metadata", e); }
+
+                    setShiprocketConfig(updatedConfig);
+                    return;
+                  }
+                } catch (error) {
+                  console.error("Failed to refresh token:", error);
+                }
+             }
+             // Expired and refresh failed
+             setShiprocketConfig({ ...config, token: undefined });
+          } else {
+             setShiprocketConfig(config);
+          }
+          return;
+      }
+
+      // 4. Fallback to Environment Variables
       const envEmail = process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
       const envPassword = process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
 
-      if (!saved && envEmail && envPassword) {
+      if (envEmail && envPassword) {
         try {
           const response = await fetch("/api/shiprocket/auth", {
             method: "POST",
@@ -161,14 +184,16 @@ export default function OrderDetailPage({
                 password: envPassword,
                 token,
                 tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
-                pickupLocation: "Primary", // Default to Primary
+                pickupLocation: "Primary",
               };
+              // Note: We don't save Env derived config to Metadata automatically to avoid clutter
+              // But we save to LocalStorage for session speed
               localStorage.setItem("shiprocket_config", JSON.stringify(config));
               setShiprocketConfig(config);
             }
           }
         } catch (error) {
-          console.error("Failed to get Shiprocket token:", error);
+          console.error("Failed to get Shiprocket token from env:", error);
         }
       }
     };

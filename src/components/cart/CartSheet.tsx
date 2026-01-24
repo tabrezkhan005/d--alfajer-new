@@ -110,21 +110,14 @@ export function CartSheet() {
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.shipping')}</span>
-                  <span className={cn(
-                    "font-medium",
-                    shipping === 0 ? "text-[#009744]" : "text-gray-900"
-                  )}>
-                    {shipping === 0 ? t('cart.free') : formatCurrency(convertCurrency(shipping, 'INR'))}
+                  <span className="text-gray-500 italic">
+                    Calculated at checkout
                   </span>
                 </div>
-                {shipping > 0 && (
-                  <div className="bg-[#009744]/10 rounded-lg p-3 text-sm text-[#009744] font-body">
-                    {t('cart.add_more_pre')} <span className="font-semibold">{formatCurrency(convertCurrency(200 - totalPrice, 'INR'))}</span> {t('cart.add_more_post')}
-                  </div>
-                )}
+
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
                   <span>{t('cart.total')}</span>
-                  <span>{formatCurrency(convertCurrency(finalTotal, 'INR'))}</span>
+                  <span>{formatCurrency(convertCurrency(totalPrice, 'INR'))}</span>
                 </div>
               </div>
 

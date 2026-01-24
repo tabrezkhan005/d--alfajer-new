@@ -725,14 +725,14 @@ function CheckoutPageContent() {
                   <CardContent className="space-y-3 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
                     {/* Shipping Zone Info */}
                     {shippingDetails && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                      <div className="p-3 bg-[#009744]/5 border border-[#009744]/20 rounded-lg mb-4">
                         <div className="flex items-center gap-2 mb-1">
-                          <Package className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">
+                          <Package className="h-4 w-4 text-[#009744]" />
+                          <span className="text-sm font-medium text-[#009744]">
                             {shippingDetails.zone.name}
                           </span>
                         </div>
-                        <p className="text-xs text-blue-600">
+                        <p className="text-xs text-[#009744]/80">
                           {shippingDetails.rateDisplay}
                         </p>
                       </div>
@@ -744,7 +744,7 @@ function CheckoutPageContent() {
                         key={option.id}
                         className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${
                           shippingOptionId === option.id
-                            ? 'border-[#009744] bg-green-50'
+                            ? 'border-[#009744] bg-[#009744]/5'
                             : 'border-gray-200 hover:border-[#009744]/50 hover:bg-gray-50'
                         }`}
                       >
@@ -759,9 +759,9 @@ function CheckoutPageContent() {
                           />
                           <div className="flex items-center gap-2">
                             {option.id === 'overnight' ? (
-                              <Zap className="h-4 w-4 text-amber-500" />
+                              <Zap className="h-4 w-4 text-[#AB1F23]" />
                             ) : (
-                              <Truck className="h-4 w-4 text-blue-500" />
+                              <Truck className="h-4 w-4 text-[#009744]" />
                             )}
                             <div>
                               <p className="font-semibold text-gray-800 text-sm">{option.name}</p>
@@ -771,7 +771,7 @@ function CheckoutPageContent() {
                         </div>
                         <div className="text-right">
                           {option.extraCostPerPiece > 0 ? (
-                            <p className="text-sm font-semibold text-amber-600">+₹{option.extraCostPerPiece}/piece</p>
+                            <p className="text-sm font-semibold text-[#AB1F23]">+₹{option.extraCostPerPiece}/piece</p>
                           ) : (
                             <p className="text-sm font-semibold text-[#009744]">Included</p>
                           )}
@@ -781,13 +781,13 @@ function CheckoutPageContent() {
 
                     {/* Free Shipping Progress */}
                     {shippingDetails && !shippingDetails.isFreeShipping && shippingDetails.amountForFreeShipping > 0 && (
-                      <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-xs text-amber-800">
-                          🎁 Add <span className="font-bold">₹{Math.ceil(shippingDetails.amountForFreeShipping)}</span> more to get FREE shipping!
+                      <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                        <p className="text-xs text-gray-800 mb-2">
+                          Add <span className="font-bold text-[#AB1F23]">₹{Math.ceil(shippingDetails.amountForFreeShipping)}</span> more to unlock <span className="font-bold text-[#009744]">FREE Shipping!</span>
                         </p>
-                        <div className="mt-2 h-2 bg-amber-200 rounded-full overflow-hidden">
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#009744] transition-all"
+                            className="h-full bg-[#009744] transition-all duration-500 ease-out"
                             style={{ width: `${Math.min((subtotal / shippingDetails.freeShippingThreshold) * 100, 100)}%` }}
                           />
                         </div>

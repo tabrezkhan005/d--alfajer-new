@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
+import { sendOrderStatusEmail, prepareOrderEmailData } from '@/src/lib/email';
 import crypto from 'crypto';
 
 // POST: Create Razorpay order
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error?.description || errorData.error?.message || `Razorpay API error (${response.status})`;
-        
+
         console.error('Razorpay order creation failed:', {
           status: response.status,
           error: errorData,
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', orderId);
-      
+
       if (updateError) {
         console.error('Failed to update order with Razorpay order ID:', updateError);
         // Don't fail the request if this update fails
@@ -114,14 +115,14 @@ export async function POST(request: NextRequest) {
       });
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
-      
+
       if (fetchError.name === 'AbortError') {
         return NextResponse.json(
           { error: 'Payment gateway request timeout. Please try again.' },
           { status: 504 }
         );
       }
-      
+
       throw fetchError;
     }
   } catch (error: any) {
@@ -230,6 +231,33 @@ export async function PUT(request: NextRequest) {
         { error: 'Failed to update order status. Please contact support.' },
         { status: 500 }
       );
+    }
+
+    // Send Order Confirmation Email on successful payment
+    try {
+      // Fetch full order details with items for email
+      const { data: completedOrder } = await supabase
+        .from('orders')
+        .select('*, items:order_items(*)')
+        .eq('id', orderId)
+        .single();
+
+      if (completedOrder) {
+        const emailData = prepareOrderEmailData(completedOrder as any);
+
+        // Send email asynchronously
+        sendOrderStatusEmail('confirmed', emailData)
+          .then(result => {
+            if (result.success) {
+              console.log('Payment success email sent:', result.messageId);
+            } else {
+              console.error('Failed to send payment success email:', result.error);
+            }
+          })
+          .catch(err => console.error('Error sending payment success email:', err));
+      }
+    } catch (emailError) {
+      console.error('Error in payment success email flow:', emailError);
     }
 
     return NextResponse.json({

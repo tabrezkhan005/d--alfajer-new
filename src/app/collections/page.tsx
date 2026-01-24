@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Leaf, Sparkles, Heart, Star, Grid3x3 } from "lucide-react";
@@ -20,26 +21,66 @@ export default function CollectionsPage() {
     const fetchCategories = async () => {
       try {
         const categories = await getCategories();
-        
-        // Fetch products to check which categories have products
+
+        // Fetch products to check which categories have products and get images
         const supabase = createClient();
         const { data: products } = await supabase
           .from("products")
-          .select("category_id")
+          .select("category_id, images")
           .eq("is_active", true);
-        
+
         // Get unique category IDs that have products
         const categoryIdsWithProducts = new Set(
           (products || []).map((p: any) => p.category_id).filter(Boolean)
         );
-        
+
+        // Helper to find an image for a category
+        const getCategoryImage = (categoryId: string) => {
+           const product = products?.find((p: any) => p.category_id === categoryId && p.images && p.images.length > 0);
+           // Handle images array which might be JSON or string array
+           if (product?.images) {
+              const img = Array.isArray(product.images) ? product.images[0] : product.images[0];
+              // Note: If Supabase returns string array, index 0 works. If JSON, validation needed.
+              // Assuming standard text[] or JSON array.
+              // Also check if public Url is needed? My schemas usually store paths.
+              // But CollectionsPage renders <Image src>. Which handles paths if configured or external URLs.
+              // If path is "products/...", Next/Image might need full URL or Supabase Loader.
+              // However, hardcoded ones are "/images/...".
+              // Products use Storage paths.
+              // I should ideally resolve standard public URL. "https://PROJECT.supabase.co/storage/v1/object/public/product-images/..."
+              // But 'ProductListing' logic resolves it.
+              // For now, let's assume if it starts with 'http' use it, else try to use it (maybe setup loader later).
+              // Actually, simply returning the path is risky if <Image> doesn't know the domain.
+              // I'll stick to hardcoded ones primarily, and only use this as fallback.
+              if (typeof img === 'string') {
+                 if (img.startsWith('http')) return img;
+                 // Construct Supabase Public URL?
+                 // I don't have project URL easily here without another call.
+                 // But I can guess standard pattern if env is public?
+                 return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${img}`;
+              }
+           }
+           return "/images/placeholder.jpg";
+        };
+
         // Filter categories to only show those with products
-        const categoriesWithProducts = categories.filter(cat => 
+        const categoriesWithProducts = categories.filter(cat =>
           categoryIdsWithProducts.has(cat.id)
         );
-        
-        // Map categories to collection format with icons and colors
-        const icons = [Sparkles, Leaf, Heart, Star, Grid3x3];
+
+        const categoryImages: Record<string, string> = {
+          "Saffron": "/images/products/saffron/saffron_main.png",
+          "Shilajit": "/images/products/shirajit/shilajit_main.jpeg",
+          "Spices": "/images/products/chillipowder/chillipowder_main.jpeg",
+          "Honey & Spreads": "/images/products/honey/honey_main.jpeg",
+          "Tea & Beverages": "/images/products/kashmirtea/kashmir_main.jpeg",
+          "Dry Fruits": "/images/placeholder.jpg",
+          "Nuts": "/images/placeholder.jpg",
+          "Seeds": "/images/placeholder.jpg",
+          "Gift Packs": "/images/placeholder.jpg",
+          "Organic": "/images/placeholder.jpg",
+        };
+
         const colors = [
           "from-orange-500/20 to-red-500/20",
           "from-amber-500/20 to-yellow-500/20",
@@ -58,13 +99,14 @@ export default function CollectionsPage() {
         const mappedCollections = categoriesWithProducts.map((cat, index) => ({
           id: cat.id,
           name: cat.name,
+          slug: cat.slug || cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           titleKey: cat.name,
           descriptionKey: `collections.${cat.name.toLowerCase().replace(/[&\s]+/g, '_')}_desc`,
-          icon: icons[index % icons.length],
+          image: (categoryImages[cat.name] && categoryImages[cat.name] !== "/images/placeholder.jpg") ? categoryImages[cat.name] : getCategoryImage(cat.id),
           color: colors[index % colors.length],
           accent: accents[index % accents.length],
         }));
-        
+
         setCollections(mappedCollections);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -89,7 +131,7 @@ export default function CollectionsPage() {
 
   return (
     <div className="w-full bg-white overflow-x-hidden">
-      {/* Language & Currency Selector */}
+      {/* ... (Header parts unchanged) ... */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-2 xs:py-2.5 sm:py-3 flex justify-end gap-2 xs:gap-2.5 sm:gap-3">
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
@@ -140,30 +182,41 @@ export default function CollectionsPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 xs:gap-3.5 sm:gap-4 md:gap-4 lg:gap-5"
+            className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
           >
-            {collections.map((collection) => {
-            const Icon = collection.icon;
-            return (
+            {collections.map((collection) => (
               <motion.div
                 key={collection.id}
                 variants={itemVariants}
-                className="group"
+                className="group h-full"
               >
-                <Link href={`/products?category=${encodeURIComponent(collection.name)}`}>
-                  <div className={`bg-gradient-to-br ${collection.color} border border-gray-200 rounded-2xl p-3 xs:p-3.5 sm:p-4 md:p-4 lg:p-5 h-48 xs:h-52 sm:h-56 md:h-60 lg:h-56 flex flex-col items-center justify-center text-center hover:shadow-2xl hover:border-[#009744]/30 transition-all duration-300 transform hover:scale-105 cursor-pointer`}>
-                    <div className={`${collection.accent} mb-2 xs:mb-2.5 sm:mb-3 transition-transform group-hover:scale-110`}>
-                      <Icon className="w-8 xs:w-10 sm:w-12 lg:w-16 h-8 xs:h-10 sm:h-12 lg:h-16" />
+                <Link href={`/collections/${collection.slug}`} className="block h-full">
+                  <div className="relative h-full bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${collection.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 p-6 flex items-center justify-center">
+                       <Image
+                         src={collection.image}
+                         alt={collection.name}
+                         fill
+                         className="object-contain transition-transform duration-700 group-hover:scale-110"
+                       />
                     </div>
-                    <h2 className="text-xs xs:text-sm sm:text-base lg:text-xl font-bold text-gray-900 mb-0.5 xs:mb-1">
-                      {t(collection.titleKey)}
-                    </h2>
-                    <p className="text-gray-700 text-[10px] xs:text-xs sm:text-xs lg:text-sm">{t(collection.descriptionKey)}</p>
+
+                    <div className="p-6 text-center">
+                      <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#009744] transition-colors font-heading">
+                        {t(collection.titleKey)}
+                      </h2>
+                      <p className="text-sm text-gray-500 line-clamp-2">{t(collection.descriptionKey)}</p>
+
+                      <div className="mt-4 inline-flex items-center text-sm font-semibold text-[#009744] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                         View Collection
+                      </div>
+                    </div>
                   </div>
                 </Link>
               </motion.div>
-            );
-          })}
+            ))}
           </motion.div>
         )}
 

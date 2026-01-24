@@ -60,23 +60,41 @@ export default function ShiprocketSettingsPage() {
 
   // Load saved configuration and fetch pickup locations
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setConfig(parsed);
+    const loadConfig = async () => {
+      // Try to load from Supabase User Metadata first (Server/Cross-Browser)
+      const { createClient } = await import("@/src/lib/supabase/client");
+      const supabase = createClient();
 
-          // If we have a token, try to fetch pickup locations
-          if (parsed.token) {
-            fetchPickupLocations(parsed.token);
-            setConnectionStatus("connected");
+      const { data: { user } } = await supabase.auth.getUser();
+      const metadataConfig = user?.user_metadata?.shiprocket_config;
+
+      if (metadataConfig) {
+        setConfig(metadataConfig);
+        if (metadataConfig.token) {
+          fetchPickupLocations(metadataConfig.token);
+          setConnectionStatus("connected");
+        }
+      } else {
+        // Fallback to localStorage for backward compatibility
+        if (typeof window !== "undefined") {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              setConfig(parsed);
+              if (parsed.token) {
+                fetchPickupLocations(parsed.token);
+                setConnectionStatus("connected");
+              }
+            } catch (e) {
+              console.error("Failed to parse saved config:", e);
+            }
           }
-        } catch (e) {
-          console.error("Failed to parse saved config:", e);
         }
       }
-    }
+    };
+
+    loadConfig();
   }, []);
 
   const fetchPickupLocations = async (token: string) => {
@@ -155,17 +173,31 @@ export default function ShiprocketSettingsPage() {
       // Fetch pickup locations with new token
       await fetchPickupLocations(token);
 
-      // Save config with token
+      // Save config to User Metadata (Persist DB)
       const configToSave: ShiprocketConfig = {
         ...config,
         token,
         tokenExpiry: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       };
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+      const { createClient } = await import("@/src/lib/supabase/client");
+      const supabase = createClient();
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { shiprocket_config: configToSave }
+      });
+
+      if (updateError) {
+         console.warn("Failed to save to user metadata, falling back to local storage", updateError);
+         localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+      } else {
+         // Also update local storage for redundancy/latency
+         localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+      }
+
       setConfig(configToSave);
       setConnectionStatus("connected");
-      toast.success("Shiprocket credentials saved and authenticated successfully!");
+      toast.success("Shiprocket credentials saved!");
     } catch (error: any) {
       console.error("Save error:", error);
       setConnectionStatus("disconnected");
@@ -212,7 +244,14 @@ export default function ShiprocketSettingsPage() {
         token,
         tokenExpiry: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       };
+      const { createClient } = await import("@/src/lib/supabase/client");
+      const supabase = createClient();
+
+      await supabase.auth.updateUser({
+        data: { shiprocket_config: configToSave }
+      });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+
       setConfig(configToSave);
       setConnectionStatus("connected");
     } catch (error: any) {
@@ -235,6 +274,13 @@ export default function ShiprocketSettingsPage() {
 
     // Save immediately when pickup location changes
     if (config.token) {
+      // Save to DB and Local Storage
+      import("@/src/lib/supabase/client").then(({ createClient }) => {
+         const supabase = createClient();
+         supabase.auth.updateUser({
+            data: { shiprocket_config: updatedConfig }
+         });
+      });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedConfig));
       toast.success("Pickup location updated!");
     }

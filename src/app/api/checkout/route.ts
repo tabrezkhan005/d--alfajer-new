@@ -417,41 +417,47 @@ export async function POST(request: NextRequest) {
     // This is the secure approach and gives admin control over when shipments are created
 
     // Send Order Confirmation Email
-    try {
-      const emailData = prepareOrderEmailData({
-        id: order.id,
-        order_number: orderNumber,
-        email: email || finalAddress.email,
-        status: 'confirmed',
-        subtotal,
-        shipping_cost: shippingCost,
-        tax: taxAmount,
-        discount,
-        total_amount: totalAmount,
-        currency: orderCurrency,
-        shipping_address: finalAddress,
-        created_at: order.created_at || new Date().toISOString(),
-        items: validatedItems.map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          image_url: item.image_url,
-        })),
-      });
+    // Only send immediately for non-payment-gateway methods (e.g. COD, Mock)
+    // For Razorpay, we send email after successful payment verification (in /api/razorpay/route.ts)
+    const isOnlinePayment = finalPaymentMethod === 'razorpay' || finalPaymentMethod === 'card' || finalPaymentMethod === 'upi';
 
-      // Send email asynchronously (don't block the response)
-      sendOrderStatusEmail('confirmed', emailData)
-        .then(result => {
-          if (result.success) {
-            console.log('Order confirmation email sent successfully:', result.messageId);
-          } else {
-            console.error('Failed to send order confirmation email:', result.error);
-          }
-        })
-        .catch(err => console.error('Error sending order confirmation email:', err));
-    } catch (emailError) {
-      // Log error but don't fail the order
-      console.error('Error preparing order confirmation email:', emailError);
+    if (!isOnlinePayment) {
+      try {
+        const emailData = prepareOrderEmailData({
+          id: order.id,
+          order_number: orderNumber,
+          email: email || finalAddress.email,
+          status: 'confirmed',
+          subtotal,
+          shipping_cost: shippingCost,
+          tax: taxAmount,
+          discount,
+          total_amount: totalAmount,
+          currency: orderCurrency,
+          shipping_address: finalAddress,
+          created_at: order.created_at || new Date().toISOString(),
+          items: validatedItems.map((item: any) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            image_url: item.image_url,
+          })),
+        });
+
+        // Send email asynchronously (don't block the response)
+        sendOrderStatusEmail('confirmed', emailData)
+          .then(result => {
+            if (result.success) {
+              console.log('Order confirmation email sent successfully:', result.messageId);
+            } else {
+              console.error('Failed to send order confirmation email:', result.error);
+            }
+          })
+          .catch(err => console.error('Error sending order confirmation email:', err));
+      } catch (emailError) {
+        // Log error but don't fail the order
+        console.error('Error preparing order confirmation email:', emailError);
+      }
     }
 
     return NextResponse.json({
