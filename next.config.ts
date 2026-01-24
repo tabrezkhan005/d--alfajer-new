@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  compress: true,
   images: {
     formats: ["image/avif", "image/webp"],
-    unoptimized: true, // Bypass Next.js image optimization for external URLs
     remotePatterns: [
       {
         protocol: "https",

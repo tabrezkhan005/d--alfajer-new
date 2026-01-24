@@ -91,31 +91,48 @@ export default function OrderDetailPage({
     // Load Shiprocket config
     const loadShiprocketConfig = async () => {
       if (typeof window === "undefined") return;
-      
+
       // First check localStorage
       const saved = localStorage.getItem("shiprocket_config");
       if (saved) {
         try {
           const config = JSON.parse(saved);
+
+          // Ensure pickupLocation defaults to "Primary" if not set
+          if (!config.pickupLocation) {
+            config.pickupLocation = "Primary";
+          }
+
           // Check if token is expired
           if (config.tokenExpiry && Date.now() > config.tokenExpiry) {
-            // Token expired, try to refresh
-            try {
-              const response = await fetch("/api/shiprocket/auth", { method: "POST" });
-              if (response.ok) {
-                const { token } = await response.json();
-                const updatedConfig = {
-                  ...config,
-                  token,
-                  tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
-                };
-                localStorage.setItem("shiprocket_config", JSON.stringify(updatedConfig));
-                setShiprocketConfig(updatedConfig);
-                return;
+            // Token expired, try to refresh using saved credentials
+            if (config.email && config.password) {
+              try {
+                const response = await fetch("/api/shiprocket/auth", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: config.email,
+                    password: config.password,
+                  }),
+                });
+                if (response.ok) {
+                  const { token } = await response.json();
+                  const updatedConfig = {
+                    ...config,
+                    token,
+                    tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+                    pickupLocation: config.pickupLocation || "Primary",
+                  };
+                  localStorage.setItem("shiprocket_config", JSON.stringify(updatedConfig));
+                  setShiprocketConfig(updatedConfig);
+                  return;
+                }
+              } catch (error) {
+                console.error("Failed to refresh token:", error);
               }
-            } catch (error) {
-              console.error("Failed to refresh token:", error);
             }
+            // Token expired and couldn't refresh
             setShiprocketConfig({ ...config, token: undefined });
           } else {
             setShiprocketConfig(config);
@@ -124,20 +141,27 @@ export default function OrderDetailPage({
           console.error("Failed to parse Shiprocket config:", e);
         }
       }
-      
-      // If no config in localStorage, try to get token from API (for API key setup)
-      if (!saved || !JSON.parse(saved || "{}").token) {
+
+      // If no config in localStorage, try using environment variables
+      const envEmail = process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
+      const envPassword = process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
+
+      if (!saved && envEmail && envPassword) {
         try {
-          const response = await fetch("/api/shiprocket/auth", { method: "POST" });
+          const response = await fetch("/api/shiprocket/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: envEmail, password: envPassword }),
+          });
           if (response.ok) {
             const { token } = await response.json();
             if (token) {
               const config = {
-                email: "",
-                password: "",
+                email: envEmail,
+                password: envPassword,
                 token,
-                tokenExpiry: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year for API key
-                pickupLocation: "",
+                tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+                pickupLocation: "Primary", // Default to Primary
               };
               localStorage.setItem("shiprocket_config", JSON.stringify(config));
               setShiprocketConfig(config);
@@ -148,7 +172,7 @@ export default function OrderDetailPage({
         }
       }
     };
-    
+
     loadShiprocketConfig();
   }, [id]);
 
@@ -161,6 +185,30 @@ export default function OrderDetailPage({
     if (success) {
       setOrder({ ...order, status: newStatus });
       toast.success("Order status updated");
+
+      // Trigger email notification
+      try {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            status: newStatus,
+          }),
+        }).then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              toast.success(`Email notification sent to customer`);
+            } else {
+              if (data.error && !data.error.includes("configured")) {
+                 console.error("Email notification failed:", data.error);
+              }
+            }
+          })
+          .catch(err => console.error("Error sending email notification:", err));
+      } catch (e) {
+        console.error("Failed to trigger email notification", e);
+      }
     } else {
       toast.error("Failed to update status");
     }
@@ -193,9 +241,11 @@ export default function OrderDetailPage({
         email?: string;
         phone?: string;
         address?: string;
+        streetAddress?: string; // Checkout form uses streetAddress
         city?: string;
         state?: string;
         zip?: string;
+        postalCode?: string; // Checkout form uses postalCode
         country?: string;
       } | null;
 
@@ -205,8 +255,12 @@ export default function OrderDetailPage({
         return;
       }
 
+      // Handle both naming conventions (address/streetAddress, zip/postalCode)
+      const addressLine = shippingAddress.address || shippingAddress.streetAddress || "";
+      const postalCode = shippingAddress.zip || shippingAddress.postalCode || "";
+
       // Validate required address fields
-      if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.zip || !shippingAddress.state) {
+      if (!addressLine || !shippingAddress.city || !postalCode || !shippingAddress.state) {
         toast.error("Please ensure shipping address has complete details (address, city, pincode, state)");
         setCreatingShipment(false);
         return;
@@ -216,7 +270,7 @@ export default function OrderDetailPage({
       const shiprocketItems = orderItems.map((item: any) => {
         const price = Number(item.price) || Number(item.price_at_purchase) || 0;
         const quantity = item.quantity || 1;
-        
+
         return {
           name: item.name || "Product",
           sku: item.sku || item.product_id || "SKU001",
@@ -230,22 +284,29 @@ export default function OrderDetailPage({
         return sum + (item.weight || 0.5) * (item.quantity || 1);
       }, 0) || 0.5;
 
-      // Validate required address fields
-      if (!shippingAddress.zip || !shippingAddress.city || !shippingAddress.state) {
-        toast.error("Complete shipping address is required (pincode, city, state)");
-        return;
-      }
+      // Calculate estimated package dimensions based on number of items
+      // Default dimensions for typical dry fruit/spice packages (in cm)
+      const itemCount = orderItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      const baseLength = 20; // Base length in cm
+      const baseBreadth = 15; // Base breadth in cm
+      const baseHeight = 10; // Base height in cm
 
-      // Prepare shipment data
+      // Adjust dimensions based on item count (add 5cm per additional 3 items)
+      const additionalSpace = Math.floor(itemCount / 3) * 5;
+      const packageLength = Math.min(baseLength + additionalSpace, 60); // Max 60cm
+      const packageBreadth = Math.min(baseBreadth + Math.floor(additionalSpace / 2), 40); // Max 40cm
+      const packageHeight = Math.min(baseHeight + Math.floor(additionalSpace / 2), 30); // Max 30cm
+
+      // Prepare shipment data with all required fields for Shiprocket
       const shipmentData = {
         order_id: order.order_number || order.id,
         order_date: new Date(order.created_at || Date.now()).toISOString().split('T')[0],
         pickup_location: shiprocketConfig.pickupLocation || process.env.NEXT_PUBLIC_SHIPROCKET_PICKUP_LOCATION || "Primary",
         billing_customer_name: shippingAddress.firstName || "",
         billing_last_name: shippingAddress.lastName || "",
-        billing_address: shippingAddress.address || "",
+        billing_address: addressLine,
         billing_city: shippingAddress.city || "",
-        billing_pincode: shippingAddress.zip || "",
+        billing_pincode: postalCode,
         billing_state: shippingAddress.state || "",
         billing_country: shippingAddress.country || "India",
         billing_email: shippingAddress.email || order.email || "",
@@ -255,6 +316,10 @@ export default function OrderDetailPage({
         payment_method: order.payment_method === "cod" ? "COD" : "Prepaid",
         sub_total: Number(order.subtotal) || 0,
         weight: totalWeight,
+        // Required dimension fields for Shiprocket API
+        length: packageLength,
+        breadth: packageBreadth,
+        height: packageHeight,
       };
 
       const response = await fetch("/api/shiprocket/shipment", {
@@ -268,32 +333,121 @@ export default function OrderDetailPage({
         }),
       });
 
+      const result = await response.json();
+
+      console.log("Shiprocket full response:", JSON.stringify(result, null, 2));
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || errorData.message || `Failed to create shipment (Status: ${response.status})`;
-        console.error("Shiprocket API error:", errorData);
+        const errorMessage = result.error || result.message || `Failed to create shipment (Status: ${response.status})`;
+        console.error("Shiprocket API error:", result);
         throw new Error(errorMessage);
       }
 
-      const result = await response.json();
+      // Shiprocket API can return different response formats
+      // Check for various success indicators
+      const srOrderId = result.order_id || result.payload?.order_id;
+      const shipmentId = result.shipment_id || result.payload?.shipment_id;
+      const awbCode = result.awb_code || result.payload?.awb_code;
+      const statusCode = result.status_code || result.status;
 
-      if (result.shipment_id && result.awb_code) {
-        // Update order with tracking number
-        await updateOrderTrackingNumber(order.id, result.awb_code);
-        await updateOrderStatus(order.id, "shipped");
+      // Check if order was created successfully (even without AWB)
+      if (srOrderId || shipmentId) {
+        // If we have AWB code, update tracking
+        if (awbCode) {
+          // Try to update database, but don't fail if it doesn't work
+          const trackingUpdated = await updateOrderTrackingNumber(order.id, awbCode);
+          const statusUpdated = await updateOrderStatus(order.id, "shipped");
 
-        toast.success(`Shipment created! AWB: ${result.awb_code}`);
+          if (!trackingUpdated || !statusUpdated) {
+            console.warn("Database update may have failed, but Shiprocket order was created successfully");
+          }
 
-        // Update local order state
+          toast.success(`Shipment created! AWB: ${awbCode}`);
+
+          // Trigger Shipped Email
+          try {
+             fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: order.id,
+                status: 'shipped',
+              }),
+            });
+          } catch (e) {
+             console.error("Failed to trigger shipped email", e);
+          }
+
+          setOrder({
+            ...order,
+            tracking_number: awbCode,
+            status: "shipped",
+          });
+        } else {
+          // Order created but no AWB yet - this happens when courier isn't auto-assigned
+          // Store the shipment ID for later reference
+          const trackingRef = `SR-${shipmentId || srOrderId}`;
+
+          // Try to update database, but don't fail if it doesn't work
+          const trackingUpdated = await updateOrderTrackingNumber(order.id, trackingRef);
+          const statusUpdated = await updateOrderStatus(order.id, "processing");
+
+          if (!trackingUpdated || !statusUpdated) {
+            console.warn("Database update may have failed, but Shiprocket order was created successfully");
+          }
+
+          toast.success(`Order registered with Shiprocket! ID: ${srOrderId || shipmentId}. Courier assignment pending.`);
+
+          // Trigger Processing Email
+          try {
+             fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: order.id,
+                status: 'processing',
+              }),
+            });
+          } catch (e) {
+             console.error("Failed to trigger processing email", e);
+          }
+
+          // Update local state regardless of DB update
+          setOrder({
+            ...order,
+            tracking_number: trackingRef,
+            status: "processing",
+          });
+        }
+      } else if (statusCode === 1 || statusCode === 200 || result.status === "success") {
+        // Some success responses might not have order_id in expected place
+        toast.success("Shipment request sent to Shiprocket successfully!");
+        await updateOrderStatus(order.id, "processing");
+
+        // Trigger Processing Email
+        try {
+            fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: order.id,
+              status: 'processing',
+            }),
+          });
+        } catch (e) {
+            console.error("Failed to trigger processing email", e);
+        }
+
         setOrder({
           ...order,
-          tracking_number: result.awb_code,
-          status: "shipped",
+          status: "processing",
         });
       } else {
-        const errorMsg = result.message || result.error || "Shipment creation failed - no shipment ID returned";
+        // Check for error messages in the response
+        const errorMsg = result.message || result.error || result.errors || "Shipment creation failed - unexpected response from Shiprocket";
+        const errorDetails = typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg;
         console.error("Shiprocket response:", result);
-        throw new Error(errorMsg);
+        throw new Error(errorDetails);
       }
     } catch (error: any) {
       console.error("Create shipment error:", error);
@@ -457,53 +611,157 @@ export default function OrderDetailPage({
             </CardContent>
           </Card>
 
-          {/* Shiprocket Integration */}
-          {shiprocketConfig?.token && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Shiprocket Shipping
-                </CardTitle>
-                <CardDescription>
-                  Create and manage shipments through Shiprocket
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {order.tracking_number ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+          {/* Shipment Status & Tracking */}
+          <Card className="border-2 border-dashed border-muted-foreground/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-[#009744]" />
+                Shipment Status
+              </CardTitle>
+              <CardDescription>
+                Track and manage order fulfillment
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Order Progress Timeline */}
+              <div className="relative">
+                <div className="flex justify-between items-center">
+                  {[
+                    { status: "pending", label: "Order Placed", icon: Clock },
+                    { status: "processing", label: "Processing", icon: Package },
+                    { status: "shipped", label: "Shipped", icon: Truck },
+                    { status: "delivered", label: "Delivered", icon: CheckCircle2 },
+                  ].map((step, index, arr) => {
+                    const isActive = order.status === step.status;
+                    const isPast =
+                      (order.status === "processing" && index < 1) ||
+                      (order.status === "shipped" && index < 2) ||
+                      (order.status === "delivered" && index < 3) ||
+                      (order.status === "cancelled" && index === 0);
+                    const isCancelled = order.status === "cancelled";
+                    const Icon = step.icon;
+
+                    return (
+                      <div key={step.status} className="flex flex-col items-center relative z-10">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            isCancelled && index === 0
+                              ? "bg-red-100 border-2 border-red-500"
+                              : isActive
+                              ? "bg-[#009744] text-white shadow-lg shadow-[#009744]/30"
+                              : isPast
+                              ? "bg-[#009744]/20 text-[#009744] border-2 border-[#009744]"
+                              : "bg-gray-100 text-gray-400 border-2 border-gray-200"
+                          }`}
+                        >
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span
+                          className={`text-xs mt-2 font-medium text-center ${
+                            isActive
+                              ? "text-[#009744]"
+                              : isPast
+                              ? "text-gray-600"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {step.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Progress Line */}
+                <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-0" style={{ marginLeft: '40px', marginRight: '40px' }}>
+                  <div
+                    className="h-full bg-[#009744] transition-all duration-500"
+                    style={{
+                      width: order.status === "pending" ? "0%"
+                        : order.status === "processing" ? "33%"
+                        : order.status === "shipped" ? "66%"
+                        : order.status === "delivered" ? "100%"
+                        : "0%"
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Current Status Badge */}
+              <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-muted/50">
+                <div className={`w-3 h-3 rounded-full animate-pulse ${
+                  order.status === "pending" ? "bg-yellow-500"
+                  : order.status === "processing" ? "bg-blue-500"
+                  : order.status === "shipped" ? "bg-purple-500"
+                  : order.status === "delivered" ? "bg-green-500"
+                  : order.status === "cancelled" ? "bg-red-500"
+                  : "bg-gray-400"
+                }`} />
+                <span className="font-semibold text-lg capitalize">
+                  {order.status === "return_requested" ? "Return Requested"
+                   : order.status === "return_rejected" ? "Return Rejected"
+                   : order.status || "Pending"}
+                </span>
+              </div>
+
+              {/* Tracking Information */}
+              {order.tracking_number ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <Truck className="h-6 w-6 text-green-600" />
+                      </div>
                       <div>
-                        <p className="text-sm font-medium">Tracking Number</p>
-                        <p className="text-xs text-muted-foreground font-mono">
+                        <p className="text-sm text-green-600 font-medium">Shipment Created</p>
+                        <p className="text-lg font-bold text-green-800 font-mono">
                           {order.tracking_number}
                         </p>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
+                    </div>
+                    <Button
+                      variant="default"
+                      className="bg-green-600 hover:bg-green-700"
+                      asChild
+                    >
+                      <a
+                        href={getShiprocketTrackingURL(order.tracking_number)}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <a
-                          href={getShiprocketTrackingURL(order.tracking_number)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Track
-                        </a>
-                      </Button>
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Track Shipment
+                      </a>
+                    </Button>
+                  </div>
+
+                  {/* Quick Status Info */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-muted rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Carrier</p>
+                      <p className="font-semibold">Shiprocket</p>
+                    </div>
+                    <div className="p-3 bg-muted rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Last Updated</p>
+                      <p className="font-semibold text-sm">{formatLongDate(order.updated_at)}</p>
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Create a shipment in Shiprocket for this order
+                </div>
+              ) : shiprocketConfig?.token ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Package className="h-5 w-5 text-amber-600" />
+                      <p className="text-sm font-medium text-amber-800">
+                        No shipment created yet
+                      </p>
+                    </div>
+                    <p className="text-xs text-amber-700 mb-4">
+                      Create a Shiprocket shipment to enable tracking and automated delivery updates.
                     </p>
                     <Button
                       onClick={handleCreateShipment}
                       disabled={creatingShipment || order.status === "cancelled"}
-                      className="w-full"
+                      className="w-full bg-[#009744] hover:bg-[#008339]"
                     >
                       {creatingShipment ? (
                         <>
@@ -518,18 +776,22 @@ export default function OrderDetailPage({
                       )}
                     </Button>
                   </div>
-                )}
-                {!shiprocketConfig?.token && (
-                  <p className="text-xs text-muted-foreground">
-                    <Link href="/admin/settings/shiprocket" className="text-primary underline">
-                      Configure Shiprocket
-                    </Link>{" "}
-                    to enable shipping automation
+                </div>
+              ) : (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Shiprocket integration not configured
                   </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  <Link
+                    href="/admin/settings/shiprocket"
+                    className="text-sm text-[#009744] hover:underline font-medium"
+                  >
+                    Configure Shiprocket →
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Payment Info */}
           {order.payment_method && (

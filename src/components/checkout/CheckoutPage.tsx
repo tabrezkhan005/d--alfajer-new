@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, AlertCircle, Check } from "lucide-react";
+import { ChevronDown, AlertCircle, Check, Truck, Zap, Package } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -14,12 +14,20 @@ import { useI18n } from "@/src/components/providers/i18n-provider";
 import { useAuth } from "@/src/lib/auth-context";
 
 import {
-  shippingMethods,
   paymentMethods,
   validatePromoCode,
   calculateTax,
+  getCurrencyByCountry,
+  countryCodes,
   type ShippingAddress,
 } from "@/src/lib/checkout";
+import {
+  calculateShippingCost,
+  fetchPincodeDetails,
+  getAvailableShippingOptions,
+  FREE_SHIPPING_THRESHOLD,
+  type ShippingCalculationResult,
+} from "@/src/lib/shipping";
 import { toast } from "sonner";
 import { loadRazorpayScript, openRazorpayCheckout, verifyRazorpayPayment } from "@/src/lib/razorpay";
 
@@ -113,8 +121,10 @@ function CheckoutPageContent() {
   const [shippingAddress, setShippingAddress] = useState<Partial<ShippingAddress>>({});
   const [billingAddress, setBillingAddress] = useState<Partial<ShippingAddress>>({});
   const [useSameAddress, setUseSameAddress] = useState(true);
-  const [shippingMethodId, setShippingMethodId] = useState('standard');
   const [paymentMethodId, setPaymentMethodId] = useState('card');
+
+  // Get currency based on selected country
+  const selectedCurrency = getCurrencyByCountry(shippingAddress.country || 'IN');
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<{
@@ -127,15 +137,14 @@ function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [redirectCountdown, setRedirectCountdown] = useState<number>(5);
-
-  // Get selected shipping method
-  const selectedShippingMethod = shippingMethods.find(
-    (m) => m.id === shippingMethodId
-  );
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [calculatingShipping, setCalculatingShipping] = useState(false);
+  const [shippingOptionId, setShippingOptionId] = useState<string>("standard");
+  const [shippingDetails, setShippingDetails] = useState<ShippingCalculationResult | null>(null);
+  const [fetchingPincode, setFetchingPincode] = useState(false);
 
   // Calculate totals
   const subtotal = getTotalPrice();
-  const shippingCost = selectedShippingMethod?.price || 0;
 
   let discountAmount = 0;
   if (appliedPromo) {
@@ -188,12 +197,82 @@ function CheckoutPageContent() {
     );
   }, [shippingAddress]);
 
+  // Calculate shipping cost when address changes
+  useEffect(() => {
+    if (!shippingAddress.country) {
+      setShippingCost(0);
+      setShippingDetails(null);
+      return;
+    }
+
+    // Calculate total item count and weight
+    const totalItemCount = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    const totalWeight = items.reduce((sum, item) => sum + (item.quantity || 1) * 0.5, 0) || 0.5;
+
+    if (totalItemCount <= 0) {
+      setShippingCost(0);
+      setShippingDetails(null);
+      return;
+    }
+
+    setCalculatingShipping(true);
+
+    // Use the new zone-based shipping calculation
+    const result = calculateShippingCost(
+      shippingAddress.country || 'IN',
+      shippingAddress.state || '',
+      totalItemCount,
+      totalWeight,
+      subtotal,
+      selectedCurrency,
+      shippingOptionId
+    );
+
+    setShippingDetails(result);
+    setShippingCost(result.totalShippingCost);
+    setCalculatingShipping(false);
+  }, [
+    shippingAddress.country,
+    shippingAddress.state,
+    items,
+    subtotal,
+    selectedCurrency,
+    shippingOptionId,
+  ]);
+
+  // Auto-fetch city and state from pincode
+  useEffect(() => {
+    const fetchFromPincode = async () => {
+      if (!shippingAddress.postalCode || shippingAddress.postalCode.length !== 6) return;
+      if (shippingAddress.country !== 'IN') return;
+
+      setFetchingPincode(true);
+      try {
+        const data = await fetchPincodeDetails(shippingAddress.postalCode);
+        if (data) {
+          setShippingAddress((prev) => ({
+            ...prev,
+            city: data.city || prev.city,
+            state: data.state || prev.state,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching pincode details:', error);
+      } finally {
+        setFetchingPincode(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchFromPincode, 500);
+    return () => clearTimeout(timeoutId);
+  }, [shippingAddress.postalCode, shippingAddress.country]);
+
   // Auto-redirect countdown effect - MUST be before any conditional returns
   useEffect(() => {
     if (orderNumber) {
       // Reset countdown when order is placed
       setRedirectCountdown(5);
-      
+
       const timer = setInterval(() => {
         setRedirectCountdown((prev) => {
           if (prev <= 1) {
@@ -237,13 +316,14 @@ function CheckoutPageContent() {
           email: shippingAddress.email,
           name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
           address: shippingAddress,
-          phone: shippingAddress.phone,
-          shippingMethod: shippingMethodId,
+          phone: shippingAddress.countryCode ? `${shippingAddress.countryCode} ${shippingAddress.phone}` : shippingAddress.phone,
           paymentMethod: paymentMethodId,
           userId: user?.id,
           giftMessage,
           subscription: subscribe ? { enabled: true, frequency: 'monthly' } : null,
           promoCode: appliedPromo?.code,
+          currency: selectedCurrency,
+          shippingCost: shippingCost, // Include calculated shipping cost
         }),
       });
 
@@ -490,23 +570,45 @@ function CheckoutPageContent() {
 
                   <div>
                     <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.phone')}</Label>
-                    <Input
-                      placeholder={t('checkout.placeholderPhone')}
-                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                      onChange={(e) =>
-                        setShippingAddress({
-                          ...shippingAddress,
-                          phone: e.target.value,
-                        })
-                      }
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={shippingAddress.countryCode || (countryCodes.find(c => c.code === shippingAddress.country)?.dialCode) || '+91'}
+                        onChange={(e) => {
+                          const selectedCountry = countryCodes.find(c => c.dialCode === e.target.value);
+                          setShippingAddress({
+                            ...shippingAddress,
+                            countryCode: e.target.value,
+                            country: selectedCountry?.code || shippingAddress.country || 'IN',
+                          });
+                        }}
+                        className="w-24 xs:w-28 sm:w-32 px-2 xs:px-2.5 sm:px-3 py-2 xs:py-2 sm:py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-xs sm:text-sm h-9 xs:h-9 sm:h-10"
+                      >
+                        {countryCodes.map((country) => (
+                          <option key={country.code} value={country.dialCode} className="bg-white text-gray-800">
+                            {country.dialCode}
+                          </option>
+                        ))}
+                      </select>
+                      <Input
+                        placeholder={t('checkout.placeholderPhone')}
+                        className="flex-1 text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                        value={shippingAddress.phone || ''}
+                        onChange={(e) =>
+                          setShippingAddress({
+                            ...shippingAddress,
+                            phone: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.streetAddress')}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">Full Address</Label>
                     <Input
-                      placeholder={t('checkout.placeholderStreet')}
+                      placeholder="Enter your complete address"
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                      value={shippingAddress.streetAddress || ''}
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -517,10 +619,11 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.apartment')}</Label>
+                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">Landmark</Label>
                     <Input
-                      placeholder={t('checkout.placeholderApartment')}
+                      placeholder="Near landmark (optional)"
                       className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                      value={shippingAddress.apartment || ''}
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -532,10 +635,33 @@ function CheckoutPageContent() {
 
                   <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
+                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postal')} (PIN Code)</Label>
+                      <div className="relative">
+                        <Input
+                          placeholder="Enter PIN code"
+                          className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                          value={shippingAddress.postalCode || ''}
+                          maxLength={6}
+                          onChange={(e) =>
+                            setShippingAddress({
+                              ...shippingAddress,
+                              postalCode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                            })
+                          }
+                        />
+                        {fetchingPincode && (
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <div className="w-4 h-4 border-2 border-[#009744] border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div>
                       <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.city')}</Label>
                       <Input
-                        placeholder={t('checkout.placeholderCity')}
+                        placeholder={fetchingPincode ? 'Loading...' : t('checkout.placeholderCity')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                        value={shippingAddress.city || ''}
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -544,11 +670,15 @@ function CheckoutPageContent() {
                         }
                       />
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
                     <div>
                       <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.state')}</Label>
                       <Input
-                        placeholder={t('checkout.placeholderState')}
+                        placeholder={fetchingPincode ? 'Loading...' : t('checkout.placeholderState')}
                         className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                        value={shippingAddress.state || ''}
                         onChange={(e) =>
                           setShippingAddress({
                             ...shippingAddress,
@@ -557,84 +687,124 @@ function CheckoutPageContent() {
                         }
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
-                    <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postal')}</Label>
-                      <Input
-                        placeholder={t('checkout.placeholderPostal')}
-                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                        onChange={(e) =>
-                          setShippingAddress({
-                            ...shippingAddress,
-                            postalCode: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
                     <div>
                       <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.country')}</Label>
                       <select
                         value={shippingAddress.country || ''}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const selectedCountry = countryCodes.find(c => c.code === e.target.value);
                           setShippingAddress({
                             ...shippingAddress,
                             country: e.target.value,
-                          })
-                        }
+                            countryCode: selectedCountry?.dialCode || '+91',
+                          });
+                        }}
                         className="w-full px-2.5 xs:px-3 sm:px-3 py-2 xs:py-2 sm:py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-xs sm:text-sm h-9 xs:h-9 sm:h-10"
                       >
                         <option value="" className="bg-white text-gray-800">{t('checkout.selectCountry')}</option>
-                        <option value="IN" className="bg-white text-gray-800">India</option>
-                        <option value="US" className="bg-white text-gray-800">United States</option>
-                        <option value="GB" className="bg-white text-gray-800">United Kingdom</option>
-                        <option value="AE" className="bg-white text-gray-800">UAE</option>
-                        <option value="EU" className="bg-white text-gray-800">Europe</option>
+                        {countryCodes.map((country) => (
+                          <option key={country.code} value={country.code} className="bg-white text-gray-800">
+                            {country.name} ({country.currency})
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Shipping Method */}
-              <Card className="bg-white dark:bg-white border-gray-200">
-                <CardHeader className="bg-white dark:bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-5">
-                  <CardTitle className="text-sm xs:text-base sm:text-lg text-gray-800">{t('checkout.shippingMethod')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 xs:space-y-2.5 sm:space-y-3 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
-                  {shippingMethods.map((method) => (
-                    <label
-                      key={method.id}
-                      className="flex items-center p-2 xs:p-3 sm:p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-[#009744]"
-                    >
-                      <input
-                        type="radio"
-                        name="shipping"
-                        value={method.id}
-                        checked={shippingMethodId === method.id}
-                        onChange={(e) => setShippingMethodId(e.target.value)}
-                        className="mr-2 xs:mr-3 accent-[#009744]"
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base">
-                          {method.id === 'standard' ? t('checkout.shippingSpeed.standard') :
-                            method.id === 'express' ? t('checkout.shippingSpeed.express') :
-                              t('checkout.shippingSpeed.overnight')}
-                        </p>
-                        <p className="text-xs xs:text-sm text-gray-600">
-                          {method.id === 'standard' ? t('checkout.shippingDays.standard') :
-                            method.id === 'express' ? t('checkout.shippingDays.express') :
-                              t('checkout.shippingDays.overnight')}
+              {/* Shipping Options */}
+              {shippingAddress.country && (
+                <Card className="bg-white dark:bg-white border-gray-200">
+                  <CardHeader className="bg-white dark:bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-5">
+                    <CardTitle className="text-sm xs:text-base sm:text-lg text-gray-800 flex items-center gap-2">
+                      <Truck className="h-5 w-5 text-[#009744]" />
+                      Shipping Options
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
+                    {/* Shipping Zone Info */}
+                    {shippingDetails && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Package className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-800">
+                            {shippingDetails.zone.name}
+                          </span>
+                        </div>
+                        <p className="text-xs text-blue-600">
+                          {shippingDetails.rateDisplay}
                         </p>
                       </div>
-                      <p className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">
-                        {method.price === 0 ? t('checkout.free') : formatCurrency(method.price)}
-                      </p>
-                    </label>
-                  ))}
-                </CardContent>
-              </Card>
+                    )}
+
+                    {/* Shipping Speed Options */}
+                    {getAvailableShippingOptions(shippingAddress.country || 'IN').map((option) => (
+                      <label
+                        key={option.id}
+                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${
+                          shippingOptionId === option.id
+                            ? 'border-[#009744] bg-green-50'
+                            : 'border-gray-200 hover:border-[#009744]/50 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="shippingOption"
+                            value={option.id}
+                            checked={shippingOptionId === option.id}
+                            onChange={(e) => setShippingOptionId(e.target.value)}
+                            className="accent-[#009744]"
+                          />
+                          <div className="flex items-center gap-2">
+                            {option.id === 'overnight' ? (
+                              <Zap className="h-4 w-4 text-amber-500" />
+                            ) : (
+                              <Truck className="h-4 w-4 text-blue-500" />
+                            )}
+                            <div>
+                              <p className="font-semibold text-gray-800 text-sm">{option.name}</p>
+                              <p className="text-xs text-gray-500">{option.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {option.extraCostPerPiece > 0 ? (
+                            <p className="text-sm font-semibold text-amber-600">+₹{option.extraCostPerPiece}/piece</p>
+                          ) : (
+                            <p className="text-sm font-semibold text-[#009744]">Included</p>
+                          )}
+                        </div>
+                      </label>
+                    ))}
+
+                    {/* Free Shipping Progress */}
+                    {shippingDetails && !shippingDetails.isFreeShipping && shippingDetails.amountForFreeShipping > 0 && (
+                      <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-xs text-amber-800">
+                          🎁 Add <span className="font-bold">₹{Math.ceil(shippingDetails.amountForFreeShipping)}</span> more to get FREE shipping!
+                        </p>
+                        <div className="mt-2 h-2 bg-amber-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#009744] transition-all"
+                            style={{ width: `${Math.min((subtotal / shippingDetails.freeShippingThreshold) * 100, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {shippingDetails?.isFreeShipping && (
+                      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-xs text-green-800 flex items-center gap-2">
+                          <Check className="h-4 w-4" />
+                          <span>🎉 You qualify for <span className="font-bold">FREE shipping!</span></span>
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               <Button
                 size="lg"
@@ -781,11 +951,6 @@ function CheckoutPageContent() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">{t('checkout.shippingMethod')}</h4>
-                    <p className="text-sm text-gray-700">{selectedShippingMethod?.name}</p>
-                  </div>
-
-                  <div>
                     <h4 className="font-semibold text-gray-800 mb-2">{t('checkout.paymentMethod')}</h4>
                     <p className="text-sm text-gray-700">
                       {paymentMethods.find((m) => m.id === paymentMethodId)?.name}
@@ -845,16 +1010,18 @@ function CheckoutPageContent() {
                   </div>
                 )}
 
-                {selectedShippingMethod && (
-                  <div className="flex justify-between text-gray-900">
-                    <span className="text-gray-900">{t('cart.shipping')}</span>
-                    <span className="font-semibold text-gray-900">
-                      {selectedShippingMethod.price === 0
-                        ? t('checkout.free')
-                        : formatCurrency(convertCurrency(selectedShippingMethod.price, 'INR'))}
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between text-gray-900">
+                  <span className="text-gray-900">{t('cart.shipping') || 'Shipping'}</span>
+                  <span className="font-semibold text-gray-900">
+                    {calculatingShipping ? (
+                      <span className="text-xs">Calculating...</span>
+                    ) : shippingCost === 0 ? (
+                      t('checkout.free') || 'Free'
+                    ) : (
+                      formatCurrency(convertCurrency(shippingCost, 'INR'))
+                    )}
+                  </span>
+                </div>
 
                 <div className="flex justify-between text-gray-900">
                   <span className="text-gray-900">{t('cart.tax')}</span>

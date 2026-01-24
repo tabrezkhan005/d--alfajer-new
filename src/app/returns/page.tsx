@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { RotateCcw, CheckCircle, Zap, AlertCircle } from "lucide-react";
+import { RotateCcw, CheckCircle, AlertCircle, ShieldCheck, Truck, Sprout } from "lucide-react";
 import { Newsletter } from "@/src/components/newsletter/Newsletter";
 import { useI18n } from "@/src/components/providers/i18n-provider";
 import { LanguageSelector } from "@/src/components/announcement-bar/LanguageSelector";
@@ -34,177 +34,118 @@ export default function ReturnsPage() {
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-2 xs:py-2.5 sm:py-3">
           <div className="flex items-center gap-2 text-xs xs:text-xs sm:text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">{t('common.home')}</Link>
+            <Link href="/" className="hover:text-[#009744] transition-colors font-medium">Home</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-semibold truncate">{t('returns.title')}</span>
+            <span className="text-gray-900 font-semibold truncate">Return & Exchange Policy</span>
           </div>
         </div>
       </div>
 
       {/* Hero */}
       <div className="bg-gradient-to-r from-[#009744] to-[#00803a] text-white py-12 md:py-16 pt-16 sm:pt-20 lg:pt-24">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("returns.title")}</h1>
-            <p className="text-lg text-white/90 max-w-2xl">
-              {t("returns.description")}
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">Return & Exchange Policy</h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed font-medium">
+              We currently do not accept returns or exchanges once an order has been delivered.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Key Benefits */}
-      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-3.5 sm:gap-4 md:gap-5 lg:gap-6"
-        >
-          {[
-            { icon: Zap, titleKey: "returns.benefit1_title", descKey: "returns.benefit1_desc" },
-            { icon: CheckCircle, titleKey: "returns.benefit2_title", descKey: "returns.benefit2_desc" },
-            { icon: RotateCcw, titleKey: "returns.benefit3_title", descKey: "returns.benefit3_desc" },
-            { icon: AlertCircle, titleKey: "returns.benefit4_title", descKey: "returns.benefit4_desc" }
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              variants={itemVariants}
-              className="p-4 xs:p-4.5 sm:p-5 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-[#009744]/30 transition-all"
-            >
-              <item.icon className="h-8 xs:h-9 sm:h-10 md:h-12 w-8 xs:w-9 sm:w-10 md:w-12 text-[#009744] mb-2 xs:mb-3 sm:mb-4" />
-              <h3 className="text-xs xs:text-xs sm:text-base md:text-lg font-bold text-gray-900 mb-1 xs:mb-1.5 sm:mb-2">{t(item.titleKey)}</h3>
-              <p className="text-gray-500 text-xs">{t(item.descKey)}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 py-12 md:py-20 space-y-16">
 
-      {/* Policy Details */}
-      <div className="bg-gray-50 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-4 xs:space-y-5 sm:space-y-6"
-          >
-            {[
-              { 
-                titleKey: "returns.window_title", 
-                contentKey: "returns.window_content" 
-              },
-              { 
-                titleKey: "returns.eligibility_title", 
-                contentKey: "returns.eligibility_content",
-                itemKeys: ["returns.eligibility_item1", "returns.eligibility_item2", "returns.eligibility_item3"]
-              },
-              { 
-                titleKey: "returns.process_title", 
-                contentKey: "returns.process_content",
-                itemKeys: ["returns.process_item1", "returns.process_item2", "returns.process_item3", "returns.process_item4", "returns.process_item5"]
-              },
-              { 
-                titleKey: "returns.exchange_title", 
-                contentKey: "returns.exchange_content" 
-              },
-              { 
-                titleKey: "returns.refund_title", 
-                contentKey: "returns.refund_content" 
-              }
-            ].map((section, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                className="bg-white border border-gray-200 rounded-lg p-4 xs:p-5 sm:p-6 lg:p-8 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start gap-2 xs:gap-2.5 sm:gap-3 mb-2 xs:mb-3">
-                  <CheckCircle className="h-5 xs:h-6 sm:h-6 w-5 xs:w-6 sm:w-6 text-[#009744] flex-shrink-0 mt-0.5 xs:mt-0.5" />
-                  <h2 className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900">{t(section.titleKey)}</h2>
+        {/* Why No Returns */}
+        <section>
+          <div className="flex items-start gap-4 mb-6">
+             <div className="p-3 bg-green-50 rounded-full text-[#009744]">
+                <Sprout className="h-8 w-8" />
+             </div>
+             <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Why we don’t offer returns</h2>
+                <div className="space-y-4 text-gray-600 text-lg leading-relaxed">
+                   <p>
+                      Our products are sourced directly from farmers and carefully quality-checked before dispatch.
+                   </p>
+                   <p>
+                      To maintain hygiene, freshness, and product integrity, returned items cannot be restocked or resold.
+                   </p>
                 </div>
-                <p className="text-xs xs:text-xs sm:text-base text-gray-700 leading-relaxed ml-7 xs:ml-8 sm:ml-9 mb-3 xs:mb-4">{t(section.contentKey)}</p>
-                {section.itemKeys && (
-                  <ul className="ml-7 xs:ml-8 sm:ml-9 space-y-2 xs:space-y-2.5">
-                    {section.itemKeys.map((itemKey, idx) => (
-                      <li key={idx} className="text-xs xs:text-xs sm:text-base text-gray-700 flex items-start gap-2">
-                        <span className="text-[#009744] mt-0.5 flex-shrink-0">✓</span>
-                        <span>{t(itemKey)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Cannot Accept */}
-      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-red-50 border border-red-200 rounded-xl p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10"
-        >
-          <div className="flex items-start gap-2 xs:gap-2.5 sm:gap-3 mb-4 xs:mb-5 sm:mb-6">
-            <AlertCircle className="h-6 xs:h-6 sm:h-7 w-6 xs:w-6 sm:w-7 text-red-600 flex-shrink-0 mt-0.5" />
-            <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-red-900">{t('returns.cannotAccept')}</h2>
+             </div>
           </div>
-          <ul className="space-y-2 xs:space-y-2.5 sm:space-y-3 ml-9 xs:ml-10">
-            {[
-              "returns.cannotAccept_item1",
-              "returns.cannotAccept_item2",
-              "returns.cannotAccept_item3",
-              "returns.cannotAccept_item4",
-              "returns.cannotAccept_item5"
-            ].map((itemKey, i) => (
-              <li key={i} className="text-red-800 flex items-start gap-2 text-xs xs:text-xs sm:text-base">
-                <span className="mt-0.5 flex-shrink-0">×</span>
-                <span>{t(itemKey)}</span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </div>
+        </section>
 
-      {/* FAQ */}
-      <div className="bg-gray-50 py-8 xs:py-10 sm:py-12 md:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 md:px-7 lg:px-8">
-          <h2 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 xs:mb-7 sm:mb-8 md:mb-10 text-center">{t('returns.faq_title')}</h2>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 gap-3 xs:gap-3.5 sm:gap-4 md:gap-5 lg:gap-6"
-          >
-            {[
-              { qKey: "returns.faq_q1", aKey: "returns.faq_a1" },
-              { qKey: "returns.faq_q2", aKey: "returns.faq_a2" },
-              { qKey: "returns.faq_q3", aKey: "returns.faq_a3" },
-              { qKey: "returns.faq_q4", aKey: "returns.faq_a4" },
-              { qKey: "returns.faq_q5", aKey: "returns.faq_a5" },
-              { qKey: "returns.faq_q6", aKey: "returns.faq_a6" }
-            ].map((faq, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                className="bg-white border border-gray-200 rounded-lg p-4 xs:p-4.5 sm:p-5 md:p-6 hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-bold text-gray-900 mb-1 xs:mb-1.5 sm:mb-2 text-xs xs:text-xs sm:text-base md:text-lg">{t(faq.qKey)}</h3>
-                <p className="text-gray-700 leading-relaxed text-xs xs:text-xs sm:text-base">{t(faq.aKey)}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+        {/* Quality Promise */}
+        <section className="bg-gray-50 border border-gray-100 rounded-2xl p-8 md:p-10">
+           <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+              <ShieldCheck className="h-7 w-7 text-[#009744]" />
+              Our Quality Promise
+           </h2>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                 { text: "Every order is inspected before dispatch", icon: CheckCircle },
+                 { text: "Products are securely packed to prevent damage", icon: Truck },
+                 { text: "Only genuine, farm-sourced items are shipped", icon: Sprout }
+              ].map((item, i) => (
+                 <div key={i} className="bg-white p-6 rounded-xl border border-gray-200 text-center shadow-sm">
+                    <item.icon className="h-8 w-8 text-[#009744] mx-auto mb-4" />
+                    <p className="text-gray-700 font-medium">{item.text}</p>
+                 </div>
+              ))}
+           </div>
+        </section>
+
+        {/* Damaged Items */}
+        <section>
+           <div className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                 <AlertCircle className="h-8 w-8 text-amber-500" />
+                 Damaged or Incorrect Items
+              </h2>
+              <div className="prose prose-lg text-gray-600 max-w-none">
+                 <p className="mb-4">If you receive:</p>
+                 <ul className="list-none space-y-2 pl-4 mb-6">
+                    <li className="flex items-center gap-3">
+                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                       A damaged product, or
+                    </li>
+                    <li className="flex items-center gap-3">
+                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                       An incorrect item
+                    </li>
+                 </ul>
+                 <p className="font-medium text-gray-900 mb-4">
+                    Please contact us within 24 hours of delivery with photos/videos of the issue.
+                 </p>
+                 <p>
+                    We will review and provide a suitable resolution as per our policy (replacement, refund, or store credit).
+                 </p>
+              </div>
+           </div>
+
+           <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-lg">
+              <p className="text-amber-800 font-medium">
+                 Please review product details carefully before placing your order.
+              </p>
+           </div>
+        </section>
+
+        {/* Contact CTA */}
+        <div className="text-center pt-8 border-t border-gray-200">
+           <p className="text-gray-600 mb-6">Have concerns about your order?</p>
+           <Link
+             href="/contact"
+             className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-[#009744] hover:bg-[#00803a] transition-colors"
+           >
+             Contact Support
+           </Link>
         </div>
+
       </div>
 
       {/* Newsletter */}

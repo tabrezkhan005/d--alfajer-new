@@ -81,6 +81,34 @@ export function ExquisiteCollection({
   */
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Check scroll position to update arrow visibility
+  const updateScrollButtons = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+    window.addEventListener('resize', updateScrollButtons);
+    return () => window.removeEventListener('resize', updateScrollButtons);
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 340; // Card width + gap
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Category name to translation key mapping (for dynamic DB categories)
   const categoryKeyMap: { [key: string]: string } = {
@@ -129,9 +157,35 @@ export function ExquisiteCollection({
         </div>
 
         {/* Carousel Container */}
-        <div className="relative group flex justify-center">
-          {/* Collection Cards - One line on all screens */}
-          <div className="flex gap-4 sm:gap-6 md:gap-8 justify-center items-center flex-wrap sm:flex-nowrap px-2 xs:px-3 sm:px-0">
+        <div className="relative group">
+          {/* Left Navigation Arrow */}
+          <button
+            onClick={() => scroll('left')}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/95 hover:bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-gray-100 ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'} -translate-x-2 sm:-translate-x-4`}
+            aria-label="Scroll left"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#AB1F23] rotate-180" />
+          </button>
+
+          {/* Right Navigation Arrow */}
+          <button
+            onClick={() => scroll('right')}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/95 hover:bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-gray-100 ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'} translate-x-2 sm:translate-x-4`}
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#009744]" />
+          </button>
+
+          {/* Gradient Fade Overlays */}
+          <div className={`absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none transition-opacity duration-300 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none transition-opacity duration-300 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
+
+          {/* Collection Cards - Horizontal Scroll */}
+          <div
+            ref={scrollContainerRef}
+            onScroll={updateScrollButtons}
+            className="flex gap-4 sm:gap-5 md:gap-6 lg:gap-8 overflow-x-auto scroll-smooth px-4 sm:px-8 md:px-12 py-4 scrollbar-custom"
+          >
             {categories.map((category) => {
               // Map category names to database category names
               const categoryNameMap: { [key: string]: string } = {
@@ -142,18 +196,18 @@ export function ExquisiteCollection({
                 "Combo": "Combo",
               };
               const dbCategoryName = categoryNameMap[category.name] || category.name;
-              
+
               // For coming soon items, don't make them clickable
               const cardContent = (
                 <motion.div
-                  className="shrink-0 w-[85vw] xs:w-[calc(50vw-24px)] sm:w-[280px] md:w-[300px] lg:w-[320px] xl:w-[340px]"
+                  className="shrink-0 w-[260px] xs:w-[280px] sm:w-[280px] md:w-[300px] lg:w-[320px] xl:w-[340px]"
                   onMouseEnter={() => setHoveredCard(category.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   whileHover={category.comingSoon ? {} : { y: -8 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                   <div
-                    className={`relative h-[280px] xs:h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-2xl overflow-hidden ${category.comingSoon ? '' : 'cursor-pointer group/card'} bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300 ${category.comingSoon ? 'opacity-75' : ''}`}
+                    className={`relative h-[300px] xs:h-[320px] sm:h-[350px] md:h-[380px] lg:h-[400px] rounded-2xl overflow-hidden ${category.comingSoon ? '' : 'cursor-pointer group/card'} bg-muted shadow-md hover:shadow-2xl transition-shadow duration-300 ${category.comingSoon ? 'opacity-75' : ''}`}
                     role={category.comingSoon ? undefined : "button"}
                     tabIndex={category.comingSoon ? undefined : 0}
                     aria-label={category.comingSoon ? `${category.name} - Coming Soon` : `View ${category.name}`}
@@ -241,7 +295,11 @@ export function ExquisiteCollection({
       </div>
 
       <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
+        .scrollbar-custom {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .scrollbar-custom::-webkit-scrollbar {
           display: none;
         }
       `}</style>

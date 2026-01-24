@@ -46,7 +46,7 @@
 
 ### 1. **Razorpay Webhook Configuration**
 - **Status**: Webhook endpoint exists at `/api/razorpay/webhook`
-- **Action Required**: 
+- **Action Required**:
   - Configure webhook URL in Razorpay Dashboard: `https://yourdomain.com/api/razorpay/webhook`
   - Verify `RAZORPAY_WEBHOOK_SECRET` matches dashboard
 - **Status**: ⚠️ VERIFY IN RAZORPAY DASHBOARD
@@ -160,7 +160,7 @@ Verify these columns exist in your `orders` table:
 
 ## 🔒 Security Fixes Applied
 
-1. **SQL Injection Prevention**: 
+1. **SQL Injection Prevention**:
    - Replaced `.or()` with string interpolation with separate `.eq()` queries
    - Added input validation and length checks
    - Supabase uses parameterized queries, but added extra validation

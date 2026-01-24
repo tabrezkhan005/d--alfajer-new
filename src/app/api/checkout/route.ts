@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
 import { calculateTax, shippingMethods, validatePromoCode } from '@/src/lib/checkout';
+import { sendOrderStatusEmail, prepareOrderEmailData } from '@/src/lib/email';
 // Note: Shiprocket shipment creation is done manually from admin panel
 // Automatic creation disabled for security (requires email/password credentials)
 
@@ -14,19 +15,26 @@ export async function POST(request: NextRequest) {
       email,
       name,
       phone,
-      shippingMethod,
       paymentMethodId,
       paymentMethod,
       promoCode,
       userId,
       giftMessage,
-      subscription
+      subscription,
+      currency,
+      shippingCost: providedShippingCost
     } = body;
 
     // Handle both naming conventions for address
     const finalAddress = shippingAddress || address;
     const finalPaymentMethod = paymentMethodId || paymentMethod || 'card';
-    const finalShippingMethod = shippingMethod || 'standard';
+    // Get currency from request or derive from country
+    const orderCurrency = currency || (finalAddress?.country ?
+      (finalAddress.country === 'IN' ? 'INR' :
+       finalAddress.country === 'US' ? 'USD' :
+       finalAddress.country === 'GB' ? 'GBP' :
+       finalAddress.country === 'AE' ? 'AED' :
+       finalAddress.country === 'EU' ? 'EUR' : 'INR') : 'INR');
 
     // Validate request
     if (!items || items.length === 0) {
@@ -73,7 +81,7 @@ export async function POST(request: NextRequest) {
         return null;
       })
       .filter((id: string | null): id is string => id !== null && id !== undefined); // Filter out null/undefined
-    
+
     if (productIds.length === 0) {
       console.error('No valid product IDs found in items:', JSON.stringify(items, null, 2));
       return NextResponse.json({ error: 'No valid products found in cart' }, { status: 400 });
@@ -96,16 +104,16 @@ export async function POST(request: NextRequest) {
     if (productError) {
       console.error('Error fetching products:', productError);
       console.error('Product IDs attempted:', uniqueProductIds);
-      return NextResponse.json({ 
-        error: 'Failed to validate products', 
-        details: productError.message 
+      return NextResponse.json({
+        error: 'Failed to validate products',
+        details: productError.message
       }, { status: 500 });
     }
 
     if (!products || products.length === 0) {
       console.error('No products found for IDs:', uniqueProductIds);
       console.error('Items sent:', JSON.stringify(items, null, 2));
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'One or more products not found in database',
         details: `Products with IDs ${uniqueProductIds.join(', ')} not found. Please refresh your cart and try again.`
       }, { status: 404 });
@@ -114,11 +122,11 @@ export async function POST(request: NextRequest) {
     // Check if all requested products were found
     const foundProductIds = new Set(products.map(p => p.id));
     const missingProductIds = uniqueProductIds.filter(id => !foundProductIds.has(id));
-    
+
     if (missingProductIds.length > 0) {
       console.error('Some products not found:', missingProductIds);
       console.error('Found products:', Array.from(foundProductIds));
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'One or more products not found in database',
         details: `The following products are no longer available: ${missingProductIds.join(', ')}. Please remove them from your cart and try again.`
       }, { status: 404 });
@@ -187,9 +195,20 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Get shipping cost
-    const selectedShipping = shippingMethods.find(m => m.id === finalShippingMethod) || shippingMethods[0];
-    const shippingCost = selectedShipping?.price || 0;
+    // Use provided shipping cost or calculate if not provided
+    let shippingCost = providedShippingCost || 0;
+
+    // If shipping cost not provided and address is in India, try to calculate
+    if (shippingCost === 0 && finalAddress?.country === 'IN' && finalAddress?.postalCode) {
+      // Calculate total weight
+      const totalWeight = validatedItems.reduce((sum: number, item: { quantity: number }) => {
+        return sum + (item.quantity || 1) * 0.5; // Default 0.5kg per item
+      }, 0) || 0.5;
+
+      // Try to get Shiprocket token from environment or calculate shipping
+      // For now, we'll use the provided shipping cost
+      // If not provided, shipping will be 0
+    }
 
     // Calculate discount from promo code
     let discount = 0;
@@ -251,10 +270,10 @@ export async function POST(request: NextRequest) {
         email: email || finalAddress.email,
         subtotal: subtotal,
         total_amount: totalAmount, // Use total_amount instead of total
-        currency: 'INR',
+        currency: orderCurrency,
         shipping_address: finalAddress,
         billing_address: finalAddress,
-        shipping_method: finalShippingMethod,
+        shipping_method: 'standard', // Default since shipping method is removed
         shipping_cost: shippingCost,
         tax: taxAmount,
         discount: discount,
@@ -295,10 +314,10 @@ export async function POST(request: NextRequest) {
       // If order items fail, we should still return success but log the error
       // The order exists but items might be missing - admin can manually add them
       console.warn('Order created but order items insertion failed. Order ID:', order.id);
-      return NextResponse.json({ 
-        error: 'Order created but items failed to save', 
+      return NextResponse.json({
+        error: 'Order created but items failed to save',
         details: itemsError.message,
-        orderId: order.id 
+        orderId: order.id
       }, { status: 500 });
     }
 
@@ -318,8 +337,8 @@ export async function POST(request: NextRequest) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              amount: Math.round(totalAmount * 100), // in paise
-              currency: 'INR',
+              amount: Math.round(totalAmount * 100), // Convert to smallest currency unit (paise for INR, cents for USD, etc.)
+              currency: orderCurrency,
               receipt: order.id,
               payment_capture: 1,
             }),
@@ -396,6 +415,44 @@ export async function POST(request: NextRequest) {
     // Shiprocket requires email/password authentication which should not be stored server-side
     // Admin must create shipments manually from the order detail page in the admin panel
     // This is the secure approach and gives admin control over when shipments are created
+
+    // Send Order Confirmation Email
+    try {
+      const emailData = prepareOrderEmailData({
+        id: order.id,
+        order_number: orderNumber,
+        email: email || finalAddress.email,
+        status: 'confirmed',
+        subtotal,
+        shipping_cost: shippingCost,
+        tax: taxAmount,
+        discount,
+        total_amount: totalAmount,
+        currency: orderCurrency,
+        shipping_address: finalAddress,
+        created_at: order.created_at || new Date().toISOString(),
+        items: validatedItems.map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          image_url: item.image_url,
+        })),
+      });
+
+      // Send email asynchronously (don't block the response)
+      sendOrderStatusEmail('confirmed', emailData)
+        .then(result => {
+          if (result.success) {
+            console.log('Order confirmation email sent successfully:', result.messageId);
+          } else {
+            console.error('Failed to send order confirmation email:', result.error);
+          }
+        })
+        .catch(err => console.error('Error sending order confirmation email:', err));
+    } catch (emailError) {
+      // Log error but don't fail the order
+      console.error('Error preparing order confirmation email:', emailError);
+    }
 
     return NextResponse.json({
       success: true,

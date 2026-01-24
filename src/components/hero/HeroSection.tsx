@@ -1,430 +1,62 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/src/components/ui/button";
-import { Heart, Truck, CheckCircle2, Star, Play, ArrowRight, Shield, Award, Headphones, Check, Leaf, Sparkles } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/src/components/ui/carousel";
 
 /* ---------------------------------------------
    HERO SLIDES CONFIG
 ---------------------------------------------- */
 const heroSlides = [
   {
-    type: "video",
-    src: "/images/hero/hero1.mp4",
-    title: "Bringing Healthy Smiles",
-    subtitle: "to Every Home",
-    description:
-      "Experience the joy of premium organic products delivered fresh to your door. From handpicked almonds to pure honey - bringing health and happiness to families across the UAE.",
-    align: "center",
-    overlay: "dark",
-    showStats: true,
-    showFeatures: true,
-    showBanner: true,
-  },
-  {
     type: "image",
-    src: "/images/hero/hero2.png",
-    title: "Fresh & Natural",
-    subtitle: "Dry Fruits",
-    description:
-      "Handpicked premium dry fruits sourced directly for maximum freshness.",
-    align: "right",
-    overlay: "light",
-    accent: "#009744",
-  },
-  {
-    type: "image",
-    src: "/images/hero/hero3.png",
+    src: "/banners/1920x1080/dryfruits.jpg",
     title: "Premium Quality",
-    subtitle: "Nuts & Spices",
-    description:
-      "A curated selection of nuts and spices chosen for purity, aroma, and taste.",
-    align: "right",
-    overlay: "light",
-    accent: "#AB1F23",
   },
   {
     type: "image",
-    src: "/images/hero/hero4.png",
+    src: "/banners/1920x1080/kahwa.jpg",
+    title: "Royal Blend",
+  },
+  {
+    type: "image",
+    src: "/banners/1920x1080/saffron.jpg",
     title: "Authentic Saffron",
-    subtitle: "From Source",
-    description:
-      "Experience the richness of handpicked saffron and whole spices.",
-    align: "right",
-    overlay: "light",
-    accent: "#009744",
   },
   {
     type: "image",
-    src: "/images/hero/hero5.png",
-    title: "Bold Flavors",
-    subtitle: "Spice Collection",
-    description:
-      "From mild warmth to fiery heat — spices that elevate every dish.",
-    align: "right-bottom",
-    overlay: "dark",
-    accent: "#AB1F23",
+    src: "/banners/1920x1080/shilajit.jpg",
+    title: "Pure Kraft",
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, scale: 0.9, x: 50 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    x: 0,
-    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
 export function HeroSection() {
-  const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const { t } = require('@/src/components/providers/i18n-provider').useI18n();
 
   useEffect(() => {
-    if (!api) return;
-
-    setCurrent(api.selectedScrollSnap());
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
-
-  useEffect(() => {
-    if (!api) return;
-
-    const id = setInterval(() => {
-      const currentIndex = api.selectedScrollSnap();
-      if (currentIndex !== 0) {
-        api.scrollNext();
-      }
-    }, 8000);
-
-    return () => clearInterval(id);
-  }, [api]);
-
-  const slide = heroSlides[current];
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-black" style={{ minHeight: "100dvh", paddingTop: "0" }}>
-      {/* ---------------- BACKGROUND CAROUSEL ---------------- */}
-      <div className="absolute inset-0 z-0 h-full w-full">
-        <Carousel
-          setApi={setApi}
-          opts={{ loop: true }}
-          className="h-full w-full"
-        >
-          <CarouselContent className="h-full -ml-0">
-            {heroSlides.map((s, i) => (
-              <CarouselItem key={i} className="relative h-full w-full pl-0 basis-full min-w-full">
-                <div className="relative h-full w-full overflow-hidden" style={{ minHeight: "100dvh" }}>
-                  {s.type === "video" ? (
-                    <video
-                      autoPlay
-                      muted
-                      playsInline
-                      loop
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                        zIndex: 0
-                      }}
-                    >
-                      <source src={s.src} type="video/mp4" />
-                    </video>
-                  ) : (
-                    <>
-                      <motion.div
-                        initial={{ scale: 1.2 }}
-                        animate={{ scale: current === i ? 1 : 1.2 }}
-                        transition={{ duration: 10, ease: "linear" }}
-                        className="absolute inset-0"
-                      >
-                        <Image
-                          src={s.src}
-                          alt={s.title}
-                          fill
-                          className="object-cover object-center"
-                          priority={i === 0}
-                        />
-                      </motion.div>
-                      <div
-                        className="absolute inset-0 z-0"
-                        style={{
-                          background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%)",
-                        }}
-                      />
-                    </>
-                  )}
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
-
-      {/* ---------------- OVERLAY ---------------- */}
-      <div
-        className={`absolute inset-0 z-10 transition-opacity duration-1000 ${
-          slide.overlay === "dark"
-            ? "bg-gradient-to-r from-black/80 via-black/50 to-black/20"
-            : "bg-gradient-to-r from-black/60 via-black/30 to-transparent"
-        }`}
-      />
-
-      {/* ---------------- CONTENT ---------------- */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center w-full" style={{ paddingTop: "clamp(180px, 20vw, 280px)", paddingBottom: "clamp(60px, 15vw, 120px)" }}>
-        <div className="container mx-auto w-full px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8">
-          <AnimatePresence mode="wait">
-            {slide.showBanner && current === 0 ? (
-                <motion.div
-                  key="slide-0"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  className="w-full max-w-6xl mx-auto px-2 sm:px-4"
-                >
-                  <motion.div variants={itemVariants} className="flex items-center justify-center gap-2 mb-2 sm:mb-3">
-                    <span className="bg-[#AB1F23]/20 backdrop-blur-md border border-[#AB1F23]/30 px-3 sm:px-4 py-1.5 rounded-full flex items-center gap-2">
-                      <Heart className="h-3 sm:h-4 w-3 sm:w-4 text-[#AB1F23]" fill="#AB1F23" />
-                      <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase">{t('hero.realCustomersJoy')}</span>
-                    </span>
-                  </motion.div>
-
-                  <div className="text-center mb-2 xs:mb-3 sm:mb-4 md:mb-6">
-                    <motion.h1 variants={itemVariants} className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white leading-[1.05] font-heading mb-0.5 xs:mb-1 sm:mb-2 drop-shadow-2xl px-2">
-                      {t('hero.mainTitle')}
-                    </motion.h1>
-                    <motion.h1 variants={itemVariants} className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.05] font-heading mb-2 xs:mb-2.5 sm:mb-3 md:mb-4 drop-shadow-2xl px-2">
-                      <span className="text-white">{t('hero.mainSubtitle')}</span>
-                    </motion.h1>
-                    <motion.p variants={itemVariants} className="text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-3xl mx-auto font-body font-light leading-relaxed mb-2 xs:mb-3 sm:mb-4 md:mb-6 px-2 xs:px-3 sm:px-4">
-                      {t('hero.mainDescription')}
-                    </motion.p>
-                  </div>
-
-                  <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 mb-2.5 xs:mb-3.5 sm:mb-4 md:mb-6 px-2 xs:px-2.5 sm:px-4">
-                    {[
-                      { icon: "/images/icons/fresh_6643364.png", labelKey: "hero.box1Label", descKey: "hero.box1Desc", color: "#009744" },
-                      { icon: "/images/icons/green-logistics_9402143.png", labelKey: "hero.box2Label", descKey: "hero.box2Desc", color: "#FFD700" },
-                      { icon: "/images/icons/organic_4497598.png", labelKey: "hero.box3Label", descKey: "hero.box3Desc", color: "#009744" },
-                      { icon: "/images/icons/Rating-Five-Star--Streamline-Ultimate.png", labelKey: "hero.box4Label", descKey: "hero.box4Desc", color: "#AB1F23" }
-                    ].map((feat, idx) => (
-                      <div key={idx} className="group bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-lg xs:rounded-xl sm:rounded-2xl p-1.5 xs:p-2 sm:p-3 md:p-4 transition-all duration-500 cursor-default">
-                        <div className="flex justify-center mb-1 xs:mb-1.5 sm:mb-2 md:mb-3">
-                          <div
-                            className="h-6 xs:h-7 sm:h-10 md:h-12 w-6 xs:w-7 sm:w-10 md:w-12 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 overflow-hidden"
-                            style={{ backgroundColor: `${feat.color}20` }}
-                          >
-                            <Image
-                              src={feat.icon}
-                              alt={t(feat.labelKey)}
-                              width={32}
-                              height={32}
-                              className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 object-contain"
-                            />
-                          </div>
-                        </div>
-                        <div className="text-[8px] xs:text-[9px] sm:text-xs md:text-sm text-white font-bold font-poppins mb-0.5">{t(feat.labelKey)}</div>
-                        <div className="text-white/60 text-[7px] xs:text-[8px] sm:text-xs font-body tracking-tight leading-tight">{t(feat.descKey)}</div>
-                      </div>
-                    ))}
-                  </motion.div>
-
-                  <motion.div variants={itemVariants} className="flex flex-col xs:flex-col sm:flex-row items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 px-2 xs:px-2.5 sm:px-4">
-                    <Link href="/shop">
-                      <Button
-                        size="lg"
-                        className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-4 xs:px-5 sm:px-7 md:px-8 py-3 xs:py-3.5 sm:py-4 md:py-5 text-[11px] xs:text-xs sm:text-sm md:text-base font-bold shadow-[0_0_20px_rgba(0,151,68,0.4)] rounded-full transition-all duration-500 overflow-hidden w-full sm:w-auto"
-                      >
-                        <span className="relative z-10 flex items-center gap-1.5 xs:gap-2 sm:gap-2 justify-center">
-                          {t('hero.cta')}
-                          <ArrowRight className="h-3 xs:h-3.5 sm:h-4 w-3 xs:w-3.5 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                      </Button>
-                    </Link>
-                    <Link href="/about">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="border-2 border-white/30 text-white bg-white/5 hover:bg-white/15 hover:border-white/60 px-4 xs:px-5 sm:px-7 md:px-8 py-3 xs:py-3.5 sm:py-4 md:py-5 text-[11px] xs:text-xs sm:text-sm md:text-base font-semibold rounded-full transition-all duration-500 backdrop-blur-md flex items-center gap-1.5 xs:gap-2 sm:gap-2 justify-center w-full sm:w-auto"
-                      >
-                        {t('hero.story')}
-                        <Play className="h-3 xs:h-3.5 sm:h-4 w-3 xs:w-3.5 sm:w-4 fill-white" />
-                      </Button>
-                    </Link>
-                  </motion.div>
-                </motion.div>
-            ) : (
-              <motion.div
-                key={`slide-${current}`}
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:gap-20 items-center">
-                  <div className="text-left space-y-4 sm:space-y-6 lg:space-y-8 px-2 sm:px-0">
-                    <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-[#009744]/90 backdrop-blur-sm text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg border border-[#009744]/20">
-                      <Sparkles className="h-3 sm:h-4 w-3 sm:w-4 text-[#FFD700]" />
-                      <span className="text-[8px] sm:text-xs md:text-sm font-bold font-poppins tracking-widest uppercase">{t('hero.signature')}</span>
-                    </motion.div>
-
-                    <motion.h1 variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1] font-heading tracking-tight">
-                      {slide.title}
-                      <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#009744] to-[#00b350] drop-shadow-sm">{slide.subtitle}</span>
-                    </motion.h1>
-
-                    <motion.p variants={itemVariants} className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white/80 max-w-lg font-body font-light leading-relaxed">
-                      {slide.description}
-                    </motion.p>
-
-                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-8">
-                      {[
-                        { icon: <Check className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature1' },
-                        { icon: <Leaf className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature2' },
-                        { icon: <Award className="h-4 sm:h-5 w-4 sm:w-5" />, labelKey: 'hero.feature3' }
-                      ].map((f, i) => (
-                        <div key={i} className="flex items-center gap-2 sm:gap-3 group">
-                          <div className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[#009744]/20 flex items-center justify-center text-[#009744] transition-transform group-hover:scale-110">
-                            {f.icon}
-                          </div>
-                          <span className="text-white font-medium font-body text-sm sm:text-base md:text-lg">{t(f.labelKey)}</span>
-                        </div>
-                      ))}
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 sm:gap-5 pt-4 sm:pt-6">
-                      <Link href="/shop">
-                        <Button
-                          size="lg"
-                          className="group relative bg-[#009744] hover:bg-[#00803a] text-white px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-full transition-all duration-500 w-full sm:w-auto"
-                        >
-                          <span className="flex items-center gap-2 sm:gap-3 justify-center">
-                            {t('hero.cta')}
-                            <ArrowRight className="h-4 sm:h-5 md:h-6 w-4 sm:w-5 md:w-6 transition-transform group-hover:translate-x-1" />
-                          </span>
-                        </Button>
-                      </Link>
-                      <Link href="/about">
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="border-2 border-white/20 text-white bg-white/5 hover:bg-white/10 px-6 sm:px-10 py-6 sm:py-8 text-xs sm:text-base md:text-lg lg:text-xl font-semibold rounded-full transition-all duration-500 backdrop-blur-md w-full sm:w-auto"
-                        >
-                          {t('hero.story')}
-                        </Button>
-                      </Link>
-                    </motion.div>
-                  </div>
-
-                  <motion.div
-                    variants={cardVariants}
-                    className="relative group hidden lg:block"
-                  >
-                    <div className="absolute -inset-4 bg-gradient-to-tr from-[#009744]/20 to-[#AB1F23]/20 rounded-[40px] blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500" />
-
-                    <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl overflow-hidden p-4">
-                      {/* Product Image Container */}
-                      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900 shadow-inner">
-                        <Image
-                          src={slide.src}
-                          alt={slide.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                        <div className="absolute top-4 right-4 bg-[#AB1F23] text-white px-4 py-2 rounded-xl shadow-lg transform rotate-2">
-                          <span className="text-xs font-black font-poppins tracking-tighter">OFF 20%</span>
-                        </div>
-                      </div>
-
-                      {/* Info Panel */}
-                      <div className="p-6 space-y-5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 text-[#FFD700] fill-[#FFD700]" />
-                            ))}
-                            <span className="ml-2 text-xs text-white/60 font-medium">4.9/5.0</span>
-                          </div>
-                          <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">In Stock</span>
-                        </div>
-
-                        <div className="flex items-end justify-between border-t border-white/10 pt-5">
-                          <div>
-                            <p className="text-xs text-white/50 font-medium mb-1 uppercase tracking-wide">Starting from</p>
-                            <p className="text-4xl font-black text-[#FFD700] font-heading tracking-tight">
-                              ₹89.99
-                            </p>
-                          </div>
-                          <button className="h-14 w-14 rounded-2xl bg-[#009744] hover:bg-[#00803a] text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95">
-                            <ArrowRight className="h-6 w-6" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Floating Decorative Elements */}
-                    <div className="absolute -top-6 -left-6 bg-[#009744] text-white p-4 rounded-2xl shadow-2xl transform -rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                      <Leaf className="h-6 w-6" />
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* Navigation and indicators removed for cleaner design */}
-
-      {/* ---------------- SIDEBAR DECOR (Professional Touch) - HIDDEN ON MOBILE/TABLET-------- */}
-      <div className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 z-30 hidden xl:flex flex-col gap-12 items-center">
-        <div className="h-20 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-        <span className="rotate-90 text-[9px] sm:text-[10px] text-white/20 font-bold tracking-[0.5em] uppercase whitespace-nowrap">Scroll for Wellness</span>
-        <div className="h-20 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+    <section className="relative w-full bg-black mt-[70px] sm:mt-[85px]">
+      {/* 16:9 Aspect Ratio Main Container */}
+      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+        {heroSlides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              index === current ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
+          >
+            {/* Standard HTML img tag for guaranteed rendering */}
+            <img
+              src={slide.src}
+              alt={slide.title || "Banner"}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
       </div>
     </section>
   );

@@ -1,15 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createShiprocketShipment } from "@/src/lib/shiprocket";
+import { createShiprocketShipment, getShiprocketToken } from "@/src/lib/shiprocket";
 
 export async function POST(request: NextRequest) {
   try {
     const { token, shipmentData } = await request.json();
 
-    if (!token) {
-      return NextResponse.json(
-        { error: "Shiprocket token is required" },
-        { status: 401 }
-      );
+    let authToken = token;
+
+    // If no token provided, try to get one using environment variables
+    if (!authToken) {
+      const email = process.env.SHIPROCKET_EMAIL || process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
+      const password = process.env.SHIPROCKET_PASSWORD || process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
+
+      if (email && password) {
+        const authResult = await getShiprocketToken(email, password);
+        if ("token" in authResult) {
+          authToken = authResult.token;
+        } else {
+          return NextResponse.json(
+            { error: `Authentication failed: ${authResult.error}` },
+            { status: 401 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          { error: "Shiprocket token is required. Please configure Shiprocket credentials." },
+          { status: 401 }
+        );
+      }
     }
 
     if (!shipmentData) {
@@ -19,7 +37,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createShiprocketShipment(token, shipmentData);
+    // Validate required fields
+    const requiredFields = [
+      'order_id',
+      'order_date',
+      'pickup_location',
+      'billing_customer_name',
+      'billing_address',
+      'billing_city',
+      'billing_pincode',
+      'billing_state',
+      'billing_country',
+      'billing_phone',
+      'order_items',
+      'payment_method',
+      'sub_total',
+      'weight',
+      'length',
+      'breadth',
+      'height',
+    ];
+
+    const missingFields = requiredFields.filter(field => {
+      const value = shipmentData[field];
+      return value === undefined || value === null || value === '';
+    });
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Missing required fields: ${missingFields.join(', ')}`,
+          missing_fields: missingFields
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate order_items has at least one item
+    if (!Array.isArray(shipmentData.order_items) || shipmentData.order_items.length === 0) {
+      return NextResponse.json(
+        { error: "At least one order item is required" },
+        { status: 400 }
+      );
+    }
+
+    // Log shipment data for debugging
+    console.log("Creating Shiprocket shipment with data:", JSON.stringify(shipmentData, null, 2));
+
+    const result = await createShiprocketShipment(authToken, shipmentData);
 
     if (!result) {
       return NextResponse.json(
@@ -28,12 +93,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for Shiprocket-specific error responses
+    if (result.status === 0 || (result as any).status_code === 0) {
+      const errorMessage = result.message || (result as any).error || "Shipment creation failed";
+      console.error("Shiprocket returned error:", result);
+      return NextResponse.json(
+        { error: errorMessage, shiprocket_response: result },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Shiprocket shipment creation error:", error);
-    // Return the actual error message from Shiprocket
+
+    // Parse error message for more specific errors
     const errorMessage = error.message || "Internal server error";
-    const statusCode = error.message?.includes("required") ? 400 : 500;
+
+    // Check for specific Shiprocket error patterns
+    if (errorMessage.includes("pickup location") || errorMessage.includes("Pickup location")) {
+      return NextResponse.json(
+        {
+          error: "Invalid pickup location. Please ensure the pickup_location name exactly matches one configured in your Shiprocket dashboard.",
+          suggestion: "Go to Shiprocket Dashboard > Settings > Pickup Addresses to verify the exact pickup location name."
+        },
+        { status: 400 }
+      );
+    }
+
+    const statusCode = errorMessage.includes("required") || errorMessage.includes("Invalid") ? 400 : 500;
     return NextResponse.json(
       { error: errorMessage },
       { status: statusCode }

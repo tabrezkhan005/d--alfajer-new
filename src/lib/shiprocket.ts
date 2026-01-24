@@ -153,22 +153,73 @@ export async function createShiprocketShipment(
       throw new Error("Complete address details (pincode, city, state) are required");
     }
 
+    // Ensure all required fields have valid values
+    const requestData = {
+      ...shipmentData,
+      // Ensure dimensions are numbers
+      length: Number(shipmentData.length) || 20,
+      breadth: Number(shipmentData.breadth) || 15,
+      height: Number(shipmentData.height) || 10,
+      weight: Number(shipmentData.weight) || 0.5,
+      // Ensure sub_total is a number
+      sub_total: Number(shipmentData.sub_total) || 0,
+      // Add channel_id if not present (using custom channel for API orders)
+      channel_id: (shipmentData as any).channel_id || "",
+      // Ensure billing_phone has proper format (10 digits for India)
+      billing_phone: String(shipmentData.billing_phone || "").replace(/[^0-9]/g, "").slice(-10),
+    };
+
+    console.log("Shiprocket Create Shipment Request:", JSON.stringify(requestData, null, 2));
+
     const response = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(shipmentData),
+      body: JSON.stringify(requestData),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log("Shiprocket Raw Response:", responseText);
+
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse Shiprocket response:", parseError);
+      throw new Error(`Invalid response from Shiprocket: ${responseText.substring(0, 200)}`);
+    }
+
+    console.log("Shiprocket Parsed Response:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       // Provide more detailed error message
-      const errorMessage = data.message || data.error || `Shiprocket API error (Status: ${response.status})`;
-      const errorDetails = data.errors ? JSON.stringify(data.errors) : '';
-      throw new Error(errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage);
+      let errorMessage = data.message || data.error || `Shiprocket API error (Status: ${response.status})`;
+
+      // Handle errors object (validation errors)
+      if (data.errors) {
+        let errorDetails = "";
+        if (typeof data.errors === 'object' && !Array.isArray(data.errors)) {
+          errorDetails = Object.entries(data.errors)
+            .map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return `${key}: ${value.join(', ')}`;
+              }
+              return `${key}: ${value}`;
+            })
+            .join('; ');
+        } else if (Array.isArray(data.errors)) {
+          errorDetails = data.errors.join(', ');
+        } else {
+          errorDetails = String(data.errors);
+        }
+        if (errorDetails) {
+          errorMessage = `${errorMessage}: ${errorDetails}`;
+        }
+      }
+
+      throw new Error(errorMessage);
     }
 
     return data;
@@ -292,7 +343,7 @@ export async function checkServiceability(
     // Support both pincode and postcode for backward compatibility
     const pickupPostcode = request.pickup_postcode || request.pickup_pincode;
     const deliveryPostcode = request.delivery_postcode || request.delivery_pincode;
-    
+
     // Validate required fields
     if (!pickupPostcode || !deliveryPostcode || !request.weight) {
       throw new Error("pickup_postcode, delivery_postcode, and weight are required");
@@ -327,7 +378,7 @@ export async function checkServiceability(
     // Try to parse JSON response
     let data: any;
     let responseText: string = "";
-    
+
     try {
       responseText = await response.text();
       if (responseText) {
@@ -343,7 +394,7 @@ export async function checkServiceability(
     if (!response.ok) {
       // Provide detailed error message from Shiprocket
       let errorMessage = data.message || data.error || `Shiprocket API error (Status: ${response.status})`;
-      
+
       // Handle specific error cases
       if (response.status === 401) {
         errorMessage = "Authentication failed. Please check your Shiprocket credentials or API key. Token may be expired.";
@@ -354,7 +405,7 @@ export async function checkServiceability(
       } else if (response.status >= 500) {
         errorMessage = "Shiprocket server error. Please try again later.";
       }
-      
+
       // Handle errors object
       if (data.errors) {
         let errorDetails = "";
@@ -376,7 +427,7 @@ export async function checkServiceability(
           errorMessage = `${errorMessage}: ${errorDetails}`;
         }
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -530,6 +581,7 @@ export interface PickupRequest {
   pickup_time: string; // HH:MM
   expected_package_count: number;
   pickup_location_id?: number;
+  shipment_id?: number[]; // Optional: Array of shipment IDs if requesting pickup for specific shipments
 }
 
 export async function requestPickup(
@@ -537,6 +589,51 @@ export async function requestPickup(
   request: PickupRequest
 ): Promise<any> {
   try {
+    // Ensure all required fields are present and properly formatted
+    // Shiprocket API requires these fields to be non-null and properly typed
+    const cleanRequest: any = {
+      pickup_date: String(request.pickup_date || '').trim(),
+      pickup_time: String(request.pickup_time || '').trim(),
+      expected_package_count: Number(request.expected_package_count) || 0,
+    };
+
+    // Validate that required fields are not empty
+    if (!cleanRequest.pickup_date || !cleanRequest.pickup_time || cleanRequest.expected_package_count <= 0) {
+      throw new Error("pickup_date, pickup_time, and expected_package_count are required and cannot be empty");
+    }
+
+    // Ensure expected_package_count is an integer (not float)
+    cleanRequest.expected_package_count = Math.floor(cleanRequest.expected_package_count);
+
+    // pickup_location_id is required by Shiprocket API to avoid Laravel binding errors
+    if (request.pickup_location_id === undefined || request.pickup_location_id === null) {
+      throw new Error("pickup_location_id is required. Please provide a valid pickup location ID.");
+    }
+
+    const locationId = Number(request.pickup_location_id);
+    if (isNaN(locationId) || locationId <= 0) {
+      throw new Error("pickup_location_id must be a valid positive integer.");
+    }
+
+    cleanRequest.pickup_location_id = Math.floor(locationId);
+
+    // Include shipment_id array if provided (for requesting pickup for specific shipments)
+    // Note: If shipment_id is not provided, we don't include it (not an empty array)
+    // Some API versions might require this, but sending empty array might cause issues
+    if (request.shipment_id && Array.isArray(request.shipment_id) && request.shipment_id.length > 0) {
+      // Ensure all shipment IDs are valid integers
+      const validShipmentIds = request.shipment_id
+        .map((id: any) => Number(id))
+        .filter((id: number) => !isNaN(id) && id > 0);
+
+      if (validShipmentIds.length > 0) {
+        cleanRequest.shipment_id = validShipmentIds;
+      }
+    }
+
+    // Log the request for debugging
+    console.log('Shiprocket pickup request payload:', JSON.stringify(cleanRequest, null, 2));
+
     const response = await fetch(
       "https://apiv2.shiprocket.in/v1/external/courier/generate/pickup",
       {
@@ -545,19 +642,69 @@ export async function requestPickup(
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(cleanRequest),
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to request pickup");
+    // Parse response
+    let responseData: any = {};
+    let responseText = "";
+
+    try {
+      responseText = await response.text();
+      if (responseText) {
+        responseData = JSON.parse(responseText);
+      }
+    } catch (parseError) {
+      // If parsing fails, use response text as error message
+      responseData = { message: responseText || response.statusText || "Unknown error" };
     }
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
+    if (!response.ok) {
+      // Provide detailed error message from Shiprocket
+      let errorMessage = responseData.message || responseData.error || `Failed to request pickup (Status: ${response.status})`;
+
+      // Handle specific error cases
+      if (response.status === 401) {
+        errorMessage = "Authentication failed. Please check your Shiprocket credentials or API key. Token may be expired.";
+      } else if (response.status === 400) {
+        errorMessage = responseData.message || responseData.error || "Invalid request parameters. Please check pickup_date, pickup_time, and expected_package_count.";
+      } else if (response.status === 404) {
+        errorMessage = "Pickup endpoint not found. Please check the Shiprocket API version.";
+      } else if (response.status >= 500) {
+        errorMessage = responseData.message || responseData.error || "Shiprocket server error. Please try again later.";
+      }
+
+      // Handle errors object
+      if (responseData.errors) {
+        let errorDetails = "";
+        if (Array.isArray(responseData.errors)) {
+          errorDetails = responseData.errors.join(", ");
+        } else if (typeof responseData.errors === 'object') {
+          errorDetails = Object.entries(responseData.errors)
+            .map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return `${key}: ${value.join(', ')}`;
+              }
+              return `${key}: ${value}`;
+            })
+            .join('; ');
+        } else {
+          errorDetails = String(responseData.errors);
+        }
+        if (errorDetails) {
+          errorMessage = `${errorMessage}: ${errorDetails}`;
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return responseData;
+  } catch (error: any) {
     console.error("Shiprocket pickup request error:", error);
-    return null;
+    // Re-throw the error to allow caller to handle it
+    throw error;
   }
 }
 

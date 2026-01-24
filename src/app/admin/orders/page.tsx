@@ -67,11 +67,12 @@ function OrdersContent() {
     try {
       setLoading(true);
       const data = await getAllOrders({ status: statusFilter });
-      // Sort by created_at descending to show newest first
+      // Orders are already sorted by created_at descending in the database query
+      // Additional client-side sort ensures proper ordering even if database sort fails
       const sortedData = [...data].sort((a, b) => {
-        const dateA = new Date(a.created_at || 0).getTime();
-        const dateB = new Date(b.created_at || 0).getTime();
-        return dateB - dateA;
+        const dateA = new Date(a.created_at || a.updated_at || 0).getTime();
+        const dateB = new Date(b.created_at || b.updated_at || 0).getTime();
+        return dateB - dateA; // Newest first
       });
       setOrders(sortedData);
     } catch (error) {
@@ -231,6 +232,22 @@ function OrdersContent() {
           </SelectContent>
         </Select>
       ),
+    },
+    {
+      key: "payment_status",
+      header: "Payment",
+      render: (row: OrderWithItems) => {
+        const paymentStatus = row.payment_status || "pending";
+        const isPaid = paymentStatus === "paid";
+        return (
+          <Badge 
+            variant={isPaid ? "default" : "destructive"} 
+            className="capitalize"
+          >
+            {isPaid ? "Paid" : paymentStatus === "failed" ? "Failed" : "Abandoned"}
+          </Badge>
+        );
+      },
     },
     {
       key: "date",

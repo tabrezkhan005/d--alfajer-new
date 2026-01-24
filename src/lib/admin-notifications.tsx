@@ -138,15 +138,23 @@ export function AdminNotificationProvider({ children }: { children: ReactNode })
                   created_at: newOrder.created_at || new Date().toISOString(),
                 };
 
-                // Add to notifications
+                // Add to notifications (check for duplicates first)
                 setNotifications((prev) => {
+                  // Check if notification already exists for this order
+                  const exists = prev.some(n => n.id === notification.id);
+                  if (exists) {
+                    console.log("Notification already exists for order:", notification.id);
+                    return prev; // Don't add duplicate
+                  }
+                  
                   const updated = [notification, ...prev].slice(0, 50); // Keep last 50
                   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                  
+                  // Increment unread count only if it's a new notification
+                  setUnreadCount((count) => count + 1);
+                  
                   return updated;
                 });
-
-                // Increment unread count (new notifications are always unread)
-                setUnreadCount((prev) => prev + 1);
 
                 // Show toast notification
                 toast.success("New Order Received!", {
@@ -251,14 +259,17 @@ export function AdminNotificationProvider({ children }: { children: ReactNode })
             // Check if notification already exists
             setNotifications((prev) => {
               if (prev.some((n) => n.id === notification.id)) {
+                console.log("Notification already exists for order (polling):", notification.id);
                 return prev; // Already exists
               }
               const updated = [notification, ...prev].slice(0, 50);
               localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+              
+              // Increment unread count only if it's a new notification
+              setUnreadCount((count) => count + 1);
+              
               return updated;
             });
-
-            setUnreadCount((prev) => prev + 1);
 
             toast.success("New Order Received!", {
               description: `Order #${notification.order_number || notification.id.slice(0, 8)} from ${customerName} - ${formatCurrency(notification.total_amount || 0)}`,

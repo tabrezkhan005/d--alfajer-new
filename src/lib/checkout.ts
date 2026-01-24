@@ -5,6 +5,7 @@ export interface ShippingAddress {
   lastName: string;
   email: string;
   phone: string;
+  countryCode?: string; // Country dial code for phone
   streetAddress: string;
   apartment?: string;
   city: string;
@@ -206,3 +207,31 @@ export function calculateShippingByRegion(country: string, weight: number): numb
   const weightCharge = Math.ceil((weight / 500) * 5);
   return base + weightCharge;
 }
+
+// Country to currency mapping
+export function getCurrencyByCountry(country: string): string {
+  const currencyMap: Record<string, string> = {
+    'IN': 'INR',
+    'US': 'USD',
+    'GB': 'GBP',
+    'AE': 'AED',
+    'EU': 'EUR',
+  };
+  return currencyMap[country] || 'INR'; // Default to INR
+}
+
+// Country codes with names and dial codes
+export interface CountryCode {
+  code: string;
+  name: string;
+  dialCode: string;
+  currency: string;
+}
+
+export const countryCodes: CountryCode[] = [
+  { code: 'IN', name: 'India', dialCode: '+91', currency: 'INR' },
+  { code: 'US', name: 'United States', dialCode: '+1', currency: 'USD' },
+  { code: 'GB', name: 'United Kingdom', dialCode: '+44', currency: 'GBP' },
+  { code: 'AE', name: 'UAE', dialCode: '+971', currency: 'AED' },
+  { code: 'EU', name: 'Europe', dialCode: '+33', currency: 'EUR' },
+];

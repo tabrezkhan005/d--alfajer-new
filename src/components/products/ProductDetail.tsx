@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Star, Heart, Share2, Check, AlertCircle, Plus, Minus, Truck, Lock, RotateCcw } from "lucide-react";
+import { Star, Heart, Share2, Check, AlertCircle, Plus, Minus, Truck, Lock, RotateCcw, Sprout } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
@@ -409,8 +409,8 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 <div className="flex justify-center mb-2">
                   <Truck size={24} className="text-[#009744]" />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">{t('product.freeShipping')}</p>
-                <p className="text-xs text-gray-600 mt-1">{t('product.onOrders')}</p>
+                <p className="text-sm font-semibold text-gray-900">Free Shipping</p>
+                <p className="text-xs text-gray-600 mt-1">Above min. shipping value</p>
               </div>
               <div className="text-center">
                 <div className="flex justify-center mb-2">
@@ -421,10 +421,10 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
               </div>
               <div className="text-center">
                 <div className="flex justify-center mb-2">
-                  <RotateCcw size={24} className="text-[#009744]" />
+                  <Sprout size={24} className="text-[#009744]" />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">{t('product.easyReturns')}</p>
-                <p className="text-xs text-gray-600 mt-1">{t('product.returnPolicy')}</p>
+                <p className="text-sm font-semibold text-gray-900">Farmer Direct</p>
+                <p className="text-xs text-gray-600 mt-1">Freshly Sourced from Farmers</p>
               </div>
             </div>
           </div>

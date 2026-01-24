@@ -116,26 +116,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    title: "Shipping & Tax",
-    href: "/admin/shipping",
-    icon: MapPin,
-    children: [
-      { title: "Shipping Zones", href: "/admin/shipping/zones", icon: MapPin },
-      { title: "Delivery Charges", href: "/admin/shipping/charges", icon: DollarSign },
-      { title: "Tax Settings", href: "/admin/shipping/tax", icon: Receipt },
-    ],
-  },
-  {
-    title: "Payments",
-    href: "/admin/payments",
-    icon: CreditCard,
-    children: [
-      { title: "Payment Methods", href: "/admin/payments/methods", icon: CreditCard },
-      { title: "Transactions", href: "/admin/payments/transactions", icon: Receipt },
-      { title: "Refund Logs", href: "/admin/payments/refunds", icon: RotateCcw },
-    ],
-  },
-  {
     title: "Analytics",
     href: "/admin/analytics",
     icon: BarChart3,
@@ -150,9 +130,7 @@ const navItems: NavItem[] = [
     href: "/admin/content",
     icon: FileText,
     children: [
-      { title: "Pages", href: "/admin/content/pages", icon: FileEdit },
       { title: "Blogs", href: "/admin/content/blogs", icon: FileText },
-      { title: "SEO Settings", href: "/admin/content/seo", icon: Search },
     ],
   },
   {
@@ -163,6 +141,7 @@ const navItems: NavItem[] = [
       { title: "Cookie Categories", href: "/admin/cookies/categories", icon: Cookie },
       { title: "Consent Banner", href: "/admin/cookies/banner", icon: Shield },
       { title: "Tracking Scripts", href: "/admin/cookies/tracking", icon: FileText },
+      { title: "Privacy Policy", href: "/admin/cookies/privacy", icon: FileText },
     ],
   },
   {
@@ -173,8 +152,6 @@ const navItems: NavItem[] = [
       { title: "Store Settings", href: "/admin/settings/store", icon: Settings },
       { title: "Shiprocket", href: "/admin/settings/shiprocket", icon: Truck },
       { title: "Notifications", href: "/admin/settings/notifications", icon: Mail },
-      { title: "Roles & Permissions", href: "/admin/settings/roles", icon: Shield },
-      { title: "Security", href: "/admin/settings/security", icon: Shield },
     ],
   },
 ];

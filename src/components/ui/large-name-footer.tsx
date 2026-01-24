@@ -63,6 +63,22 @@ function Footer() {
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
+                  href="/about"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blogs"
+                  className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
+                >
+                  Blogs
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/products"
                   className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >

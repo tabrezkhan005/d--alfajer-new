@@ -199,11 +199,16 @@ export default function PickupPage() {
                   className="w-full px-3 py-2 border rounded-md"
                 >
                   <option value="">Use Default Location</option>
-                  {pickupLocations.map((location: any) => (
-                    <option key={location.pickup_location_id} value={location.pickup_location_id}>
-                      {location.pickup_location_name || `Location ${location.pickup_location_id}`}
-                    </option>
-                  ))}
+                  {pickupLocations.map((location: any) => {
+                    // Try different field names for location ID
+                    const locId = location.pickup_location_id || location.id || location.location_id;
+                    const locName = location.pickup_location_name || location.name || location.location_name || `Location ${locId}`;
+                    return (
+                      <option key={locId} value={locId}>
+                        {locName}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}

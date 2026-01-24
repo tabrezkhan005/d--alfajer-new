@@ -756,3 +756,313 @@ export async function deleteEmailCampaign(id: string) {
     return false;
   }
 }
+
+// --- Analytics: Product Performance ---
+export async function getProductPerformanceData() {
+  const supabase = createClient();
+
+  // 1. Fetch all order items
+  const { data: items, error: itemsError } = await supabase
+    .from('order_items')
+    .select('product_id, quantity, price, total');
+
+  if (itemsError) {
+    console.error("Error fetching order items:", JSON.stringify(itemsError, null, 2));
+    // If order_items table missing, return empty
+    return [];
+  }
+
+  if (!items || items.length === 0) return [];
+
+  // 2. Fetch all products (to get names/prices)
+  // Optimization: Could fetch only IDs in items, but fetching all active is fine for now
+  const { data: products, error: productsError } = await supabase
+    .from('products')
+    .select('id, name, slug, base_price');
+
+  if (productsError) {
+    console.error("Error fetching products:", JSON.stringify(productsError, null, 2));
+    return [];
+  }
+
+  // Map products
+  const productMap = new Map((products as any[])?.map(p => [p.id, p]));
+
+  // 3. Aggregate
+  const productStats: Record<string, { id: string; name: string; slug: string; totalSold: number; totalRevenue: number; currentPrice: number }> = {};
+
+  items.forEach((item: any) => {
+    const pid = item.product_id;
+    const product = productMap.get(pid);
+
+    // If product deleted, use placeholder or skip? Use placeholder to show legacy revenue.
+    const name = product ? product.name : 'Unknown Product';
+    const slug = product ? product.slug : '#';
+    const currentPrice = product ? product.base_price : 0;
+
+    if (!productStats[pid]) {
+        productStats[pid] = {
+            id: pid,
+            name,
+            slug,
+            totalSold: 0,
+            totalRevenue: 0,
+            currentPrice
+        };
+    }
+
+    // Use total from item if available, else calc
+    const revenue = item.total || (item.quantity * (item.price || 0));
+    productStats[pid].totalSold += item.quantity || 0;
+    productStats[pid].totalRevenue += revenue || 0;
+  });
+
+  return Object.values(productStats).sort((a, b) => b.totalRevenue - a.totalRevenue);
+}
+
+// --- Analytics: Customer Insights ---
+export async function getCustomerInsightsData() {
+  const supabase = createClient();
+
+  // 1. Fetch customers
+  const { data: customers, error: customerError } = await supabase
+    .from('customers')
+    .select('id, first_name, last_name, email, city');
+
+  if (customerError) {
+    console.error("Error fetching customers:", JSON.stringify(customerError, null, 2));
+    return [];
+  }
+
+  // 2. Fetch all orders
+  const { data: orders, error: orderError } = await supabase
+    .from('orders')
+    .select('user_id, total, created_at, status')
+    .neq('status', 'cancelled'); // Exclude cancelled
+
+  if (orderError) {
+    console.error("Error fetching orders:", JSON.stringify(orderError, null, 2));
+    return [];
+  }
+
+  // 3. Aggregate Orders by User
+  const userOrders: Record<string, { totalSpent: number; count: number; lastOrder: string }> = {};
+
+  (orders as any[])?.forEach(o => {
+      if (!o.user_id) return;
+      if (!userOrders[o.user_id]) {
+          userOrders[o.user_id] = { totalSpent: 0, count: 0, lastOrder: o.created_at };
+      }
+      userOrders[o.user_id].totalSpent += o.total || 0;
+      userOrders[o.user_id].count += 1;
+      // Update last order if newer
+      if (new Date(o.created_at) > new Date(userOrders[o.user_id].lastOrder)) {
+          userOrders[o.user_id].lastOrder = o.created_at;
+      }
+  });
+
+  // 4. Merge
+  const insights = (customers as any[])?.map(c => {
+      const stats = userOrders[c.id] || { totalSpent: 0, count: 0, lastOrder: null };
+      return {
+          id: c.id,
+          name: `${c.first_name || ''} ${c.last_name || ''}`.trim() || 'No Name',
+          email: c.email,
+          location: c.city || 'Unknown',
+          totalSpent: stats.totalSpent,
+          totalOrders: stats.count,
+          lastOrderDate: stats.lastOrder
+      };
+  });
+
+  return insights.sort((a, b) => b.totalSpent - a.totalSpent);
+}
+
+// --- Analytics: Sales Reports ---
+export async function getDetailedSalesData() {
+  const supabase = createClient();
+
+  // 1. Fetch all orders
+  const { data: orders, error: orderError } = await supabase
+    .from('orders')
+    .select('id, total_amount, created_at, user_id')
+    .neq('status', 'cancelled')
+    .order('created_at', { ascending: true });
+
+  if (orderError) {
+    console.error("Error fetching sales data:", JSON.stringify(orderError, null, 2));
+    return null;
+  }
+
+  // 2. Fetch Active Customers count
+  const { count: activeCustomers } = await supabase
+    .from('customers')
+    .select('id', { count: 'exact', head: true });
+
+  if (!orders || orders.length === 0) {
+    return {
+      kpi: {
+        totalRevenue: 0,
+        totalOrders: 0,
+        avgOrderValue: 0,
+        activeCustomers: activeCustomers || 0
+      },
+      chartData: []
+    };
+  }
+
+  // 3. Aggregate Monthly Sales
+  const monthlySales: Record<string, number> = {};
+  const monthOrder = new Map<string, Date>(); // To sort correctly later
+
+  orders.forEach((o: any) => {
+    const date = new Date(o.created_at);
+    const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); // "Jan 2024"
+    if (!monthlySales[monthKey]) {
+      monthlySales[monthKey] = 0;
+      monthOrder.set(monthKey, date);
+    }
+    // Use total_amount
+    monthlySales[monthKey] += o.total_amount || 0;
+  });
+
+  // Calculate KPIs
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+  const totalOrders = orders.length;
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+  // Format Chart Data
+  const chartData = Object.entries(monthlySales)
+    .sort(([keyA], [keyB]) => {
+        const dateA = monthOrder.get(keyA)?.getTime() || 0;
+        const dateB = monthOrder.get(keyB)?.getTime() || 0;
+        return dateA - dateB;
+    })
+    .map(([month, sales]) => ({
+      month,
+      sales
+    }));
+
+
+  return {
+    kpi: {
+      totalRevenue,
+      totalOrders,
+      avgOrderValue,
+      activeCustomers: activeCustomers || 0
+    },
+    chartData
+  };
+}
+
+// --- Content: Blogs ---
+export async function getBlogs(): Promise<any[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('blogs' as any)
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching blogs:", JSON.stringify(error, null, 2));
+    return [];
+  }
+  return data || [];
+}
+
+export async function getBlog(id: string): Promise<any> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('blogs' as any)
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching blog:", JSON.stringify(error, null, 2));
+    return null;
+  }
+  return data;
+}
+
+export async function createBlog(blog: any) {
+  const supabase = createClient();
+
+  // Auto-generate slug if missing
+  const slug = blog.slug || blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const { data, error } = await supabase
+    .from('blogs' as any)
+    .insert({
+      title: blog.title,
+      slug: slug,
+      excerpt: blog.excerpt,
+      content: blog.content,
+      image_url: blog.image_url,
+      is_published: blog.is_published ?? false,
+      published_at: blog.is_published ? new Date().toISOString() : null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating blog:", JSON.stringify(error, null, 2));
+    throw error;
+  }
+  return data;
+}
+
+export async function updateBlog(id: string, updates: any) {
+  const supabase = createClient();
+
+  const payload: any = {
+    ...updates,
+    updated_at: new Date().toISOString()
+  };
+
+  if (updates.title && !updates.slug) {
+     // Optional: update slug if title changes? Usually bad for SEO. Keep existing slug unless explicitly changed.
+  }
+
+  const { error } = await supabase
+    .from('blogs' as any)
+    .update(payload)
+    .eq('id', id);
+
+  if (error) {
+    console.error("Error updating blog:", JSON.stringify(error, null, 2));
+    throw error;
+  }
+  return true;
+}
+
+export async function deleteBlog(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('blogs' as any)
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error("Error deleting blog:", JSON.stringify(error, null, 2));
+    throw error;
+  }
+  return true;
+}
+
+export async function getBlogBySlug(slug: string): Promise<any> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('blogs' as any)
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error("Error fetching blog by slug:", JSON.stringify(error, null, 2));
+    return null;
+  }
+  return data;
+}

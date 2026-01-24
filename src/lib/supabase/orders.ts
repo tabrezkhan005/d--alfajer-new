@@ -44,7 +44,7 @@ export interface OrderItem {
     created_at: string | null;
 }
 
-// Get orders for a user
+// Get orders for a user (only paid orders)
 export async function getUserOrders(userId: string): Promise<OrderWithItems[]> {
     const supabase = createClient();
 
@@ -55,6 +55,7 @@ export async function getUserOrders(userId: string): Promise<OrderWithItems[]> {
       items:order_items(*)
     `)
         .eq("user_id", userId)
+        .eq("payment_status", "paid") // Only show orders with completed payment
         .order("created_at", { ascending: false });
 
     if (error) {
@@ -140,16 +141,27 @@ export async function getAllOrders(options?: {
 export async function updateOrderTrackingNumber(orderId: string, trackingNumber: string): Promise<boolean> {
     const supabase = createClient();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from("orders")
-        .update({ tracking_number: trackingNumber } as any)
-        .eq("id", orderId);
+        .update({
+            tracking_number: trackingNumber,
+            updated_at: new Date().toISOString(),
+        } as any)
+        .eq("id", orderId)
+        .select();
 
     if (error) {
-        console.error("Error updating tracking number:", error);
+        console.error("Error updating tracking number:", JSON.stringify(error, null, 2));
         return false;
     }
 
+    // Check if any rows were actually updated
+    if (!data || data.length === 0) {
+        console.error("No rows updated for order:", orderId, "- check if order exists and RLS policies allow update");
+        return false;
+    }
+
+    console.log("Tracking number updated successfully for order:", orderId);
     return true;
 }
 
