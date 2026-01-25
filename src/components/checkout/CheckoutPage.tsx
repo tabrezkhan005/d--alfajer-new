@@ -271,7 +271,7 @@ function CheckoutPageContent() {
       }
     };
 
-    const timeoutId = setTimeout(fetchFromPincode, 500);
+    const timeoutId = setTimeout(fetchData, 800);
     return () => clearTimeout(timeoutId);
   }, [shippingAddress.postalCode, shippingAddress.country]);
 
