@@ -242,19 +242,26 @@ export function getStateFromPincode(pincode: string): string | null {
 
 // Function to fetch pincode details from API
 export async function fetchPincodeDetails(pincode: string): Promise<PincodeData | null> {
-  if (!pincode || pincode.length !== 6) return null;
+  if (!pincode || pincode.length < 3) return null;
 
   try {
-    // Use India Post API
-    const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+    // Use Zippopotam.us API
+    // Defaulting to India (IN) for now as this function signature only accepts pincode
+    // In a full implementation, we should pass country code too
+    const response = await fetch(`https://api.zippopotam.us/IN/${pincode}`);
+
+    if (!response.ok) {
+       return null;
+    }
+
     const data = await response.json();
 
-    if (data && data[0]?.Status === "Success" && data[0]?.PostOffice?.length > 0) {
-      const postOffice = data[0].PostOffice[0];
+    if (data && data.places && data.places.length > 0) {
+      const place = data.places[0];
       return {
-        city: postOffice.Name || postOffice.District,
-        state: postOffice.State,
-        district: postOffice.District,
+        city: place["place name"],
+        state: place["state"],
+        district: place["place name"], // Zippopotam doesn't always have district, using place name or state
       };
     }
 

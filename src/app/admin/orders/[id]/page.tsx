@@ -2,7 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Package, Truck, CheckCircle2, Clock, Loader2, Printer, RefreshCw, ExternalLink } from "lucide-react";
+import { ArrowLeft, Package, Truck, CheckCircle2, Clock, Loader2, Printer, RefreshCw, ExternalLink, Star } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
@@ -18,6 +18,18 @@ import {
 } from "@/src/components/ui/select";
 import { toast } from "sonner";
 import { getShiprocketTrackingURL } from "@/src/lib/shiprocket-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/src/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/src/components/ui/radio-group";
+import { Label } from "@/src/components/ui/label";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
 
 const formatLongDate = (dateString: string | null) => {
   if (!dateString) return "N/A";
@@ -71,6 +83,12 @@ export default function OrderDetailPage({
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [creatingShipment, setCreatingShipment] = useState(false);
   const [shiprocketConfig, setShiprocketConfig] = useState<any>(null);
+
+  // New state for shipment modal
+  const [showShipmentModal, setShowShipmentModal] = useState(false);
+  const [couriers, setCouriers] = useState<any[]>([]);
+  const [loadingRates, setLoadingRates] = useState(false);
+  const [selectedCourier, setSelectedCourier] = useState<any>(null);
 
   useEffect(() => {
     async function fetchOrder() {
@@ -186,8 +204,6 @@ export default function OrderDetailPage({
                 tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
                 pickupLocation: "Primary",
               };
-              // Note: We don't save Env derived config to Metadata automatically to avoid clutter
-              // But we save to LocalStorage for session speed
               localStorage.setItem("shiprocket_config", JSON.stringify(config));
               setShiprocketConfig(config);
             }
@@ -220,17 +236,7 @@ export default function OrderDetailPage({
             orderId: order.id,
             status: newStatus,
           }),
-        }).then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              toast.success(`Email notification sent to customer`);
-            } else {
-              if (data.error && !data.error.includes("configured")) {
-                 console.error("Email notification failed:", data.error);
-              }
-            }
-          })
-          .catch(err => console.error("Error sending email notification:", err));
+        });
       } catch (e) {
         console.error("Failed to trigger email notification", e);
       }
@@ -245,9 +251,98 @@ export default function OrderDetailPage({
     window.print();
   };
 
-  const handleCreateShipment = async () => {
+  // Fetch available couriers
+  const fetchCouriers = async () => {
+    if (!order || !shiprocketConfig?.token) return;
+
+    setLoadingRates(true);
+    setCouriers([]);
+    setSelectedCourier(null);
+
+    try {
+      const shippingAddress = order.shipping_address as any;
+      if (!shippingAddress?.postalCode && !shippingAddress?.zip) {
+        toast.error("Delivery pincode is missing");
+        return;
+      }
+
+      // 1. Get Pickup Location Details (to find pickup pincode)
+      const pickupRes = await fetch(`/api/shiprocket/pickup-locations?token=${shiprocketConfig.token}`);
+      const pickupData = await pickupRes.json();
+
+      console.log("Pickup Locations Response:", pickupData);
+
+      let pickupPincode = "";
+      // Shiprocket response structure: { data: { shipping_address: [...] } } or { data: [...] } depending on version/endpoint wrapper
+      const locations = pickupData.data?.shipping_address || pickupData.data || [];
+
+      if (Array.isArray(locations)) {
+        const locationName = shiprocketConfig.pickupLocation || "Primary";
+        // Try exact match first, then case-insensitive
+        const location = locations.find((l: any) => l.pickup_location === locationName) ||
+                         locations.find((l: any) => l.pickup_location.toLowerCase() === locationName.toLowerCase()) ||
+                         locations[0];
+
+        if (location) {
+          pickupPincode = location.pin_code || location.pincode;
+        }
+      }
+
+      if (!pickupPincode) {
+        console.error("Failed to find pickup pincode. Locations:", locations);
+        toast.error(`Could not determine pickup location pincode. Please check your Shiprocket Pickup Location settings.`);
+        return;
+      }
+
+      // 2. Calculate Weight
+      const orderItems = order.items || [];
+      const totalWeight = orderItems.reduce((sum: number, item: any) => {
+        return sum + (item.weight || 0.5) * (item.quantity || 1);
+      }, 0) || 0.5;
+
+      // 3. Check Serviceability
+      const serviceabilityRes = await fetch("/api/shiprocket/serviceability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: shiprocketConfig.token,
+          pickup_pincode: pickupPincode,
+          delivery_pincode: shippingAddress.postalCode || shippingAddress.zip,
+          weight: totalWeight,
+          cod: order.payment_method === "cod" ? 1 : 0,
+        }),
+      });
+
+      const serviceData = await serviceabilityRes.json();
+
+      if (serviceData.data?.available_courier_companies) {
+        // Sort by rate (cheapest first)
+        const sorted = serviceData.data.available_courier_companies.sort((a: any, b: any) => a.rate - b.rate);
+        setCouriers(sorted);
+        if (sorted.length > 0) {
+          setSelectedCourier(sorted[0]);
+        }
+      } else {
+        toast.error("No courier service available for this route");
+      }
+    } catch (error) {
+      console.error("Error fetching rates:", error);
+      toast.error("Failed to fetch courier rates");
+    } finally {
+      setLoadingRates(false);
+    }
+  };
+
+  const handleCreateShipment = async (courierId?: number) => {
     if (!order || !shiprocketConfig?.token) {
       toast.error("Please configure Shiprocket settings first");
+      return;
+    }
+
+    // Open Modal flow if no courier selected yet
+    if (!courierId && !showShipmentModal) {
+      setShowShipmentModal(true);
+      fetchCouriers();
       return;
     }
 
@@ -266,11 +361,11 @@ export default function OrderDetailPage({
         email?: string;
         phone?: string;
         address?: string;
-        streetAddress?: string; // Checkout form uses streetAddress
+        streetAddress?: string;
         city?: string;
         state?: string;
         zip?: string;
-        postalCode?: string; // Checkout form uses postalCode
+        postalCode?: string;
         country?: string;
       } | null;
 
@@ -280,7 +375,7 @@ export default function OrderDetailPage({
         return;
       }
 
-      // Handle both naming conventions (address/streetAddress, zip/postalCode)
+      // Handle both naming conventions
       const addressLine = shippingAddress.address || shippingAddress.streetAddress || "";
       const postalCode = shippingAddress.zip || shippingAddress.postalCode || "";
 
@@ -304,25 +399,21 @@ export default function OrderDetailPage({
         };
       });
 
-      // Calculate total weight (default 0.5kg per item if not specified)
+      // Calculate total weight
       const totalWeight = orderItems.reduce((sum: number, item: any) => {
         return sum + (item.weight || 0.5) * (item.quantity || 1);
       }, 0) || 0.5;
 
-      // Calculate estimated package dimensions based on number of items
-      // Default dimensions for typical dry fruit/spice packages (in cm)
+      // Calculate estimated package dimensions
       const itemCount = orderItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
-      const baseLength = 20; // Base length in cm
-      const baseBreadth = 15; // Base breadth in cm
-      const baseHeight = 10; // Base height in cm
-
-      // Adjust dimensions based on item count (add 5cm per additional 3 items)
+      const baseLength = 20;
+      const baseBreadth = 15;
+      const baseHeight = 10;
       const additionalSpace = Math.floor(itemCount / 3) * 5;
-      const packageLength = Math.min(baseLength + additionalSpace, 60); // Max 60cm
-      const packageBreadth = Math.min(baseBreadth + Math.floor(additionalSpace / 2), 40); // Max 40cm
-      const packageHeight = Math.min(baseHeight + Math.floor(additionalSpace / 2), 30); // Max 30cm
+      const packageLength = Math.min(baseLength + additionalSpace, 60);
+      const packageBreadth = Math.min(baseBreadth + Math.floor(additionalSpace / 2), 40);
+      const packageHeight = Math.min(baseHeight + Math.floor(additionalSpace / 2), 30);
 
-      // Prepare shipment data with all required fields for Shiprocket
       const shipmentData = {
         order_id: order.order_number || order.id,
         order_date: new Date(order.created_at || Date.now()).toISOString().split('T')[0],
@@ -341,7 +432,6 @@ export default function OrderDetailPage({
         payment_method: order.payment_method === "cod" ? "COD" : "Prepaid",
         sub_total: Number(order.subtotal) || 0,
         weight: totalWeight,
-        // Required dimension fields for Shiprocket API
         length: packageLength,
         breadth: packageBreadth,
         height: packageHeight,
@@ -355,6 +445,7 @@ export default function OrderDetailPage({
         body: JSON.stringify({
           token: shiprocketConfig.token,
           shipmentData,
+          courier_id: courierId,
         }),
       });
 
@@ -363,121 +454,44 @@ export default function OrderDetailPage({
       console.log("Shiprocket full response:", JSON.stringify(result, null, 2));
 
       if (!response.ok) {
-        const errorMessage = result.error || result.message || `Failed to create shipment (Status: ${response.status})`;
-        console.error("Shiprocket API error:", result);
-        throw new Error(errorMessage);
+        throw new Error(result.error || result.message || `Failed (Status: ${response.status})`);
       }
 
-      // Shiprocket API can return different response formats
-      // Check for various success indicators
+      // Check for success
       const srOrderId = result.order_id || result.payload?.order_id;
       const shipmentId = result.shipment_id || result.payload?.shipment_id;
       const awbCode = result.awb_code || result.payload?.awb_code;
-      const statusCode = result.status_code || result.status;
 
-      // Check if order was created successfully (even without AWB)
       if (srOrderId || shipmentId) {
-        // If we have AWB code, update tracking
         if (awbCode) {
-          // Try to update database, but don't fail if it doesn't work
-          const trackingUpdated = await updateOrderTrackingNumber(order.id, awbCode);
-          const statusUpdated = await updateOrderStatus(order.id, "shipped");
+          await updateOrderTrackingNumber(order.id, awbCode);
+          await updateOrderStatus(order.id, "shipped");
+          toast.success(`Shipment created with Courier! AWB: ${awbCode}`);
+          setOrder({ ...order, tracking_number: awbCode, status: "shipped" });
+          setShowShipmentModal(false);
 
-          if (!trackingUpdated || !statusUpdated) {
-            console.warn("Database update may have failed, but Shiprocket order was created successfully");
-          }
-
-          toast.success(`Shipment created! AWB: ${awbCode}`);
-
-          // Trigger Shipped Email
-          try {
-             fetch('/api/email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                orderId: order.id,
-                status: 'shipped',
-              }),
-            });
-          } catch (e) {
-             console.error("Failed to trigger shipped email", e);
-          }
-
-          setOrder({
-            ...order,
-            tracking_number: awbCode,
-            status: "shipped",
+          // Send Email
+          fetch('/api/email', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ orderId: order.id, status: 'shipped' }),
           });
+
         } else {
-          // Order created but no AWB yet - this happens when courier isn't auto-assigned
-          // Store the shipment ID for later reference
           const trackingRef = `SR-${shipmentId || srOrderId}`;
-
-          // Try to update database, but don't fail if it doesn't work
-          const trackingUpdated = await updateOrderTrackingNumber(order.id, trackingRef);
-          const statusUpdated = await updateOrderStatus(order.id, "processing");
-
-          if (!trackingUpdated || !statusUpdated) {
-            console.warn("Database update may have failed, but Shiprocket order was created successfully");
-          }
-
-          toast.success(`Order registered with Shiprocket! ID: ${srOrderId || shipmentId}. Courier assignment pending.`);
-
-          // Trigger Processing Email
-          try {
-             fetch('/api/email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                orderId: order.id,
-                status: 'processing',
-              }),
-            });
-          } catch (e) {
-             console.error("Failed to trigger processing email", e);
-          }
-
-          // Update local state regardless of DB update
-          setOrder({
-            ...order,
-            tracking_number: trackingRef,
-            status: "processing",
-          });
+          await updateOrderTrackingNumber(order.id, trackingRef);
+          await updateOrderStatus(order.id, "processing");
+          toast.success(`Order created in Shiprocket (ID: ${srOrderId}). Courier assignment failed/pending.`);
+          setOrder({ ...order, tracking_number: trackingRef, status: "processing" });
+          setShowShipmentModal(false);
         }
-      } else if (statusCode === 1 || statusCode === 200 || result.status === "success") {
-        // Some success responses might not have order_id in expected place
-        toast.success("Shipment request sent to Shiprocket successfully!");
-        await updateOrderStatus(order.id, "processing");
-
-        // Trigger Processing Email
-        try {
-            fetch('/api/email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: order.id,
-              status: 'processing',
-            }),
-          });
-        } catch (e) {
-            console.error("Failed to trigger processing email", e);
-        }
-
-        setOrder({
-          ...order,
-          status: "processing",
-        });
       } else {
-        // Check for error messages in the response
-        const errorMsg = result.message || result.error || result.errors || "Shipment creation failed - unexpected response from Shiprocket";
-        const errorDetails = typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg;
-        console.error("Shiprocket response:", result);
-        throw new Error(errorDetails);
+        toast.warning("Shiprocket request completed but no ID returned. Check dashboard.");
+        setShowShipmentModal(false);
       }
     } catch (error: any) {
       console.error("Create shipment error:", error);
-      const errorMessage = error.message || "Failed to create shipment";
-      toast.error(errorMessage);
+      toast.error(error.message || "Failed to create shipment");
     } finally {
       setCreatingShipment(false);
     }
@@ -505,32 +519,94 @@ export default function OrderDetailPage({
     );
   }
 
-  const shippingAddress = order.shipping_address as {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
-  } | null;
-
+  const shippingAddress = order.shipping_address as any; // simplified type for render
   const orderItems = order.items || [];
-  // Use subtotal from database, or calculate from items if not available
-  const subtotal = order.subtotal || (orderItems.length > 0 ? orderItems.reduce((sum: number, item: any) => {
-    const itemTotal = (Number(item.price) || Number(item.price_at_purchase) || 0) * (item.quantity || 0);
-    return sum + itemTotal;
-  }, 0) : 0);
-  const shipping = order.shipping_cost || 0;
-  const tax = order.tax || 0;
-  const discount = order.discount || 0;
-  // Use total_amount from database, fallback to calculated total
-  const total = order.total_amount || order.total || (subtotal - discount + shipping + tax);
 
   return (
     <div className="space-y-6">
+      <Dialog open={showShipmentModal} onOpenChange={setShowShipmentModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Select Courier Service</DialogTitle>
+            <DialogDescription>
+              Choose the best courier partner for this shipment.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            {loadingRates ? (
+               <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                 <Loader2 className="h-8 w-8 animate-spin text-[#009744]" />
+                 <p className="text-sm text-muted-foreground">Fetching live rates from Shiprocket...</p>
+               </div>
+            ) : couriers.length === 0 ? (
+               <div className="text-center py-8 text-muted-foreground">
+                 No couriers available. Try checking pickup pincode or weight.
+                 <br/>
+                 <Button variant="link" onClick={fetchCouriers} className="mt-2 text-[#009744]">Retry Serviceability Check</Button>
+               </div>
+            ) : (
+               <ScrollArea className="h-[400px] pr-4">
+                 <RadioGroup
+                    value={String(selectedCourier?.courier_company_id || "")}
+                    onValueChange={(val) => {
+                       const courier = couriers.find(c => String(c.courier_company_id) === String(val));
+                       setSelectedCourier(courier);
+                    }}
+                 >
+                   <div className="space-y-3">
+                     {couriers.map((courier) => (
+                       <div key={courier.courier_company_id}
+                            onClick={() => setSelectedCourier(courier)}
+                            className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all hover:bg-gray-50
+                            ${selectedCourier?.courier_company_id === courier.courier_company_id ? 'border-[#009744] bg-green-50/50' : 'border-gray-200'}`}>
+                         <div className="flex items-center gap-3">
+                           <RadioGroupItem value={String(courier.courier_company_id)} id={`c-${courier.courier_company_id}`} className="mt-1" />
+                           <Label htmlFor={`c-${courier.courier_company_id}`} className="cursor-pointer">
+                             <div className="font-semibold text-base">{courier.courier_name}</div>
+                             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                               <span className="flex items-center gap-1">
+                                 {courier.rating} <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                               </span>
+                               <span>•</span>
+                               <span>{courier.estimated_delivery_days} Days ETA</span>
+                             </div>
+                           </Label>
+                         </div>
+                         <div className="text-right">
+                           <div className="font-bold text-lg text-[#009744]">{formatCurrency(courier.rate)}</div>
+                           {courier.cod === 1 && <div className="text-[10px] text-muted-foreground">COD Available</div>}
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 </RadioGroup>
+               </ScrollArea>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+             <Button variant="outline" onClick={() => setShowShipmentModal(false)}>Cancel</Button>
+             <Button
+               onClick={() => handleCreateShipment(selectedCourier?.courier_company_id)}
+               disabled={!selectedCourier || creatingShipment}
+               className="bg-[#009744] hover:bg-[#008339]"
+             >
+               {creatingShipment ? (
+                 <>
+                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                   Creating...
+                 </>
+               ) : (
+                 <>
+                   Ship via {selectedCourier?.courier_name || 'Selected'}
+                 </>
+               )}
+             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
           <Link href="/admin/orders">
@@ -560,7 +636,6 @@ export default function OrderDetailPage({
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
-          {/* Order Items */}
           <Card>
             <CardHeader>
               <CardTitle>Order Items ({orderItems.length})</CardTitle>
@@ -570,7 +645,7 @@ export default function OrderDetailPage({
                 {orderItems.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No items in this order</p>
                 ) : (
-                  orderItems.map((item) => (
+                  orderItems.map((item: any) => (
                     <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                       <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center overflow-hidden">
                         {item.image_url ? (
@@ -596,7 +671,6 @@ export default function OrderDetailPage({
             </CardContent>
           </Card>
 
-          {/* Order Status & Timeline */}
           <Card>
             <CardHeader>
               <CardTitle>Update Order Status</CardTitle>
@@ -636,7 +710,6 @@ export default function OrderDetailPage({
             </CardContent>
           </Card>
 
-          {/* Shipment Status & Tracking */}
           <Card className="border-2 border-dashed border-muted-foreground/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
@@ -648,87 +721,35 @@ export default function OrderDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Order Progress Timeline */}
               <div className="relative">
                 <div className="flex justify-between items-center">
                   {[
-                    { status: "pending", label: "Order Placed", icon: Clock },
-                    { status: "processing", label: "Processing", icon: Package },
+                    { status: "pending", label: "Paid", icon: Clock },
+                    { status: "processing", label: "Processed", icon: Package },
                     { status: "shipped", label: "Shipped", icon: Truck },
                     { status: "delivered", label: "Delivered", icon: CheckCircle2 },
-                  ].map((step, index, arr) => {
+                  ].map((step, index) => {
                     const isActive = order.status === step.status;
-                    const isPast =
-                      (order.status === "processing" && index < 1) ||
-                      (order.status === "shipped" && index < 2) ||
-                      (order.status === "delivered" && index < 3) ||
-                      (order.status === "cancelled" && index === 0);
-                    const isCancelled = order.status === "cancelled";
-                    const Icon = step.icon;
-
                     return (
                       <div key={step.status} className="flex flex-col items-center relative z-10">
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            isCancelled && index === 0
-                              ? "bg-red-100 border-2 border-red-500"
-                              : isActive
-                              ? "bg-[#009744] text-white shadow-lg shadow-[#009744]/30"
-                              : isPast
-                              ? "bg-[#009744]/20 text-[#009744] border-2 border-[#009744]"
+                             isActive
+                              ? "bg-[#009744] text-white shadow-lg"
                               : "bg-gray-100 text-gray-400 border-2 border-gray-200"
                           }`}
                         >
-                          <Icon className="h-5 w-5" />
+                          <step.icon className="h-5 w-5" />
                         </div>
-                        <span
-                          className={`text-xs mt-2 font-medium text-center ${
-                            isActive
-                              ? "text-[#009744]"
-                              : isPast
-                              ? "text-gray-600"
-                              : "text-gray-400"
-                          }`}
-                        >
+                        <span className="text-xs mt-2 font-medium text-center text-gray-600">
                           {step.label}
                         </span>
                       </div>
                     );
                   })}
                 </div>
-                {/* Progress Line */}
-                <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-0" style={{ marginLeft: '40px', marginRight: '40px' }}>
-                  <div
-                    className="h-full bg-[#009744] transition-all duration-500"
-                    style={{
-                      width: order.status === "pending" ? "0%"
-                        : order.status === "processing" ? "33%"
-                        : order.status === "shipped" ? "66%"
-                        : order.status === "delivered" ? "100%"
-                        : "0%"
-                    }}
-                  />
-                </div>
               </div>
 
-              {/* Current Status Badge */}
-              <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-muted/50">
-                <div className={`w-3 h-3 rounded-full animate-pulse ${
-                  order.status === "pending" ? "bg-yellow-500"
-                  : order.status === "processing" ? "bg-blue-500"
-                  : order.status === "shipped" ? "bg-purple-500"
-                  : order.status === "delivered" ? "bg-green-500"
-                  : order.status === "cancelled" ? "bg-red-500"
-                  : "bg-gray-400"
-                }`} />
-                <span className="font-semibold text-lg capitalize">
-                  {order.status === "return_requested" ? "Return Requested"
-                   : order.status === "return_rejected" ? "Return Rejected"
-                   : order.status || "Pending"}
-                </span>
-              </div>
-
-              {/* Tracking Information */}
               {order.tracking_number ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
@@ -758,18 +779,6 @@ export default function OrderDetailPage({
                       </a>
                     </Button>
                   </div>
-
-                  {/* Quick Status Info */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">Carrier</p>
-                      <p className="font-semibold">Shiprocket</p>
-                    </div>
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">Last Updated</p>
-                      <p className="font-semibold text-sm">{formatLongDate(order.updated_at)}</p>
-                    </div>
-                  </div>
                 </div>
               ) : shiprocketConfig?.token ? (
                 <div className="space-y-4">
@@ -780,11 +789,8 @@ export default function OrderDetailPage({
                         No shipment created yet
                       </p>
                     </div>
-                    <p className="text-xs text-amber-700 mb-4">
-                      Create a Shiprocket shipment to enable tracking and automated delivery updates.
-                    </p>
                     <Button
-                      onClick={handleCreateShipment}
+                      onClick={() => handleCreateShipment()}
                       disabled={creatingShipment || order.status === "cancelled"}
                       className="w-full bg-[#009744] hover:bg-[#008339]"
                     >
@@ -803,149 +809,99 @@ export default function OrderDetailPage({
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Shiprocket integration not configured
-                  </p>
-                  <Link
-                    href="/admin/settings/shiprocket"
-                    className="text-sm text-[#009744] hover:underline font-medium"
-                  >
-                    Configure Shiprocket →
-                  </Link>
-                </div>
+                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+                   <p className="text-sm text-gray-500 mb-2">Configure Shiprocket to enable shipping</p>
+                   <Button variant="outline" asChild>
+                     <Link href="/admin/settings/shiprocket">Go to Settings</Link>
+                   </Button>
+                 </div>
               )}
             </CardContent>
           </Card>
-
-          {/* Payment Info */}
-          {order.payment_method && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Method</span>
-                  <span className="font-medium capitalize">{order.payment_method}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge variant={order.payment_status === "paid" ? "default" : "outline"} className="capitalize">
-                    {order.payment_status || "pending"}
-                  </Badge>
-                </div>
-                {order.tracking_number && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Tracking Number</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs">{order.tracking_number}</span>
-                      {shiprocketConfig?.token && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2"
-                          asChild
-                        >
-                          <a
-                            href={getShiprocketTrackingURL(order.tracking_number)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         <div className="space-y-6">
-          {/* Customer Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Customer</CardTitle>
+              <CardTitle>Customer Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="font-medium">
-                {shippingAddress?.firstName} {shippingAddress?.lastName}
-              </p>
-              <p className="text-sm text-muted-foreground">{shippingAddress?.email}</p>
-              {shippingAddress?.phone && (
-                <p className="text-sm text-muted-foreground">{shippingAddress?.phone}</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Payment Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>{formatCurrency(shipping)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
-                <span>{formatCurrency(tax)}</span>
-              </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-sm text-green-600">
-                  <span>Discount</span>
-                  <span>-{formatCurrency(discount)}</span>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-xs text-muted-foreground">Name</Label>
+                <div className="font-medium">
+                  {shippingAddress?.firstName} {shippingAddress?.lastName}
                 </div>
-              )}
-              <Separator />
-              <div className="flex justify-between font-semibold text-lg">
-                <span>Total</span>
-                <span className="text-[#009744]">{formatCurrency(total)}</span>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Email</Label>
+                <div className="font-medium break-all">{shippingAddress?.email || order.email}</div>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Phone</Label>
+                <div className="font-medium">{shippingAddress?.phone}</div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Shipping Address */}
           <Card>
             <CardHeader>
               <CardTitle>Shipping Address</CardTitle>
             </CardHeader>
             <CardContent>
-              {shippingAddress ? (
-                <p className="text-sm">
-                  {shippingAddress.firstName} {shippingAddress.lastName}
-                  <br />
-                  {shippingAddress.address}
-                  <br />
-                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
-                  <br />
-                  {shippingAddress.country}
+              <div className="text-sm leading-relaxed">
+                <p>{shippingAddress?.address || shippingAddress?.streetAddress}</p>
+                <p>{shippingAddress?.apartment}</p>
+                <p>
+                  {shippingAddress?.city}, {shippingAddress?.state} {shippingAddress?.zip || shippingAddress?.postalCode}
                 </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">No shipping address provided</p>
-              )}
+                <p>{shippingAddress?.country}</p>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Notes */}
-          {order.notes && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Notes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{order.notes}</p>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Info</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-xs text-muted-foreground">Payment Method</Label>
+                <div className="font-medium capitalize">{order.payment_method}</div>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Payment Status</Label>
+                <Badge variant={order.payment_status === "paid" ? "default" : "destructive"}>
+                  {order.payment_status}
+                </Badge>
+              </div>
+              <Separator />
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatCurrency(Number(order.subtotal || 0))}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span>{formatCurrency(Number(order.shipping_cost || 0))}</span>
+                </div>
+                 {Number(order.discount) > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span>-{formatCurrency(Number(order.discount))}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span>{formatCurrency(Number(order.tax || 0))}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total</span>
+                  <span>{formatCurrency(Number(order.total_amount || order.total || 0))}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -638,14 +638,13 @@ function CheckoutPageContent() {
                       <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.postal')} (PIN Code)</Label>
                       <div className="relative">
                         <Input
-                          placeholder="Enter PIN code"
+                          placeholder="Enter PIN/Zip code"
                           className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
                           value={shippingAddress.postalCode || ''}
-                          maxLength={6}
                           onChange={(e) =>
                             setShippingAddress({
                               ...shippingAddress,
-                              postalCode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                              postalCode: e.target.value.replace(/[^a-zA-Z0-9\s-]/g, ''),
                             })
                           }
                         />

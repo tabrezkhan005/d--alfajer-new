@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link"; // Added import
 
 /* ---------------------------------------------
    HERO SLIDES CONFIG
@@ -10,23 +11,28 @@ const heroSlides = [
     type: "image",
     src: "/banners/1920x1080/dryfruits.jpg",
     title: "Premium Quality",
+    link: "/products?category=Dry%20Fruits",
   },
   {
     type: "image",
     src: "/banners/1920x1080/kahwa.jpg",
     title: "Royal Blend",
+    link: "/products?category=Tea%20%26%20Beverages",
   },
   {
     type: "image",
     src: "/banners/1920x1080/saffron.jpg",
     title: "Authentic Saffron",
+    link: "/products?category=Saffron",
   },
   {
     type: "image",
     src: "/banners/1920x1080/shilajit.jpg",
     title: "Pure Kraft",
+    link: "/products?category=Shilajit",
   },
 ];
+
 
 export function HeroSection() {
   const [current, setCurrent] = useState(0);
@@ -50,11 +56,13 @@ export function HeroSection() {
             }`}
           >
             {/* Standard HTML img tag for guaranteed rendering */}
-            <img
-              src={slide.src}
-              alt={slide.title || "Banner"}
-              className="w-full h-full object-cover"
-            />
+            <Link href={slide.link || "#"} className="block w-full h-full">
+              <img
+                src={slide.src}
+                alt={slide.title || "Banner"}
+                className="w-full h-full object-cover"
+              />
+            </Link>
           </div>
         ))}
       </div>

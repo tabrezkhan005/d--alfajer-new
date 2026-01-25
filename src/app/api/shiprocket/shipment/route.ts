@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createShiprocketShipment, getShiprocketToken } from "@/src/lib/shiprocket";
+import { createShiprocketShipment, getShiprocketToken, assignCourierAndGenerateAWB } from "@/src/lib/shiprocket";
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, shipmentData } = await request.json();
+    const { token, shipmentData, courier_id } = await request.json();
 
     let authToken = token;
 
@@ -101,6 +101,46 @@ export async function POST(request: NextRequest) {
         { error: errorMessage, shiprocket_response: result },
         { status: 400 }
       );
+    }
+
+    // If courier_id is provided, try to assign courier and generate AWB immediately
+    if (courier_id && result.shipment_id) {
+       console.log(`Auto-assigning courier ${courier_id} for shipment ${result.shipment_id}`);
+       try {
+         const awbResult = await assignCourierAndGenerateAWB(authToken, {
+           shipment_id: result.shipment_id,
+           courier_id: Number(courier_id)
+         });
+
+         if (awbResult && (awbResult.awb_assign_status === 1 || awbResult.response?.data?.awb_assign_status === 1)) {
+            // Merge response
+            return NextResponse.json({
+              ...result,
+              awb_code: awbResult.response?.data?.awb_code || awbResult.awb_code,
+              courier_name: awbResult.response?.data?.courier_name || awbResult.courier_name,
+              courier_company_id: courier_id,
+              awb_status: "assigned",
+              message: "Shipment created and courier assigned successfully"
+            });
+         } else {
+           console.warn("Courier assignment failed:", awbResult);
+           // Return partial success - order created but courier not assigned
+            return NextResponse.json({
+              ...result,
+              awb_status: "failed",
+              awb_error: awbResult?.message || "Failed to assign courier",
+              message: "Order created but courier assignment failed. Please assign manually."
+            });
+         }
+       } catch (awbError: any) {
+         console.error("Error during auto-courier assignment:", awbError);
+         return NextResponse.json({
+            ...result,
+            awb_status: "failed",
+            awb_error: awbError.message,
+            message: "Order created but courier assignment failed. Please assign manually."
+         });
+       }
     }
 
     return NextResponse.json(result);
