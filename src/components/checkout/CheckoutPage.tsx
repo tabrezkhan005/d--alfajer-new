@@ -242,24 +242,32 @@ function CheckoutPageContent() {
 
   // Auto-fetch city and state from pincode
   useEffect(() => {
-    const fetchFromPincode = async () => {
-      if (!shippingAddress.postalCode || shippingAddress.postalCode.length !== 6) return;
-      if (shippingAddress.country !== 'IN') return;
+    const fetchData = async () => {
+      const pincode = shippingAddress.postalCode;
+      // Use selected country or default to 'IN'
+      const countryCode = shippingAddress.country || 'IN';
 
-      setFetchingPincode(true);
-      try {
-        const data = await fetchPincodeDetails(shippingAddress.postalCode);
-        if (data) {
-          setShippingAddress((prev) => ({
-            ...prev,
-            city: data.city || prev.city,
-            state: data.state || prev.state,
-          }));
+      if (pincode && pincode.length >= 3) {
+        setFetchingPincode(true);
+        try {
+          const details = await fetchPincodeDetails(pincode, countryCode);
+          if (details) {
+            setShippingAddress((prev) => ({
+              ...prev,
+              city: details.city,
+              state: details.state,
+              // If API returns country, we could update it,
+              // but usually we queried BY country so it matches.
+              // If we want to support auto-detecting country from ZIP alone,
+              // we'd need to try multiple endpoints which is slow.
+              // For now, trust the API mapping.
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching pincode details:', error);
+        } finally {
+          setFetchingPincode(false);
         }
-      } catch (error) {
-        console.error('Error fetching pincode details:', error);
-      } finally {
-        setFetchingPincode(false);
       }
     };
 
