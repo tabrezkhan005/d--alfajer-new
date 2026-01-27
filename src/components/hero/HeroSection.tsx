@@ -11,25 +11,25 @@ const heroSlides = [
     type: "image",
     src: "/banners/1920x1080/dryfruits.jpg",
     title: "Premium Quality",
-    link: "/products?category=Dry%20Fruits",
+    link: "/products/kashmiri-almonds-1768884269714",
   },
   {
     type: "image",
     src: "/banners/1920x1080/kahwa.jpg",
     title: "Royal Blend",
-    link: "/products?category=Tea%20%26%20Beverages",
+    link: "/products/kashmiri-kahwa-tea-1768841751952",
   },
   {
     type: "image",
     src: "/banners/1920x1080/saffron.jpg",
     title: "Authentic Saffron",
-    link: "/products?category=Saffron",
+    link: "/products/kashmiri-saffron-1768883914688",
   },
   {
     type: "image",
     src: "/banners/1920x1080/shilajit.jpg",
     title: "Pure Kraft",
-    link: "/products?category=Shilajit",
+    link: "/products/pure-himalayan-shilajit-1768884867994",
   },
 ];
 
