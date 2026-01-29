@@ -107,8 +107,8 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
         variantId: selectedVariant.id,
         name: `${product.name} - ${selectedVariant.size}`,
         image: product.image,
-        price: selectedVariant.price,
-        originalPrice: selectedVariant.originalPrice,
+        price: displayPrice,
+        originalPrice: displayOriginalPrice,
         packageSize: selectedVariant.size,
         quantity: quantity
       });

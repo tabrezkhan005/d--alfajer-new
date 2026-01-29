@@ -16,7 +16,6 @@ import { useAuth } from "@/src/lib/auth-context";
 import {
   paymentMethods,
   validatePromoCode,
-  calculateTax,
   getCurrencyByCountry,
   countryCodes,
   type ShippingAddress,
@@ -58,7 +57,7 @@ export function CheckoutPage() {
 function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t, formatCurrency, convertCurrency } = useI18n();
+  const { t, formatCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
   const { user } = useAuth();
 
@@ -155,8 +154,7 @@ function CheckoutPageContent() {
   }
 
   const subtotalAfterDiscount = subtotal - discountAmount;
-  const tax = calculateTax(subtotalAfterDiscount, shippingAddress.country || 'IN');
-  const total = subtotalAfterDiscount + shippingCost + tax;
+  const total = subtotalAfterDiscount + shippingCost;
 
   // Handle promo code
   const handleApplyPromo = async () => {
@@ -997,7 +995,7 @@ function CheckoutPageContent() {
                       <p className="text-gray-700">{t('checkout.qty')}: {item.quantity}</p>
                     </div>
                     <p className="font-semibold text-gray-900">
-                      {formatCurrency(convertCurrency(item.price * item.quantity, 'INR'))}
+                      {formatCurrency(item.price * item.quantity)}
                     </p>
                   </div>
                 ))}
@@ -1007,13 +1005,13 @@ function CheckoutPageContent() {
               <div className="space-y-2 border-t pt-4 text-gray-900">
                 <div className="flex justify-between text-gray-900">
                   <span className="text-gray-900">{t('checkout.subtotal')}</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(convertCurrency(subtotal, 'INR'))}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
 
                 {appliedPromo && (
                   <div className="flex justify-between text-[#009744] font-semibold">
                     <span>{t('checkout.discount')} ({appliedPromo.code})</span>
-                    <span>-{formatCurrency(convertCurrency(discountAmount, 'INR'))}</span>
+                    <span>-{formatCurrency(discountAmount)}</span>
                   </div>
                 )}
 
@@ -1025,19 +1023,14 @@ function CheckoutPageContent() {
                     ) : shippingCost === 0 ? (
                       t('checkout.free') || 'Free'
                     ) : (
-                      formatCurrency(convertCurrency(shippingCost, 'INR'))
+                      formatCurrency(shippingCost)
                     )}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-gray-900">
-                  <span className="text-gray-900">{t('cart.tax')}</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(convertCurrency(tax, 'INR'))}</span>
-                </div>
-
                 <div className="flex justify-between text-lg font-bold border-t pt-2 text-gray-900">
                   <span className="text-gray-900">{t('cart.total')}</span>
-                  <span className="text-[#009744] font-bold">{formatCurrency(convertCurrency(total, 'INR'))}</span>
+                  <span className="text-[#009744] font-bold">{formatCurrency(total)}</span>
                 </div>
               </div>
             </CardContent>
