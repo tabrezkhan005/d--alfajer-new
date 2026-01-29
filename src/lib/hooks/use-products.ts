@@ -10,6 +10,16 @@ type Category = Database["public"]["Tables"]["categories"]["Row"];
 // Transform database product to frontend Product format
 export function transformProduct(dbProduct: ProductWithVariants) {
     const primaryVariant = dbProduct.variants?.[0];
+    
+    // Debug log to see what's coming from database
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`[Product: ${dbProduct.name}]`, {
+            base_price: dbProduct.base_price,
+            variant_price: primaryVariant?.price,
+            all_variants: dbProduct.variants?.map(v => ({ id: v.id, price: v.price, weight: v.weight }))
+        });
+    }
+    
     // Filter out empty strings and null/undefined values from images
     const rawImages = dbProduct.images || [];
     const images = Array.isArray(rawImages)
@@ -17,13 +27,18 @@ export function transformProduct(dbProduct: ProductWithVariants) {
         : [];
     const mainImage = images.length > 0 ? images[0] : "/images/placeholder.jpg";
 
+    // Use variant price if available, otherwise use base_price. Never use 0 as fallback.
+    const productPrice = primaryVariant?.price !== null && primaryVariant?.price !== undefined 
+        ? primaryVariant.price 
+        : (dbProduct.base_price !== null && dbProduct.base_price !== undefined ? dbProduct.base_price : 0);
+
     return {
         id: dbProduct.id,
         name: dbProduct.name,
         slug: dbProduct.slug,
         image: mainImage,
         images: images.length > 0 ? images : ["/images/placeholder.jpg"],
-        price: primaryVariant?.price || dbProduct.base_price || 0,
+        price: productPrice,
         originalPrice: primaryVariant?.compare_at_price || dbProduct.original_price || undefined,
         discount: primaryVariant?.compare_at_price
             ? Math.round(((primaryVariant.compare_at_price - primaryVariant.price) / primaryVariant.compare_at_price) * 100)

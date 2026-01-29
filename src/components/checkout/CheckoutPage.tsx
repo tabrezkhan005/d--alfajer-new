@@ -57,17 +57,50 @@ export function CheckoutPage() {
 function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t, formatCurrency } = useI18n();
+  const { t, formatCurrency, convertCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
   const { user } = useAuth();
-
+  
+  // Track which product+variant we've already added using localStorage to persist across re-renders
+  const processedProductKey = 'buyNowProcessedProduct';
 
   // Handle product from Buy Now button
   useEffect(() => {
     const productId = searchParams.get('product');
     const variantId = searchParams.get('variant');
+    
+    if (!productId) return;
 
-    if (productId && items.length === 0) {
+    // Create a unique key for this product+variant combo
+    const productKey = variantId ? `${productId}-${variantId}` : productId;
+    
+    // Get the stored processed product from sessionStorage (survives page reload but clears on new tab)
+    const storedProcessed = sessionStorage.getItem(processedProductKey);
+    
+    // Debug: Log what's happening
+    console.log('Buy Now Debug:', {
+      productId,
+      variantId,
+      productKey,
+      storedProcessed,
+      currentCartItems: items.length,
+      cartItemIds: items.map(i => i.id)
+    });
+    
+    // Skip if we've already processed this exact product+variant in this session
+    if (storedProcessed === productKey) {
+      console.log('Product already processed in session, skipping');
+      return;
+    }
+
+    // IMPORTANT: Mark as processed IMMEDIATELY before async operation
+    // This prevents React StrictMode from running the effect twice and adding the item twice
+    sessionStorage.setItem(processedProductKey, productKey);
+
+    // Check if this product is already in cart
+    const productInCart = items.some(item => item.productId === productId && item.variantId === variantId);
+    
+    if (!productInCart) {
       const fetchProduct = async () => {
         try {
           // Dynamic import to avoid circular dependencies
@@ -86,25 +119,45 @@ function CheckoutPageContent() {
             }
 
             if (selectedVariant) {
+                 console.log('Adding variant to cart:', { productId, variantId, variantPrice: selectedVariant.price });
                  addItem({
                   id: `${product.id}-${selectedVariant.id}`,
                   productId: product.id,
                   variantId: selectedVariant.id,
-                  name: `${product.name} - ${selectedVariant.size || selectedVariant.weight}`,
+                  name: `${product.name} - ${selectedVariant.weight}`,
                   price: selectedVariant.price,
                   image: product.images?.[0] || '/images/placeholder.png',
-                  packageSize: selectedVariant.size || selectedVariant.weight || 'Standard',
+                  packageSize: selectedVariant.weight || 'Standard',
                 }, false);
             } else {
-                addItem({
-                  id: product.id,
-                  productId: product.id,
-                  name: product.name,
-                  price: product.base_price || 0,
-                  image: product.images?.[0] || '/images/placeholder.png',
-                  packageSize: 'Standard',
-                }, false);
+                // If no specific variant, use first variant or base_price
+                const firstVariant = product.variants?.[0];
+                if (firstVariant) {
+                  console.log('Adding first variant to cart:', { productId, firstVariantId: firstVariant.id, price: firstVariant.price });
+                  addItem({
+                    id: `${product.id}-${firstVariant.id}`,
+                    productId: product.id,
+                    variantId: firstVariant.id,
+                    name: `${product.name} - ${firstVariant.weight}`,
+                    price: firstVariant.price,
+                    image: product.images?.[0] || '/images/placeholder.png',
+                    packageSize: firstVariant.weight || 'Standard',
+                  }, false);
+                } else {
+                  console.log('Adding base product to cart:', { productId, basePrice: product.base_price });
+                  addItem({
+                    id: product.id,
+                    productId: product.id,
+                    name: product.name,
+                    price: product.base_price || 0,
+                    image: product.images?.[0] || '/images/placeholder.png',
+                    packageSize: 'Standard',
+                  }, false);
+                }
             }
+            
+            // Already marked as processed at the start of the effect
+            console.log('Successfully added product to cart');
           }
         } catch (error) {
           console.error("Error fetching product for buy now:", error);
@@ -112,8 +165,11 @@ function CheckoutPageContent() {
       };
 
       fetchProduct();
+    } else {
+      // Product already in cart, no need to add again
+      console.log('Product already in cart');
     }
-  }, [searchParams, items.length, addItem]);
+  }, [searchParams]); // Only depend on searchParams, not items or addItem
 
   // Checkout State
   const [step, setStep] = useState<'shipping' | 'payment' | 'review'>('shipping');

@@ -918,11 +918,11 @@ function ProductCard({ product }: { product: TransformedProduct }) {
         {/* Price - Optimized for mobile */}
         <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 pt-0.5 mt-auto">
           <span className="text-sm xs:text-base sm:text-xl lg:text-2xl font-bold text-gray-900 font-poppins">
-            {formatCurrency(convertCurrency(displayPrice, 'INR'))}
+            {formatCurrency(displayPrice)}
           </span>
           {displayOriginalPrice && displayOriginalPrice > displayPrice && (
             <span className="text-[9px] xs:text-[10px] sm:text-sm text-gray-400 line-through font-body">
-              {formatCurrency(convertCurrency(displayOriginalPrice, 'INR'))}
+              {formatCurrency(displayOriginalPrice)}
             </span>
           )}
         </div>

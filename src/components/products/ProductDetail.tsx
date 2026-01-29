@@ -95,9 +95,9 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
   const rawPrice = selectedVariant?.price || product.price;
   const rawOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
 
-  // Convert prices based on current currency (prices in DB are in INR)
-  const displayPrice = convertCurrency(rawPrice, 'INR');
-  const displayOriginalPrice = rawOriginalPrice ? convertCurrency(rawOriginalPrice, 'INR') : undefined;
+  // Don't convert here - formatCurrency will handle conversion and formatting
+  const displayPrice = rawPrice;
+  const displayOriginalPrice = rawOriginalPrice;
 
   const handleAddToCart = () => {
     if (selectedVariant) {
@@ -107,8 +107,8 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
         variantId: selectedVariant.id,
         name: `${product.name} - ${selectedVariant.size}`,
         image: product.image,
-        price: displayPrice,
-        originalPrice: displayOriginalPrice,
+        price: selectedVariant.price,
+        originalPrice: selectedVariant.originalPrice,
         packageSize: selectedVariant.size,
         quantity: quantity
       });
@@ -300,7 +300,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                     >
                       <div className="font-semibold">{variant.display_name || variant.size || variant.weight}</div>
                       <div className={`text-xs mt-1 ${selectedVariantId === variant.id ? "text-white/80" : "text-gray-500"}`}>
-                        {formatCurrency(convertCurrency(variant.price, 'INR'))}
+                        {formatCurrency(variant.price)}
                       </div>
                     </motion.button>
                   ))}

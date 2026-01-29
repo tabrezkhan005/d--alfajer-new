@@ -131,7 +131,11 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLanguage,
     setCurrency,
     t: (key: string) => t(key, language),
-    formatCurrency: (amount: number) => formatCurrency(amount, currency),
+    formatCurrency: (amount: number) => {
+      // Convert from INR (database currency) to user's currency, then format
+      const convertedAmount = convertCurrency(amount, 'INR', currency);
+      return formatCurrency(convertedAmount, currency);
+    },
     convertCurrency: (amount: number, fromCurrency: Currency = 'INR') =>
       convertCurrency(amount, fromCurrency, currency),
     direction,
@@ -146,7 +150,10 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLanguage: () => {},
       setCurrency: () => {},
       t: (key: string) => key,
-      formatCurrency: (amount: number) => formatCurrency(amount, 'INR'),
+      formatCurrency: (amount: number) => {
+        // Default to INR during hydration - no conversion needed
+        return formatCurrency(amount, 'INR');
+      },
       convertCurrency: (amount: number, fromCurrency: Currency = 'INR') =>
         convertCurrency(amount, fromCurrency, 'INR'),
       direction: 'ltr',

@@ -106,7 +106,7 @@ export function CartSheet() {
               <div className="px-6 py-5 space-y-4 bg-gray-50/50">
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.subtotal')}</span>
-                  <span className="font-medium text-gray-900">{formatCurrency(convertCurrency(totalPrice, 'INR'))}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 font-body">
                   <span>{t('cart.shipping')}</span>
@@ -117,7 +117,7 @@ export function CartSheet() {
 
                 <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200 font-heading">
                   <span>{t('cart.total')}</span>
-                  <span>{formatCurrency(convertCurrency(totalPrice, 'INR'))}</span>
+                  <span>{formatCurrency(totalPrice)}</span>
                 </div>
               </div>
 
@@ -217,11 +217,11 @@ function CartItemCard({
 
           <div className="text-right">
             <p className="font-bold text-gray-900 font-heading">
-              {formatCurrency(convertCurrency(item.price * item.quantity, 'INR'))}
+              {formatCurrency(item.price * item.quantity)}
             </p>
             {item.quantity > 1 && (
               <p className="text-xs text-gray-500 font-body">
-                {formatCurrency(convertCurrency(item.price, 'INR'))} {t('cart.each')}
+                {formatCurrency(item.price)} {t('cart.each')}
               </p>
             )}
           </div>

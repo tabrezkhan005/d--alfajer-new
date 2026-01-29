@@ -334,11 +334,11 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               {/* Price Section */}
               <div className="flex items-baseline gap-3 py-2">
                 <span className="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight">
-                  {formatCurrency(convertCurrency(displayPrice, 'INR'))}
+                  {formatCurrency(displayPrice)}
                 </span>
                 {displayOriginalPrice && displayOriginalPrice > displayPrice && (
                   <span className="text-lg text-gray-400 line-through font-medium">
-                    {formatCurrency(convertCurrency(displayOriginalPrice, 'INR'))}
+                    {formatCurrency(displayOriginalPrice)}
                   </span>
                 )}
                 {displayOriginalPrice && displayOriginalPrice > displayPrice && (
@@ -371,7 +371,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                           (selectedVariantId === variant.id || (!selectedVariantId && variant.id === product.variants?.[0]?.id))
                             ? "text-white/80" : "text-gray-500"
                         )}>
-                          {formatCurrency(convertCurrency(variant.price, 'INR'))}
+                          {formatCurrency(variant.price)}
                         </span>
                       </button>
                     ))}

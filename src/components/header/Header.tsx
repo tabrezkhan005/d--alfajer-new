@@ -314,7 +314,7 @@ export function Header() {
                                 {product.category}
                               </p>
                               <p className="text-sm font-semibold text-[#009744] mt-1">
-                                {formatCurrency(convertCurrency(product.price, 'INR'))}
+                                {formatCurrency(product.price)}
                               </p>
                             </div>
                           </button>
