@@ -9,6 +9,12 @@ import Link from "next/link"; // Added import
 const heroSlides = [
   {
     type: "image",
+    src: "/banners/1920x1080/saffron.jpg",
+    title: "Authentic Saffron",
+    link: "/products/kashmiri-saffron-1768883914688",
+  },
+  {
+    type: "image",
     src: "/banners/1920x1080/dryfruits.jpg",
     title: "Premium Quality",
     link: "/products/kashmiri-almonds-1768884269714",
@@ -18,12 +24,6 @@ const heroSlides = [
     src: "/banners/1920x1080/kahwa.jpg",
     title: "Royal Blend",
     link: "/products/kashmiri-kahwa-tea-1768841751952",
-  },
-  {
-    type: "image",
-    src: "/banners/1920x1080/saffron.jpg",
-    title: "Authentic Saffron",
-    link: "/products/kashmiri-saffron-1768883914688",
   },
   {
     type: "image",
