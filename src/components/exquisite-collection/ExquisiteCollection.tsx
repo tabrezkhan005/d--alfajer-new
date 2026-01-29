@@ -46,31 +46,29 @@ export function ExquisiteCollection({
   const { t } = useI18n();
   const categories: Category[] = [
     {
-      id: "shilajit",
-      name: "Shilajit",
-      image: "/images/hero/shilajit.png",
-    },
-    {
       id: "saffron",
       name: "Saffron",
-      image: "/images/hero/hero4.png",
+      image: "/images/collections/Premium-Saffron.jpg",
     },
     {
       id: "dry-fruits",
       name: "Premium Dry Fruits",
-      // Using existing mapping or explicit path
-      image: "/images/hero/hero2.png",
+      image: "/images/collections/Premium-Dryfruits.jpg",
     },
     {
       id: "spices",
       name: "Authentic Spices",
-      // Using existing mapping or explicit path
-      image: "/images/hero/hero5.png",
+      image: "/images/collections/AUTHENTIC-SPICES.jpg",
+    },
+    {
+      id: "shilajit",
+      name: "Shilajit",
+      image: "/images/collections/PURE-SHILAJIT.jpg",
     },
     {
       id: "combo",
       name: "Combo",
-      image: "/images/hero/hero2.png",
+      image: "/images/collections/COMBOS.jpg",
       comingSoon: true,
     },
   ];
