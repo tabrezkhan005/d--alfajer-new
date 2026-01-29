@@ -61,8 +61,9 @@ function CheckoutPageContent() {
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
   const { user } = useAuth();
   
-  // Track which product+variant we've already added using localStorage to persist across re-renders
+  // Track which product+variant we've already added using sessionStorage to persist across re-renders
   const processedProductKey = 'buyNowProcessedProduct';
+  const isBuyNowMode = !!searchParams.get('product');
 
   // Handle product from Buy Now button
   useEffect(() => {
@@ -97,11 +98,12 @@ function CheckoutPageContent() {
     // This prevents React StrictMode from running the effect twice and adding the item twice
     sessionStorage.setItem(processedProductKey, productKey);
 
-    // Check if this product is already in cart
-    const productInCart = items.some(item => item.productId === productId && item.variantId === variantId);
-    
-    if (!productInCart) {
-      const fetchProduct = async () => {
+    // Clear cart for Buy Now mode - user wants to buy only this product
+    clearCart();
+    console.log('Cart cleared for Buy Now mode');
+
+    // For Buy Now, we always add the product since we just cleared the cart
+    const fetchProduct = async () => {
         try {
           // Dynamic import to avoid circular dependencies
           const { getSupabaseClient } = await import("@/src/lib/supabase/client");
@@ -165,10 +167,6 @@ function CheckoutPageContent() {
       };
 
       fetchProduct();
-    } else {
-      // Product already in cart, no need to add again
-      console.log('Product already in cart');
-    }
   }, [searchParams]); // Only depend on searchParams, not items or addItem
 
   // Checkout State
