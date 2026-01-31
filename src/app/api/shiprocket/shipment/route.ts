@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields
+    // IMPORTANT: billing_email is required for Shiprocket to send customer notifications (dispatch, delivery, etc.)
     const requiredFields = [
       'order_id',
       'order_date',
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
       'billing_pincode',
       'billing_state',
       'billing_country',
+      'billing_email', // Required for customer notifications
       'billing_phone',
       'order_items',
       'payment_method',
@@ -57,6 +59,13 @@ export async function POST(request: NextRequest) {
       'breadth',
       'height',
     ];
+
+    // Warn if email is empty (Shiprocket won't send notifications without valid email)
+    if (!shipmentData.billing_email || shipmentData.billing_email.trim() === '') {
+      console.warn('WARNING: billing_email is empty or missing. Customer will NOT receive Shiprocket notifications (dispatch, delivery updates, etc.)');
+    } else {
+      console.log('Shiprocket shipment will send notifications to:', shipmentData.billing_email);
+    }
 
     const missingFields = requiredFields.filter(field => {
       const value = shipmentData[field];

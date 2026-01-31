@@ -32,10 +32,20 @@ export async function sendEmail(
   replyTo: string = REPLY_TO
 ): Promise<SendEmailResult> {
   try {
+    console.log('📧 sendEmail called:', {
+      to,
+      subject,
+      from: FROM_EMAIL,
+      replyTo,
+      htmlLength: html?.length || 0,
+    });
+
     if (!process.env.RESEND_API_KEY) {
-      console.warn('RESEND_API_KEY not configured. Email not sent.');
-      return { success: false, error: 'Email service not configured' };
+      console.error('❌ RESEND_API_KEY not configured. Email not sent.');
+      return { success: false, error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' };
     }
+
+    console.log('📧 Calling Resend API...');
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -46,14 +56,22 @@ export async function sendEmail(
     });
 
     if (error) {
-      console.error('Failed to send email:', error);
+      console.error('❌ Resend API error:', {
+        name: error.name,
+        message: error.message,
+      });
       return { success: false, error: error.message };
     }
 
-    console.log('Email sent successfully:', data?.id);
+    console.log('✅ Email sent successfully via Resend:', {
+      messageId: data?.id,
+      to,
+      subject,
+    });
+
     return { success: true, messageId: data?.id };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('❌ Exception in sendEmail:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
