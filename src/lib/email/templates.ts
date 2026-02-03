@@ -1,5 +1,5 @@
 // Email Templates for Order Notifications
-// Beautiful, responsive HTML email templates
+// Light theme, professional layout with logo
 
 export interface OrderEmailData {
   orderNumber: string;
@@ -33,17 +33,23 @@ export interface OrderEmailData {
   status: string;
 }
 
-// Brand colors and styling
+// Base URL for logo and links (absolute required in email)
+const BASE_URL =
+  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_APP_URL) || 'https://alfajer.com';
+const LOGO_URL = `${BASE_URL}/images/alfajernewlogo.jpeg`;
+
+// Light theme – professional, high contrast
 const BRAND_COLORS = {
-  primary: '#D4AF37', // Gold
-  primaryDark: '#B8860B',
-  background: '#1a1a2e',
-  backgroundLight: '#16213e',
-  text: '#ffffff',
-  textMuted: '#a0a0b0',
-  accent: '#e94560',
-  success: '#10b981',
-  warning: '#f59e0b',
+  primary: '#B8860B',
+  primaryDark: '#996f09',
+  background: '#ffffff',
+  backgroundSecondary: '#f8fafc',
+  border: '#e2e8f0',
+  text: '#1e293b',
+  textMuted: '#64748b',
+  accent: '#dc2626',
+  success: '#059669',
+  warning: '#d97706',
 };
 
 // Currency formatting
@@ -69,7 +75,34 @@ function formatDate(dateString: string): string {
   });
 }
 
-// Base email template wrapper
+// Shared header with logo (light theme)
+function emailHeader(): string {
+  return `
+  <div class="header">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center" style="padding: 28px 24px;">
+          <a href="${BASE_URL}" target="_blank" rel="noopener">
+            <img src="${LOGO_URL}" alt="Al Fajer" width="180" height="auto" style="display:block; max-width:180px; height:auto; border:0;" />
+          </a>
+          <p class="tagline">Premium quality, delivered with care</p>
+        </td>
+      </tr>
+    </table>
+  </div>`;
+}
+
+// Shared footer with logo and legal
+function emailFooter(): string {
+  return `
+  <div class="footer">
+    <img src="${LOGO_URL}" alt="Al Fajer" width="120" height="auto" style="display:block; max-width:120px; height:auto; margin:0 auto 16px; border:0;" />
+    <p class="footer-text">Premium Arabian Fragrances &amp; Natural Products</p>
+    <p class="footer-legal">&copy; ${new Date().getFullYear()} Al Fajer. All rights reserved.<br/>Questions? Reply to this email or contact support@alfajer.com</p>
+  </div>`;
+}
+
+// Base email template wrapper – light theme, professional
 function baseTemplate(content: string, preheaderText: string = ''): string {
   return `
 <!DOCTYPE html>
@@ -80,336 +113,172 @@ function baseTemplate(content: string, preheaderText: string = ''): string {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Al Fajer</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: ${BRAND_COLORS.background};
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f1f5f9;
       color: ${BRAND_COLORS.text};
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-
-    .preheader {
-      display: none !important;
-      visibility: hidden;
-      opacity: 0;
-      color: transparent;
-      height: 0;
-      width: 0;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, ${BRAND_COLORS.backgroundLight} 0%, ${BRAND_COLORS.background} 100%);
-    }
-
+    .preheader { display: none !important; visibility: hidden; opacity: 0; height: 0; width: 0; overflow: hidden; }
+    .container { max-width: 600px; margin: 0 auto; background: ${BRAND_COLORS.background}; }
     .header {
-      background: linear-gradient(135deg, ${BRAND_COLORS.primary} 0%, ${BRAND_COLORS.primaryDark} 100%);
-      padding: 30px 40px;
+      background: ${BRAND_COLORS.background};
+      border-bottom: 1px solid ${BRAND_COLORS.border};
       text-align: center;
     }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      font-weight: 700;
-      color: ${BRAND_COLORS.background};
-      text-decoration: none;
-      letter-spacing: 2px;
-    }
-
     .tagline {
       font-size: 12px;
-      color: ${BRAND_COLORS.background};
-      opacity: 0.8;
-      margin-top: 5px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
+      color: ${BRAND_COLORS.textMuted};
+      letter-spacing: 0.5px;
+      margin-top: 8px;
     }
-
-    .content {
-      padding: 40px;
-    }
-
+    .content { padding: 40px 32px; }
     .status-badge {
       display: inline-block;
-      padding: 8px 20px;
-      border-radius: 50px;
+      padding: 8px 18px;
+      border-radius: 6px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
-    .status-confirmed {
-      background: linear-gradient(135deg, ${BRAND_COLORS.success}, #059669);
-      color: white;
-    }
-
-    .status-processing {
-      background: linear-gradient(135deg, ${BRAND_COLORS.warning}, #d97706);
-      color: white;
-    }
-
-    .status-shipped {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: white;
-    }
-
-    .status-delivered {
-      background: linear-gradient(135deg, ${BRAND_COLORS.primary}, ${BRAND_COLORS.primaryDark});
-      color: ${BRAND_COLORS.background};
-    }
-
+    .status-confirmed { background: ${BRAND_COLORS.success}; color: #fff; }
+    .status-processing { background: ${BRAND_COLORS.warning}; color: #fff; }
+    .status-shipped { background: #2563eb; color: #fff; }
+    .status-delivered { background: ${BRAND_COLORS.primary}; color: #fff; }
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 26px;
       font-weight: 600;
-      margin-bottom: 15px;
-      color: ${BRAND_COLORS.primary};
+      margin-bottom: 12px;
+      color: ${BRAND_COLORS.text};
+      line-height: 1.3;
     }
-
     h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px;
       font-weight: 600;
-      margin: 25px 0 15px;
+      margin: 28px 0 12px;
       color: ${BRAND_COLORS.text};
-      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-      padding-bottom: 10px;
+      border-bottom: 1px solid ${BRAND_COLORS.border};
+      padding-bottom: 8px;
     }
-
-    p {
-      color: ${BRAND_COLORS.textMuted};
-      margin-bottom: 15px;
-    }
-
-    .highlight {
-      color: ${BRAND_COLORS.primary};
-      font-weight: 600;
-    }
-
+    p { color: ${BRAND_COLORS.textMuted}; margin-bottom: 14px; font-size: 15px; }
+    .highlight { color: ${BRAND_COLORS.primary}; font-weight: 600; }
     .order-info-box {
-      background: rgba(212, 175, 55, 0.1);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      border-radius: 12px;
+      background: ${BRAND_COLORS.backgroundSecondary};
+      border: 1px solid ${BRAND_COLORS.border};
+      border-radius: 8px;
       padding: 20px;
-      margin: 25px 0;
+      margin: 24px 0;
     }
-
-    .order-info-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .order-info-label {
-      color: ${BRAND_COLORS.textMuted};
-      font-size: 14px;
-    }
-
-    .order-info-value {
-      color: ${BRAND_COLORS.text};
-      font-weight: 500;
-    }
-
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-
+    .order-info-row { margin-bottom: 10px; }
+    .order-info-row:last-child { margin-bottom: 0; }
+    .order-info-label { color: ${BRAND_COLORS.textMuted}; font-size: 13px; }
+    .order-info-value { color: ${BRAND_COLORS.text}; font-weight: 500; font-size: 14px; }
+    .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
     .items-table th {
       text-align: left;
-      padding: 12px;
-      background: rgba(212, 175, 55, 0.1);
-      color: ${BRAND_COLORS.primary};
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .items-table td {
-      padding: 15px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 10px;
+      background: ${BRAND_COLORS.backgroundSecondary};
       color: ${BRAND_COLORS.text};
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid ${BRAND_COLORS.border};
     }
-
-    .item-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid rgba(212, 175, 55, 0.3);
+    .items-table td {
+      padding: 14px 10px;
+      border-bottom: 1px solid ${BRAND_COLORS.border};
+      color: ${BRAND_COLORS.text};
+      vertical-align: middle;
     }
-
+    .item-image { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid ${BRAND_COLORS.border}; }
     .totals-section {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
+      background: ${BRAND_COLORS.backgroundSecondary};
+      border: 1px solid ${BRAND_COLORS.border};
+      border-radius: 8px;
       padding: 20px;
       margin-top: 20px;
     }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      color: ${BRAND_COLORS.textMuted};
-    }
-
+    .total-row { padding: 6px 0; color: ${BRAND_COLORS.textMuted}; font-size: 14px; }
     .total-row.grand-total {
       border-top: 2px solid ${BRAND_COLORS.primary};
       margin-top: 10px;
-      padding-top: 15px;
+      padding-top: 14px;
       color: ${BRAND_COLORS.text};
       font-size: 18px;
       font-weight: 600;
     }
-
-    .grand-total .amount {
-      color: ${BRAND_COLORS.primary};
-    }
-
+    .grand-total .amount { color: ${BRAND_COLORS.primary}; }
     .address-box {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 15px 0;
+      background: ${BRAND_COLORS.backgroundSecondary};
+      border: 1px solid ${BRAND_COLORS.border};
+      border-radius: 8px;
+      padding: 18px;
+      margin: 16px 0;
     }
-
-    .address-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: ${BRAND_COLORS.primary};
-      margin-bottom: 10px;
-    }
-
-    .address-text {
-      color: ${BRAND_COLORS.text};
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
+    .address-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.primary}; margin-bottom: 8px; font-weight: 600; }
+    .address-text { color: ${BRAND_COLORS.text}; font-size: 14px; line-height: 1.7; }
     .cta-button {
       display: inline-block;
-      background: linear-gradient(135deg, ${BRAND_COLORS.primary} 0%, ${BRAND_COLORS.primaryDark} 100%);
-      color: ${BRAND_COLORS.background} !important;
-      padding: 15px 35px;
-      border-radius: 50px;
+      background: ${BRAND_COLORS.primary};
+      color: #fff !important;
+      padding: 14px 28px;
+      border-radius: 6px;
       text-decoration: none;
       font-weight: 600;
       font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
       margin: 20px 0;
-      transition: all 0.3s ease;
     }
-
     .tracking-box {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      border-radius: 12px;
-      padding: 25px;
-      margin: 25px 0;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
       text-align: center;
     }
-
     .tracking-number {
       font-family: 'Courier New', monospace;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       color: ${BRAND_COLORS.text};
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px 20px;
-      border-radius: 8px;
+      background: ${BRAND_COLORS.background};
+      padding: 10px 18px;
+      border-radius: 6px;
       display: inline-block;
       margin: 10px 0;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
+      border: 1px solid ${BRAND_COLORS.border};
     }
-
     .delivery-estimate {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 25px 0;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 18px;
+      margin: 24px 0;
       text-align: center;
     }
-
-    .delivery-date {
-      font-size: 20px;
-      font-weight: 600;
-      color: ${BRAND_COLORS.success};
-    }
-
+    .delivery-date { font-size: 18px; font-weight: 600; color: ${BRAND_COLORS.success}; }
     .footer {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 30px 40px;
+      background: ${BRAND_COLORS.backgroundSecondary};
+      border-top: 1px solid ${BRAND_COLORS.border};
+      padding: 28px 32px;
       text-align: center;
     }
-
-    .footer-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      color: ${BRAND_COLORS.primary};
-      margin-bottom: 15px;
-    }
-
-    .footer-text {
-      font-size: 12px;
-      color: ${BRAND_COLORS.textMuted};
-      margin-bottom: 15px;
-    }
-
-    .social-links {
-      margin: 20px 0;
-    }
-
-    .social-link {
-      display: inline-block;
-      margin: 0 10px;
-      color: ${BRAND_COLORS.primary};
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .footer-legal {
-      font-size: 11px;
-      color: ${BRAND_COLORS.textMuted};
-      opacity: 0.7;
-      margin-top: 20px;
-    }
-
+    .footer-text { font-size: 13px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 12px; }
+    .footer-legal { font-size: 11px; color: ${BRAND_COLORS.textMuted}; line-height: 1.6; }
     @media only screen and (max-width: 600px) {
-      .container {
-        width: 100% !important;
-      }
-      .content {
-        padding: 20px !important;
-      }
-      .header {
-        padding: 20px !important;
-      }
-      h1 {
-        font-size: 24px !important;
-      }
-      .items-table td, .items-table th {
-        padding: 8px !important;
-        font-size: 12px !important;
-      }
-      .item-image {
-        width: 40px !important;
-        height: 40px !important;
-      }
+      .container { width: 100% !important; }
+      .content { padding: 24px 20px !important; }
+      .header td { padding: 20px 16px !important; }
+      h1 { font-size: 22px !important; }
+      .items-table td, .items-table th { padding: 10px 8px !important; font-size: 13px !important; }
+      .item-image { width: 44px !important; height: 44px !important; }
     }
   </style>
 </head>
@@ -515,34 +384,19 @@ function generateAddressSection(address: OrderEmailData['shippingAddress']): str
  */
 export function orderConfirmationEmail(data: OrderEmailData): { subject: string; html: string } {
   const content = `
-    <div class="header">
-      <div class="logo">AL FAJER</div>
-      <div class="tagline">Premium Fragrances</div>
-    </div>
-
+    ${emailHeader()}
     <div class="content">
       <div style="text-align: center;">
         <span class="status-badge status-confirmed">✓ Order Confirmed</span>
         <h1>Thank You for Your Order!</h1>
         <p>Hi ${data.customerName},</p>
-        <p>We're thrilled to confirm your order. Your premium fragrances are being prepared with care.</p>
+        <p>We're thrilled to confirm your order. Your items are being prepared with care.</p>
       </div>
 
       <div class="order-info-box">
-        <div class="order-info-row">
-          <span class="order-info-label">Order Number</span>
-          <span class="order-info-value highlight">${data.orderNumber}</span>
-        </div>
-        <div class="order-info-row">
-          <span class="order-info-label">Order Date</span>
-          <span class="order-info-value">${formatDate(data.orderDate)}</span>
-        </div>
-        ${data.estimatedDelivery ? `
-          <div class="order-info-row">
-            <span class="order-info-label">Estimated Delivery</span>
-            <span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span>
-          </div>
-        ` : ''}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Date</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value">${formatDate(data.orderDate)}</span></td></tr></table>
+        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Estimated Delivery</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span></td></tr></table>` : ''}
       </div>
 
       ${data.estimatedDelivery ? `
@@ -560,26 +414,10 @@ export function orderConfirmationEmail(data: OrderEmailData): { subject: string;
 
       <div style="text-align: center; margin-top: 30px;">
         <p style="color: ${BRAND_COLORS.textMuted};">You can track your order status in your account.</p>
-        <a href="https://alfajer.com/account/orders" class="cta-button">View Order Details</a>
+        <a href="${BASE_URL}/account/orders" class="cta-button">View Order Details</a>
       </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-logo">AL FAJER</div>
-      <div class="footer-text">
-        Premium Arabian Fragrances<br/>
-        Crafted with passion, delivered with care
-      </div>
-      <div class="social-links">
-        <a href="#" class="social-link">Instagram</a>
-        <a href="#" class="social-link">Facebook</a>
-        <a href="#" class="social-link">WhatsApp</a>
-      </div>
-      <div class="footer-legal">
-        © 2024 Al Fajer. All rights reserved.<br/>
-        If you have any questions, reply to this email or contact us at support@alfajer.com
-      </div>
-    </div>
+    ${emailFooter()}
   `;
 
   return {
@@ -594,34 +432,19 @@ export function orderConfirmationEmail(data: OrderEmailData): { subject: string;
  */
 export function orderProcessingEmail(data: OrderEmailData): { subject: string; html: string } {
   const content = `
-    <div class="header">
-      <div class="logo">AL FAJER</div>
-      <div class="tagline">Premium Fragrances</div>
-    </div>
-
+    ${emailHeader()}
     <div class="content">
       <div style="text-align: center;">
         <span class="status-badge status-processing">⏳ Processing</span>
         <h1>Your Order is Being Prepared</h1>
         <p>Hi ${data.customerName},</p>
-        <p>Great news! We've started preparing your order. Our team is carefully packaging your premium fragrances.</p>
+        <p>Great news! We've started preparing your order. Our team is carefully packaging your items.</p>
       </div>
 
       <div class="order-info-box">
-        <div class="order-info-row">
-          <span class="order-info-label">Order Number</span>
-          <span class="order-info-value highlight">${data.orderNumber}</span>
-        </div>
-        <div class="order-info-row">
-          <span class="order-info-label">Status</span>
-          <span class="order-info-value" style="color: ${BRAND_COLORS.warning};">Processing</span>
-        </div>
-        ${data.estimatedDelivery ? `
-          <div class="order-info-row">
-            <span class="order-info-label">Expected Delivery</span>
-            <span class="order-info-value">${data.estimatedDelivery}</span>
-          </div>
-        ` : ''}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Status</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.warning};">Processing</span></td></tr></table>
+        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Expected Delivery</span></td><td style="text-align:right;"><span class="order-info-value">${data.estimatedDelivery}</span></td></tr></table>` : ''}
       </div>
 
       <h2>What's Next?</h2>
@@ -633,18 +456,10 @@ export function orderProcessingEmail(data: OrderEmailData): { subject: string; h
       ${generateItemsTable(data.items, data.currency)}
 
       <div style="text-align: center; margin-top: 30px;">
-        <a href="https://alfajer.com/account/orders" class="cta-button">Track Your Order</a>
+        <a href="${BASE_URL}/account/orders" class="cta-button">Track Your Order</a>
       </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-logo">AL FAJER</div>
-      <div class="footer-text">Premium Arabian Fragrances</div>
-      <div class="footer-legal">
-        © 2024 Al Fajer. All rights reserved.<br/>
-        Questions? Reply to this email or contact support@alfajer.com
-      </div>
-    </div>
+    ${emailFooter()}
   `;
 
   return {
@@ -659,50 +474,29 @@ export function orderProcessingEmail(data: OrderEmailData): { subject: string; h
  */
 export function orderShippedEmail(data: OrderEmailData): { subject: string; html: string } {
   const content = `
-    <div class="header">
-      <div class="logo">AL FAJER</div>
-      <div class="tagline">Premium Fragrances</div>
-    </div>
-
+    ${emailHeader()}
     <div class="content">
       <div style="text-align: center;">
         <span class="status-badge status-shipped">🚚 Shipped</span>
         <h1>Your Order is On Its Way!</h1>
         <p>Hi ${data.customerName},</p>
-        <p>Exciting news! Your order has been shipped and is on its way to you.</p>
+        <p>Your order has been shipped and is on its way to you.</p>
       </div>
 
       ${data.trackingNumber ? `
         <div class="tracking-box">
           <div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 10px;">📍 Track Your Package</div>
           <div class="tracking-number">${data.trackingNumber}</div>
-          ${data.trackingUrl ? `
-            <div style="margin-top: 15px;">
-              <a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a>
-            </div>
-          ` : ''}
+          ${data.trackingUrl ? `<div style="margin-top: 15px;"><a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a></div>` : ''}
         </div>
       ` : ''}
 
       <div class="order-info-box">
-        <div class="order-info-row">
-          <span class="order-info-label">Order Number</span>
-          <span class="order-info-value highlight">${data.orderNumber}</span>
-        </div>
-        ${data.estimatedDelivery ? `
-          <div class="order-info-row">
-            <span class="order-info-label">Expected Delivery</span>
-            <span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span>
-          </div>
-        ` : ''}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
+        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Expected Delivery</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span></td></tr></table>` : ''}
       </div>
 
-      ${data.estimatedDelivery ? `
-        <div class="delivery-estimate">
-          <div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 5px;">Arriving</div>
-          <div class="delivery-date">🎁 ${data.estimatedDelivery}</div>
-        </div>
-      ` : ''}
+      ${data.estimatedDelivery ? `<div class="delivery-estimate"><div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 5px;">Arriving</div><div class="delivery-date">🎁 ${data.estimatedDelivery}</div></div>` : ''}
 
       <h2>Delivery Address</h2>
       ${generateAddressSection(data.shippingAddress)}
@@ -711,18 +505,10 @@ export function orderShippedEmail(data: OrderEmailData): { subject: string; html
       ${generateItemsTable(data.items, data.currency)}
 
       <div style="text-align: center; margin-top: 30px;">
-        <p style="color: ${BRAND_COLORS.textMuted};">Keep an eye on your tracking for delivery updates!</p>
+        <p style="color: ${BRAND_COLORS.textMuted};">Keep an eye on your tracking for delivery updates.</p>
       </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-logo">AL FAJER</div>
-      <div class="footer-text">Premium Arabian Fragrances</div>
-      <div class="footer-legal">
-        © 2024 Al Fajer. All rights reserved.<br/>
-        Questions about your delivery? Reply to this email.
-      </div>
-    </div>
+    ${emailFooter()}
   `;
 
   return {
@@ -737,58 +523,35 @@ export function orderShippedEmail(data: OrderEmailData): { subject: string; html
  */
 export function orderDeliveredEmail(data: OrderEmailData): { subject: string; html: string } {
   const content = `
-    <div class="header">
-      <div class="logo">AL FAJER</div>
-      <div class="tagline">Premium Fragrances</div>
-    </div>
-
+    ${emailHeader()}
     <div class="content">
       <div style="text-align: center;">
         <span class="status-badge status-delivered">✓ Delivered</span>
         <h1>Your Order Has Been Delivered!</h1>
         <p>Hi ${data.customerName},</p>
-        <p>Your Al Fajer fragrances have arrived! We hope you love them as much as we loved crafting them for you.</p>
+        <p>Your Al Fajer order has arrived. We hope you love it.</p>
       </div>
 
       <div class="order-info-box">
-        <div class="order-info-row">
-          <span class="order-info-label">Order Number</span>
-          <span class="order-info-value highlight">${data.orderNumber}</span>
-        </div>
-        <div class="order-info-row">
-          <span class="order-info-label">Status</span>
-          <span class="order-info-value" style="color: ${BRAND_COLORS.success};">✓ Delivered</span>
-        </div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Status</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">✓ Delivered</span></td></tr></table>
       </div>
 
       <h2>Your Items</h2>
       ${generateItemsTable(data.items, data.currency)}
 
-      <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 134, 11, 0.1)); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+      <div style="background: ${BRAND_COLORS.backgroundSecondary}; border: 1px solid ${BRAND_COLORS.border}; border-radius: 8px; padding: 24px; margin: 28px 0; text-align: center;">
         <h2 style="border: none; margin-top: 0;">How Did We Do? ⭐</h2>
-        <p>We'd love to hear your feedback! Your review helps other fragrance lovers discover our collection.</p>
-        <a href="https://alfajer.com/reviews" class="cta-button">Leave a Review</a>
+        <p>We'd love to hear your feedback. Your review helps other customers discover our collection.</p>
+        <a href="${BASE_URL}/reviews" class="cta-button">Leave a Review</a>
       </div>
 
-      <div style="text-align: center; margin-top: 30px;">
-        <p style="color: ${BRAND_COLORS.textMuted};">Thank you for choosing Al Fajer! 💛</p>
-        <p style="color: ${BRAND_COLORS.textMuted};">Need help or have questions? We're always here for you.</p>
+      <div style="text-align: center; margin-top: 28px;">
+        <p style="color: ${BRAND_COLORS.textMuted};">Thank you for choosing Al Fajer.</p>
+        <p style="color: ${BRAND_COLORS.textMuted};">Need help? Reply to this email or contact support@alfajer.com</p>
       </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-logo">AL FAJER</div>
-      <div class="footer-text">Premium Arabian Fragrances</div>
-      <div class="social-links">
-        <a href="#" class="social-link">Instagram</a>
-        <a href="#" class="social-link">Facebook</a>
-        <a href="#" class="social-link">WhatsApp</a>
-      </div>
-      <div class="footer-legal">
-        © 2024 Al Fajer. All rights reserved.<br/>
-        Contact us: support@alfajer.com
-      </div>
-    </div>
+    ${emailFooter()}
   `;
 
   return {
@@ -803,47 +566,29 @@ export function orderDeliveredEmail(data: OrderEmailData): { subject: string; ht
  */
 export function orderCancelledEmail(data: OrderEmailData): { subject: string; html: string } {
   const content = `
-    <div class="header">
-      <div class="logo">AL FAJER</div>
-      <div class="tagline">Premium Fragrances</div>
-    </div>
-
+    ${emailHeader()}
     <div class="content">
       <div style="text-align: center;">
         <span class="status-badge" style="background: ${BRAND_COLORS.accent}; color: white;">Order Cancelled</span>
         <h1>Order Cancellation Confirmed</h1>
         <p>Hi ${data.customerName},</p>
-        <p>Your order has been cancelled as requested. If you paid online, your refund will be processed within 5-7 business days.</p>
+        <p>Your order has been cancelled as requested. If you paid online, your refund will be processed within 5–7 business days.</p>
       </div>
 
       <div class="order-info-box">
-        <div class="order-info-row">
-          <span class="order-info-label">Order Number</span>
-          <span class="order-info-value">${data.orderNumber}</span>
-        </div>
-        <div class="order-info-row">
-          <span class="order-info-label">Refund Amount</span>
-          <span class="order-info-value">${formatCurrency(data.total, data.currency)}</span>
-        </div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value">${data.orderNumber}</span></td></tr></table>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Refund Amount</span></td><td style="text-align:right;"><span class="order-info-value">${formatCurrency(data.total, data.currency)}</span></td></tr></table>
       </div>
 
       <h2>Cancelled Items</h2>
       ${generateItemsTable(data.items, data.currency)}
 
       <div style="text-align: center; margin-top: 30px;">
-        <p style="color: ${BRAND_COLORS.textMuted};">We're sorry to see you go. If there was an issue, please let us know - we're always improving!</p>
-        <a href="https://alfajer.com" class="cta-button">Continue Shopping</a>
+        <p style="color: ${BRAND_COLORS.textMuted};">We're sorry to see you go. If there was an issue, please let us know.</p>
+        <a href="${BASE_URL}" class="cta-button">Continue Shopping</a>
       </div>
     </div>
-
-    <div class="footer">
-      <div class="footer-logo">AL FAJER</div>
-      <div class="footer-text">Premium Arabian Fragrances</div>
-      <div class="footer-legal">
-        © 2024 Al Fajer. All rights reserved.<br/>
-        Questions about your refund? Reply to this email.
-      </div>
-    </div>
+    ${emailFooter()}
   `;
 
   return {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
+import { prepareOrderEmailData, sendOrderStatusEmail } from '@/src/lib/email';
 import crypto from 'crypto';
 
 // POST: Razorpay Webhook Handler
@@ -117,7 +118,8 @@ async function handlePaymentSuccess(event: any) {
   }
 
   // Update order if not already paid
-  if (order.payment_status !== 'paid') {
+  const wasAlreadyPaid = order.payment_status === 'paid';
+  if (!wasAlreadyPaid) {
     const { error: updateError } = await supabase
       .from('orders')
       .update({
@@ -131,6 +133,32 @@ async function handlePaymentSuccess(event: any) {
 
     if (updateError) {
       console.error('Error updating order payment status:', updateError);
+      return;
+    }
+
+    // Send order confirmation email (so customer gets it even if they closed the tab)
+    try {
+      const { data: fullOrder } = await supabase
+        .from('orders')
+        .select('*, items:order_items(*)')
+        .eq('id', order.id)
+        .single();
+
+      if (fullOrder) {
+        const emailData = prepareOrderEmailData(fullOrder as any);
+        if (emailData.customerEmail && emailData.customerEmail.trim()) {
+          sendOrderStatusEmail('confirmed', emailData)
+            .then((result) => {
+              if (result.success) console.log('Webhook: order confirmation email sent:', result.messageId);
+              else console.error('Webhook: confirmation email failed:', result.error);
+            })
+            .catch((err) => console.error('Webhook: confirmation email error:', err));
+        } else {
+          console.warn('Webhook: no customer email for order', order.id);
+        }
+      }
+    } catch (emailErr) {
+      console.error('Webhook: error sending confirmation email:', emailErr);
     }
   }
 }
@@ -226,6 +254,13 @@ async function handleOrderPaid(event: any) {
   }
 
   if (existingOrder) {
+    const { data: currentOrder } = await supabase
+      .from('orders')
+      .select('payment_status')
+      .eq('id', existingOrder.id)
+      .single();
+
+    const wasAlreadyPaid = currentOrder?.payment_status === 'paid';
     const { error: updateError } = await supabase
       .from('orders')
       .update({
@@ -238,6 +273,31 @@ async function handleOrderPaid(event: any) {
 
     if (updateError) {
       console.error('Error updating order payment status:', updateError);
+      return;
+    }
+
+    if (!wasAlreadyPaid) {
+      try {
+        const { data: fullOrder } = await supabase
+          .from('orders')
+          .select('*, items:order_items(*)')
+          .eq('id', existingOrder.id)
+          .single();
+
+        if (fullOrder) {
+          const emailData = prepareOrderEmailData(fullOrder as any);
+          if (emailData.customerEmail && emailData.customerEmail.trim()) {
+            sendOrderStatusEmail('confirmed', emailData)
+              .then((result) => {
+                if (result.success) console.log('Webhook order.paid: confirmation email sent:', result.messageId);
+                else console.error('Webhook order.paid: confirmation email failed:', result.error);
+              })
+              .catch((err) => console.error('Webhook order.paid: confirmation email error:', err));
+          }
+        }
+      } catch (emailErr) {
+        console.error('Webhook order.paid: error sending confirmation email:', emailErr);
+      }
     }
   }
 }

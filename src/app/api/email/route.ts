@@ -9,7 +9,7 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { orderId, status, customSubject, customHtml } = body;
+    const { orderId, status, customSubject, customHtml, trackingNumber, trackingUrl } = body;
 
     console.log('📧 Email API called:', { orderId, status, hasCustomHtml: !!customHtml });
 
@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
     }
 
     const orderData = order as any;
+
+    // Allow overriding tracking for shipped emails (e.g. when admin just assigned AWB)
+    if (trackingNumber != null && String(trackingNumber).trim() !== '') {
+      orderData.tracking_number = String(trackingNumber).trim();
+    }
+    if (trackingUrl != null && String(trackingUrl).trim() !== '') {
+      orderData.tracking_url = String(trackingUrl).trim();
+    }
 
     console.log('📧 Order found:', {
       id: orderData.id,

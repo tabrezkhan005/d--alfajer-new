@@ -233,9 +233,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Send Order Confirmation Email on successful payment
+    // Send order confirmation email on successful payment (only if customer email present)
     try {
-      // Fetch full order details with items for email
       const { data: completedOrder } = await supabase
         .from('orders')
         .select('*, items:order_items(*)')
@@ -244,17 +243,16 @@ export async function PUT(request: NextRequest) {
 
       if (completedOrder) {
         const emailData = prepareOrderEmailData(completedOrder as any);
-
-        // Send email asynchronously
-        sendOrderStatusEmail('confirmed', emailData)
-          .then(result => {
-            if (result.success) {
-              console.log('Payment success email sent:', result.messageId);
-            } else {
-              console.error('Failed to send payment success email:', result.error);
-            }
-          })
-          .catch(err => console.error('Error sending payment success email:', err));
+        if (emailData.customerEmail && emailData.customerEmail.trim()) {
+          sendOrderStatusEmail('confirmed', emailData)
+            .then((result) => {
+              if (result.success) console.log('Payment success email sent:', result.messageId);
+              else console.error('Failed to send payment success email:', result.error);
+            })
+            .catch((err) => console.error('Error sending payment success email:', err));
+        } else {
+          console.warn('Order confirmation not sent: no customer email for order', orderId);
+        }
       }
     } catch (emailError) {
       console.error('Error in payment success email flow:', emailError);

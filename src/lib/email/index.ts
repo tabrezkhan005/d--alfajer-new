@@ -29,13 +29,15 @@ export async function sendEmail(
   to: string,
   subject: string,
   html: string,
-  replyTo: string = REPLY_TO
+  replyTo: string = REPLY_TO,
+  fromOverride?: string
 ): Promise<SendEmailResult> {
+  const from = fromOverride || FROM_EMAIL
   try {
     console.log('📧 sendEmail called:', {
       to,
       subject,
-      from: FROM_EMAIL,
+      from,
       replyTo,
       htmlLength: html?.length || 0,
     });
@@ -48,7 +50,7 @@ export async function sendEmail(
     console.log('📧 Calling Resend API...');
 
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from,
       to: [to],
       subject,
       html,

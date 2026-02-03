@@ -73,9 +73,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (missingFields.length > 0) {
+      const message = missingFields.includes('billing_email')
+        ? 'Customer email (billing_email) is required so Shiprocket can send order updates (shipped, delivered) to the customer. Ensure the order has an email in shipping address or order details.'
+        : `Missing required fields: ${missingFields.join(', ')}`;
       return NextResponse.json(
         {
-          error: `Missing required fields: ${missingFields.join(', ')}`,
+          error: message,
           missing_fields: missingFields
         },
         { status: 400 }

@@ -227,15 +227,21 @@ export default function OrderDetailPage({
       setOrder({ ...order, status: newStatus });
       toast.success("Order status updated");
 
-      // Trigger email notification
+      // Trigger email notification (include tracking for shipped so customer gets AWB link)
       try {
+        const body: { orderId: string; status: string; trackingNumber?: string; trackingUrl?: string } = {
+          orderId: order.id,
+          status: newStatus,
+        };
+        if (newStatus === 'shipped' && order.tracking_number) {
+          body.trackingNumber = order.tracking_number;
+          const awb = String(order.tracking_number).replace(/^SR-/i, '');
+          body.trackingUrl = `https://www.shiprocket.in/tracking/${awb}`;
+        }
         fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId: order.id,
-            status: newStatus,
-          }),
+          body: JSON.stringify(body),
         });
       } catch (e) {
         console.error("Failed to trigger email notification", e);
@@ -379,6 +385,23 @@ export default function OrderDetailPage({
       const addressLine = shippingAddress.address || shippingAddress.streetAddress || "";
       const postalCode = shippingAddress.zip || shippingAddress.postalCode || "";
 
+      // Customer email: required for Shiprocket to send order updates (dispatch, delivery, etc.)
+      const billingAddress = order.billing_address as { email?: string } | null;
+      const customerEmail = (
+        shippingAddress.email ||
+        (order as any).email ||
+        billingAddress?.email ||
+        ""
+      ).trim();
+
+      if (!customerEmail) {
+        toast.error(
+          "Customer email is required so Shiprocket can send order updates (shipped, delivered). Add email in shipping address or order details."
+        );
+        setCreatingShipment(false);
+        return;
+      }
+
       // Validate required address fields
       if (!addressLine || !shippingAddress.city || !postalCode || !shippingAddress.state) {
         toast.error("Please ensure shipping address has complete details (address, city, pincode, state)");
@@ -425,9 +448,10 @@ export default function OrderDetailPage({
         billing_pincode: postalCode,
         billing_state: shippingAddress.state || "",
         billing_country: shippingAddress.country || "India",
-        billing_email: shippingAddress.email || order.email || "",
+        billing_email: customerEmail,
         billing_phone: shippingAddress.phone || "",
         shipping_is_billing: true,
+        shipping_email: customerEmail,
         order_items: shiprocketItems,
         payment_method: order.payment_method === "cod" ? "COD" : "Prepaid",
         sub_total: Number(order.subtotal) || 0,
@@ -470,11 +494,18 @@ export default function OrderDetailPage({
           setOrder({ ...order, tracking_number: awbCode, status: "shipped" });
           setShowShipmentModal(false);
 
-          // Send Email
+          // Send shipped email with tracking so customer gets AWB and link
           fetch('/api/email', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ orderId: order.id, status: 'shipped' }),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: order.id,
+              status: 'shipped',
+              trackingNumber: awbCode,
+              trackingUrl: awbCode
+                ? `https://www.shiprocket.in/tracking/${String(awbCode).replace(/^SR-/i, '')}`
+                : undefined,
+            }),
           });
 
         } else {
