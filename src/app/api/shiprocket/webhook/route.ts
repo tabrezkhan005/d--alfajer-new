@@ -50,10 +50,14 @@ function getShipmentStatus(payload: Record<string, unknown>): string {
   return normalizeStatus(raw);
 }
 
-/** Resolve our order reference: channel_order_id or order_id (we send order_number or id when creating shipment) */
-function getOrderReference(payload: Record<string, unknown>): string | null {
+/** Resolve order reference: Shiprocket may send order_id (our ref or theirs) or sr_order_id (numeric). */
+function getOrderReference(payload: Record<string, unknown>): { ref: string; srOrderId?: number } | null {
   const channel = payload.channel_order_id ?? payload.order_id;
-  if (channel != null && String(channel).trim()) return String(channel).trim();
+  const ref = channel != null && String(channel).trim() ? String(channel).trim() : null;
+  const srOrderId = payload.sr_order_id != null ? Number(payload.sr_order_id) : undefined;
+  if (ref || (srOrderId !== undefined && !Number.isNaN(srOrderId))) {
+    return { ref: ref || String(srOrderId), srOrderId: srOrderId };
+  }
   return null;
 }
 
@@ -82,8 +86,8 @@ export async function POST(request: NextRequest) {
       return ok({ received: true, processed: false, message: "Invalid JSON" });
     }
 
-    const ref = getOrderReference(payload);
-    if (!ref) {
+    const orderRef = getOrderReference(payload);
+    if (!orderRef) {
       console.warn("Shiprocket webhook: no order reference in payload", JSON.stringify(payload, null, 2));
       return ok({ received: true, processed: false, message: "No order reference" });
     }
@@ -96,18 +100,47 @@ export async function POST(request: NextRequest) {
 
     const awbCode = getAwbCode(payload);
     const supabase = createAdminClient();
+    const { ref, srOrderId } = orderRef;
+
+    // Find order: by order_number, by id (UUID), or by notes.shiprocket_order_id / sr_order_id
+    let orders: any[] | null = null;
+    let findError: any = null;
 
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
-    const query = supabase
-      .from("orders")
-      .select("id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, total, currency, shipping_cost, tax, discount, created_at")
-      .limit(1);
-    const { data: orders, error: findError } = isUuid
-      ? await query.eq("id", ref)
-      : await query.eq("order_number", ref);
+    const isNumeric = /^\d+$/.test(ref);
+
+    const baseSelect = "id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, total, currency, shipping_cost, tax, discount, created_at, notes";
+
+    if (isUuid) {
+      const r = await supabase.from("orders").select(baseSelect).eq("id", ref).limit(1);
+      findError = r.error;
+      orders = r.data;
+    } else if (!isNumeric) {
+      const r = await supabase.from("orders").select(baseSelect).eq("order_number", ref).limit(1);
+      findError = r.error;
+      orders = r.data;
+    }
+
+    if ((!orders || orders.length === 0) && (isNumeric || srOrderId !== undefined)) {
+      const srId = srOrderId ?? (isNumeric ? parseInt(ref, 10) : undefined);
+      if (srId !== undefined && !Number.isNaN(srId)) {
+        const r = await supabase.from("orders").select(baseSelect).not("notes", "is", null).limit(500);
+        if (!r.error && r.data?.length) {
+          const found = (r.data as any[]).find((o) => {
+            try {
+              const n = o.notes && typeof o.notes === "string" ? JSON.parse(o.notes) : o.notes;
+              return n && (Number(n.shiprocket_order_id) === srId || Number(n.sr_order_id) === srId);
+            } catch {
+              return false;
+            }
+          });
+          if (found) orders = [found];
+        }
+      }
+    }
 
     if (findError || !orders?.length) {
-      console.warn("Shiprocket webhook: order not found for ref", ref, findError);
+      console.warn("Shiprocket webhook: order not found", { ref, srOrderId, findError, payloadKeys: Object.keys(payload) });
       return ok({ received: true, processed: false, message: "Order not found" });
     }
 
@@ -165,12 +198,16 @@ export async function POST(request: NextRequest) {
 
         const emailData = prepareOrderEmailData(orderData);
         if (emailData.customerEmail && emailData.customerEmail.trim()) {
-          sendOrderStatusEmail(newStatus, emailData)
-            .then((result) => {
-              if (result.success) console.log("Shiprocket webhook: email sent", newStatus, result.messageId);
-              else console.error("Shiprocket webhook: email failed", newStatus, result.error);
-            })
-            .catch((err) => console.error("Shiprocket webhook: email error", err));
+          try {
+            const emailResult = await sendOrderStatusEmail(newStatus, emailData);
+            if (emailResult.success) {
+              console.log("Shiprocket webhook: email sent", newStatus, "to", emailData.customerEmail, "messageId:", emailResult.messageId);
+            } else {
+              console.error("Shiprocket webhook: email failed", newStatus, emailResult.error);
+            }
+          } catch (err) {
+            console.error("Shiprocket webhook: email error", err);
+          }
         } else {
           console.warn("Shiprocket webhook: no customer email for order", orderId);
         }

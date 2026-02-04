@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendOrderConfirmationEmail, sendEmail } from '@/src/lib/email'
-import { orderConfirmationEmail, type OrderEmailData } from '@/src/lib/email/templates'
+import { sendOrderConfirmationEmail } from '@/src/lib/email'
+import { type OrderEmailData } from '@/src/lib/email/templates'
 
 const TEST_RECIPIENT = 'tabrezkhangnt@gmail.com'
 
@@ -31,8 +31,6 @@ export async function POST(request: NextRequest) {
     const mockOrderId = 'ORD-TEST-' + Date.now()
     const mockProductId1 = 'prod_test_saffron_001'
     const mockProductId2 = 'prod_test_shilajit_002'
-    // Use Resend sandbox sender by default so the test delivers even if EMAIL_FROM is Gmail (unverified)
-    const useTestFrom = body.useTestFrom !== false
 
     const emailData: OrderEmailData = {
       orderNumber: mockOrderId,
@@ -62,31 +60,11 @@ export async function POST(request: NextRequest) {
       status: 'confirmed',
     }
 
-    const result = useTestFrom
-      ? await (async () => {
-          const template = orderConfirmationEmail(emailData)
-          return sendEmail(
-            emailData.customerEmail,
-            template.subject,
-            template.html,
-            'Al Fajer <orders.alfajer@gmail.com>',
-            'Al Fajer <onboarding@resend.dev>'
-          )
-        })()
-      : await sendOrderConfirmationEmail(emailData)
+    const result = await sendOrderConfirmationEmail(emailData)
 
     if (!result.success) {
-      const isResendDomainError =
-        result.error?.toLowerCase().includes('domain') ||
-        result.error?.toLowerCase().includes('not verified')
       return NextResponse.json(
-        {
-          success: false,
-          error: result.error,
-          ...(isResendDomainError && {
-            fix: 'Resend cannot send from @gmail.com. Use a verified domain in Resend (e.g. orders@yourdomain.com) or for testing set EMAIL_FROM to "Al Fajer <onboarding@resend.dev>" in .env',
-          }),
-        },
+        { success: false, error: result.error },
         { status: 500 }
       )
     }

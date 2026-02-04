@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createAdminClient } from "@/src/lib/supabase/server";
 import { createShiprocketShipment, getShiprocketToken, assignCourierAndGenerateAWB } from "@/src/lib/shiprocket";
 
 export async function POST(request: NextRequest) {
@@ -113,6 +114,32 @@ export async function POST(request: NextRequest) {
         { error: errorMessage, shiprocket_response: result },
         { status: 400 }
       );
+    }
+
+    // Store Shiprocket order id on our order so webhook can find it when Shiprocket sends order_id/sr_order_id
+    const srOrderId = result.order_id ?? (result as any).payload?.order_id ?? (result as any).sr_order_id;
+    if (srOrderId != null && shipmentData.order_id) {
+      try {
+        const supabase = createAdminClient();
+        const ourRef = String(shipmentData.order_id).trim();
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ourRef);
+        const q = supabase.from("orders").select("id, notes").limit(1);
+        const { data: rows } = isUuid ? await q.eq("id", ourRef) : await q.eq("order_number", ourRef);
+        if (rows?.[0]) {
+          const existing = (rows[0] as any).notes;
+          let notesObj: Record<string, unknown> = {};
+          try {
+            if (existing && typeof existing === "string") notesObj = JSON.parse(existing);
+            else if (existing && typeof existing === "object") notesObj = { ...existing };
+          } catch {}
+          notesObj.shiprocket_order_id = typeof srOrderId === "number" ? srOrderId : parseInt(String(srOrderId), 10) || srOrderId;
+          notesObj.sr_order_id = notesObj.shiprocket_order_id;
+          await supabase.from("orders").update({ notes: JSON.stringify(notesObj) }).eq("id", (rows[0] as any).id);
+          console.log("Stored shiprocket_order_id for webhook lookup:", notesObj.shiprocket_order_id);
+        }
+      } catch (e) {
+        console.warn("Failed to store shiprocket_order_id on order:", e);
+      }
     }
 
     // If courier_id is provided, try to assign courier and generate AWB immediately

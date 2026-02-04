@@ -138,16 +138,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to check if email service is configured
+// GET endpoint to check if email service is configured (SMTP)
 export async function GET() {
-  const isConfigured = !!process.env.RESEND_API_KEY;
-  const apiKeyPrefix = process.env.RESEND_API_KEY?.substring(0, 10) || 'Not set';
+  const isConfigured = !!process.env.SMTP_HOST;
 
   return NextResponse.json({
     configured: isConfigured,
-    from: process.env.EMAIL_FROM || 'Not configured',
-    replyTo: process.env.EMAIL_REPLY_TO || 'Not configured',
-    apiKeyConfigured: isConfigured,
-    apiKeyPrefix: isConfigured ? `${apiKeyPrefix}...` : 'Not set',
+    from: process.env.EMAIL_FROM || "Not configured",
+    replyTo: process.env.EMAIL_REPLY_TO || "Not configured",
+    smtpHost: process.env.SMTP_HOST ? `${process.env.SMTP_HOST}:${process.env.SMTP_PORT || "587"}` : "Not set",
   });
 }

@@ -33,10 +33,22 @@ export interface OrderEmailData {
   status: string;
 }
 
-// Base URL for logo and links (absolute required in email)
-const BASE_URL =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_APP_URL) || 'https://alfajer.com';
-const LOGO_URL = `${BASE_URL}/images/alfajernewlogo.jpeg`;
+// Base URL for logo and links – must be absolute HTTPS so images load in email clients
+function getBaseUrl(): string {
+  const raw =
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_APP_URL) ||
+    (typeof process !== 'undefined' && process.env?.EMAIL_APP_URL) ||
+    'https://alfajermart.com';
+  return raw.startsWith('http') ? raw : `https://${raw}`;
+}
+const BASE_URL = getBaseUrl();
+// Logo: use cid:alfajerlogo so the logo is embedded in the email (no external URL needed)
+export const EMAIL_LOGO_CID = 'alfajerlogo';
+
+// Contact / shipping address in emails = footer contact info (single source of truth)
+const CONTACT_ADDRESS = 'NH44, Lethpora - Jammu and Kashmir';
+const CONTACT_PHONE = '+91 96228 63806';
+const CONTACT_EMAIL = 'alfajermart@gmail.com';
 
 // Light theme – professional, high contrast
 const BRAND_COLORS = {
@@ -75,7 +87,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-// Shared header with logo (light theme)
+// Shared header with logo (embedded via cid so it always displays)
 function emailHeader(): string {
   return `
   <div class="header">
@@ -83,7 +95,7 @@ function emailHeader(): string {
       <tr>
         <td align="center" style="padding: 28px 24px;">
           <a href="${BASE_URL}" target="_blank" rel="noopener">
-            <img src="${LOGO_URL}" alt="Al Fajer" width="180" height="auto" style="display:block; max-width:180px; height:auto; border:0;" />
+            <img src="cid:${EMAIL_LOGO_CID}" alt="Al Fajer" width="180" height="58" style="display:block; max-width:180px; width:180px; height:auto; border:0; outline:none;" />
           </a>
           <p class="tagline">Premium quality, delivered with care</p>
         </td>
@@ -96,7 +108,7 @@ function emailHeader(): string {
 function emailFooter(): string {
   return `
   <div class="footer">
-    <img src="${LOGO_URL}" alt="Al Fajer" width="120" height="auto" style="display:block; max-width:120px; height:auto; margin:0 auto 16px; border:0;" />
+    <img src="cid:${EMAIL_LOGO_CID}" alt="Al Fajer" width="120" height="auto" style="display:block; max-width:120px; height:auto; margin:0 auto 16px; border:0;" />
     <p class="footer-text">Premium Arabian Fragrances &amp; Natural Products</p>
     <p class="footer-legal">&copy; ${new Date().getFullYear()} Al Fajer. All rights reserved.<br/>Questions? Reply to this email or contact support@alfajer.com</p>
   </div>`;
@@ -168,14 +180,7 @@ function baseTemplate(content: string, preheaderText: string = ''): string {
     }
     p { color: ${BRAND_COLORS.textMuted}; margin-bottom: 14px; font-size: 15px; }
     .highlight { color: ${BRAND_COLORS.primary}; font-weight: 600; }
-    .order-info-box {
-      background: ${BRAND_COLORS.backgroundSecondary};
-      border: 1px solid ${BRAND_COLORS.border};
-      border-radius: 8px;
-      padding: 20px;
-      margin: 24px 0;
-    }
-    .order-info-row { margin-bottom: 10px; }
+    .order-info-row { margin-bottom: 8px; }
     .order-info-row:last-child { margin-bottom: 0; }
     .order-info-label { color: ${BRAND_COLORS.textMuted}; font-size: 13px; }
     .order-info-value { color: ${BRAND_COLORS.text}; font-weight: 500; font-size: 14px; }
@@ -197,32 +202,6 @@ function baseTemplate(content: string, preheaderText: string = ''): string {
       vertical-align: middle;
     }
     .item-image { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid ${BRAND_COLORS.border}; }
-    .totals-section {
-      background: ${BRAND_COLORS.backgroundSecondary};
-      border: 1px solid ${BRAND_COLORS.border};
-      border-radius: 8px;
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .total-row { padding: 6px 0; color: ${BRAND_COLORS.textMuted}; font-size: 14px; }
-    .total-row.grand-total {
-      border-top: 2px solid ${BRAND_COLORS.primary};
-      margin-top: 10px;
-      padding-top: 14px;
-      color: ${BRAND_COLORS.text};
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .grand-total .amount { color: ${BRAND_COLORS.primary}; }
-    .address-box {
-      background: ${BRAND_COLORS.backgroundSecondary};
-      border: 1px solid ${BRAND_COLORS.border};
-      border-radius: 8px;
-      padding: 18px;
-      margin: 16px 0;
-    }
-    .address-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.primary}; margin-bottom: 8px; font-weight: 600; }
-    .address-text { color: ${BRAND_COLORS.text}; font-size: 14px; line-height: 1.7; }
     .cta-button {
       display: inline-block;
       background: ${BRAND_COLORS.primary};
@@ -234,36 +213,7 @@ function baseTemplate(content: string, preheaderText: string = ''): string {
       font-size: 14px;
       margin: 20px 0;
     }
-    .tracking-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 8px;
-      padding: 24px;
-      margin: 24px 0;
-      text-align: center;
-    }
-    .tracking-number {
-      font-family: 'Courier New', monospace;
-      font-size: 17px;
-      font-weight: 600;
-      color: ${BRAND_COLORS.text};
-      background: ${BRAND_COLORS.background};
-      padding: 10px 18px;
-      border-radius: 6px;
-      display: inline-block;
-      margin: 10px 0;
-      letter-spacing: 1px;
-      border: 1px solid ${BRAND_COLORS.border};
-    }
-    .delivery-estimate {
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      border-radius: 8px;
-      padding: 18px;
-      margin: 24px 0;
-      text-align: center;
-    }
-    .delivery-date { font-size: 18px; font-weight: 600; color: ${BRAND_COLORS.success}; }
+    .delivery-date { font-size: 15px; font-weight: 600; color: ${BRAND_COLORS.success}; }
     .footer {
       background: ${BRAND_COLORS.backgroundSecondary};
       border-top: 1px solid ${BRAND_COLORS.border};
@@ -292,29 +242,34 @@ function baseTemplate(content: string, preheaderText: string = ''): string {
   `;
 }
 
-// Generate items table HTML
+// Generate items table with serial no (S.No.), product, qty, amount – clean, professional
 function generateItemsTable(items: OrderEmailData['items'], currency: string): string {
-  const rows = items.map(item => `
+  if (!items || items.length === 0) {
+    return `<p style="color: ${BRAND_COLORS.textMuted}; margin: 12px 0;">No items listed.</p>`;
+  }
+  const rows = items
+    .map(
+      (item, index) => `
     <tr>
-      <td>
-        ${item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image" />` : ''}
+      <td style="padding: 10px 12px; font-size: 13px; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">${index + 1}</td>
+      <td style="padding: 10px 12px; font-size: 14px; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">
+        <strong>${String(item.name).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
       </td>
-      <td>
-        <strong>${item.name}</strong>
-      </td>
-      <td style="text-align: center;">${item.quantity}</td>
-      <td style="text-align: right;">${formatCurrency(item.price * item.quantity, currency)}</td>
+      <td style="padding: 10px 12px; text-align: center; font-size: 14px; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">${item.quantity}</td>
+      <td style="padding: 10px 12px; text-align: right; font-size: 14px; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">${formatCurrency((item.price || 0) * (item.quantity || 1), currency)}</td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
   return `
-    <table class="items-table">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 16px 0; font-size: 14px;">
       <thead>
         <tr>
-          <th style="width: 70px;"></th>
-          <th>Product</th>
-          <th style="text-align: center; width: 60px;">Qty</th>
-          <th style="text-align: right; width: 100px;">Amount</th>
+          <th style="width: 44px; padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">S.No.</th>
+          <th style="padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Product</th>
+          <th style="padding: 10px 12px; text-align: center; width: 48px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Qty</th>
+          <th style="padding: 10px 12px; text-align: right; width: 90px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Amount</th>
         </tr>
       </thead>
       <tbody>
@@ -324,54 +279,47 @@ function generateItemsTable(items: OrderEmailData['items'], currency: string): s
   `;
 }
 
-// Generate totals section HTML
+// Totals: clean rows, no box
 function generateTotalsSection(data: OrderEmailData): string {
   const { subtotal, shippingCost, tax, discount, total, currency } = data;
 
   return `
-    <div class="totals-section">
-      <div class="total-row">
-        <span>Subtotal</span>
-        <span>${formatCurrency(subtotal, currency)}</span>
-      </div>
-      ${discount > 0 ? `
-        <div class="total-row" style="color: ${BRAND_COLORS.success};">
-          <span>Discount</span>
-          <span>-${formatCurrency(discount, currency)}</span>
-        </div>
-      ` : ''}
-      <div class="total-row">
-        <span>Shipping</span>
-        <span>${shippingCost === 0 ? '<span style="color: ' + BRAND_COLORS.success + ';">FREE</span>' : formatCurrency(shippingCost, currency)}</span>
-      </div>
-      ${tax > 0 ? `
-        <div class="total-row">
-          <span>Tax</span>
-          <span>${formatCurrency(tax, currency)}</span>
-        </div>
-      ` : ''}
-      <div class="total-row grand-total">
-        <span>Total</span>
-        <span class="amount">${formatCurrency(total, currency)}</span>
-      </div>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 20px; font-size: 14px;">
+      <tr><td style="padding: 6px 0; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Subtotal</td><td style="padding: 6px 0; text-align: right; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">${formatCurrency(subtotal, currency)}</td></tr>
+      ${discount > 0 ? `<tr><td style="padding: 6px 0; color: ${BRAND_COLORS.success}; border-bottom: 1px solid ${BRAND_COLORS.border};">Discount</td><td style="padding: 6px 0; text-align: right; color: ${BRAND_COLORS.success}; border-bottom: 1px solid ${BRAND_COLORS.border};">-${formatCurrency(discount, currency)}</td></tr>` : ''}
+      <tr><td style="padding: 6px 0; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Shipping</td><td style="padding: 6px 0; text-align: right; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">${shippingCost === 0 ? 'FREE' : formatCurrency(shippingCost, currency)}</td></tr>
+      ${tax > 0 ? `<tr><td style="padding: 6px 0; color: ${BRAND_COLORS.textMuted}; border-bottom: 1px solid ${BRAND_COLORS.border};">Tax</td><td style="padding: 6px 0; text-align: right; color: ${BRAND_COLORS.text}; border-bottom: 1px solid ${BRAND_COLORS.border};">${formatCurrency(tax, currency)}</td></tr>` : ''}
+      <tr><td style="padding: 12px 0 0 0; font-weight: 600; color: ${BRAND_COLORS.text};">Total</td><td style="padding: 12px 0 0 0; text-align: right; font-weight: 600; font-size: 16px; color: ${BRAND_COLORS.primary};">${formatCurrency(total, currency)}</td></tr>
+    </table>
   `;
 }
 
-// Generate address section
-function generateAddressSection(address: OrderEmailData['shippingAddress']): string {
+// Order info as simple rows (no box)
+function generateOrderInfoLines(lines: Array<{ label: string; value: string; highlight?: boolean }>): string {
+  if (lines.length === 0) return ''
+  const rows = lines
+    .map(
+      (l) =>
+        `<tr><td style="padding: 6px 0; color: ${BRAND_COLORS.textMuted}; font-size: 13px;">${l.label}</td><td style="padding: 6px 0; text-align: right; font-size: 14px; font-weight: 500; color: ${l.highlight ? BRAND_COLORS.primary : BRAND_COLORS.text};">${l.value}</td></tr>`
+    )
+    .join('')
   return `
-    <div class="address-box">
-      <div class="address-title">📍 Shipping Address</div>
-      <div class="address-text">
-        ${address.name || ''}<br/>
-        ${address.address || ''}<br/>
-        ${address.city ? `${address.city}, ` : ''}${address.state || ''} ${address.postalCode || ''}<br/>
-        ${address.country || ''}<br/>
-        ${address.phone ? `📞 ${address.phone}` : ''}
-      </div>
-    </div>
-  `;
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+      ${rows}
+    </table>
+  `
+}
+
+// Contact / shipping address in email = footer contact info (no box)
+function generateContactSection(): string {
+  return `
+    <p style="margin: 20px 0 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted};">Contact &amp; Address</p>
+    <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.text}; line-height: 1.7;">
+      ${CONTACT_ADDRESS}<br/>
+      <a href="tel:${CONTACT_PHONE.replace(/\s/g, '')}" style="color: ${BRAND_COLORS.primary}; text-decoration: none;">${CONTACT_PHONE}</a><br/>
+      <a href="mailto:${CONTACT_EMAIL}" style="color: ${BRAND_COLORS.primary}; text-decoration: none;">${CONTACT_EMAIL}</a>
+    </p>
+  `
 }
 
 // ============================================
@@ -393,24 +341,17 @@ export function orderConfirmationEmail(data: OrderEmailData): { subject: string;
         <p>We're thrilled to confirm your order. Your items are being prepared with care.</p>
       </div>
 
-      <div class="order-info-box">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Date</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value">${formatDate(data.orderDate)}</span></td></tr></table>
-        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Estimated Delivery</span></td><td style="text-align:right; padding:4px 0;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span></td></tr></table>` : ''}
-      </div>
-
-      ${data.estimatedDelivery ? `
-        <div class="delivery-estimate">
-          <div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 5px;">Expected Delivery</div>
-          <div class="delivery-date">📦 ${data.estimatedDelivery}</div>
-        </div>
-      ` : ''}
+      ${generateOrderInfoLines([
+        { label: 'Order Number', value: data.orderNumber, highlight: true },
+        { label: 'Order Date', value: formatDate(data.orderDate) },
+        ...(data.estimatedDelivery ? [{ label: 'Expected delivery', value: data.estimatedDelivery, highlight: true } as const] : []),
+      ])}
 
       <h2>Order Summary</h2>
       ${generateItemsTable(data.items, data.currency)}
       ${generateTotalsSection(data)}
 
-      ${generateAddressSection(data.shippingAddress)}
+      ${generateContactSection()}
 
       <div style="text-align: center; margin-top: 30px;">
         <p style="color: ${BRAND_COLORS.textMuted};">You can track your order status in your account.</p>
@@ -441,11 +382,11 @@ export function orderProcessingEmail(data: OrderEmailData): { subject: string; h
         <p>Great news! We've started preparing your order. Our team is carefully packaging your items.</p>
       </div>
 
-      <div class="order-info-box">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Status</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.warning};">Processing</span></td></tr></table>
-        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Expected Delivery</span></td><td style="text-align:right;"><span class="order-info-value">${data.estimatedDelivery}</span></td></tr></table>` : ''}
-      </div>
+      ${generateOrderInfoLines([
+        { label: 'Order Number', value: data.orderNumber, highlight: true },
+        { label: 'Status', value: 'Processing' },
+        ...(data.estimatedDelivery ? [{ label: 'Expected delivery', value: data.estimatedDelivery } as const] : []),
+      ])}
 
       <h2>What's Next?</h2>
       <p>📦 Your order is being carefully packaged</p>
@@ -483,23 +424,16 @@ export function orderShippedEmail(data: OrderEmailData): { subject: string; html
         <p>Your order has been shipped and is on its way to you.</p>
       </div>
 
-      ${data.trackingNumber ? `
-        <div class="tracking-box">
-          <div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 10px;">📍 Track Your Package</div>
-          <div class="tracking-number">${data.trackingNumber}</div>
-          ${data.trackingUrl ? `<div style="margin-top: 15px;"><a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a></div>` : ''}
-        </div>
-      ` : ''}
+      ${data.trackingNumber ? `${generateOrderInfoLines([{ label: 'Tracking (AWB)', value: data.trackingNumber, highlight: true }])}
+      ${data.trackingUrl ? `<p style="margin: 0 0 20px 0;"><a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a></p>` : ''}` : ''}
 
-      <div class="order-info-box">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
-        ${data.estimatedDelivery ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Expected Delivery</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">${data.estimatedDelivery}</span></td></tr></table>` : ''}
-      </div>
+      ${generateOrderInfoLines([
+        { label: 'Order Number', value: data.orderNumber, highlight: true },
+        ...(data.estimatedDelivery ? [{ label: 'Expected delivery', value: data.estimatedDelivery, highlight: true } as const] : []),
+      ])}
 
-      ${data.estimatedDelivery ? `<div class="delivery-estimate"><div style="font-size: 14px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 5px;">Arriving</div><div class="delivery-date">🎁 ${data.estimatedDelivery}</div></div>` : ''}
-
-      <h2>Delivery Address</h2>
-      ${generateAddressSection(data.shippingAddress)}
+      <h2>Contact &amp; Address</h2>
+      ${generateContactSection()}
 
       <h2>Your Items</h2>
       ${generateItemsTable(data.items, data.currency)}
@@ -532,19 +466,26 @@ export function orderDeliveredEmail(data: OrderEmailData): { subject: string; ht
         <p>Your Al Fajer order has arrived. We hope you love it.</p>
       </div>
 
-      <div class="order-info-box">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value highlight">${data.orderNumber}</span></td></tr></table>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Status</span></td><td style="text-align:right;"><span class="order-info-value" style="color: ${BRAND_COLORS.success};">✓ Delivered</span></td></tr></table>
-      </div>
+      ${generateOrderInfoLines([
+        { label: 'Order Number', value: data.orderNumber, highlight: true },
+        { label: 'Status', value: 'Delivered' },
+      ])}
 
       <h2>Your Items</h2>
-      ${generateItemsTable(data.items, data.currency)}
+      ${generateItemsTable(data.items || [], data.currency)}
 
-      <div style="background: ${BRAND_COLORS.backgroundSecondary}; border: 1px solid ${BRAND_COLORS.border}; border-radius: 8px; padding: 24px; margin: 28px 0; text-align: center;">
-        <h2 style="border: none; margin-top: 0;">How Did We Do? ⭐</h2>
-        <p>We'd love to hear your feedback. Your review helps other customers discover our collection.</p>
-        <a href="${BASE_URL}/reviews" class="cta-button">Leave a Review</a>
-      </div>
+      ${generateTotalsSection(data)}
+
+      ${data.trackingNumber && data.trackingUrl ? `
+      ${generateOrderInfoLines([
+        { label: 'Tracking (AWB)', value: data.trackingNumber },
+      ])}
+      <p style="margin: 0 0 20px 0;"><a href="${data.trackingUrl}" style="color: ${BRAND_COLORS.primary}; font-weight: 600;">Track your delivery</a></p>
+      ` : ''}
+
+      <h2>How Did We Do? ⭐</h2>
+      <p>We'd love to hear your feedback. Your review helps other customers discover our collection.</p>
+      <p style="margin-bottom: 24px;"><a href="${BASE_URL}/reviews" class="cta-button">Leave a Review</a></p>
 
       <div style="text-align: center; margin-top: 28px;">
         <p style="color: ${BRAND_COLORS.textMuted};">Thank you for choosing Al Fajer.</p>
@@ -575,10 +516,10 @@ export function orderCancelledEmail(data: OrderEmailData): { subject: string; ht
         <p>Your order has been cancelled as requested. If you paid online, your refund will be processed within 5–7 business days.</p>
       </div>
 
-      <div class="order-info-box">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Order Number</span></td><td style="text-align:right;"><span class="order-info-value">${data.orderNumber}</span></td></tr></table>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:4px 0;"><span class="order-info-label">Refund Amount</span></td><td style="text-align:right;"><span class="order-info-value">${formatCurrency(data.total, data.currency)}</span></td></tr></table>
-      </div>
+      ${generateOrderInfoLines([
+        { label: 'Order Number', value: data.orderNumber },
+        { label: 'Refund amount', value: formatCurrency(data.total, data.currency) },
+      ])}
 
       <h2>Cancelled Items</h2>
       ${generateItemsTable(data.items, data.currency)}
