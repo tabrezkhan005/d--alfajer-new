@@ -1,16 +1,7 @@
-import { getCategoryBySlug, getProducts } from "@/src/lib/supabase/products";
+import { getCategoryBySlug, getProducts } from "@/src/lib/supabase/products-server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
-import { Star, Heart } from "lucide-react";
-import { useCartStore } from "@/src/lib/cart-store";
-import { useWishlistStore } from "@/src/lib/wishlist-store";
-import { Badge } from "@/src/components/ui/badge";
-import { formatCurrency } from "@/src/lib/utils"; // Assuming utils has it, or I'll implement inline
-// ProductCard import removed
-
-// Inline Product Card for now to ensure all deps work without refactoring existing files
 import { ProductCardComponent } from "./product-card";
 
 export const dynamic = 'force-dynamic';
