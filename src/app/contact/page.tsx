@@ -92,7 +92,7 @@ export default function ContactPage() {
           {[
             { icon: Mail, title: t('contact.emailSupport'), content: "alfajermart@gmail.com", desc: t('contact.sendEmail') },
             { icon: Phone, title: t('contact.phoneSupport'), content: "+91 96228 63806", desc: t('contact.businessHours') },
-            { icon: MapPin, title: t('contact.visitUs'), content: "Dubai, UAE", desc: t('contact.visitStore') },
+            { icon: MapPin, title: t('contact.visitUs'), content: "NH44, Lethpora - Jammu & Kashmir", desc: t('contact.visitStore') },
             { icon: Clock, title: t('page.support'), content: "24/7", desc: t('contact.liveChat') }
           ].map((info, i) => (
             <motion.div
