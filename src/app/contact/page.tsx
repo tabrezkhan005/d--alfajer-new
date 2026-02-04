@@ -90,8 +90,8 @@ export default function ContactPage() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
         >
           {[
-            { icon: Mail, title: t('contact.emailSupport'), content: "support@alfajer.com", desc: t('contact.sendEmail') },
-            { icon: Phone, title: t('contact.phoneSupport'), content: "+971 4 XXX XXXX", desc: t('contact.businessHours') },
+            { icon: Mail, title: t('contact.emailSupport'), content: "alfajermart@gmail.com", desc: t('contact.sendEmail') },
+            { icon: Phone, title: t('contact.phoneSupport'), content: "+91 96228 63806", desc: t('contact.businessHours') },
             { icon: MapPin, title: t('contact.visitUs'), content: "Dubai, UAE", desc: t('contact.visitStore') },
             { icon: Clock, title: t('page.support'), content: "24/7", desc: t('contact.liveChat') }
           ].map((info, i) => (

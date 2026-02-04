@@ -158,7 +158,7 @@ function Footer() {
               <li className="flex items-center gap-1.5 sm:gap-2">
                 <Phone className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] shrink-0" />
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+919622863806"
                   className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors"
                 >
                   {t('footer.phone_text')}
@@ -167,7 +167,7 @@ function Footer() {
               <li className="flex items-center gap-1.5 sm:gap-2">
                 <Mail className="h-3 sm:h-4 md:h-5 w-3 sm:w-4 md:w-5 text-[#009744] shrink-0" />
                 <a
-                  href="mailto:info@alfajermart.com"
+                  href="mailto:alfajermart@gmail.com"
                   className="text-xs sm:text-sm md:text-sm text-gray-600 hover:text-[#009744] transition-colors break-all"
                 >
                   {t('footer.email_text')}

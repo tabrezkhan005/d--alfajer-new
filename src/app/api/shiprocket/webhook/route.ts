@@ -5,14 +5,9 @@ import { prepareOrderEmailData, sendOrderStatusEmail } from "@/src/lib/email";
 /**
  * Shiprocket Webhook – automated order status updates and customer emails
  *
- * Register this URL in Shiprocket: Settings → API → Webhooks (URL + Token).
- * Token is sent in HTTP header: x-api-key. Set the same value in env as SHIPROCKET_WEBHOOK_SECRET.
- * e.g. https://yourdomain.com/api/shiprocket/webhook
- *
- * When Shiprocket sends status updates (dispatched, delivered), we:
- * 1. Find the order by channel_order_id or order_id (our order_number or id)
- * 2. Update order status and tracking_number
- * 3. Send the appropriate email (shipped with tracking, or delivered) with full order details
+ * Guidelines: POST, Content-Type: application/json, token in x-api-key, respond with 200 only.
+ * Prefer URL without "shiprocket/sr/kr" in path – use https://yourdomain.com/api/courier/webhook
+ * Token: set same value in Shiprocket (Token field) and env SHIPROCKET_WEBHOOK_SECRET.
  */
 
 const SHIPPED_STATUSES = new Set([
@@ -23,13 +18,14 @@ const SHIPPED_STATUSES = new Set([
   "PICKUP_SCHEDULED",
   "SHIPPED",
   "OUT_FOR_DELIVERY",
-  "RTO_INITIATED", // optional: you may treat differently
+  "MANIFEST_GENERATED",
+  "RTO_INITIATED",
 ]);
 const DELIVERED_STATUS = "DELIVERED";
 
 function normalizeStatus(value: unknown): string {
   if (typeof value !== "string") return "";
-  return value.toUpperCase().trim();
+  return value.toUpperCase().trim().replace(/\s+/g, "_");
 }
 
 function getAwbCode(payload: Record<string, unknown>): string {
@@ -44,8 +40,9 @@ function getAwbCode(payload: Record<string, unknown>): string {
 
 function getShipmentStatus(payload: Record<string, unknown>): string {
   const raw =
-    payload.status ??
+    payload.current_status ??
     payload.shipment_status ??
+    payload.status ??
     payload.shipment_status_label ??
     (payload.tracking_data as Record<string, unknown>)?.shipment_status ??
     (payload.tracking_data as Record<string, unknown>)?.status ??
@@ -60,15 +57,20 @@ function getOrderReference(payload: Record<string, unknown>): string | null {
   return null;
 }
 
+/** Always return 200 per provider guideline: "The URL should be set to send only code 200 in response." */
+function ok(body: { received: boolean; processed?: boolean; message?: string }) {
+  return NextResponse.json(body, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
+  let processed = false;
   try {
-    // Shiprocket sends the token in the x-api-key header (as per their Webhooks settings)
     const token = request.headers.get("x-api-key") ?? request.headers.get("x-shiprocket-webhook-secret") ?? request.headers.get("x-webhook-secret");
     const configuredSecret = process.env.SHIPROCKET_WEBHOOK_SECRET;
     if (configuredSecret && configuredSecret.length > 0) {
       if (token !== configuredSecret) {
         console.warn("Shiprocket webhook: token mismatch");
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return ok({ received: true, processed: false, message: "Unauthorized" });
       }
     }
 
@@ -76,25 +78,25 @@ export async function POST(request: NextRequest) {
     try {
       payload = await request.json();
     } catch {
-      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+      console.warn("Shiprocket webhook: invalid JSON body");
+      return ok({ received: true, processed: false, message: "Invalid JSON" });
     }
 
     const ref = getOrderReference(payload);
     if (!ref) {
       console.warn("Shiprocket webhook: no order reference in payload", JSON.stringify(payload, null, 2));
-      return NextResponse.json({ received: true, message: "No order reference" });
+      return ok({ received: true, processed: false, message: "No order reference" });
     }
 
     const status = getShipmentStatus(payload);
     if (!status) {
       console.warn("Shiprocket webhook: no status in payload", JSON.stringify(payload, null, 2));
-      return NextResponse.json({ received: true, message: "No status" });
+      return ok({ received: true, processed: false, message: "No status" });
     }
 
     const awbCode = getAwbCode(payload);
     const supabase = createAdminClient();
 
-    // Find order by order_number or id (we send one of these as order_id when creating shipment)
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
     const query = supabase
       .from("orders")
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     if (findError || !orders?.length) {
       console.warn("Shiprocket webhook: order not found for ref", ref, findError);
-      return NextResponse.json({ received: true, message: "Order not found" });
+      return ok({ received: true, processed: false, message: "Order not found" });
     }
 
     const order = orders[0] as any;
@@ -121,7 +123,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!newStatus) {
-      return NextResponse.json({ received: true, message: `Status ${status} not mapped to shipped/delivered` });
+      return ok({ received: true, processed: false, message: `Status ${status} not mapped` });
     }
 
     const updates: { status?: string; tracking_number?: string; updated_at: string } = {
@@ -137,10 +139,10 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error("Shiprocket webhook: failed to update order", orderId, updateError);
-      return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+      return ok({ received: true, processed: false, message: "Update failed" });
     }
 
-    // Idempotency: only send email once per status (optional: could add a sent_emails log)
+    processed = true;
     const alreadyShipped = currentStatus === "shipped" || currentStatus === "delivered";
     const alreadyDelivered = currentStatus === "delivered";
     const shouldSendShipped = newStatus === "shipped" && !alreadyShipped;
@@ -176,8 +178,8 @@ export async function POST(request: NextRequest) {
     }
   } catch (err) {
     console.error("Shiprocket webhook error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return ok({ received: true, processed: false, message: "Internal error" });
   }
 
-  return NextResponse.json({ received: true });
+  return ok({ received: true, processed });
 }

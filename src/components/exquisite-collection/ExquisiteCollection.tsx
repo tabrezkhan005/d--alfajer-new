@@ -69,7 +69,6 @@ export function ExquisiteCollection({
       id: "combo",
       name: "Combo",
       image: "/images/collections/COMBOS.jpg",
-      comingSoon: true,
     },
   ];
 
