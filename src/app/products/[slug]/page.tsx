@@ -10,19 +10,27 @@ interface ProductPageProps {
     }>;
 }
 
-// Cached data fetcher
-const getProduct = cache(async (slug: string) => {
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Cached data fetcher: resolve by slug or by id (when param looks like UUID)
+const getProduct = cache(async (slugOrId: string) => {
+    const param = String(slugOrId || "").trim();
+    if (!param || param === "undefined" || param === "null") return null;
+
     const supabase = await createServerClient();
-    const { data } = await supabase
+    const isUuid = UUID_REGEX.test(param);
+    const query = supabase
         .from("products")
         .select(`
       *,
       variants:product_variants(*),
       category:categories(*)
     `)
-        .eq("slug", slug)
-        .eq("is_active", true)
-        .single();
+        .eq("is_active", true);
+
+    const { data } = isUuid
+        ? await query.eq("id", param).single()
+        : await query.eq("slug", param).single();
 
     // Transform storage paths to public URLs
     if (data && data.images) {

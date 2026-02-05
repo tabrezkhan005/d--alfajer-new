@@ -32,6 +32,17 @@ interface FilterState {
   onSaleOnly: boolean;
 }
 
+// Product page path: Combo always uses id (slug often has +/encoding or DB mismatch). Others use slug when valid.
+function getProductHref(product: TransformedProduct): string {
+  const categoryName = product.category?.name?.toLowerCase();
+  if (categoryName === "combo") return `/products/${product.id}`;
+
+  const slug = product.slug && String(product.slug).trim();
+  const slugLower = slug?.toLowerCase();
+  if (!slug || slug === "undefined" || (categoryName && slugLower === categoryName)) return `/products/${product.id}`;
+  return `/products/${slug}`;
+}
+
 export function ProductListing() {
   const { t, formatCurrency, convertCurrency, currency } = useI18n();
   const searchParams = useSearchParams();
@@ -827,7 +838,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
         </motion.div>
 
         {/* Product Image */}
-        <Link href={`/products/${product.slug}`} className="block h-full w-full">
+        <Link href={getProductHref(product)} className="block h-full w-full">
             <div className="relative h-full w-full">
                 <Image
                 src={product.image}
@@ -843,7 +854,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
 
         {/* Quick View - Shows on hover (hidden on mobile) */}
         <div className="hidden sm:block absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pt-20 pb-5 px-5 pointer-events-none">
-          <Link href={`/products/${product.slug}`} className="pointer-events-auto">
+          <Link href={getProductHref(product)} className="pointer-events-auto">
             <div className="w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold shadow-lg rounded-full h-11 font-poppins flex items-center justify-center cursor-pointer transition-colors">
               <Eye className="h-4 w-4 mr-2" />
               {t('product.viewDetails')}
@@ -878,7 +889,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
         </div>
 
         {/* Title - Compact on mobile */}
-        <Link href={`/products/${product.slug}`}>
+        <Link href={getProductHref(product)}>
             <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2rem] xs:min-h-[2.25rem] sm:min-h-[3rem] leading-tight font-poppins hover:text-[#009744] transition-colors">
             {product.name}
             </h3>

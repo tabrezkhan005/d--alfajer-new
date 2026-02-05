@@ -592,7 +592,12 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                   key={relatedProduct.id}
                   className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
                   whileHover={{ y: -4 }}
-                  onClick={() => router.push(`/products/${relatedProduct.slug}`)}
+                  onClick={() => {
+                  const slug = relatedProduct.slug && String(relatedProduct.slug).trim();
+                  const catName = (relatedProduct as { category?: { name?: string } }).category?.name?.toLowerCase();
+                  const useSlug = slug && slug !== "undefined" && (!catName || slug.toLowerCase() !== catName);
+                  router.push(`/products/${useSlug ? slug : relatedProduct.id}`);
+                }}
                 >
                   <div className="relative aspect-square bg-gray-100 overflow-hidden">
                     <Image
