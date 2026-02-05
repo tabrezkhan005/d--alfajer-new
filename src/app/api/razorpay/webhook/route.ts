@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
 import { prepareOrderEmailData, sendOrderStatusEmail } from '@/src/lib/email';
+import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 import crypto from 'crypto';
 
 // POST: Razorpay Webhook Handler
@@ -93,7 +94,7 @@ async function handlePaymentSuccess(event: any) {
   // Find order by Razorpay order ID first, then by order ID
   // Supabase uses parameterized queries, but we validate inputs
   let order = null;
-  
+
   if (payment.order_id) {
     const { data } = await supabase
       .from('orders')
@@ -102,7 +103,7 @@ async function handlePaymentSuccess(event: any) {
       .single();
     order = data;
   }
-  
+
   if (!order && orderId) {
     const { data } = await supabase
       .from('orders')
@@ -160,6 +161,14 @@ async function handlePaymentSuccess(event: any) {
     } catch (emailErr) {
       console.error('Webhook: error sending confirmation email:', emailErr);
     }
+
+    // --- AUTOMATION: Create Shiprocket Shipment ---
+    try {
+      console.log('🤖 Webhook: Triggering Shiprocket automation for order:', order.id);
+      await automateShiprocketShipment(order.id);
+    } catch (automationErr) {
+      console.error('Webhook: Shiprocket automation failed:', automationErr);
+    }
   }
 }
 
@@ -181,7 +190,7 @@ async function handlePaymentFailed(event: any) {
 
   // Find order by razorpay_order_id first, then by id
   let existingOrder = null;
-  
+
   if (payment.order_id) {
     const { data } = await supabase
       .from('orders')
@@ -190,7 +199,7 @@ async function handlePaymentFailed(event: any) {
       .single();
     existingOrder = data;
   }
-  
+
   if (!existingOrder && orderId) {
     const { data } = await supabase
       .from('orders')
@@ -234,7 +243,7 @@ async function handleOrderPaid(event: any) {
 
   // Find order by razorpay_order_id first, then by id
   let existingOrder = null;
-  
+
   if (order.id) {
     const { data } = await supabase
       .from('orders')
@@ -243,7 +252,7 @@ async function handleOrderPaid(event: any) {
       .single();
     existingOrder = data;
   }
-  
+
   if (!existingOrder && orderId) {
     const { data } = await supabase
       .from('orders')
@@ -297,6 +306,14 @@ async function handleOrderPaid(event: any) {
         }
       } catch (emailErr) {
         console.error('Webhook order.paid: error sending confirmation email:', emailErr);
+      }
+
+      // --- AUTOMATION: Create Shiprocket Shipment ---
+      try {
+        console.log('🤖 Webhook order.paid: Triggering Shiprocket automation for order:', existingOrder.id);
+        await automateShiprocketShipment(existingOrder.id);
+      } catch (automationErr) {
+        console.error('Webhook order.paid: Shiprocket automation failed:', automationErr);
       }
     }
   }

@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/src/lib/supabase/server";
-import { prepareOrderEmailData, sendOrderStatusEmail } from "@/src/lib/email";
 
 /**
- * Shiprocket Webhook – automated order status updates and customer emails
+ * Shiprocket Webhook – update order status in DB only.
+ * Customer emails (shipped, out for delivery, delivered) are sent by Shiprocket when
+ * billing_email and billing_phone are set in the Create Order API and Email Notifications
+ * are enabled in Shiprocket Dashboard → Settings → Communication.
  *
  * Guidelines: POST, Content-Type: application/json, token in x-api-key, respond with 200 only.
- * Prefer URL without "shiprocket/sr/kr" in path – use https://yourdomain.com/api/courier/webhook
- * Token: set same value in Shiprocket (Token field) and env SHIPROCKET_WEBHOOK_SECRET.
+ * Webhook URL: https://yourdomain.com/api/courier/webhook
+ * Token: set in Shiprocket (Token field) and env SHIPROCKET_WEBHOOK_SECRET.
  */
 
 const SHIPPED_STATUSES = new Set([
@@ -176,43 +178,7 @@ export async function POST(request: NextRequest) {
     }
 
     processed = true;
-    const alreadyShipped = currentStatus === "shipped" || currentStatus === "delivered";
-    const alreadyDelivered = currentStatus === "delivered";
-    const shouldSendShipped = newStatus === "shipped" && !alreadyShipped;
-    const shouldSendDelivered = newStatus === "delivered" && !alreadyDelivered;
-
-    if (shouldSendShipped || shouldSendDelivered) {
-      const { data: fullOrder } = await supabase
-        .from("orders")
-        .select("*, items:order_items(*)")
-        .eq("id", orderId)
-        .single();
-
-      if (fullOrder) {
-        const orderData = fullOrder as any;
-        if (awbCode) {
-          orderData.tracking_number = awbCode;
-          orderData.tracking_url = `https://www.shiprocket.in/tracking/${String(awbCode).replace(/^SR-/i, "")}`;
-        }
-        orderData.status = newStatus;
-
-        const emailData = prepareOrderEmailData(orderData);
-        if (emailData.customerEmail && emailData.customerEmail.trim()) {
-          try {
-            const emailResult = await sendOrderStatusEmail(newStatus, emailData);
-            if (emailResult.success) {
-              console.log("Shiprocket webhook: email sent", newStatus, "to", emailData.customerEmail, "messageId:", emailResult.messageId);
-            } else {
-              console.error("Shiprocket webhook: email failed", newStatus, emailResult.error);
-            }
-          } catch (err) {
-            console.error("Shiprocket webhook: email error", err);
-          }
-        } else {
-          console.warn("Shiprocket webhook: no customer email for order", orderId);
-        }
-      }
-    }
+    console.log("Shiprocket webhook: order updated", { orderId, newStatus, awbCode: awbCode || "(none)" });
   } catch (err) {
     console.error("Shiprocket webhook error:", err);
     return ok({ received: true, processed: false, message: "Internal error" });

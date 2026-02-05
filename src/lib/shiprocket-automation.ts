@@ -1,0 +1,141 @@
+import { createAdminClient } from "./supabase/server";
+import {
+  createShiprocketShipment,
+  getShiprocketToken,
+  CreateShipmentRequest,
+  ShiprocketOrderItem
+} from "./shiprocket";
+
+/**
+ * Automatically creates a Shiprocket shipment for a given order ID.
+ * This is intended for use in webhooks or automated flows.
+ */
+export async function automateShiprocketShipment(orderId: string) {
+  const supabase = createAdminClient();
+
+  try {
+    console.log(`🚀 Starting Shiprocket automation for Order: ${orderId}`);
+
+    // 1. Fetch Order and Items
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select(`
+        *,
+        items:order_items(*)
+      `)
+      .eq("id", orderId)
+      .single();
+
+    if (orderError || !order) {
+      throw new Error(`Order not found: ${orderError?.message}`);
+    }
+
+    const orderData = order as any;
+
+    // 2. Validate if already shipped
+    if (orderData.status === "shipped" || orderData.tracking_number) {
+      console.log(`⏩ Order ${orderId} is already shipped or has tracking. Skipping.`);
+      return { success: true, skipped: true, message: "Already shipped" };
+    }
+
+    // 3. Authenticate with Shiprocket
+    let email = process.env.SHIPROCKET_EMAIL;
+    let password = process.env.SHIPROCKET_PASSWORD;
+
+    if (!email || !password) {
+      throw new Error("Shiprocket credentials (SHIPROCKET_EMAIL/PASSWORD) not configured in env.");
+    }
+
+    // Strip literal quotes if present (some env loaders include them)
+    if (email.startsWith("'") && email.endsWith("'")) email = email.slice(1, -1);
+    if (email.startsWith('"') && email.endsWith('"')) email = email.slice(1, -1);
+    if (password.startsWith("'") && password.endsWith("'")) password = password.slice(1, -1);
+    if (password.startsWith('"') && password.endsWith('"')) password = password.slice(1, -1);
+
+    const authResult = await getShiprocketToken(email, password);
+    if ("error" in authResult) {
+      throw new Error(`Authentication failed: ${authResult.error}`);
+    }
+    const token = authResult.token;
+
+    // 4. Prepare Shipment Data
+    const shippingAddress = order.shipping_address as any;
+    const orderItems = order.items as any[] || [];
+
+    // Map items to Shiprocket format
+    const shiprocketItems: ShiprocketOrderItem[] = orderItems.map((item) => ({
+      name: item.name || "Product",
+      sku: item.sku || item.product_id || "SKU-UNKNOWN",
+      units: item.quantity || 1,
+      selling_price: Number(item.price) || 0,
+    }));
+
+    // Calculate total weight (defaulting to 0.5kg per item if not known)
+    const totalWeight = orderItems.reduce((sum, item) => sum + (item.quantity * 0.5), 0);
+
+    const shipmentData: CreateShipmentRequest = {
+      order_id: orderData.id,
+      order_date: new Date(orderData.created_at || Date.now()).toISOString().split('T')[0],
+      pickup_location: process.env.NEXT_PUBLIC_SHIPROCKET_PICKUP_LOCATION || "Primary",
+      billing_customer_name: shippingAddress.firstName || "Customer",
+      billing_last_name: shippingAddress.lastName || "",
+      billing_address: shippingAddress.address || shippingAddress.streetAddress || "",
+      billing_address_2: shippingAddress.apartment || "",
+      billing_city: shippingAddress.city || "",
+      billing_pincode: shippingAddress.zip || shippingAddress.postalCode || "",
+      billing_state: shippingAddress.state || "",
+      billing_country: shippingAddress.country || "India",
+      billing_email: orderData.email || shippingAddress.email || "",
+      billing_phone: shippingAddress.phone || "",
+      shipping_is_billing: true,
+      order_items: shiprocketItems,
+      payment_method: orderData.payment_method === "cod" ? "COD" : "Prepaid",
+      sub_total: Number(orderData.subtotal) || Number(orderData.total_amount) || 0,
+      weight: totalWeight,
+      length: 15, // Default dimensions
+      breadth: 15,
+      height: 10,
+    };
+
+    console.log(`📦 Creating Shiprocket Order for ${orderId}...`);
+    const result = await createShiprocketShipment(token, shipmentData);
+
+    if (!result) {
+      throw new Error("No response from Shiprocket API");
+    }
+
+    // 5. Update Database
+    const srOrderId = result.order_id || (result as any).payload?.order_id;
+    const shipmentId = result.shipment_id || (result as any).payload?.shipment_id;
+    const awbCode = result.awb_code || (result as any).payload?.awb_code;
+
+    // Use a reference if AWB is not yet assigned
+    const trackingRef = awbCode || `SR-${shipmentId || srOrderId}`;
+
+    const { error: updateError } = await supabase
+      .from("orders")
+      .update({
+        status: "shipped",
+        tracking_number: trackingRef,
+        updated_at: new Date().toISOString(),
+        notes: JSON.stringify({
+          shiprocket_order_id: srOrderId,
+          shiprocket_shipment_id: shipmentId,
+          automated: true,
+          shiprocket_response: result
+        })
+      })
+      .eq("id", orderId);
+
+    if (updateError) {
+      console.error(`❌ Failed to update order in DB: ${updateError.message}`);
+    }
+
+    console.log(`✅ Shiprocket automation completed for ${orderId}. Reference: ${trackingRef}`);
+    return { success: true, trackingNumber: trackingRef, shiprocketOrderId: srOrderId };
+
+  } catch (error: any) {
+    console.error(`❌ Shiprocket Automation Error [${orderId}]:`, error.message);
+    return { success: false, error: error.message };
+  }
+}

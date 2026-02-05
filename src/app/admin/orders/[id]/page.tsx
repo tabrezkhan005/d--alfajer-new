@@ -217,41 +217,6 @@ export default function OrderDetailPage({
     loadShiprocketConfig();
   }, [id]);
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!order) return;
-
-    setUpdatingStatus(true);
-    const success = await updateOrderStatus(order.id, newStatus);
-
-    if (success) {
-      setOrder({ ...order, status: newStatus });
-      toast.success("Order status updated");
-
-      // Trigger email notification (include tracking for shipped so customer gets AWB link)
-      try {
-        const body: { orderId: string; status: string; trackingNumber?: string; trackingUrl?: string } = {
-          orderId: order.id,
-          status: newStatus,
-        };
-        if (newStatus === 'shipped' && order.tracking_number) {
-          body.trackingNumber = order.tracking_number;
-          const awb = String(order.tracking_number).replace(/^SR-/i, '');
-          body.trackingUrl = `https://www.shiprocket.in/tracking/${awb}`;
-        }
-        fetch('/api/email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-      } catch (e) {
-        console.error("Failed to trigger email notification", e);
-      }
-    } else {
-      toast.error("Failed to update status");
-    }
-
-    setUpdatingStatus(false);
-  };
 
   const handlePrint = () => {
     window.print();
@@ -493,21 +458,7 @@ export default function OrderDetailPage({
           toast.success(`Shipment created with Courier! AWB: ${awbCode}`);
           setOrder({ ...order, tracking_number: awbCode, status: "shipped" });
           setShowShipmentModal(false);
-
-          // Send shipped email with tracking so customer gets AWB and link
-          fetch('/api/email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: order.id,
-              status: 'shipped',
-              trackingNumber: awbCode,
-              trackingUrl: awbCode
-                ? `https://www.shiprocket.in/tracking/${String(awbCode).replace(/^SR-/i, '')}`
-                : undefined,
-            }),
-          });
-
+          // Customer shipment emails (shipped, delivered) are sent by Shiprocket when billing_email/billing_phone are set at order creation.
         } else {
           const trackingRef = `SR-${shipmentId || srOrderId}`;
           await updateOrderTrackingNumber(order.id, trackingRef);
@@ -702,44 +653,6 @@ export default function OrderDetailPage({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Update Order Status</CardTitle>
-              <CardDescription>Change the order status to notify the customer</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(order.status)}
-                  <span className="text-sm font-medium capitalize">{order.status || "pending"}</span>
-                </div>
-                <RefreshCw className="h-4 w-4 text-muted-foreground" />
-                <Select
-                  value={order.status || "pending"}
-                  onValueChange={handleStatusChange}
-                  disabled={updatingStatus}
-                >
-                  <SelectTrigger className="w-40">
-                    {updatingStatus ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <SelectValue />
-                    )}
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                    <SelectItem value="return_requested">Return Requested</SelectItem>
-                    <SelectItem value="returned">Returned</SelectItem>
-                    <SelectItem value="return_rejected">Return Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card className="border-2 border-dashed border-muted-foreground/20">
             <CardHeader className="pb-3">
@@ -789,7 +702,9 @@ export default function OrderDetailPage({
                         <Truck className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-sm text-green-600 font-medium">Shipment Created</p>
+                        <p className="text-sm text-green-600 font-medium">
+                          {order.tracking_number.startsWith('SR-') ? 'Order Registered (Awaiting AWB)' : 'Shipment Dispatched'}
+                        </p>
                         <p className="text-lg font-bold text-green-800 font-mono">
                           {order.tracking_number}
                         </p>
@@ -797,17 +712,25 @@ export default function OrderDetailPage({
                     </div>
                     <Button
                       variant="default"
-                      className="bg-green-600 hover:bg-green-700"
-                      asChild
+                      className={`${order.tracking_number.startsWith('SR-') ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                      asChild={!order.tracking_number.startsWith('SR-')}
+                      disabled={order.tracking_number.startsWith('SR-')}
                     >
-                      <a
-                        href={getShiprocketTrackingURL(order.tracking_number)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Track Shipment
-                      </a>
+                      {order.tracking_number.startsWith('SR-') ? (
+                        <>
+                          <Clock className="mr-2 h-4 w-4" />
+                          AWB Pending
+                        </>
+                      ) : (
+                        <a
+                          href={getShiprocketTrackingURL(order.tracking_number)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Track Shipment
+                        </a>
+                      )}
                     </Button>
                   </div>
                 </div>

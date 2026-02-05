@@ -367,8 +367,8 @@ export async function getDashboardStats() {
     ] = await Promise.all([
         // Total orders
         supabase.from('orders').select('*', { count: 'exact', head: true }),
-        // Revenue (sum total)
-        supabase.from('orders').select('total').neq('status', 'cancelled'),
+        // Revenue (sum total_amount)
+        supabase.from('orders').select('total_amount').neq('status', 'cancelled'),
         // Active products
         supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true),
         // Total customers
@@ -378,7 +378,7 @@ export async function getDashboardStats() {
             .select(`
                 id,
                 user_id,
-                total,
+                total_amount,
                 status,
                 created_at,
                 email
@@ -393,7 +393,7 @@ export async function getDashboardStats() {
     ]);
 
     // Calculate total revenue
-    const totalRevenue = (revenueData as any[])?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
+    const totalRevenue = (revenueData as any[])?.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0) || 0;
 
     // Calculate growth (mock logic for now as we don't have historical data easily accessible without complex queries)
     const stats = {
@@ -421,7 +421,7 @@ export async function getSalesChartData() {
 
     const { data: orders } = await supabase
         .from('orders')
-        .select('created_at, total')
+        .select('created_at, total_amount')
         .gte('created_at', sevenDaysAgo.toISOString())
         .neq('status', 'cancelled')
         .order('created_at');
@@ -431,7 +431,7 @@ export async function getSalesChartData() {
     (orders as any[])?.forEach(order => {
         if (!order.created_at) return;
         const date = new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        chartData[date] = (chartData[date] || 0) + (order.total || 0);
+        chartData[date] = (chartData[date] || 0) + (Number(order.total_amount) || 0);
     });
 
     return Object.entries(chartData).map(([date, amount]) => ({ name: date, total: amount }));
