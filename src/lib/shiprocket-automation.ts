@@ -49,8 +49,15 @@ export async function automateShiprocketShipment(orderId: string) {
     // Strip literal quotes if present (some env loaders include them)
     if (email.startsWith("'") && email.endsWith("'")) email = email.slice(1, -1);
     if (email.startsWith('"') && email.endsWith('"')) email = email.slice(1, -1);
+    email = email.trim();
+
     if (password.startsWith("'") && password.endsWith("'")) password = password.slice(1, -1);
     if (password.startsWith('"') && password.endsWith('"')) password = password.slice(1, -1);
+    password = password.trim();
+
+    console.log(`🔑 Using Shiprocket Email: ${email}`);
+    console.log(`🔑 Password length: ${password.length}`);
+    console.log(`🔑 Password first 3 chars: ${password.substring(0, 3)}...`);
 
     const authResult = await getShiprocketToken(email, password);
     if ("error" in authResult) {
