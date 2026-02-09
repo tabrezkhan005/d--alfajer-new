@@ -25,7 +25,7 @@ export interface ShippingMethod {
 
 export interface PaymentMethod {
   id: string;
-  type: 'card' | 'upi' | 'wallet' | 'apple_pay' | 'google_pay';
+  type: 'card' | 'upi' | 'wallet' | 'apple_pay' | 'google_pay' | 'cod';
   name: string;
   isAvailable: boolean;
   requiresTokenization: boolean;
@@ -112,6 +112,13 @@ export const shippingMethods: ShippingMethod[] = [
 
 // Payment methods
 export const paymentMethods: PaymentMethod[] = [
+  {
+    id: 'cod',
+    type: 'cod',
+    name: 'Cash on Delivery',
+    isAvailable: true,
+    requiresTokenization: false,
+  },
   {
     id: 'card',
     type: 'card',

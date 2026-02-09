@@ -424,8 +424,12 @@ export function orderShippedEmail(data: OrderEmailData): { subject: string; html
         <p>Your order has been shipped and is on its way to you.</p>
       </div>
 
-      ${data.trackingNumber ? `${generateOrderInfoLines([{ label: 'Tracking (AWB)', value: data.trackingNumber, highlight: true }])}
-      ${data.trackingUrl ? `<p style="margin: 0 0 20px 0;"><a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a></p>` : ''}` : ''}
+      ${data.trackingNumber ? `
+      <div style="text-align: center; margin: 24px 0 32px;">
+        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: ${BRAND_COLORS.textMuted}; margin-bottom: 8px;">Tracking Number (AWB)</p>
+        <p style="font-size: 20px; font-weight: 700; color: ${BRAND_COLORS.text}; margin-bottom: 24px;">${data.trackingNumber}</p>
+        ${data.trackingUrl ? `<a href="${data.trackingUrl}" class="cta-button" style="margin: 0;">Track Shipment</a>` : ''}
+      </div>` : ''}
 
       ${generateOrderInfoLines([
         { label: 'Order Number', value: data.orderNumber, highlight: true },

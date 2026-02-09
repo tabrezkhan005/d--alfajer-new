@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/src/lib/supabase/server";
 
 /**
- * Shiprocket Webhook – update order status in DB only.
+ * Shiprocket Webhook – update order status in DB and log analytics.
  * Customer emails (shipped, out for delivery, delivered) are sent by Shiprocket when
  * billing_email and billing_phone are set in the Create Order API and Email Notifications
  * are enabled in Shiprocket Dashboard → Settings → Communication.
  *
  * Guidelines: POST, Content-Type: application/json, token in x-api-key, respond with 200 only.
- * Webhook URL: https://yourdomain.com/api/courier/webhook
+ * Webhook URL: https://yourdomain.com/api/shiprocket/webhook
  * Token: set in Shiprocket (Token field) and env SHIPROCKET_WEBHOOK_SECRET.
  */
 
@@ -24,6 +24,8 @@ const SHIPPED_STATUSES = new Set([
   "RTO_INITIATED",
 ]);
 const DELIVERED_STATUS = "DELIVERED";
+const RTO_STATUSES = new Set(["RTO_INITIATED", "RTO_IN_TRANSIT", "RTO_DELIVERED", "RTO"]);
+const CANCELLED_STATUSES = new Set(["CANCELLED", "CANCELLATION REQUESTED"]);
 
 function normalizeStatus(value: unknown): string {
   if (typeof value !== "string") return "";
@@ -70,6 +72,8 @@ function ok(body: { received: boolean; processed?: boolean; message?: string }) 
 
 export async function POST(request: NextRequest) {
   let processed = false;
+  const supabase = createAdminClient();
+
   try {
     const token = request.headers.get("x-api-key") ?? request.headers.get("x-shiprocket-webhook-secret") ?? request.headers.get("x-webhook-secret");
     const configuredSecret = process.env.SHIPROCKET_WEBHOOK_SECRET;
@@ -88,55 +92,77 @@ export async function POST(request: NextRequest) {
       return ok({ received: true, processed: false, message: "Invalid JSON" });
     }
 
+    const status = getShipmentStatus(payload);
+    const awbCode = getAwbCode(payload);
+
+    // Log webhook event for debuggin
+    try {
+      await supabase.from("shiprocket_webhook_logs" as any).insert({
+        event_type: payload.event_type || "status_update",
+        awb_code: awbCode || null,
+        status: status || null,
+        payload: payload,
+        processed: false,
+      });
+    } catch (logError) {
+      console.error("Failed to log webhook:", logError);
+    }
+
     const orderRef = getOrderReference(payload);
     if (!orderRef) {
       console.warn("Shiprocket webhook: no order reference in payload", JSON.stringify(payload, null, 2));
       return ok({ received: true, processed: false, message: "No order reference" });
     }
 
-    const status = getShipmentStatus(payload);
     if (!status) {
       console.warn("Shiprocket webhook: no status in payload", JSON.stringify(payload, null, 2));
       return ok({ received: true, processed: false, message: "No status" });
     }
 
-    const awbCode = getAwbCode(payload);
-    const supabase = createAdminClient();
     const { ref, srOrderId } = orderRef;
 
-    // Find order: by order_number, by id (UUID), or by notes.shiprocket_order_id / sr_order_id
+    // Find order: by order_number, by id (UUID), by shiprocket_order_id, or by notes.shiprocket_order_id
     let orders: any[] | null = null;
     let findError: any = null;
 
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
     const isNumeric = /^\d+$/.test(ref);
 
-    const baseSelect = "id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, total, currency, shipping_cost, tax, discount, created_at, notes";
+    const baseSelect = "id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, total, currency, shipping_cost, tax, discount, created_at, notes, shiprocket_order_id, shiprocket_shipment_id, payment_method";
 
+    // Try to find by UUID
     if (isUuid) {
       const r = await supabase.from("orders").select(baseSelect).eq("id", ref).limit(1);
       findError = r.error;
       orders = r.data;
+    // Try to find by order_number
     } else if (!isNumeric) {
       const r = await supabase.from("orders").select(baseSelect).eq("order_number", ref).limit(1);
       findError = r.error;
       orders = r.data;
     }
 
+    // Try to find by shiprocket_order_id column
     if ((!orders || orders.length === 0) && (isNumeric || srOrderId !== undefined)) {
       const srId = srOrderId ?? (isNumeric ? parseInt(ref, 10) : undefined);
       if (srId !== undefined && !Number.isNaN(srId)) {
-        const r = await supabase.from("orders").select(baseSelect).not("notes", "is", null).limit(500);
+        const r = await supabase.from("orders").select(baseSelect).eq("shiprocket_order_id", srId).limit(1);
         if (!r.error && r.data?.length) {
-          const found = (r.data as any[]).find((o) => {
-            try {
-              const n = o.notes && typeof o.notes === "string" ? JSON.parse(o.notes) : o.notes;
-              return n && (Number(n.shiprocket_order_id) === srId || Number(n.sr_order_id) === srId);
-            } catch {
-              return false;
-            }
-          });
-          if (found) orders = [found];
+          orders = r.data;
+        } else {
+          // Fallback: search in notes JSON
+          const r2 = await supabase.from("orders").select(baseSelect).not("notes", "is", null).limit(500);
+          if (!r2.error && r2.data?.length) {
+            const found = (r2.data as any[]).find((o) => {
+              try {
+                const n = o.notes && typeof o.notes === "string" ? JSON.parse(o.notes) : o.notes;
+                return n && (Number(n.shiprocket_order_id) === srId || Number(n.sr_order_id) === srId);
+              } catch {
+                return false;
+              }
+            });
+            if (found) orders = [found];
+          }
         }
       }
     }
@@ -150,9 +176,14 @@ export async function POST(request: NextRequest) {
     const orderId = order.id;
     const currentStatus = (order.status || "").toLowerCase();
 
-    let newStatus: "shipped" | "delivered" | null = null;
+    // Determine new order status
+    let newStatus: "shipped" | "delivered" | "return_requested" | "cancelled" | null = null;
     if (status === DELIVERED_STATUS) {
       newStatus = "delivered";
+    } else if (RTO_STATUSES.has(status)) {
+      newStatus = "return_requested";
+    } else if (CANCELLED_STATUSES.has(status)) {
+      newStatus = "cancelled";
     } else if (SHIPPED_STATUSES.has(status)) {
       newStatus = "shipped";
     }
@@ -161,6 +192,23 @@ export async function POST(request: NextRequest) {
       return ok({ received: true, processed: false, message: `Status ${status} not mapped` });
     }
 
+    // Don't downgrade status (e.g., don't change delivered back to shipped)
+    const statusOrder: Record<string, number> = {
+      pending: 0,
+      processing: 1,
+      shipped: 2,
+      delivered: 3,
+      return_requested: 4,
+      returned: 5,
+      cancelled: 6,
+    };
+
+    if (statusOrder[newStatus] <= statusOrder[currentStatus] && newStatus !== "return_requested") {
+      console.log("Shiprocket webhook: skipping status downgrade", { currentStatus, newStatus });
+      return ok({ received: true, processed: false, message: "Status not updated (no downgrade)" });
+    }
+
+    // Update order
     const updates: { status?: string; tracking_number?: string; updated_at: string } = {
       updated_at: new Date().toISOString(),
     };
@@ -175,6 +223,67 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error("Shiprocket webhook: failed to update order", orderId, updateError);
       return ok({ received: true, processed: false, message: "Update failed" });
+    }
+
+    // Update shipping analytics
+    try {
+      const analyticsUpdate: any = {
+        status: status,
+        last_status_update: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // If delivered, calculate delivery days
+      if (status === DELIVERED_STATUS) {
+        analyticsUpdate.delivered_date = new Date().toISOString();
+        // Calculate delivery days from order creation
+        const createdDate = new Date(order.created_at);
+        const deliveredDate = new Date();
+        const diffTime = Math.abs(deliveredDate.getTime() - createdDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        analyticsUpdate.delivery_days = diffDays;
+      }
+
+      // Update or insert analytics record
+      if (awbCode) {
+        const { data: existingAnalytics } = await supabase
+          .from("shipping_analytics" as any)
+          .select("id")
+          .eq("awb_code", awbCode)
+          .limit(1);
+
+        if (existingAnalytics && existingAnalytics.length > 0) {
+          await supabase
+            .from("shipping_analytics" as any)
+            .update(analyticsUpdate)
+            .eq("awb_code", awbCode);
+        } else if (order.shiprocket_shipment_id) {
+          await supabase
+            .from("shipping_analytics" as any)
+            .insert({
+              order_id: orderId,
+              shiprocket_order_id: order.shiprocket_order_id,
+              shiprocket_shipment_id: order.shiprocket_shipment_id,
+              awb_code: awbCode,
+              courier_name: payload.courier_name || null,
+              status: status,
+              last_status_update: new Date().toISOString(),
+            });
+        }
+      }
+
+      // Mark webhook log as processed
+      if (awbCode) {
+        await supabase
+          .from("shiprocket_webhook_logs" as any)
+          .update({ processed: true })
+          .eq("awb_code", awbCode)
+          .order("created_at", { ascending: false })
+          .limit(1);
+      }
+    } catch (analyticsError) {
+      console.error("Failed to update analytics:", analyticsError);
+      // Don't fail the webhook if analytics update fails
     }
 
     processed = true;

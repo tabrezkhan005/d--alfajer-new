@@ -116,29 +116,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store Shiprocket order id on our order so webhook can find it when Shiprocket sends order_id/sr_order_id
+    // Store Shiprocket order id/shipment id on our order
     const srOrderId = result.order_id ?? (result as any).payload?.order_id ?? (result as any).sr_order_id;
-    if (srOrderId != null && shipmentData.order_id) {
+    const shipmentId = result.shipment_id ?? (result as any).payload?.shipment_id;
+
+    if (shipmentData.order_id) {
       try {
         const supabase = createAdminClient();
         const ourRef = String(shipmentData.order_id).trim();
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ourRef);
-        const q = supabase.from("orders").select("id, notes").limit(1);
-        const { data: rows } = isUuid ? await q.eq("id", ourRef) : await q.eq("order_number", ourRef);
-        if (rows?.[0]) {
-          const existing = (rows[0] as any).notes;
-          let notesObj: Record<string, unknown> = {};
-          try {
-            if (existing && typeof existing === "string") notesObj = JSON.parse(existing);
-            else if (existing && typeof existing === "object") notesObj = { ...existing };
-          } catch {}
-          notesObj.shiprocket_order_id = typeof srOrderId === "number" ? srOrderId : parseInt(String(srOrderId), 10) || srOrderId;
-          notesObj.sr_order_id = notesObj.shiprocket_order_id;
-          await supabase.from("orders").update({ notes: JSON.stringify(notesObj) }).eq("id", (rows[0] as any).id);
-          console.log("Stored shiprocket_order_id for webhook lookup:", notesObj.shiprocket_order_id);
+
+        // Prepare update data
+        const updates: any = {};
+        if (srOrderId) updates.shiprocket_order_id = typeof srOrderId === "number" ? srOrderId : parseInt(String(srOrderId), 10);
+        if (shipmentId) updates.shiprocket_shipment_id = typeof shipmentId === "number" ? shipmentId : parseInt(String(shipmentId), 10);
+
+        if (Object.keys(updates).length > 0) {
+          if (isUuid) {
+            await supabase.from("orders").update(updates).eq("id", ourRef);
+          } else {
+            await supabase.from("orders").update(updates).eq("order_number", ourRef);
+          }
+          console.log("Stored Shiprocket IDs:", updates);
         }
       } catch (e) {
-        console.warn("Failed to store shiprocket_order_id on order:", e);
+        console.warn("Failed to store shiprocket IDs on order:", e);
       }
     }
 

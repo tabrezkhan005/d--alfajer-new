@@ -7,7 +7,7 @@ import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
-import { getOrderById, updateOrderStatus, updateOrderTrackingNumber, type OrderWithItems } from "@/src/lib/supabase/orders";
+import { getOrderById, updateOrderStatus, updateOrderTrackingNumber, updateShiprocketIds, type OrderWithItems } from "@/src/lib/supabase/orders";
 import { formatCurrency } from "@/src/lib/utils";
 import {
   Select,
@@ -89,6 +89,7 @@ export default function OrderDetailPage({
   const [couriers, setCouriers] = useState<any[]>([]);
   const [loadingRates, setLoadingRates] = useState(false);
   const [selectedCourier, setSelectedCourier] = useState<any>(null);
+  const [printingLabel, setPrintingLabel] = useState(false);
 
   useEffect(() => {
     async function fetchOrder() {
@@ -218,8 +219,60 @@ export default function OrderDetailPage({
   }, [id]);
 
 
+
   const handlePrint = () => {
     window.print();
+  };
+
+  // Print shipping label from Shiprocket
+  const handlePrintShippingLabel = async () => {
+    if (!order || !shiprocketConfig?.token) {
+      toast.error("Shiprocket not configured");
+      return;
+    }
+
+    // Check if we have a shipment ID
+    const shipmentId = order.shiprocket_shipment_id;
+
+    if (!shipmentId) {
+      toast.error("No shipment ID found. Please create a shipment first.");
+      return;
+    }
+
+    setPrintingLabel(true);
+    try {
+      const response = await fetch("/api/shiprocket/generate-label", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: shiprocketConfig.token,
+          shipmentIds: [shipmentId],
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to generate label");
+      }
+
+      // Shiprocket returns label_url or label_created with a URL
+      const labelUrl = result.label_url || result.label_created || result.response?.label_url;
+
+      if (labelUrl) {
+        // Open the label in a new tab for printing
+        window.open(labelUrl, "_blank");
+        toast.success("Shipping label opened in new tab");
+      } else {
+        toast.error("Label URL not found in response. Please try generating from Shiprocket dashboard.");
+        console.error("Label response:", result);
+      }
+    } catch (error: any) {
+      console.error("Print label error:", error);
+      toast.error(error.message || "Failed to generate shipping label");
+    } finally {
+      setPrintingLabel(false);
+    }
   };
 
   // Fetch available couriers
@@ -452,11 +505,20 @@ export default function OrderDetailPage({
       const awbCode = result.awb_code || result.payload?.awb_code;
 
       if (srOrderId || shipmentId) {
+        // Save Shiprocket IDs to the database
+        await updateShiprocketIds(order.id, srOrderId || null, shipmentId || null);
+
         if (awbCode) {
           await updateOrderTrackingNumber(order.id, awbCode);
           await updateOrderStatus(order.id, "shipped");
           toast.success(`Shipment created with Courier! AWB: ${awbCode}`);
-          setOrder({ ...order, tracking_number: awbCode, status: "shipped" });
+          setOrder({
+            ...order,
+            tracking_number: awbCode,
+            status: "shipped",
+            shiprocket_order_id: srOrderId || null,
+            shiprocket_shipment_id: shipmentId || null
+          });
           setShowShipmentModal(false);
           // Customer shipment emails (shipped, delivered) are sent by Shiprocket when billing_email/billing_phone are set at order creation.
         } else {
@@ -464,7 +526,13 @@ export default function OrderDetailPage({
           await updateOrderTrackingNumber(order.id, trackingRef);
           await updateOrderStatus(order.id, "processing");
           toast.success(`Order created in Shiprocket (ID: ${srOrderId}). Courier assignment failed/pending.`);
-          setOrder({ ...order, tracking_number: trackingRef, status: "processing" });
+          setOrder({
+            ...order,
+            tracking_number: trackingRef,
+            status: "processing",
+            shiprocket_order_id: srOrderId || null,
+            shiprocket_shipment_id: shipmentId || null
+          });
           setShowShipmentModal(false);
         }
       } else {
@@ -710,28 +778,52 @@ export default function OrderDetailPage({
                         </p>
                       </div>
                     </div>
-                    <Button
-                      variant="default"
-                      className={`${order.tracking_number.startsWith('SR-') ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
-                      asChild={!order.tracking_number.startsWith('SR-')}
-                      disabled={order.tracking_number.startsWith('SR-')}
-                    >
-                      {order.tracking_number.startsWith('SR-') ? (
-                        <>
-                          <Clock className="mr-2 h-4 w-4" />
-                          AWB Pending
-                        </>
-                      ) : (
-                        <a
-                          href={getShiprocketTrackingURL(order.tracking_number)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                    <div className="flex items-center gap-2">
+                      {/* Print Shipping Label Button */}
+                      {order.shiprocket_shipment_id && !order.tracking_number.startsWith('SR-') && (
+                        <Button
+                          variant="outline"
+                          onClick={handlePrintShippingLabel}
+                          disabled={printingLabel}
+                          className="border-[#009744] text-[#009744] hover:bg-[#009744]/10"
                         >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Track Shipment
-                        </a>
+                          {printingLabel ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Loading...
+                            </>
+                          ) : (
+                            <>
+                              <Printer className="mr-2 h-4 w-4" />
+                              Print Label
+                            </>
+                          )}
+                        </Button>
                       )}
-                    </Button>
+                      {/* Track Shipment Button */}
+                      <Button
+                        variant="default"
+                        className={`${order.tracking_number.startsWith('SR-') ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                        asChild={!order.tracking_number.startsWith('SR-')}
+                        disabled={order.tracking_number.startsWith('SR-')}
+                      >
+                        {order.tracking_number.startsWith('SR-') ? (
+                          <>
+                            <Clock className="mr-2 h-4 w-4" />
+                            AWB Pending
+                          </>
+                        ) : (
+                          <a
+                            href={getShiprocketTrackingURL(order.tracking_number)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Track Shipment
+                          </a>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : shiprocketConfig?.token ? (

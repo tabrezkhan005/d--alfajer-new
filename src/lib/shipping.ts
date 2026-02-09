@@ -372,6 +372,7 @@ export function calculateShippingCost(
   const freeThreshold = FREE_SHIPPING_THRESHOLD[currency as keyof typeof FREE_SHIPPING_THRESHOLD] || FREE_SHIPPING_THRESHOLD.INR;
 
   // Check if eligible for free shipping
+  // Standard logic: Free if subtotal >= threshold
   const isFreeShipping = subtotal >= freeThreshold;
 
   let baseCost = 0;

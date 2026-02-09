@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
 import { calculateTax, shippingMethods, validatePromoCode } from '@/src/lib/checkout';
 import { sendOrderStatusEmail, prepareOrderEmailData } from '@/src/lib/email';
+import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 // Note: Shiprocket shipment creation is done manually from admin panel
 // Automatic creation disabled for security (requires email/password credentials)
 
@@ -411,15 +412,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Note: Automatic Shiprocket shipment creation is disabled
-    // Shiprocket requires email/password authentication which should not be stored server-side
-    // Admin must create shipments manually from the order detail page in the admin panel
-    // This is the secure approach and gives admin control over when shipments are created
-
-    // Send Order Confirmation Email
-    // Only send immediately for non-payment-gateway methods (e.g. COD, Mock)
-    // For Razorpay, we send email after successful payment verification (in /api/razorpay/route.ts)
+    // AUTOMATE SHIPROCKET SHIPMENT (Only for COD/Mock orders here)
+    // For online payments, automation happens in webhook/verification after payment success
     const isOnlinePayment = finalPaymentMethod === 'razorpay' || finalPaymentMethod === 'card' || finalPaymentMethod === 'upi';
+
+    if (!isOnlinePayment) {
+      try {
+        console.log(`🚀 Triggering auto-ship for checkoud order ${order.id}`);
+        // We await to ensure reliability
+        await automateShiprocketShipment(order.id);
+      } catch (shipError) {
+        console.error("❌ Auto-shipping failed:", shipError);
+      }
+    }
 
     if (!isOnlinePayment) {
       const customerEmail = email || finalAddress?.email;

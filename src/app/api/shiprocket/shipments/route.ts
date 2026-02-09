@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllShipments, getShipmentDetails } from "@/src/lib/shiprocket";
+import { getAllShipments, getShipmentDetails, getShipments } from "@/src/lib/shiprocket";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       if (startDate) params.start_date = startDate;
       if (endDate) params.end_date = endDate;
 
-      result = await getAllShipments(token, params);
+      result = await getShipments(token, params);
     }
 
     return NextResponse.json(result);

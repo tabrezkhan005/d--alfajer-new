@@ -1066,3 +1066,65 @@ export async function getBlogBySlug(slug: string): Promise<any> {
   }
   return data;
 }
+
+// --- Store Settings ---
+export interface StoreSetting {
+  key: string;
+  value: any;
+  description?: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
+export async function getStoreSetting(key: string): Promise<any> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('store_settings' as any)
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching store setting '${key}':`, error);
+    return null;
+  }
+  return (data as any)?.value;
+}
+
+export async function getAllStoreSettings(): Promise<StoreSetting[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('store_settings' as any)
+    .select('*')
+    .order('key');
+
+  if (error) {
+    console.error("Error fetching store settings:", error);
+    return [];
+  }
+  return (data as unknown as StoreSetting[]) || [];
+}
+
+export async function updateStoreSetting(key: string, value: any, description?: string): Promise<boolean> {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('store_settings' as any)
+    .upsert({
+      key,
+      value,
+      description: description || null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'key' });
+
+  if (error) {
+    console.error(`Error updating store setting '${key}':`, error);
+    return false;
+  }
+  return true;
+}
+
+export async function isCodEnabled(): Promise<boolean> {
+  const value = await getStoreSetting('enable_cod');
+  return value === true || value === 'true';
+}

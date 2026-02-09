@@ -29,6 +29,7 @@ import {
 } from "@/src/lib/shipping";
 import { toast } from "sonner";
 import { loadRazorpayScript, openRazorpayCheckout, verifyRazorpayPayment } from "@/src/lib/razorpay";
+import { getStoreSetting } from "@/src/lib/supabase/admin";
 
 export function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -60,7 +61,7 @@ function CheckoutPageContent() {
   const { t, formatCurrency, convertCurrency } = useI18n();
   const { items, getTotalPrice, clearCart, addItem } = useCartStore();
   const { user } = useAuth();
-  
+
   // Track which product+variant we've already added using sessionStorage to persist across re-renders
   const processedProductKey = 'buyNowProcessedProduct';
   const isBuyNowMode = !!searchParams.get('product');
@@ -69,15 +70,15 @@ function CheckoutPageContent() {
   useEffect(() => {
     const productId = searchParams.get('product');
     const variantId = searchParams.get('variant');
-    
+
     if (!productId) return;
 
     // Create a unique key for this product+variant combo
     const productKey = variantId ? `${productId}-${variantId}` : productId;
-    
+
     // Get the stored processed product from sessionStorage (survives page reload but clears on new tab)
     const storedProcessed = sessionStorage.getItem(processedProductKey);
-    
+
     // Debug: Log what's happening
     console.log('Buy Now Debug:', {
       productId,
@@ -87,7 +88,7 @@ function CheckoutPageContent() {
       currentCartItems: items.length,
       cartItemIds: items.map(i => i.id)
     });
-    
+
     // Skip if we've already processed this exact product+variant in this session
     if (storedProcessed === productKey) {
       console.log('Product already processed in session, skipping');
@@ -157,7 +158,7 @@ function CheckoutPageContent() {
                   }, false);
                 }
             }
-            
+
             // Already marked as processed at the start of the effect
             console.log('Successfully added product to cart');
           }
@@ -195,6 +196,29 @@ function CheckoutPageContent() {
   const [shippingOptionId, setShippingOptionId] = useState<string>("standard");
   const [shippingDetails, setShippingDetails] = useState<ShippingCalculationResult | null>(null);
   const [fetchingPincode, setFetchingPincode] = useState(false);
+  const [codEnabled, setCodEnabled] = useState<boolean>(true);
+
+  // Fetch COD setting on mount
+  useEffect(() => {
+    async function fetchCodSetting() {
+      try {
+        const value = await getStoreSetting('enable_cod');
+        setCodEnabled(value === true || value === 'true' || value === null);
+      } catch (error) {
+        console.error('Error fetching COD setting:', error);
+        setCodEnabled(true); // Default to enabled on error
+      }
+    }
+    fetchCodSetting();
+  }, []);
+
+  // Filter payment methods based on COD setting
+  const availablePaymentMethods = useMemo(() => {
+    if (codEnabled) {
+      return paymentMethods;
+    }
+    return paymentMethods.filter(method => method.type !== 'cod');
+  }, [codEnabled]);
 
   // Calculate totals
   const subtotal = getTotalPrice();
@@ -337,7 +361,6 @@ function CheckoutPageContent() {
         setRedirectCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            router.push('/');
             return 0;
           }
           return prev - 1;
@@ -346,7 +369,14 @@ function CheckoutPageContent() {
 
       return () => clearInterval(timer);
     }
-  }, [orderNumber, router]);
+  }, [orderNumber]);
+
+  // Navigation effect
+  useEffect(() => {
+    if (orderNumber && redirectCountdown === 0) {
+      router.push('/');
+    }
+  }, [orderNumber, redirectCountdown, router]);
 
   // Handle proceed
   const handleProceed = () => {
@@ -882,7 +912,7 @@ function CheckoutPageContent() {
                   <CardTitle className="text-gray-800">{t('checkout.paymentMethod')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 bg-white dark:bg-white">
-                  {paymentMethods.map((method) => (
+                  {availablePaymentMethods.map((method) => (
                     <label
                       key={method.id}
                       className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-[#009744]"
@@ -1074,6 +1104,8 @@ function CheckoutPageContent() {
                   <span className="font-semibold text-gray-900">
                     {calculatingShipping ? (
                       <span className="text-xs">Calculating...</span>
+                    ) : !shippingDetails ? (
+                      <span className="text-xs text-gray-500 font-normal">Enter address</span>
                     ) : shippingCost === 0 ? (
                       t('checkout.free') || 'Free'
                     ) : (

@@ -41,6 +41,7 @@ export default function ShiprocketDashboardPage() {
           const parsed = JSON.parse(saved);
           setConfig(parsed);
           fetchShipmentData(parsed.token);
+          // fetchStats(); // Removed as we use API data now
         } catch (e) {
           console.error("Failed to parse config:", e);
           setLoading(false);
@@ -51,30 +52,103 @@ export default function ShiprocketDashboardPage() {
     }
   }, []);
 
-  const fetchShipmentData = async (token: string) => {
+  /* Removed fetchStats as we use API data now */
+
+  const refreshToken = async (email: string, password: string) => {
+    try {
+      const response = await fetch("/api/shiprocket/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to refresh token");
+      }
+
+      const data = await response.json();
+      return data.token;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      return null;
+    }
+  };
+
+  const fetchShipmentData = async (token: string, isRetry = false) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/shiprocket/shipments?token=${token}&per_page=10`);
+      // Fetch more items to get better stats overview
+      const response = await fetch(`/api/shiprocket/shipments?token=${token}&per_page=100`);
+
+      if (response.status === 401 && !isRetry && config?.email && config?.password) {
+        // Token expired, try refreshing
+        console.log("Token expired, attempting refresh...");
+        const newToken = await refreshToken(config.email, config.password);
+
+        if (newToken) {
+          // Update local config
+          const newConfig = { ...config, token: newToken };
+          setConfig(newConfig);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+
+          // Retry with new token
+          return fetchShipmentData(newToken, true);
+        } else {
+          toast.error("Session expired. Please re-login to Shiprocket.");
+          // Clear invalid token? Maybe user can fix in settings.
+        }
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
+
+        // Shiprocket shipments endpoint returns structure: { data: [...], meta: { pagination: { total: ... } } }
         if (data.data && Array.isArray(data.data)) {
-          setRecentShipments(data.data);
-          // Calculate stats
-          const stats: ShiprocketStats = {
-            totalShipments: data.data.length,
-            pendingShipments: data.data.filter((s: any) => s.status === "NEW" || s.status === "READY_TO_SHIP").length,
-            inTransitShipments: data.data.filter((s: any) => s.status === "IN_TRANSIT" || s.status === "OUT_FOR_DELIVERY").length,
-            deliveredShipments: data.data.filter((s: any) => s.status === "DELIVERED").length,
-            cancelledShipments: data.data.filter((s: any) => s.status === "CANCELLED" || s.status === "RTO").length,
+          setRecentShipments(data.data.slice(0, 10)); // Show only 10 recent
+
+          // Calculate stats from the API response
+          const totalFromApi = data.meta?.pagination?.total || data.data.length;
+
+          const newStats: ShiprocketStats = {
+            totalShipments: totalFromApi,
+            // Note: These status counts are based on the fetched batch (up to 100).
+            // For exact counts, we would need separate API calls, but this is a good approximation for the dashboard.
+            pendingShipments: data.data.filter((s: any) =>
+               s.status === "NEW" || s.status === "AWB ASSIGNED" || s.status === "READY TO SHIP" || s.status === "PICKUP SCHEDULED" || s.status_code === 6 || s.status_code === 13 || s.status_code === 15
+            ).length,
+            inTransitShipments: data.data.filter((s: any) =>
+               s.status === "SHIPPED" || s.status === "IN TRANSIT" || s.status === "OUT FOR DELIVERY" || s.status === "REACHED AT DESTINATION" || s.status_code === 17 || s.status_code === 18 || s.status_code === 42
+            ).length,
+            deliveredShipments: data.data.filter((s: any) =>
+               s.status === "DELIVERED" || s.status_code === 7
+            ).length,
+            cancelledShipments: data.data.filter((s: any) =>
+               s.status === "CANCELLED" || s.status === "RTO INITIATED" || s.status === "RTO DELIVERED" || s.status_code === 8
+            ).length,
           };
-          setStats(stats);
+          setStats(newStats);
         }
+      } else {
+        // Handle non-401 errors
+        let errorData = {};
+        try {
+          const text = await response.text();
+          if (text) {
+            errorData = JSON.parse(text);
+          }
+        } catch (e) {
+          console.error("Failed to parse error response:", e);
+        }
+
+        console.error("Fetch shipments error:", errorData);
+        toast.error((errorData as any).error || response.statusText || "Failed to load shipment data");
       }
     } catch (error) {
       console.error("Error fetching shipments:", error);
       toast.error("Failed to load shipment data");
     } finally {
-      setLoading(false);
+      if (!isRetry) setLoading(false);
     }
   };
 
@@ -189,19 +263,39 @@ export default function ShiprocketDashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Link href="/admin/shiprocket/analytics">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-2 opacity-10">
+                <TrendingUp className="h-24 w-24" />
+             </div>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                Analytics
+              </CardTitle>
+              <CardDescription>Shipping costs & performance</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/admin/shiprocket/cod">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-2 opacity-10">
+                <Download className="h-24 w-24" />
+             </div>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Download className="h-4 w-4 text-green-600" />
+                COD Remittance
+              </CardTitle>
+              <CardDescription>Track payments & settlements</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
         <Link href="/admin/shiprocket/serviceability">
           <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="text-base">Serviceability Check</CardTitle>
               <CardDescription>Check if courier can deliver</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-        <Link href="/admin/shiprocket/rate-calculator">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-base">Rate Calculator</CardTitle>
-              <CardDescription>Calculate shipping rates</CardDescription>
             </CardHeader>
           </Card>
         </Link>
@@ -218,6 +312,14 @@ export default function ShiprocketDashboardPage() {
             <CardHeader>
               <CardTitle className="text-base">Return Orders</CardTitle>
               <CardDescription>Manage return shipments</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link href="/admin/orders">
+           <Card className="cursor-pointer hover:shadow-md transition-shadow bg-primary/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-base text-primary">Bulk Shipment</CardTitle>
+              <CardDescription>Process multiple orders</CardDescription>
             </CardHeader>
           </Card>
         </Link>

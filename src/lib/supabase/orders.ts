@@ -25,6 +25,8 @@ export interface OrderWithItems {
     gift_message: string | null;
     notes: string | null;
     tracking_number: string | null;
+    shiprocket_shipment_id: number | null;
+    shiprocket_order_id: number | null;
     created_at: string | null;
     updated_at: string | null;
     items: OrderItem[];
@@ -199,6 +201,31 @@ export async function updateTrackingNumber(orderId: string, trackingNumber: stri
 
     if (error) {
         console.error("Error updating tracking number:", error);
+        return false;
+    }
+
+    return true;
+}
+
+// Update Shiprocket IDs (admin)
+export async function updateShiprocketIds(
+    orderId: string,
+    shiprocketOrderId: number | null,
+    shiprocketShipmentId: number | null
+): Promise<boolean> {
+    const supabase = createClient();
+
+    const { error } = await supabase
+        .from("orders")
+        .update({
+            shiprocket_order_id: shiprocketOrderId,
+            shiprocket_shipment_id: shiprocketShipmentId,
+            updated_at: new Date().toISOString(),
+        } as any)
+        .eq("id", orderId);
+
+    if (error) {
+        console.error("Error updating Shiprocket IDs:", error);
         return false;
     }
 

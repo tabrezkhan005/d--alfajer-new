@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/src/lib/supabase/server';
 import { sendOrderStatusEmail, prepareOrderEmailData } from '@/src/lib/email';
+import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 import crypto from 'crypto';
 
 // POST: Create Razorpay order
@@ -256,6 +257,15 @@ export async function PUT(request: NextRequest) {
       }
     } catch (emailError) {
       console.error('Error in payment success email flow:', emailError);
+    }
+
+    // AUTOMATE SHIPROCKET SHIPMENT for prepaid orders
+    try {
+        console.log(`🚀 Triggering auto-ship for PREPAID order ${orderId}`);
+        // We await it for reliability
+        await automateShiprocketShipment(orderId);
+    } catch (shipError) {
+        console.error("❌ Auto-shipping failed:", shipError);
     }
 
     return NextResponse.json({

@@ -444,6 +444,56 @@ export async function checkServiceability(
   }
 }
 
+export interface GetShipmentsParams {
+  page?: number;
+  per_page?: number;
+  status?: string;
+  start_date?: string; // YYYY-MM-DD
+  end_date?: string; // YYYY-MM-DD
+}
+
+// Get Shipments (Actual Shipments Endpoint)
+export async function getShipments(
+  token: string,
+  params?: GetShipmentsParams
+): Promise<any> {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.per_page) queryParams.append("per_page", params.per_page.toString());
+    if (params?.status) queryParams.append("status", params.status);
+    if (params?.start_date) queryParams.append("start_date", params.start_date);
+    if (params?.end_date) queryParams.append("end_date", params.end_date);
+
+    const response = await fetch(
+      `https://apiv2.shiprocket.in/v1/external/shipments?${queryParams.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.message || errorData.error || `Failed to fetch shipments (Status: ${response.status})`;
+
+      if (response.status === 401) {
+        throw new Error(`Authentication failed: ${errorMessage}`);
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error("Shiprocket fetch shipments error:", error);
+    throw error;
+  }
+}
+
 // Assign Courier and Generate AWB
 export interface AssignCourierRequest {
   shipment_id: number;
@@ -455,6 +505,8 @@ export async function assignCourierAndGenerateAWB(
   request: AssignCourierRequest
 ): Promise<any> {
   try {
+    console.log("Assigning courier with request:", JSON.stringify(request));
+
     const response = await fetch(
       "https://apiv2.shiprocket.in/v1/external/courier/assign/awb",
       {
@@ -467,17 +519,29 @@ export async function assignCourierAndGenerateAWB(
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to assign courier");
+    const responseText = await response.text();
+    console.log("AWB assignment response:", responseText);
+
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      throw new Error(`Invalid response from Shiprocket: ${responseText}`);
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+      const errorMessage = data.message || data.error || `Failed to assign courier (Status: ${response.status})`;
+      console.error("AWB assignment error:", errorMessage);
+      throw new Error(errorMessage);
+    }
+
     return data;
-  } catch (error) {
-    console.error("Shiprocket courier assignment error:", error);
-    return null;
+  } catch (error: any) {
+    console.error("Shiprocket courier assignment error:", error.message || error);
+    throw error; // Re-throw to let caller handle it
   }
 }
+
 
 // Generate Shipping Label
 export async function generateShippingLabel(

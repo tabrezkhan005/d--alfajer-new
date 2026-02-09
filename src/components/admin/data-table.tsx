@@ -25,7 +25,7 @@ import { cn } from "@/src/lib/utils";
 
 interface Column<T> {
   key: keyof T | string;
-  header: string;
+  header: string | React.ReactNode | (() => React.ReactNode);
   render?: (row: T) => React.ReactNode;
 }
 
@@ -134,7 +134,11 @@ export const DataTable = <T extends { id: string }>({
                 </TableHead>
               )}
               {columns.map((column) => (
-                <TableHead key={String(column.key)}>{column.header}</TableHead>
+                <TableHead key={String(column.key)}>
+                  {typeof column.header === 'function'
+                    ? (column.header as () => React.ReactNode)()
+                    : column.header}
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
