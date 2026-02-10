@@ -5,6 +5,8 @@ import { AnnouncementBar } from "@/src/components/announcement-bar/AnnouncementB
 import { Header } from "@/src/components/header/Header";
 import { DynamicFavicon } from "@/src/components/header/DynamicFavicon";
 import { AdminFooterWrapper } from "@/src/components/admin/admin-footer-wrapper";
+import { MetaPixel } from "@/src/components/analytics/MetaPixel";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Premium Dry Fruits & Spices",
@@ -32,6 +34,9 @@ export default function RootLayout({
         <link rel="icon" href="/images/alfajerlogo.jpeg" />
       </head>
       <body className="antialiased overflow-x-hidden w-full" suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <DynamicFavicon />
           <AnnouncementBar />
