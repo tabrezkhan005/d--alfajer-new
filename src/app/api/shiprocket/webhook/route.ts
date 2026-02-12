@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/src/lib/supabase/server";
+import { sendOrderStatusEmail, prepareOrderEmailData } from "@/src/lib/email";
 
 /**
  * Shiprocket Webhook – update order status in DB and log analytics.
@@ -288,6 +289,44 @@ export async function POST(request: NextRequest) {
 
     processed = true;
     console.log("Shiprocket webhook: order updated", { orderId, newStatus, awbCode: awbCode || "(none)" });
+
+    // Send status update email to customer
+    if (newStatus && ["shipped", "delivered", "cancelled"].includes(newStatus)) {
+      try {
+        // Re-fetch order with items for email
+        const { data: fullOrder } = await supabase
+          .from("orders")
+          .select("*, items:order_items(*)")
+          .eq("id", orderId)
+          .single();
+
+        if (fullOrder) {
+          const trackingUrl = awbCode
+            ? `https://www.shiprocket.in/tracking/${awbCode}`
+            : undefined;
+
+          const emailData = prepareOrderEmailData({
+            ...fullOrder,
+            status: newStatus,
+            tracking_number: awbCode || (fullOrder as any).tracking_number || undefined,
+            tracking_url: trackingUrl,
+          } as any);
+
+          if (emailData.customerEmail && emailData.customerEmail.trim()) {
+            const result = await sendOrderStatusEmail(newStatus, emailData);
+            if (result.success) {
+              console.log(`✅ Shiprocket webhook: ${newStatus} email sent to ${emailData.customerEmail}`, result.messageId);
+            } else {
+              console.error(`❌ Shiprocket webhook: ${newStatus} email failed:`, result.error);
+            }
+          } else {
+            console.warn("Shiprocket webhook: no customer email for order", orderId);
+          }
+        }
+      } catch (emailError) {
+        console.error("Shiprocket webhook: error sending status email:", emailError);
+      }
+    }
   } catch (err) {
     console.error("Shiprocket webhook error:", err);
     return ok({ received: true, processed: false, message: "Internal error" });

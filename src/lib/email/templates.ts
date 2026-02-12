@@ -354,8 +354,7 @@ export function orderConfirmationEmail(data: OrderEmailData): { subject: string;
       ${generateContactSection()}
 
       <div style="text-align: center; margin-top: 30px;">
-        <p style="color: ${BRAND_COLORS.textMuted};">You can track your order status in your account.</p>
-        <a href="${BASE_URL}/account/orders" class="cta-button">View Order Details</a>
+        <p style="color: ${BRAND_COLORS.textMuted};">Thank you for shopping with Al Fajer!</p>
       </div>
     </div>
     ${emailFooter()}

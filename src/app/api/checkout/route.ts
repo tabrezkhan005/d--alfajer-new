@@ -252,12 +252,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate tax
-    const country = finalAddress.country || 'IN';
-    const taxAmount = calculateTax(subtotal - discount, country);
+    // Tax is not charged on the frontend checkout, so set to 0 to keep amounts consistent
+    const taxAmount = 0;
 
-    // Calculate total
-    const totalAmount = subtotal - discount + shippingCost + taxAmount;
+    // Calculate total (must match frontend: subtotal - discount + shipping)
+    const totalAmount = subtotal - discount + shippingCost;
 
     // Create the order - short, meaningful order number
     const orderNumber = `ALF-${String(Date.now()).slice(-5)}${Math.floor(Math.random() * 10)}`;
