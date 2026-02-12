@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/src/lib/supabase/server";
 import { sendOrderStatusEmail, prepareOrderEmailData } from "@/src/lib/email";
 
+// Increase serverless function timeout for email operations
+export const maxDuration = 60;
+
 /**
  * Shiprocket Webhook – update order status in DB and log analytics.
  * Customer emails (shipped, out for delivery, delivered) are sent by Shiprocket when

@@ -52,7 +52,13 @@ function getTransporter(): Transporter | null {
     port: portNum,
     secure,
     auth: user && pass ? { user, pass } : undefined,
-  });
+    // Serverless-friendly: don't pool connections (they go stale between invocations)
+    pool: false,
+    // Timeouts to prevent hanging on Vercel
+    connectionTimeout: 10000, // 10s to establish connection
+    greetingTimeout: 10000,   // 10s for SMTP greeting
+    socketTimeout: 30000,     // 30s for the entire operation
+  } as any);
 
   return transporter;
 }

@@ -6,6 +6,10 @@ import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 // Note: Shiprocket shipment creation is done manually from admin panel
 // Automatic creation disabled for security (requires email/password credentials)
 
+// Increase serverless function timeout (Vercel Hobby default is 10s, which is too short
+// for Shiprocket API calls + email sending)
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

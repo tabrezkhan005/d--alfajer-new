@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "src/app/api/checkout/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/razorpay/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/razorpay/webhook/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/shiprocket/webhook/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

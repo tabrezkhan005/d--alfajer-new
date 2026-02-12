@@ -4,6 +4,8 @@ import { sendOrderStatusEmail, prepareOrderEmailData } from '@/src/lib/email';
 import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 import crypto from 'crypto';
 
+// Increase serverless function timeout for Shiprocket + email operations
+export const maxDuration = 60;
 // POST: Create Razorpay order
 export async function POST(request: NextRequest) {
   try {

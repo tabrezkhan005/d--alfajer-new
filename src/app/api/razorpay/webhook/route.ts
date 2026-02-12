@@ -4,6 +4,9 @@ import { prepareOrderEmailData, sendOrderStatusEmail } from '@/src/lib/email';
 import { automateShiprocketShipment } from '@/src/lib/shiprocket-automation';
 import crypto from 'crypto';
 
+// Increase serverless function timeout for email + Shiprocket operations
+export const maxDuration = 60;
+
 // POST: Razorpay Webhook Handler
 // This endpoint receives payment events from Razorpay
 // Configure this URL in Razorpay Dashboard: Settings > Webhooks
