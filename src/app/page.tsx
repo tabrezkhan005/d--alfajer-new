@@ -7,7 +7,7 @@ import { Newsletter } from "@/src/components/newsletter/Newsletter";
 
 export default function Home() {
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full overflow-x-clip">
       <HeroSection />
       <ExquisiteCollection />
       <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>

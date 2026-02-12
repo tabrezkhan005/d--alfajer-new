@@ -259,8 +259,8 @@ export async function POST(request: NextRequest) {
     // Calculate total
     const totalAmount = subtotal - discount + shippingCost + taxAmount;
 
-    // Create the order
-    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    // Create the order - short, meaningful order number
+    const orderNumber = `ALF-${String(Date.now()).slice(-5)}${Math.floor(Math.random() * 10)}`;
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -417,13 +417,10 @@ export async function POST(request: NextRequest) {
     const isOnlinePayment = finalPaymentMethod === 'razorpay' || finalPaymentMethod === 'card' || finalPaymentMethod === 'upi';
 
     if (!isOnlinePayment) {
-      try {
-        console.log(`🚀 Triggering auto-ship for checkoud order ${order.id}`);
-        // We await to ensure reliability
-        await automateShiprocketShipment(order.id);
-      } catch (shipError) {
-        console.error("❌ Auto-shipping failed:", shipError);
-      }
+      // Fire-and-forget: don't await so the response is sent immediately
+      automateShiprocketShipment(order.id)
+        .then(() => console.log(`🚀 Auto-ship completed for order ${order.id}`))
+        .catch((shipError) => console.error("❌ Auto-shipping failed:", shipError));
     }
 
     if (!isOnlinePayment) {
@@ -468,7 +465,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      orderNumber: order.id,
+      orderNumber: orderNumber,
       payment: paymentResult,
       order: {
         id: order.id,

@@ -62,7 +62,7 @@ export function ProductListing() {
         .map(p => p.category?.name)
         .filter((name): name is string => Boolean(name))
     );
-    
+
     // Return categories from database that have products
     return categories
       .filter(cat => categoriesWithProducts.has(cat.name))
@@ -538,7 +538,7 @@ export function ProductListing() {
   }
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 overflow-x-hidden pt-28 sm:pt-32 md:pt-36 lg:pt-40">
+    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-50 pt-28 sm:pt-32 md:pt-36 lg:pt-40">
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 w-full">
         {/* Header */}
         <div className="mb-8 sm:mb-10 md:mb-14 text-center">
@@ -618,10 +618,10 @@ export function ProductListing() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Filter Sidebar - Hidden on mobile, visible on desktop - Sticky */}
           <aside className="hidden lg:block w-full lg:w-72 shrink-0">
-            <div className="sticky top-32 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-9rem)] overflow-y-auto">
+            <div className="sticky top-28 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
               {renderFilterContent()}
             </div>
           </aside>
@@ -890,7 +890,7 @@ function ProductCard({ product }: { product: TransformedProduct }) {
 
         {/* Title - Compact on mobile */}
         <Link href={getProductHref(product)}>
-            <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 min-h-[2rem] xs:min-h-[2.25rem] sm:min-h-[3rem] leading-tight font-poppins hover:text-[#009744] transition-colors">
+            <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-gray-900 line-clamp-3 h-[3.25rem] xs:h-[3.75rem] sm:h-[4.5rem] leading-tight font-poppins hover:text-[#009744] transition-colors">
             {product.name}
             </h3>
         </Link>

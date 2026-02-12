@@ -2,7 +2,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, AlertCircle, Check, Truck, Zap, Package } from "lucide-react";
+import { ChevronDown, AlertCircle, Check, Truck, Zap, Package, Shield, Star, ShoppingBag, ArrowRight, Home } from "lucide-react";
+import { getSupabaseClient } from "@/src/lib/supabase/client";
+import { FullPageLoader } from "@/src/components/ui/loader";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -190,13 +192,32 @@ function CheckoutPageContent() {
   const [subscribe, setSubscribe] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
-  const [redirectCountdown, setRedirectCountdown] = useState<number>(5);
+  const [confirmedTotal, setConfirmedTotal] = useState<number>(0);
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [calculatingShipping, setCalculatingShipping] = useState(false);
   const [shippingOptionId, setShippingOptionId] = useState<string>("standard");
   const [shippingDetails, setShippingDetails] = useState<ShippingCalculationResult | null>(null);
   const [fetchingPincode, setFetchingPincode] = useState(false);
   const [codEnabled, setCodEnabled] = useState<boolean>(true);
+
+  // Success page state
+  const [confirmedOrderItems, setConfirmedOrderItems] = useState<any[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+
+  // Fetch recommended products on successful order
+  useEffect(() => {
+    if (orderNumber) {
+        const fetchRecommendations = async () => {
+            try {
+                const supabase = getSupabaseClient();
+                // Get 4 random products (simulated by random range or just limit)
+                const { data } = await supabase.from('products').select('*').limit(4);
+                if (data) setRecommendedProducts(data);
+            } catch(e) { console.error("Error fetching recommendations", e); }
+        };
+        fetchRecommendations();
+    }
+  }, [orderNumber]);
 
   // Fetch COD setting on mount
   useEffect(() => {
@@ -351,32 +372,10 @@ function CheckoutPageContent() {
     return () => clearTimeout(timeoutId);
   }, [shippingAddress.postalCode, shippingAddress.country]);
 
-  // Auto-redirect countdown effect - MUST be before any conditional returns
+  // Scroll to top on step change or order confirmation
   useEffect(() => {
-    if (orderNumber) {
-      // Reset countdown when order is placed
-      setRedirectCountdown(5);
-
-      const timer = setInterval(() => {
-        setRedirectCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [orderNumber]);
-
-  // Navigation effect
-  useEffect(() => {
-    if (orderNumber && redirectCountdown === 0) {
-      router.push('/');
-    }
-  }, [orderNumber, redirectCountdown, router]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step, orderNumber]);
 
   // Handle proceed
   const handleProceed = () => {
@@ -458,6 +457,8 @@ function CheckoutPageContent() {
               if (result.success) {
                 toast.dismiss();
                 toast.success('Payment successful!');
+                setConfirmedOrderItems([...items]); // Save items to show in success screen
+                setConfirmedTotal(total);
                 setOrderNumber(data.orderNumber);
                 clearCart();
                 setIsProcessing(false);
@@ -485,6 +486,8 @@ function CheckoutPageContent() {
 
       // If non-Razorpay or Mock
       const newOrderNumber = data.orderNumber || 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      setConfirmedOrderItems([...items]); // Save items to show in success screen
+      setConfirmedTotal(total);
       setOrderNumber(newOrderNumber);
 
       // Clear cart
@@ -495,90 +498,152 @@ function CheckoutPageContent() {
       console.error('Checkout error:', error);
       alert('There was an error placing your order. Please try again.');
       setIsProcessing(false);
-    } finally {
-      // Only stop processing if NOT waiting for razorpay
-      // We handle setIsProcessing(false) in Razorpay flow separately, but if error/mock we do it here
-      // To be safe, we check if logic fell through
-      if (paymentMethodId !== 'razorpay' && paymentMethodId !== 'card' && paymentMethodId !== 'upi') {
-          setIsProcessing(false);
-      } else {
-          // Check if we hit error block, then we must stop.
-          // Since we are in finally, we can't easily know if we returned early.
-          // But 'razorpay' flow returns. 'finally' runs BEFORE return?
-          // No, 'finally' runs after try block finishes or throws.
-          // If we returned in try, usually finally runs.
-          // So this setIsProcessing(false) might clobber the loading state during Razorpay modal.
-
-          // Actually, in `openRazorpayCheckout`, the modal opens, then execution continues?
-          // No, `open` is sync-ish UI, but handler is async callback.
-          // The function returns.
-          // So `finally` runs immediately after `openRazorpayCheckout` call?
-          // Yes.
-          // So `isProcessing` will explicitly turn false.
-          // But I want it to stay true until modal closes?
-          // I didn't store `isRazorpayOpen` state.
-          // I added `ondismiss` to modal.
-
-          // Simpler: Move `setIsProcessing(false)` only to error/success paths inside non-razorpay flow.
-          // But `finally` forces it.
-          // I'll rely on the fact that if I return, finally runs.
-
-          // I should remove `finally` block logic and put `setIsProcessing(false)` explicitly where needed.
-      }
     }
   };
 
-  if (items.length === 0) {
+
+  // Order Confirmation - Inline on the same page
+  if (orderNumber) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-2 xs:px-3 sm:px-4 bg-white dark:bg-white">
-        <Card className="w-full max-w-sm bg-white dark:bg-white border-gray-200">
-          <CardContent className="pt-6 text-center bg-white dark:bg-white">
-            <p className="text-base xs:text-lg sm:text-xl font-semibold mb-4 text-gray-900">{t('cart.empty')}</p>
-            <Button className="w-full bg-[#009744] hover:bg-[#2E763B] text-white" onClick={() => router.push('/')}>{t('checkout.continueShopping')}</Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50 pt-36 pb-16 text-gray-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Success Header */}
+          <div className="text-center mb-10">
+            <div className="relative mx-auto w-24 h-24 mb-6">
+              <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-20"></div>
+              <div className="absolute inset-[-8px] bg-green-50 rounded-full"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-[#009744] to-[#007f39] rounded-full flex items-center justify-center shadow-xl shadow-green-300/40">
+                <Check className="w-12 h-12 text-white stroke-[3]" />
+              </div>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">Order Placed Successfully!</h1>
+            <p className="text-gray-500 text-sm sm:text-base">Thank you for shopping with Alfajer</p>
+          </div>
+
+          {/* Main Content - Two column on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+
+            {/* Left: Order Info */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Order Number Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">{t('checkout.orderNumber')}</p>
+                <p className="text-xl font-bold text-gray-900 tracking-tight">{orderNumber}</p>
+              </div>
+
+              {/* Email Confirmation Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Confirmation sent to</p>
+                <p className="text-sm font-semibold text-gray-700">{shippingAddress.email}</p>
+              </div>
+
+              {/* Shipping Address Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-2">Shipping to</p>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {shippingAddress.firstName} {shippingAddress.lastName}<br />
+                  {shippingAddress.streetAddress}<br />
+                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
+                </p>
+              </div>
+
+              {/* Continue Shopping Button */}
+              <Button
+                size="lg"
+                className="w-full bg-[#009744] hover:bg-[#007f39] text-white font-bold h-14 rounded-2xl text-base shadow-lg shadow-green-200/50 transition-all hover:shadow-xl hover:shadow-green-200/60 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                onClick={() => router.push('/')}
+              >
+                <Home className="w-5 h-5" />
+                Continue Shopping
+              </Button>
+            </div>
+
+            {/* Right: Items Ordered */}
+            <div className="lg:col-span-3">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full">
+                <div className="bg-gray-50 border-b border-gray-100 px-6 py-3.5">
+                  <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <ShoppingBag className="w-4 h-4 text-[#009744]" />
+                    Items Ordered
+                  </h3>
+                </div>
+                <div className="px-6 py-4 space-y-0 divide-y divide-gray-50">
+                  {confirmedOrderItems.map((item) => (
+                    <div key={item.id} className="flex gap-4 items-center py-3.5 first:pt-1">
+                      <div className="h-16 w-16 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
+                        <img src={item.image || "/images/placeholder.png"} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 text-sm leading-snug truncate">{t(item.name)}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity} × {formatCurrency(item.price)}</p>
+                      </div>
+                      <p className="font-semibold text-gray-900 text-sm whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-gray-100 px-6 py-4 bg-gray-50/50 flex justify-between items-center">
+                  <p className="font-semibold text-gray-900">Total Paid</p>
+                  <p className="text-2xl font-bold text-[#009744]">{formatCurrency(confirmedTotal)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended Products */}
+          {recommendedProducts.length > 0 && (
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-gray-900">Recommended For You</h2>
+                <button onClick={() => router.push('/products')} className="text-[#009744] font-semibold text-sm flex items-center gap-1 hover:underline">
+                  View All <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {recommendedProducts.map((product) => (
+                  <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all hover:-translate-y-0.5 cursor-pointer" onClick={() => router.push(`/product/${product.id}`)}>
+                    <div className="aspect-square bg-gray-50 relative">
+                      <img src={product.images?.[0] || "/images/placeholder.png"} alt={product.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-gray-900 text-sm truncate">{product.name}</h3>
+                      <div className="flex items-center gap-1 my-0.5">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        <span className="text-xs text-gray-500">4.8</span>
+                      </div>
+                      <p className="font-bold text-[#009744] text-sm">₹{product.base_price || 0}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
-  // Order Confirmation Screen
-  if (orderNumber) {
+  if (items.length === 0) {
+    // If we have a product param (Buy Now mode), show loader instead of empty cart
+    // This handles the split second between clearCart() and adding the new item
+    if (isBuyNowMode) {
+      return <FullPageLoader />;
+    }
+
     return (
-      <div className="min-h-screen bg-white py-8 xs:py-10 sm:py-12 md:py-16 px-2 xs:px-3 sm:px-4 dark:bg-white text-gray-900">
-        <div className="max-w-md mx-auto text-center">
-          <div className="mb-4 xs:mb-5 sm:mb-6">
-            <div className="mx-auto w-12 xs:w-14 sm:w-16 h-12 xs:h-14 sm:h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <Check className="w-6 xs:w-7 sm:w-8 h-6 xs:h-7 sm:h-8 text-[#009744]" />
-            </div>
-          </div>
-          <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-gray-900 mb-1 xs:mb-2 sm:mb-2">{t('checkout.placedSuccessfully')}</h1>
-          <p className="text-sm xs:text-base sm:text-lg text-gray-700 mb-4 xs:mb-5 sm:mb-6">{t('checkout.thankYou')}</p>
-
-          <Card className="bg-gray-50 border-gray-200 mb-4 xs:mb-5 sm:mb-6">
-            <CardContent className="pt-4 xs:pt-5 sm:pt-6">
-              <div className="text-center">
-                <p className="text-xs xs:text-sm text-gray-700 mb-1.5 xs:mb-2">{t('checkout.orderNumber')}</p>
-                <p className="text-xl xs:text-2xl sm:text-3xl font-bold text-[#009744]">{orderNumber}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <p className="text-xs xs:text-sm text-gray-700 mb-2 xs:mb-3">
-            {t('checkout.confirmationEmail')}
-          </p>
-
-          <p className="text-xs xs:text-sm text-gray-600 mb-4 xs:mb-5 sm:mb-6">
-            Redirecting to home page in <span className="font-bold text-[#009744]">{redirectCountdown}</span> {redirectCountdown === 1 ? 'second' : 'seconds'}...
-          </p>
-
-          <Button
-            size="lg"
-            className="w-full bg-[#009744] hover:bg-[#2E763B] text-white font-bold rounded-full text-xs xs:text-sm sm:text-base py-5 xs:py-6 sm:py-7"
-            onClick={() => router.push('/')}
-          >
-            {t('checkout.continueShopping')} {redirectCountdown > 0 && `(${redirectCountdown}s)`}
-          </Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center px-4 bg-white dark:bg-white text-center">
+        <Card className="w-full max-w-md bg-white dark:bg-white border-none shadow-none">
+          <CardContent className="pt-6">
+             <div className="mx-auto w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                 <ShoppingBag className="w-10 h-10 text-gray-300" />
+             </div>
+            <h2 className="text-2xl font-bold mb-3 text-gray-900">{t('cart.empty')}</h2>
+            <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+            <Button className="w-full h-12 rounded-xl bg-[#009744] hover:bg-[#2E763B] text-white font-semibold" onClick={() => router.push('/')}>
+               {t('checkout.continueShopping')}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -593,74 +658,109 @@ function CheckoutPageContent() {
         {/* Main Checkout Form */}
         <div className="lg:col-span-2">
           <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="space-y-4 xs:space-y-5 sm:space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-0.5 xs:p-1 rounded-lg">
-              <TabsTrigger value="shipping" disabled={step !== 'shipping' && !isShippingAddressValid} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                {t('checkout.shippingTab')}
-              </TabsTrigger>
-              <TabsTrigger value="payment" disabled={step === 'shipping'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                {t('checkout.paymentTab')}
-              </TabsTrigger>
-              <TabsTrigger value="review" disabled={step !== 'review'} className="text-xs xs:text-sm sm:text-sm data-[state=active]:bg-[#009744] data-[state=active]:text-white">
-                {t('checkout.reviewTab')}
-              </TabsTrigger>
-            </TabsList>
 
-            {/* Shipping Tab */}
-            <TabsContent value="shipping" className="space-y-4 xs:space-y-5 sm:space-y-6 text-gray-900">
-              <Card className="bg-white dark:bg-white border-gray-200">
-                <CardHeader className="bg-white dark:bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-5">
-                  <CardTitle className="text-sm xs:text-base sm:text-lg text-gray-800">{t('checkout.shippingAddress')}</CardTitle>
+            {/* Custom Stepper */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between relative px-4 sm:px-12">
+                {/* Connecting Line */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full px-12 z-0 hidden sm:block">
+                  <div className="w-full h-1 bg-gray-200 rounded-full dark:bg-gray-100">
+                    <div
+                      className="h-full bg-[#009744] rounded-full transition-all duration-500 ease-in-out"
+                      style={{
+                        width: step === 'shipping' ? '0%' : step === 'payment' ? '50%' : '100%'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Step 1: Shipping */}
+                <div className="relative z-10 flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setStep('shipping')}>
+                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${step === 'shipping' || step === 'payment' || step === 'review' ? 'bg-[#009744] border-[#009744] text-white shadow-lg shadow-green-500/30' : 'bg-white border-gray-300 text-gray-400'}`}>
+                      {step === 'payment' || step === 'review' ? <Check className="w-6 h-6" /> : <Truck className="w-5 h-5" />}
+                   </div>
+                   <span className={`text-xs sm:text-sm font-semibold transition-colors duration-300 ${step === 'shipping' ? 'text-[#009744]' : 'text-gray-500'}`}>
+                      Shipping
+                   </span>
+                </div>
+
+                {/* Step 2: Payment */}
+                <div className="relative z-10 flex flex-col items-center gap-2 cursor-pointer group" onClick={() => isShippingAddressValid && setStep('payment')}>
+                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${step === 'payment' || step === 'review' ? 'bg-[#009744] border-[#009744] text-white shadow-lg shadow-green-500/30' : 'bg-white border-gray-300 text-gray-400'} ${!isShippingAddressValid ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      {step === 'review' ? <Check className="w-6 h-6" /> : <div className="text-sm font-bold">2</div>}
+                   </div>
+                   <span className={`text-xs sm:text-sm font-semibold transition-colors duration-300 ${step === 'payment' ? 'text-[#009744]' : 'text-gray-500'}`}>
+                      Payment
+                   </span>
+                </div>
+
+                {/* Step 3: Review */}
+                <div className="relative z-10 flex flex-col items-center gap-2 cursor-not-allowed opacity-50 data-[active=true]:opacity-100 data-[active=true]:cursor-pointer" data-active={step === 'review'}>
+                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${step === 'review' ? 'bg-[#009744] border-[#009744] text-white shadow-lg shadow-green-500/30' : 'bg-white border-gray-300 text-gray-400'}`}>
+                      <div className="text-sm font-bold">3</div>
+                   </div>
+                   <span className={`text-xs sm:text-sm font-semibold transition-colors duration-300 ${step === 'review' ? 'text-[#009744]' : 'text-gray-500'}`}>
+                      Review
+                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Steps Content */}
+            <TabsContent value="shipping" className="space-y-6 text-gray-900 mt-0">
+              <Card className="bg-white border-none shadow-xl ring-1 ring-black/5 rounded-2xl overflow-hidden">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                     <div className="bg-green-100 p-2 rounded-lg">
+                        <Truck className="w-5 h-5 text-[#009744]" />
+                     </div>
+                     <CardTitle className="text-lg font-bold text-gray-900">{t('checkout.shippingAddress')}</CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-3 xs:space-y-3.5 sm:space-y-4 bg-white dark:bg-white p-3 xs:p-4 sm:p-5">
-                  <div className="grid grid-cols-2 gap-2 xs:gap-3 sm:gap-4">
-                    <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.firstName')}</Label>
-                      <Input
-                        placeholder={t('checkout.placeholderFirstName')}
-                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                        value={shippingAddress.firstName || ''}
-                        onChange={(e) =>
-                          setShippingAddress({
-                            ...shippingAddress,
-                            firstName: e.target.value,
-                          })
-                        }
-                      />
+                <CardContent className="space-y-6 p-6 md:p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                       <Label className="text-gray-700 font-medium text-sm flex items-center gap-1">
+                          {t('checkout.firstName')} <span className="text-red-500">*</span>
+                       </Label>
+                       <Input
+                         placeholder="e.g. John"
+                         className="h-11 px-4 border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 transition-all rounded-xl"
+                         value={shippingAddress.firstName || ''}
+                         onChange={(e) => setShippingAddress({ ...shippingAddress, firstName: e.target.value })}
+                       />
                     </div>
-                    <div>
-                      <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.lastName')}</Label>
-                      <Input
-                        placeholder={t('checkout.placeholderLastName')}
-                        className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                        onChange={(e) =>
-                          setShippingAddress({
-                            ...shippingAddress,
-                            lastName: e.target.value,
-                          })
-                        }
-                      />
+                    <div className="space-y-2">
+                       <Label className="text-gray-700 font-medium text-sm flex items-center gap-1">
+                          {t('checkout.lastName')} <span className="text-red-500">*</span>
+                       </Label>
+                       <Input
+                         placeholder="e.g. Doe"
+                         className="h-11 px-4 border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 transition-all rounded-xl"
+                         value={shippingAddress.lastName || ''}
+                         onChange={(e) => setShippingAddress({ ...shippingAddress, lastName: e.target.value })}
+                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.email')}</Label>
+                  <div className="space-y-2">
+                    <Label className="text-gray-700 font-medium text-sm flex items-center gap-1">
+                       {t('checkout.email')} <span className="text-red-500">*</span>
+                    </Label>
                     <Input
-                      placeholder={t('checkout.placeholderEmail')}
-                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                      type="email"
-                      value={shippingAddress.email || ''}
-                      onChange={(e) =>
-                        setShippingAddress({
-                          ...shippingAddress,
-                          email: e.target.value,
-                        })
-                      }
+                       placeholder="john@example.com"
+                       className="h-11 px-4 border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 transition-all rounded-xl"
+                       type="email"
+                       value={shippingAddress.email || ''}
+                       onChange={(e) => setShippingAddress({ ...shippingAddress, email: e.target.value })}
                     />
                   </div>
 
-                  <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">{t('checkout.phone')}</Label>
-                    <div className="flex gap-2">
+                  <div className="space-y-2">
+                    <Label className="text-gray-700 font-medium text-sm flex items-center gap-1">
+                       {t('checkout.phone')} <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="flex gap-3">
                       <select
                         value={shippingAddress.countryCode || (countryCodes.find(c => c.code === shippingAddress.country)?.dialCode) || '+91'}
                         onChange={(e) => {
@@ -671,34 +771,31 @@ function CheckoutPageContent() {
                             country: selectedCountry?.code || shippingAddress.country || 'IN',
                           });
                         }}
-                        className="w-24 xs:w-28 sm:w-32 px-2 xs:px-2.5 sm:px-3 py-2 xs:py-2 sm:py-2 border border-gray-300 rounded-md focus:border-[#009744] focus:ring-[#009744] bg-white text-gray-800 font-medium text-xs xs:text-xs sm:text-sm h-9 xs:h-9 sm:h-10"
+                        className="w-32 h-11 px-3 border border-gray-200 bg-gray-50/50 rounded-xl focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 outline-none text-gray-900 font-medium cursor-pointer"
                       >
                         {countryCodes.map((country) => (
-                          <option key={country.code} value={country.dialCode} className="bg-white text-gray-800">
+                          <option key={country.code} value={country.dialCode}>
                             {country.dialCode}
                           </option>
                         ))}
                       </select>
                       <Input
-                        placeholder={t('checkout.placeholderPhone')}
-                        className="flex-1 text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
+                        placeholder="98765 43210"
+                        className="flex-1 h-11 px-4 border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 transition-all rounded-xl"
                         value={shippingAddress.phone || ''}
-                        onChange={(e) =>
-                          setShippingAddress({
-                            ...shippingAddress,
-                            phone: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })}
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label className="text-gray-800 font-semibold text-xs xs:text-xs sm:text-sm">Full Address</Label>
+                  <div className="space-y-2">
+                    <Label className="text-gray-700 font-medium text-sm flex items-center gap-1">
+                       Full Address <span className="text-red-500">*</span>
+                    </Label>
                     <Input
-                      placeholder="Enter your complete address"
-                      className="text-xs xs:text-xs sm:text-sm border-gray-300 focus:border-[#009744] focus:ring-[#009744] h-9 xs:h-9 sm:h-10 px-2.5 xs:px-3 sm:px-3"
-                      value={shippingAddress.streetAddress || ''}
+                       placeholder="House No, Street, Area"
+                       className="h-11 px-4 border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-[#009744] focus:ring-4 focus:ring-[#009744]/10 transition-all rounded-xl"
+                       value={shippingAddress.streetAddress || ''}
                       onChange={(e) =>
                         setShippingAddress({
                           ...shippingAddress,
@@ -1062,62 +1159,95 @@ function CheckoutPageContent() {
 
         {/* Order Summary Sidebar */}
         <div>
-          <Card className="sticky top-8 border-2 border-[#009744] shadow-lg bg-white dark:bg-white">
-            <CardHeader className="bg-gradient-to-r from-[#009744] to-[#2E763B] text-white rounded-t-lg">
-              <CardTitle className="text-white">{t('checkout.orderSummary')}</CardTitle>
+          <Card className="sticky top-24 border-0 shadow-xl bg-white/90 backdrop-blur-md overflow-hidden ring-1 ring-black/5 rounded-2xl">
+            <CardHeader className="bg-gradient-to-br from-gray-50 to-white border-b border-gray-100 pb-6 pt-6">
+              <CardTitle className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                {t('checkout.orderSummary')}
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 bg-white dark:bg-white">
-              {/* Items */}
-              <div className="space-y-2 max-h-[300px] overflow-y-auto text-gray-900">
+            <CardContent className="space-y-6 pt-6">
+              {/* Items List */}
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                 {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-between text-sm pb-2 border-b text-gray-900"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-900">{t(item.name)}</p>
-                      <p className="text-gray-700">{t('checkout.qty')}: {item.quantity}</p>
+                  <div key={item.id} className="group flex gap-4 py-3 border-b border-dashed border-gray-100 last:border-0">
+                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+                      <img
+                        src={item.image || "/images/placeholder.png"}
+                        alt={item.name}
+                        className="h-full w-full object-cover object-center transition duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-tl-lg bg-black text-[10px] font-bold text-white shadow">
+                        {item.quantity}
+                      </div>
                     </div>
-                    <p className="font-semibold text-gray-900">
-                      {formatCurrency(item.price * item.quantity)}
-                    </p>
+
+                    <div className="flex flex-1 flex-col justify-between py-0.5">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-900 line-clamp-2 leading-snug">
+                          {t(item.name)}
+                        </h3>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {item.packageSize}
+                        </p>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formatCurrency(item.price * item.quantity)}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* Totals */}
-              <div className="space-y-2 border-t pt-4 text-gray-900">
-                <div className="flex justify-between text-gray-900">
-                  <span className="text-gray-900">{t('checkout.subtotal')}</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
+              {/* Price Breakdown */}
+              <div className="space-y-3 pt-4 border-t border-gray-100">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">{t('checkout.subtotal')}</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
 
                 {appliedPromo && (
-                  <div className="flex justify-between text-[#009744] font-semibold">
-                    <span>{t('checkout.discount')} ({appliedPromo.code})</span>
-                    <span>-{formatCurrency(discountAmount)}</span>
+                  <div className="flex justify-between text-sm animate-in fade-in slide-in-from-right-2">
+                    <span className="text-green-600 flex items-center gap-1.5 font-medium">
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      {t('checkout.discount')} <span className="text-xs ml-1 bg-green-100 px-1.5 py-0.5 rounded text-green-700 uppercase tracking-wide">{appliedPromo.code}</span>
+                    </span>
+                    <span className="font-medium text-green-600">-{formatCurrency(discountAmount)}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between text-gray-900">
-                  <span className="text-gray-900">{t('cart.shipping') || 'Shipping'}</span>
-                  <span className="font-semibold text-gray-900">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">{t('cart.shipping')}</span>
+                  <span className="font-medium">
                     {calculatingShipping ? (
-                      <span className="text-xs">Calculating...</span>
+                      <span className="flex items-center gap-1 text-amber-600 text-xs">
+                         <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+                         Calculating...
+                      </span>
                     ) : !shippingDetails ? (
-                      <span className="text-xs text-gray-500 font-normal">Enter address</span>
+                       <span className="text-gray-400 italic text-xs">Enter details</span>
                     ) : shippingCost === 0 ? (
-                      t('checkout.free') || 'Free'
+                      <span className="text-[#009744] font-bold">Free</span>
                     ) : (
-                      formatCurrency(shippingCost)
+                      <span className="text-gray-900">{formatCurrency(shippingCost)}</span>
                     )}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-lg font-bold border-t pt-2 text-gray-900">
-                  <span className="text-gray-900">{t('cart.total')}</span>
-                  <span className="text-[#009744] font-bold">{formatCurrency(total)}</span>
+                <div className="pt-4 mt-4 border-t border-gray-200 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-base font-bold text-gray-900">{t('cart.total')}</span>
+                    <span className="text-xs text-gray-500 font-normal">Including taxes</span>
+                  </div>
+                  <span className="text-2xl font-black tracking-tight text-[#009744]">{formatCurrency(total)}</span>
                 </div>
+              </div>
+
+              {/* Trust/Guarantee Micro-copy */}
+              <div className="bg-gray-50 rounded-lg p-3 flex items-start gap-3 mt-2">
+                 <Shield className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                 <p className="text-xs text-gray-500 leading-relaxed">
+                   <strong>100% Secure Checkout.</strong> Your personal information is encrypted and protected.
+                 </p>
               </div>
             </CardContent>
           </Card>

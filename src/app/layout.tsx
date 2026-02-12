@@ -33,7 +33,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/alfajerlogo.jpeg" />
       </head>
-      <body className="antialiased overflow-x-hidden w-full" suppressHydrationWarning>
+      <body className="antialiased overflow-x-clip w-full" suppressHydrationWarning>
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>
@@ -42,7 +42,7 @@ export default function RootLayout({
           <AnnouncementBar />
           <Header />
           <AdminFooterWrapper>
-            <main className="mt-0 pt-0 w-full overflow-x-hidden">
+            <main className="mt-0 pt-0 w-full overflow-x-clip">
               {children}
             </main>
           </AdminFooterWrapper>
