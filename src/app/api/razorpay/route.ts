@@ -245,12 +245,9 @@ export async function PUT(request: NextRequest) {
       if (completedOrder) {
         const emailData = prepareOrderEmailData(completedOrder as any);
         if (emailData.customerEmail && emailData.customerEmail.trim()) {
-          sendOrderStatusEmail('confirmed', emailData)
-            .then((result) => {
-              if (result.success) console.log('Payment success email sent:', result.messageId);
-              else console.error('Failed to send payment success email:', result.error);
-            })
-            .catch((err) => console.error('Error sending payment success email:', err));
+          const result = await sendOrderStatusEmail('confirmed', emailData);
+          if (result.success) console.log('✅ Payment success email sent:', result.messageId);
+          else console.error('❌ Failed to send payment success email:', result.error);
         } else {
           console.warn('Order confirmation not sent: no customer email for order', orderId);
         }

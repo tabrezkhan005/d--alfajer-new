@@ -416,14 +416,20 @@ export async function POST(request: NextRequest) {
     // For online payments, automation happens in webhook/verification after payment success
     const isOnlinePayment = finalPaymentMethod === 'razorpay' || finalPaymentMethod === 'card' || finalPaymentMethod === 'upi';
 
+    // On serverless (Vercel), fire-and-forget promises get killed when the response is sent.
+    // We must await these operations. Use Promise.allSettled to run them concurrently
+    // without failing the overall request if one errors.
     if (!isOnlinePayment) {
-      // Fire-and-forget: don't await so the response is sent immediately
-      automateShiprocketShipment(order.id)
-        .then(() => console.log(`🚀 Auto-ship completed for order ${order.id}`))
-        .catch((shipError) => console.error("❌ Auto-shipping failed:", shipError));
-    }
+      const backgroundTasks: Promise<any>[] = [];
 
-    if (!isOnlinePayment) {
+      // Shiprocket automation
+      backgroundTasks.push(
+        automateShiprocketShipment(order.id)
+          .then(() => console.log(`🚀 Auto-ship completed for order ${order.id}`))
+          .catch((shipError) => console.error("❌ Auto-shipping failed:", shipError))
+      );
+
+      // Order confirmation email
       const customerEmail = email || finalAddress?.email;
       if (customerEmail && String(customerEmail).trim()) {
         try {
@@ -448,18 +454,23 @@ export async function POST(request: NextRequest) {
             })),
           });
 
-          sendOrderStatusEmail('confirmed', emailData)
-            .then((result) => {
-              if (result.success) console.log('Order confirmation email sent:', result.messageId);
-              else console.error('Order confirmation email failed:', result.error);
-            })
-            .catch((err) => console.error('Order confirmation email error:', err));
+          backgroundTasks.push(
+            sendOrderStatusEmail('confirmed', emailData)
+              .then((result) => {
+                if (result.success) console.log('✅ Order confirmation email sent:', result.messageId);
+                else console.error('❌ Order confirmation email failed:', result.error);
+              })
+              .catch((err) => console.error('❌ Order confirmation email error:', err))
+          );
         } catch (emailError) {
           console.error('Error preparing order confirmation email:', emailError);
         }
       } else {
         console.warn('Order confirmation not sent: no customer email (COD order)', order.id);
       }
+
+      // Wait for all background tasks to complete (but don't fail if they error)
+      await Promise.allSettled(backgroundTasks);
     }
 
     return NextResponse.json({

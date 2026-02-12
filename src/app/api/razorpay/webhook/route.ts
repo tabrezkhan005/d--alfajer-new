@@ -148,12 +148,9 @@ async function handlePaymentSuccess(event: any) {
       if (fullOrder) {
         const emailData = prepareOrderEmailData(fullOrder as any);
         if (emailData.customerEmail && emailData.customerEmail.trim()) {
-          sendOrderStatusEmail('confirmed', emailData)
-            .then((result) => {
-              if (result.success) console.log('Webhook: order confirmation email sent:', result.messageId);
-              else console.error('Webhook: confirmation email failed:', result.error);
-            })
-            .catch((err) => console.error('Webhook: confirmation email error:', err));
+          const result = await sendOrderStatusEmail('confirmed', emailData);
+          if (result.success) console.log('✅ Webhook: order confirmation email sent:', result.messageId);
+          else console.error('❌ Webhook: confirmation email failed:', result.error);
         } else {
           console.warn('Webhook: no customer email for order', order.id);
         }
@@ -296,12 +293,9 @@ async function handleOrderPaid(event: any) {
         if (fullOrder) {
           const emailData = prepareOrderEmailData(fullOrder as any);
           if (emailData.customerEmail && emailData.customerEmail.trim()) {
-            sendOrderStatusEmail('confirmed', emailData)
-              .then((result) => {
-                if (result.success) console.log('Webhook order.paid: confirmation email sent:', result.messageId);
-                else console.error('Webhook order.paid: confirmation email failed:', result.error);
-              })
-              .catch((err) => console.error('Webhook order.paid: confirmation email error:', err));
+            const result = await sendOrderStatusEmail('confirmed', emailData);
+            if (result.success) console.log('✅ Webhook order.paid: confirmation email sent:', result.messageId);
+            else console.error('❌ Webhook order.paid: confirmation email failed:', result.error);
           }
         }
       } catch (emailErr) {
