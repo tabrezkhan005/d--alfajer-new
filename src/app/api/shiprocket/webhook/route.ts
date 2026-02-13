@@ -171,8 +171,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Also try by AWB code (tracking_number) as a reliable fallback
+    if ((!orders || orders.length === 0) && awbCode) {
+      const r3 = await supabase.from("orders").select(baseSelect).eq("tracking_number", awbCode).limit(1);
+      if (!r3.error && r3.data?.length) {
+        orders = r3.data;
+        console.log("Shiprocket webhook: found order by AWB code", awbCode);
+      }
+    }
+
     if (findError || !orders?.length) {
-      console.warn("Shiprocket webhook: order not found", { ref, srOrderId, findError, payloadKeys: Object.keys(payload) });
+      console.warn("Shiprocket webhook: order not found", { ref, srOrderId, awbCode, findError, payloadKeys: Object.keys(payload) });
       return ok({ received: true, processed: false, message: "Order not found" });
     }
 
@@ -336,4 +345,15 @@ export async function POST(request: NextRequest) {
   }
 
   return ok({ received: true, processed });
+}
+
+/** GET: Quick health check — visit /api/shiprocket/webhook in browser to verify reachability */
+export async function GET() {
+  return NextResponse.json({
+    status: "ok",
+    message: "Shiprocket webhook endpoint is reachable",
+    timestamp: new Date().toISOString(),
+    webhookSecretConfigured: !!process.env.SHIPROCKET_WEBHOOK_SECRET,
+    smtpConfigured: !!process.env.SMTP_HOST,
+  });
 }

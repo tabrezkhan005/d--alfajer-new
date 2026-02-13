@@ -190,6 +190,9 @@ export async function automateShiprocketShipment(orderId: string) {
         status: status,
         tracking_number: trackingRef,
         updated_at: new Date().toISOString(),
+        // Store in dedicated columns so webhook lookups work
+        shiprocket_order_id: srOrderId ? Number(srOrderId) : null,
+        shiprocket_shipment_id: shipmentId ? Number(shipmentId) : null,
         notes: JSON.stringify({
           shiprocket_order_id: srOrderId,
           shiprocket_shipment_id: shipmentId,
@@ -198,7 +201,7 @@ export async function automateShiprocketShipment(orderId: string) {
           awb: awbCode,
           shiprocket_response: result
         })
-      })
+      } as any)
       .eq("id", orderId);
 
     if (updateError) {
