@@ -1,10 +1,10 @@
 import { createAdminClient } from "./supabase/server";
 import {
   createShiprocketShipment,
-  getShiprocketToken,
   CreateShipmentRequest,
   ShiprocketOrderItem
 } from "./shiprocket";
+import { getOrRefreshShiprocketToken } from "./shiprocket-auth";
 
 /**
  * Automatically creates a Shiprocket shipment for a given order ID.
@@ -39,29 +39,8 @@ export async function automateShiprocketShipment(orderId: string) {
     }
 
     // 3. Authenticate with Shiprocket
-    let email = process.env.SHIPROCKET_EMAIL;
-    let password = process.env.SHIPROCKET_PASSWORD;
-
-    if (!email || !password) {
-      throw new Error("Shiprocket credentials (SHIPROCKET_EMAIL/PASSWORD) not configured in env.");
-    }
-
-    // Strip literal quotes if present (some env loaders include them)
-    if (email.startsWith("'") && email.endsWith("'")) email = email.slice(1, -1);
-    if (email.startsWith('"') && email.endsWith('"')) email = email.slice(1, -1);
-    email = email.trim();
-
-    if (password.startsWith("'") && password.endsWith("'")) password = password.slice(1, -1);
-    if (password.startsWith('"') && password.endsWith('"')) password = password.slice(1, -1);
-    password = password.trim();
-
-    console.log(`🔑 Shiprocket credentials: email=${email}, password=${"*".repeat(password.length)}`);
-
-    const authResult = await getShiprocketToken(email, password);
-    if ("error" in authResult) {
-      throw new Error(`Authentication failed: ${authResult.error}`);
-    }
-    const token = authResult.token;
+    // 3. Authenticate with Shiprocket (using cached token to avoid rate limits/lockouts)
+    const token = await getOrRefreshShiprocketToken(supabase);
 
     // 4.1 Get Correct Pickup Pincode
     let pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || "400001";

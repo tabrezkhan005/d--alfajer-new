@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/src/lib/supabase/server";
-import { createShiprocketShipment, getShiprocketToken, assignCourierAndGenerateAWB } from "@/src/lib/shiprocket";
+import { createShiprocketShipment, assignCourierAndGenerateAWB } from "@/src/lib/shiprocket";
+import { getOrRefreshShiprocketToken } from "@/src/lib/shiprocket-auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,24 +9,13 @@ export async function POST(request: NextRequest) {
 
     let authToken = token;
 
-    // If no token provided, try to get one using environment variables
+    // If no token provided, try to get cached/fresh token from environment variables
     if (!authToken) {
-      const email = process.env.SHIPROCKET_EMAIL || process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
-      const password = process.env.SHIPROCKET_PASSWORD || process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
-
-      if (email && password) {
-        const authResult = await getShiprocketToken(email, password);
-        if ("token" in authResult) {
-          authToken = authResult.token;
-        } else {
-          return NextResponse.json(
-            { error: `Authentication failed: ${authResult.error}` },
-            { status: 401 }
-          );
-        }
-      } else {
+      try {
+        authToken = await getOrRefreshShiprocketToken();
+      } catch (error: any) {
         return NextResponse.json(
-          { error: "Shiprocket token is required. Please configure Shiprocket credentials." },
+          { error: `Authentication failed: ${error.message}` },
           { status: 401 }
         );
       }

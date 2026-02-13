@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requestPickup, getShiprocketToken, getShiprocketPickupLocations } from "@/src/lib/shiprocket";
+import { requestPickup, getShiprocketPickupLocations } from "@/src/lib/shiprocket";
+import { getOrRefreshShiprocketToken } from "@/src/lib/shiprocket-auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,29 +8,16 @@ export async function POST(request: NextRequest) {
 
     // Get Shiprocket token from provided token or environment variables
     let token: string | null = providedToken || null;
-    
-    // If no token provided, try to get from environment variables
+
+    // If no token provided, try to get cached/fresh token from environment variables
     if (!token) {
-      const shiprocketEmail = process.env.SHIPROCKET_EMAIL;
-      const shiprocketPassword = process.env.SHIPROCKET_PASSWORD;
-      
-      if (shiprocketEmail && shiprocketPassword) {
-        try {
-          const authResult = await getShiprocketToken(shiprocketEmail, shiprocketPassword);
-          if ("error" in authResult) {
-            return NextResponse.json(
-              { error: `Failed to authenticate with Shiprocket: ${authResult.error}` },
-              { status: 401 }
-            );
-          }
-          token = authResult.token;
-        } catch (error: any) {
-          console.error("Error getting Shiprocket token:", error);
-          return NextResponse.json(
-            { error: "Failed to authenticate with Shiprocket. Please check your credentials." },
-            { status: 401 }
-          );
-        }
+      try {
+        token = await getOrRefreshShiprocketToken();
+      } catch (error: any) {
+        return NextResponse.json(
+          { error: `Authentication failed: ${error.message}` },
+          { status: 401 }
+        );
       }
     }
 
@@ -85,9 +73,9 @@ export async function POST(request: NextRequest) {
     // Handle pickup_location_id - Shiprocket API requires this field
     // Default pickup location ID from Shiprocket configuration
     const DEFAULT_PICKUP_LOCATION_ID = 29390324;
-    
+
     let locationId: number | null = null;
-    
+
     // First, try to get from request
     if (pickupData.pickup_location_id !== undefined && pickupData.pickup_location_id !== null && pickupData.pickup_location_id !== '') {
       const parsedId = parseInt(pickupData.pickup_location_id.toString(), 10);
@@ -95,7 +83,7 @@ export async function POST(request: NextRequest) {
         locationId = parsedId;
       }
     }
-    
+
     // If no location ID provided, try to fetch from API
     if (!locationId) {
       try {
@@ -105,14 +93,14 @@ export async function POST(request: NextRequest) {
           const primaryLocation = locations.data.find(
             (loc: any) => loc.name === 'Primary' || loc.is_default === 1 || loc.is_default === true
           ) || locations.data[0];
-          
+
           // Try different possible field names for location ID
           if (primaryLocation) {
-            locationId = primaryLocation.pickup_location_id || 
-                        primaryLocation.id || 
+            locationId = primaryLocation.pickup_location_id ||
+                        primaryLocation.id ||
                         primaryLocation.location_id ||
                         (primaryLocation.pickup_location ? primaryLocation.pickup_location.id : null);
-            
+
             // If still no ID found, try to extract from any numeric field
             if (!locationId) {
               for (const key of Object.keys(primaryLocation)) {
@@ -131,28 +119,28 @@ export async function POST(request: NextRequest) {
         // Will fall back to default location ID
       }
     }
-    
+
     // If still no location ID, use the default from configuration
     if (!locationId || locationId <= 0) {
       locationId = DEFAULT_PICKUP_LOCATION_ID;
       console.log(`Using default pickup location ID: ${locationId}`);
     }
-    
+
     // pickup_location_id is likely required by Shiprocket API
     // If we couldn't get it, return an error instead of sending incomplete data
     if (!locationId || locationId <= 0) {
       return NextResponse.json(
-        { 
+        {
           error: "pickup_location_id is required. Please select a pickup location or ensure your Shiprocket account has a default pickup location configured.",
           details: "Could not fetch pickup locations. Please check your Shiprocket configuration."
         },
         { status: 400 }
       );
     }
-    
+
     // Always include pickup_location_id to avoid Laravel binding errors
     cleanPickupData.pickup_location_id = locationId;
-    
+
     // Log final request for debugging
     console.log('Final pickup request payload:', JSON.stringify(cleanPickupData, null, 2));
 
@@ -170,7 +158,7 @@ export async function POST(request: NextRequest) {
       } else if (error.message?.includes("404")) {
         statusCode = 404;
       }
-      
+
       return NextResponse.json(
         { error: error.message || "Failed to request pickup" },
         { status: statusCode }

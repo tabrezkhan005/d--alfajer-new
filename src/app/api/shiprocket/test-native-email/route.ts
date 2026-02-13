@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  getShiprocketToken,
   createShiprocketShipment,
   CreateShipmentRequest,
   checkServiceability,
   assignCourierAndGenerateAWB
 } from "@/src/lib/shiprocket";
+import { getOrRefreshShiprocketToken } from "@/src/lib/shiprocket-auth";
 
 /**
  * POST /api/shiprocket/test-native-email
@@ -23,26 +23,16 @@ export async function POST(request: NextRequest) {
     const testEmail = body.email || "tabrezkhangnt@gmail.com";
     const testPhone = body.phone || "9876543210";
 
-    // Authenticate with Shiprocket
-    const email = process.env.SHIPROCKET_EMAIL;
-    const password = process.env.SHIPROCKET_PASSWORD;
-
-    if (!email || !password) {
+    // Authenticate with Shiprocket (using cached token)
+    let token: string;
+    try {
+      token = await getOrRefreshShiprocketToken();
+    } catch (error: any) {
       return NextResponse.json({
         success: false,
-        error: "Shiprocket credentials not configured"
-      }, { status: 500 });
-    }
-
-    const authResult = await getShiprocketToken(email, password);
-    if ("error" in authResult) {
-      return NextResponse.json({
-        success: false,
-        error: `Authentication failed: ${authResult.error}`
+        error: `Authentication failed: ${error.message}`
       }, { status: 401 });
     }
-
-    const token = authResult.token;
 
     // Step 0: Get correct pickup location details
     console.log("📍 Step 0: Fetching pickup location details...");
