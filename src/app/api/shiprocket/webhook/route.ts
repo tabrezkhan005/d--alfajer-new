@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
     const isNumeric = /^\d+$/.test(ref);
 
-    const baseSelect = "id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, total, currency, shipping_cost, tax, discount, created_at, notes, shiprocket_order_id, shiprocket_shipment_id, payment_method";
+    const baseSelect = "id, order_number, status, tracking_number, email, shipping_address, subtotal, total_amount, currency, shipping_cost, tax, discount, created_at, notes, shiprocket_order_id, shiprocket_shipment_id, payment_method";
 
     // Try to find by UUID
     if (isUuid) {
