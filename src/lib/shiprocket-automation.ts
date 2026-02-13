@@ -55,9 +55,7 @@ export async function automateShiprocketShipment(orderId: string) {
     if (password.startsWith('"') && password.endsWith('"')) password = password.slice(1, -1);
     password = password.trim();
 
-    console.log(`🔑 Using Shiprocket Email: ${email}`);
-    console.log(`🔑 Password length: ${password.length}`);
-    console.log(`🔑 Password first 3 chars: ${password.substring(0, 3)}...`);
+    console.log(`🔑 Shiprocket credentials: email=${email}, password=${"*".repeat(password.length)}`);
 
     const authResult = await getShiprocketToken(email, password);
     if ("error" in authResult) {
@@ -152,11 +150,20 @@ export async function automateShiprocketShipment(orderId: string) {
          });
 
          if (serviceability?.data?.available_courier_companies?.length) {
-            // Pick cheapest courier
+            // Pick Shiprocket's recommended courier (best balance of speed, reliability & cost)
             const couriers = serviceability.data.available_courier_companies;
-            const bestCourier = couriers.sort((a, b) => a.rate - b.rate)[0];
+            const recommendedId = serviceability.data?.recommended_courier_company_id;
 
-            console.log(`🚚 Assigning courier ${bestCourier.courier_name} (ID: ${bestCourier.courier_company_id})...`);
+            let bestCourier = recommendedId
+              ? couriers.find((c: any) => c.courier_company_id === recommendedId)
+              : null;
+
+            // Fallback: first courier (Shiprocket returns them in recommended order)
+            if (!bestCourier) {
+              bestCourier = couriers[0];
+            }
+
+            console.log(`🚚 Assigning ${recommendedId ? 'recommended' : 'first available'} courier: ${bestCourier.courier_name} (ID: ${bestCourier.courier_company_id})...`);
 
             const assignResult = await assignCourierAndGenerateAWB(token, {
               shipment_id: shipmentId,

@@ -332,6 +332,7 @@ export interface ServiceabilityResponse {
       estimated_delivery_days: string;
       cod_charges?: number;
     }>;
+    recommended_courier_company_id?: number;
   };
 }
 

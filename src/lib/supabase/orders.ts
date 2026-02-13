@@ -245,7 +245,7 @@ export async function getOrderStats(): Promise<{
 
     const { data: orders, error } = await supabase
         .from("orders")
-        .select("status, total");
+        .select("status, total_amount");
 
     if (error || !orders) {
         return {
@@ -258,7 +258,7 @@ export async function getOrderStats(): Promise<{
         };
     }
 
-    const ordersData = orders as unknown as Array<{ status: string; total: number }>;
+    const ordersData = orders as unknown as Array<{ status: string; total_amount: number }>;
 
     return {
         totalOrders: ordersData.length,
@@ -266,7 +266,7 @@ export async function getOrderStats(): Promise<{
         processingOrders: ordersData.filter(o => o.status === "processing").length,
         shippedOrders: ordersData.filter(o => o.status === "shipped").length,
         deliveredOrders: ordersData.filter(o => o.status === "delivered").length,
-        totalRevenue: ordersData.reduce((sum, o) => sum + (Number(o.total) || 0), 0),
+        totalRevenue: ordersData.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0),
     };
 }
 
@@ -302,7 +302,7 @@ export async function createOrder(orderData: {
         shipping_cost: orderData.shipping_cost,
         tax: orderData.tax,
         discount: orderData.discount || 0,
-        total: orderData.total,
+        total_amount: orderData.total,
         currency: orderData.currency || "INR",
         shipping_address: orderData.shipping_address,
         billing_address: orderData.billing_address || orderData.shipping_address,
