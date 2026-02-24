@@ -56,8 +56,9 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const cachedGeo = getCachedGeolocationData();
         if (cachedGeo && isMounted) {
           const detectedLang = (cachedGeo.language.toLowerCase() as Language) || 'en';
-          const detectedCurr = (cachedGeo.currency.toUpperCase() as Currency) || 'INR';
-          
+          // Force INR as default for all new users regardless of location
+          const detectedCurr = 'INR' as Currency;
+
           setLanguageState(detectedLang);
           setCurrencyState(detectedCurr);
           setIsHydrated(true);
@@ -70,7 +71,8 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (isMounted) {
           const detectedLang = (geoData.language.toLowerCase() as Language) || 'en';
-          const detectedCurr = (geoData.currency.toUpperCase() as Currency) || 'INR';
+          // Force INR as default for all new users regardless of location
+          const detectedCurr = 'INR' as Currency;
 
           setLanguageState(detectedLang);
           setCurrencyState(detectedCurr);

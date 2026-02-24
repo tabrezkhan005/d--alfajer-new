@@ -181,7 +181,8 @@ async function getIPBasedGeolocation(): Promise<GeolocationData | null> {
     }
 
     const countryCode = data.countryCode as string;
-    const currency = countryToCurrency[countryCode] || "USD";
+    // Always default to INR as per user request
+    const currency = "INR";
     const language = countryToLanguage[countryCode] || "EN";
     const timezone = data.timezone || undefined;
 
@@ -223,7 +224,7 @@ function getBrowserLanguageGeolocation(): GeolocationData {
   if (countryCode) {
     const upperCountryCode = countryCode.toUpperCase();
     detectedLanguage = countryToLanguage[upperCountryCode] || languageMap[langCode] || "en";
-    detectedCurrency = countryToCurrency[upperCountryCode] || "INR";
+    detectedCurrency = "INR"; // Always default to INR
   } else {
     detectedLanguage = languageMap[langCode] || "en";
   }
