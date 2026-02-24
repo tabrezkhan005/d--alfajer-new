@@ -247,36 +247,50 @@ export async function fetchPincodeDetails(pincode: string, countryCode: string =
   if (!pincode || pincode.length < 3) return null;
 
   try {
-    // Use Zippopotam.us API which supports multiple countries
+    // Primary API for India: Highly accurate Postal Pincode API
+    if (countryCode === "IN" && pincode.length === 6) {
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+          const po = data[0].PostOffice[0];
+          // Determine the best city name from the available data
+          // Sometimes District is "NA", so we fall back to Region or Block
+          let city = po.District;
+          if (!city || city === "NA") city = po.Region;
+          if (!city || city === "NA") city = po.Block;
+
+          return {
+            city: city || "",
+            state: po.State || "",
+            district: po.District === "NA" ? "" : po.District || "",
+            country: "India",
+            countryCode: "IN"
+          };
+        }
+      }
+    }
+
+    // Fallback or International: Zippopotam.us API
     // URL format: https://api.zippopotam.us/{country}/{zip}
     const response = await fetch(`https://api.zippopotam.us/${countryCode}/${pincode}`);
 
-    if (!response.ok) {
-       return null;
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data && data.places && data.places.length > 0) {
+        const place = data.places[0];
+        return {
+          city: place["place name"],
+          state: place["state"],
+          district: place["place name"],
+          country: data["country"],
+          countryCode: data["country abbreviation"]
+        };
+      }
     }
 
-    const data = await response.json();
-
-    if (data && data.places && data.places.length > 0) {
-      const place = data.places[0];
-
-      // Clean up city name (sometimes API returns "New Delhi G.P.O." or "Area Name (West)")
-      // We generally want just the main city name if possible, but Zippopotam usually gives the specific area name for the postal code.
-      // For shipping purposes, the primary city/town is usually preferred.
-      // Zippopotam doesn't separate "City" and "Area" cleanly in 'place name'.
-      // However, for India, 'place name' is often the specific post office area.
-      // We will use 'place name' as city for now as it's the most granular data available.
-
-      return {
-        city: place["place name"],
-        state: place["state"],
-        district: place["place name"],
-        country: data["country"],
-        countryCode: data["country abbreviation"]
-      };
-    }
-
-    // Fallback only for India if API fails
+    // Fallback only for India if both APIs fail
     if (countryCode === "IN") {
       const state = getStateFromPincode(pincode);
       if (state) {

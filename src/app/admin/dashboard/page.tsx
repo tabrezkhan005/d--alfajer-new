@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DollarSign, ShoppingCart, Users, AlertTriangle, TrendingUp } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, AlertTriangle, TrendingUp, Eye } from "lucide-react";
 import { KPICard } from "@/src/components/admin/kpi-card";
 import { SalesChart } from "@/src/components/admin/sales-chart";
 import { DataTable } from "@/src/components/admin/data-table";
@@ -136,7 +136,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div ref={kpiCardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div ref={kpiCardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <KPICard
           title="Total Revenue"
           value={formatCurrency(stats?.totalRevenue?.value || 0)}
@@ -158,6 +158,13 @@ export default function DashboardPage() {
           change="Registered Users"
           changeType="positive"
           icon={Users}
+        />
+        <KPICard
+          title="Total Visitors"
+          value={stats?.totalVisitors?.value || 0}
+          change="Unique visitors"
+          changeType="positive"
+          icon={Eye}
         />
         <KPICard
           title="Low Stock Items"

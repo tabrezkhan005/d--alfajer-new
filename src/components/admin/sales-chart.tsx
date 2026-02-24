@@ -45,9 +45,9 @@ export const SalesChart = ({ data }: SalesChartProps) => {
     }
   }, [data]);
 
-  const chartData = data.map((item) => ({
-    month: item.month,
-    sales: item.sales,
+  const chartData = data.map((item: any) => ({
+    time: item.name || item.month,
+    sales: item.total || item.sales || 0,
   }));
 
   return (
@@ -84,7 +84,7 @@ export const SalesChart = ({ data }: SalesChartProps) => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
-                dataKey="month"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}

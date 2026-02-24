@@ -6,6 +6,7 @@ import { Header } from "@/src/components/header/Header";
 import { DynamicFavicon } from "@/src/components/header/DynamicFavicon";
 import { AdminFooterWrapper } from "@/src/components/admin/admin-footer-wrapper";
 import { MetaPixel } from "@/src/components/analytics/MetaPixel";
+import { CookieBanner } from "@/src/components/analytics/CookieBanner";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>
+        <CookieBanner />
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <DynamicFavicon />
           <AnnouncementBar />

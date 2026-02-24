@@ -395,12 +395,16 @@ export async function getDashboardStats() {
     // Calculate total revenue
     const totalRevenue = (revenueData as any[])?.reduce((sum, order) => sum + (Number(order.total_amount) || 0), 0) || 0;
 
+    // Fetch visitors count
+    const visitorsCount = await getStoreSetting('visitors_count') || 0;
+
     // Calculate growth (mock logic for now as we don't have historical data easily accessible without complex queries)
     const stats = {
         totalRevenue: { value: totalRevenue, change: 0 },
         totalOrders: { value: orderCount || 0, change: 0 },
         activeProducts: { value: productsCount || 0, change: 0 },
         activeCustomers: { value: customersCount || 0, change: 0 },
+        totalVisitors: { value: Number(visitorsCount) || 0, change: 0 },
         recentOrders: recentOrders || [],
         lowStockProducts: (lowStockProducts as any[])?.map(p => ({
             id: p.product_id,
@@ -1082,7 +1086,7 @@ export async function getStoreSetting(key: string): Promise<any> {
     .from('store_settings' as any)
     .select('value')
     .eq('key', key)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error(`Error fetching store setting '${key}':`, error);

@@ -19,15 +19,39 @@ export const MetaPixel = () => {
     // Skip the first render as the pixel is initialized in the script
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      return;
+
+      // Track unique visitor on first client-side load
+      fetch('/api/track-visit', { method: 'POST' }).catch(console.error);
     }
 
-    PIXEL_IDS.forEach(() => {
-      const fbq = (window as WindowWithFBQ).fbq;
-      if (typeof fbq === "function") {
-        fbq("track", "PageView");
-      }
-    });
+    // Function to fire tracking
+    const fireTracking = () => {
+      PIXEL_IDS.forEach(() => {
+        const fbq = (window as WindowWithFBQ).fbq;
+        if (typeof fbq === "function") {
+          fbq("track", "PageView");
+        }
+      });
+    };
+
+    // Check if consent already granted
+    const hasConsentRecord = document.cookie.split('; ').find(row => row.startsWith('cookie_consent='));
+    if (hasConsentRecord) {
+        if (hasConsentRecord.split('=')[1] === 'accepted') {
+           fireTracking();
+        }
+    }
+
+    // Listen for consent updates from banner
+    const handleConsentUpdate = (event: Event) => {
+       const customEvent = event as CustomEvent;
+       if (customEvent.detail === 'accepted') {
+           fireTracking();
+       }
+    };
+    window.addEventListener('cookieConsentUpdated', handleConsentUpdate);
+
+    return () => window.removeEventListener('cookieConsentUpdated', handleConsentUpdate);
   }, [pathname, searchParams]);
 
   return (

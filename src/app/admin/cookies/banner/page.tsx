@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Shield, Palette, Type, MousePointerClick } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Shield, Palette, Type, MousePointerClick, Save } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Label } from "@/src/components/ui/label";
 import { Input } from "@/src/components/ui/input";
@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/src/components/ui/separator";
 import { Badge } from "@/src/components/ui/badge";
 import { toast } from "sonner";
+import { getStoreSetting, updateStoreSetting } from "@/src/lib/supabase/admin";
 
 export default function ConsentBannerPage() {
   const [enabled, setEnabled] = useState(true);
@@ -31,14 +32,68 @@ export default function ConsentBannerPage() {
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [textColor, setTextColor] = useState("#000000");
   const [buttonColor, setButtonColor] = useState("#000000");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    toast.success("Consent banner settings saved");
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const settings = await getStoreSetting("cookie_banner_settings");
+        if (settings) {
+          setEnabled(settings.enabled ?? true);
+          setBannerText(settings.bannerText || bannerText);
+          setAcceptButton(settings.acceptButton || acceptButton);
+          setRejectButton(settings.rejectButton || rejectButton);
+          setCustomizeButton(settings.customizeButton || customizeButton);
+          setPosition(settings.position || position);
+          setBackgroundColor(settings.backgroundColor || backgroundColor);
+          setTextColor(settings.textColor || textColor);
+          setButtonColor(settings.buttonColor || buttonColor);
+        }
+      } catch (error) {
+        console.error("Error fetching cookie banner settings:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const settings = {
+        enabled,
+        bannerText,
+        acceptButton,
+        rejectButton,
+        customizeButton,
+        position,
+        backgroundColor,
+        textColor,
+        buttonColor,
+      };
+      const success = await updateStoreSetting("cookie_banner_settings", settings, "Cookie consent banner settings");
+      if (success) {
+        toast.success("Consent banner settings saved");
+      } else {
+        toast.error("Failed to save settings");
+      }
+    } catch (error) {
+       console.error("Error saving cookie banner settings:", error);
+       toast.error("An error occurred while saving");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handlePreview = () => {
     toast.info("Preview mode - This is how the banner will appear");
   };
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground animate-pulse">Loading settings...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -89,6 +144,7 @@ export default function ConsentBannerPage() {
                   rows={4}
                   placeholder="Enter banner message..."
                 />
+                <p className="text-xs text-muted-foreground mt-1 text-right">A link to the Privacy Policy is automatically appended.</p>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-2">
@@ -215,21 +271,24 @@ export default function ConsentBannerPage() {
             </CardHeader>
             <CardContent>
               <div
-                className="rounded-lg border p-6 space-y-4"
+                className="rounded-lg border p-6 space-y-4 shadow-xl"
                 style={{
                   backgroundColor: backgroundColor,
                   color: textColor,
                 }}
               >
-                <p className="text-sm">{bannerText}</p>
-                <div className="flex gap-2">
+                <p className="text-sm leading-relaxed">
+                  {bannerText}
+                  <a href="/privacy" className="underline ml-1 font-medium hover:opacity-80 transition-opacity">Privacy Policy</a>
+                </p>
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     style={{
                       backgroundColor: buttonColor,
                       color: "#ffffff",
                     }}
-                    className="hover:opacity-90"
+                    className="hover:opacity-90 font-medium"
                   >
                     {acceptButton}
                   </Button>
@@ -240,6 +299,7 @@ export default function ConsentBannerPage() {
                       borderColor: buttonColor,
                       color: buttonColor,
                     }}
+                    className="font-medium bg-transparent border-2"
                   >
                     {rejectButton}
                   </Button>
@@ -247,12 +307,13 @@ export default function ConsentBannerPage() {
                     size="sm"
                     variant="ghost"
                     style={{ color: buttonColor }}
+                    className="font-medium hover:bg-black/5"
                   >
                     {customizeButton}
                   </Button>
                 </div>
                 <div className="text-xs opacity-70">
-                  Position: <Badge variant="outline">{position}</Badge>
+                  Position: <Badge variant="outline" className="opacity-100">{position}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -261,10 +322,16 @@ export default function ConsentBannerPage() {
       </div>
 
       <div className="flex items-center justify-end gap-4">
-        <Button variant="outline" onClick={handlePreview}>
+        <Button variant="outline" onClick={handlePreview} disabled={isSaving}>
           Preview
         </Button>
-        <Button onClick={handleSave}>Save Changes</Button>
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? (
+             <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</span>
+          ) : (
+             <span className="flex items-center gap-2"><Save className="w-4 h-4" /> Save Changes</span>
+          )}
+        </Button>
       </div>
     </div>
   );
