@@ -144,10 +144,27 @@ export async function POST(request: NextRequest) {
          });
 
          if (awbResult && (awbResult.awb_assign_status === 1 || awbResult.response?.data?.awb_assign_status === 1)) {
+            const awbCode = awbResult.response?.data?.awb_code || awbResult.awb_code;
+
+            // Save AWB to order in database immediately
+            if (shipmentData.order_id && awbCode) {
+              const supabase = createAdminClient();
+              const ourRef = String(shipmentData.order_id).trim();
+              const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ourRef);
+
+              const updates: any = { tracking_number: awbCode };
+              if (isUuid) {
+                await supabase.from("orders").update(updates).eq("id", ourRef);
+              } else {
+                await supabase.from("orders").update(updates).eq("order_number", ourRef);
+              }
+              console.log(`Saved AWB ${awbCode} to order ${ourRef}`);
+            }
+
             // Merge response
             return NextResponse.json({
               ...result,
-              awb_code: awbResult.response?.data?.awb_code || awbResult.awb_code,
+              awb_code: awbCode,
               courier_name: awbResult.response?.data?.courier_name || awbResult.courier_name,
               courier_company_id: courier_id,
               awb_status: "assigned",

@@ -19,7 +19,14 @@ export async function getOrRefreshShiprocketToken(supabaseOptional?: any): Promi
     .single();
 
   if (settings?.value) {
-    const { token, expires_at } = settings.value;
+    const { token, expires_at, failed } = settings.value;
+
+    // Check if we have an active failure cooldown
+    if (failed && expires_at && Date.now() < expires_at) {
+      console.warn("⚠️ Shiprocket auth is currently in cooldown mode to prevent account lockout.");
+      throw new Error("Shiprocket authentication cooldown. Please try again later or check credentials.");
+    }
+
     // Check if token exists and is valid (with 1 hour buffer)
     if (token && expires_at && Date.now() < expires_at - 60 * 60 * 1000) {
       console.log("✅ Using cached Shiprocket token");
@@ -30,11 +37,32 @@ export async function getOrRefreshShiprocketToken(supabaseOptional?: any): Promi
   // 2. Token missing or expired -> Refresh
   console.log("🔄 Refreshing Shiprocket token (missing or expired)...");
 
-  let email = process.env.SHIPROCKET_EMAIL || process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
-  let password = process.env.SHIPROCKET_PASSWORD || process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
+  // Attempt to fetch credentials from Admin Panel configuration (User Metadata) first
+  let email = "";
+  let password = "";
+
+  const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
+
+  if (!usersError && usersData && usersData.users.length > 0) {
+    // Find the first admin user that has shiprocket_config set
+    const adminUser = usersData.users.find((u: any) => u.user_metadata?.shiprocket_config?.email);
+
+    if (adminUser) {
+      email = adminUser.user_metadata.shiprocket_config.email;
+      password = adminUser.user_metadata.shiprocket_config.password;
+      console.log("✅ Using Shiprocket credentials from Admin Panel configuration.");
+    }
+  }
+
+  // Fallback to .env if Admin Panel wasn't configured
+  if (!email || !password) {
+    console.log("⚠️ Admin Panel Shiprocket config not found, falling back to .env credentials...");
+    email = process.env.SHIPROCKET_EMAIL || "";
+    password = process.env.SHIPROCKET_PASSWORD || "";
+  }
 
   if (!email || !password) {
-    throw new Error("Shiprocket credentials (SHIPROCKET_EMAIL/PASSWORD) not configured in env.");
+    throw new Error("Shiprocket credentials not configured in Admin Panel or .env file.");
   }
 
   // Clean credentials (remove quotes if present)
@@ -51,6 +79,15 @@ export async function getOrRefreshShiprocketToken(supabaseOptional?: any): Promi
 
   if ("error" in authResult) {
     console.error("Shiprocket Auth Failed. Response:", authResult);
+
+    // Cache the failure for 30 minutes to prevent account lockout
+    const failureExpiresAt = Date.now() + 30 * 60 * 1000;
+    await supabase.from('store_settings').upsert({
+      key: 'shiprocket_auth',
+      value: { failed: true, expires_at: failureExpiresAt },
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'key' });
+
     throw new Error(`Authentication failed: ${authResult.error}`);
   }
 

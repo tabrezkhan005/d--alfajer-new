@@ -198,8 +198,8 @@ async function getIPBasedGeolocation(): Promise<GeolocationData | null> {
 function getBrowserLanguageGeolocation(): GeolocationData {
   if (typeof navigator === "undefined") {
     return {
-      country: "US",
-      currency: "USD",
+      country: "IN",
+      currency: "INR",
       language: "en",
     };
   }
@@ -218,18 +218,18 @@ function getBrowserLanguageGeolocation(): GeolocationData {
 
   // Try country-specific first, then fallback to language
   let detectedLanguage = "en";
-  let detectedCurrency = "USD";
+  let detectedCurrency = "INR";
 
   if (countryCode) {
     const upperCountryCode = countryCode.toUpperCase();
     detectedLanguage = countryToLanguage[upperCountryCode] || languageMap[langCode] || "en";
-    detectedCurrency = countryToCurrency[upperCountryCode] || "USD";
+    detectedCurrency = countryToCurrency[upperCountryCode] || "INR";
   } else {
     detectedLanguage = languageMap[langCode] || "en";
   }
 
   return {
-    country: countryCode?.toUpperCase() || "US",
+    country: countryCode?.toUpperCase() || "IN",
     currency: detectedCurrency,
     language: detectedLanguage,
   };

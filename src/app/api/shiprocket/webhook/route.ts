@@ -216,17 +216,33 @@ export async function POST(request: NextRequest) {
       cancelled: 6,
     };
 
+    // Check if the order status is already at this level or higher
+    // Exception: If it's already "shipped", but we didn't have a tracking number before, we SHOULD process this to save the AWB
+    let shouldUpdateOrder = true;
+    let isAwbOnlyUpdate = false;
+
     if (statusOrder[newStatus] <= statusOrder[currentStatus] && newStatus !== "return_requested") {
-      console.log("Shiprocket webhook: skipping status downgrade", { currentStatus, newStatus });
-      return ok({ received: true, processed: false, message: "Status not updated (no downgrade)" });
+      if (newStatus === "shipped" && !order.tracking_number && awbCode) {
+        console.log("Shiprocket webhook: status is unchanged (shipped), but new AWB found. Updating DB.");
+        isAwbOnlyUpdate = true;
+      } else {
+        console.log("Shiprocket webhook: skipping status downgrade", { currentStatus, newStatus });
+        return ok({ received: true, processed: false, message: "Status not updated (no downgrade)" });
+      }
     }
 
     // Update order
     const updates: { status?: string; tracking_number?: string; updated_at: string } = {
       updated_at: new Date().toISOString(),
     };
-    if (newStatus) updates.status = newStatus;
-    if (awbCode && !order.tracking_number) updates.tracking_number = awbCode;
+
+    if (!isAwbOnlyUpdate && newStatus) {
+      updates.status = newStatus;
+    }
+
+    if (awbCode && !order.tracking_number) {
+      updates.tracking_number = awbCode;
+    }
 
     const { error: updateError } = await supabase
       .from("orders")
@@ -300,9 +316,12 @@ export async function POST(request: NextRequest) {
     }
 
     processed = true;
-    console.log("Shiprocket webhook: order updated", { orderId, newStatus, awbCode: awbCode || "(none)" });
+    console.log("Shiprocket webhook: order updated", { orderId, newStatus: isAwbOnlyUpdate ? "(AWB Only)" : newStatus, awbCode: awbCode || "(none)" });
 
     // Send status update email to customer
+    // User requested: "custom email i dont want i want shiprocket email like the demo email"
+    // So we disable Al Fajer SMTP emails for Shipped/Delivered statuses to let Shiprocket handle it.
+    /*
     if (newStatus && ["shipped", "delivered", "cancelled"].includes(newStatus)) {
       try {
         // Re-fetch order with items for email
@@ -327,7 +346,7 @@ export async function POST(request: NextRequest) {
           if (emailData.customerEmail && emailData.customerEmail.trim()) {
             const result = await sendOrderStatusEmail(newStatus, emailData);
             if (result.success) {
-              console.log(`✅ Shiprocket webhook: ${newStatus} email sent to ${emailData.customerEmail}`, result.messageId);
+              console.log(`✅ Shiprocket webhook: ${newStatus} email sent to ${emailData.customerEmail}`);
             } else {
               console.error(`❌ Shiprocket webhook: ${newStatus} email failed:`, result.error);
             }
@@ -339,6 +358,7 @@ export async function POST(request: NextRequest) {
         console.error("Shiprocket webhook: error sending status email:", emailError);
       }
     }
+    */
   } catch (err) {
     console.error("Shiprocket webhook error:", err);
     return ok({ received: true, processed: false, message: "Internal error" });

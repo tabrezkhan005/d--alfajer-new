@@ -101,48 +101,62 @@ export default function ShiprocketDashboardPage() {
       }
 
       if (response.ok) {
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error("Failed to parse shipments data");
+        }
 
         // Shiprocket shipments endpoint returns structure: { data: [...], meta: { pagination: { total: ... } } }
-        if (data.data && Array.isArray(data.data)) {
+        if (data && data.data && Array.isArray(data.data)) {
           setRecentShipments(data.data.slice(0, 10)); // Show only 10 recent
 
           // Calculate stats from the API response
           const totalFromApi = data.meta?.pagination?.total || data.data.length;
 
           const newStats: ShiprocketStats = {
-            totalShipments: totalFromApi,
-            // Note: These status counts are based on the fetched batch (up to 100).
-            // For exact counts, we would need separate API calls, but this is a good approximation for the dashboard.
-            pendingShipments: data.data.filter((s: any) =>
-               s.status === "NEW" || s.status === "AWB ASSIGNED" || s.status === "READY TO SHIP" || s.status === "PICKUP SCHEDULED" || s.status_code === 6 || s.status_code === 13 || s.status_code === 15
-            ).length,
-            inTransitShipments: data.data.filter((s: any) =>
-               s.status === "SHIPPED" || s.status === "IN TRANSIT" || s.status === "OUT FOR DELIVERY" || s.status === "REACHED AT DESTINATION" || s.status_code === 17 || s.status_code === 18 || s.status_code === 42
-            ).length,
-            deliveredShipments: data.data.filter((s: any) =>
-               s.status === "DELIVERED" || s.status_code === 7
-            ).length,
-            cancelledShipments: data.data.filter((s: any) =>
-               s.status === "CANCELLED" || s.status === "RTO INITIATED" || s.status === "RTO DELIVERED" || s.status_code === 8
-            ).length,
+             totalShipments: totalFromApi,
+             pendingShipments: data.data.filter((s: any) =>
+                s.status === "NEW" || s.status === "AWB ASSIGNED" || s.status === "READY TO SHIP" || s.status === "PICKUP SCHEDULED" || s.status_code === 6 || s.status_code === 13 || s.status_code === 15
+             ).length,
+             inTransitShipments: data.data.filter((s: any) =>
+                s.status === "SHIPPED" || s.status === "IN TRANSIT" || s.status === "OUT FOR DELIVERY" || s.status === "REACHED AT DESTINATION" || s.status_code === 17 || s.status_code === 18 || s.status_code === 42
+             ).length,
+             deliveredShipments: data.data.filter((s: any) =>
+                s.status === "DELIVERED" || s.status_code === 7
+             ).length,
+             cancelledShipments: data.data.filter((s: any) =>
+                s.status === "CANCELLED" || s.status === "RTO INITIATED" || s.status === "RTO DELIVERED" || s.status_code === 8
+             ).length,
           };
           setStats(newStats);
+        } else {
+          console.error("Invalid shipments response data:", data);
+          toast.error("Invalid shipment data format received");
         }
       } else {
         // Handle non-401 errors
-        let errorData = {};
+        let errorData: any = {};
+        let rawText = "";
         try {
-          const text = await response.text();
-          if (text) {
-            errorData = JSON.parse(text);
+          rawText = await response.text();
+          if (rawText) {
+            errorData = JSON.parse(rawText);
           }
         } catch (e) {
           console.error("Failed to parse error response:", e);
         }
 
-        console.error("Fetch shipments error:", errorData);
-        toast.error((errorData as any).error || response.statusText || "Failed to load shipment data");
+        console.error("Fetch shipments error:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+          rawText,
+          message: errorData.error || errorData.message || rawText || response.statusText || "Failed to load shipment data"
+        });
+
+        toast.error(errorData.error || errorData.message || response.statusText || "Failed to load shipment data");
       }
     } catch (error) {
       console.error("Error fetching shipments:", error);

@@ -183,35 +183,31 @@ export default function OrderDetailPage({
           }
           return;
       }
-
-      // 4. Fallback to Environment Variables
-      const envEmail = process.env.NEXT_PUBLIC_SHIPROCKET_EMAIL;
-      const envPassword = process.env.NEXT_PUBLIC_SHIPROCKET_PASSWORD;
-
-      if (envEmail && envPassword) {
-        try {
-          const response = await fetch("/api/shiprocket/auth", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: envEmail, password: envPassword }),
-          });
-          if (response.ok) {
-            const { token } = await response.json();
-            if (token) {
-              const config = {
-                email: envEmail,
-                password: envPassword,
-                token,
-                tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
-                pickupLocation: "Primary",
-              };
-              localStorage.setItem("shiprocket_config", JSON.stringify(config));
-              setShiprocketConfig(config);
-            }
+      // 4. Fallback to server-side authentication
+      // We no longer rely on NEXT_PUBLIC_SHIPROCKET_EMAIL/PASSWORD for security.
+      // The server `/api/shiprocket/auth` securely uses the backend .env values if we send an empty body.
+      try {
+        const response = await fetch("/api/shiprocket/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}), // Forces server to use its own secure credentials
+        });
+        if (response.ok) {
+          const { token } = await response.json();
+          if (token) {
+            const config = {
+              email: "Server Authenticated",
+              password: "***",
+              token,
+              tokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
+              pickupLocation: "Primary",
+            };
+            localStorage.setItem("shiprocket_config", JSON.stringify(config));
+            setShiprocketConfig(config);
           }
-        } catch (error) {
-          console.error("Failed to get Shiprocket token from env:", error);
         }
+      } catch (error) {
+        console.error("Failed to get Shiprocket token from server config:", error);
       }
     };
 
