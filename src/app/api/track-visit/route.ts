@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getStoreSetting, updateStoreSetting } from '@/src/lib/supabase/admin';
+import { createClient } from '@/src/lib/supabase/server';
 
 export async function POST() {
   try {
@@ -8,10 +8,27 @@ export async function POST() {
     const visited = cookieStore.get('has_visited');
 
     if (!visited) {
+      const supabase = await createClient();
+
       // Get current count
-      const currentCount = await getStoreSetting('visitors_count') || 0;
+      const { data } = await supabase
+        .from('store_settings' as any)
+        .select('value')
+        .eq('key', 'visitors_count')
+        .maybeSingle();
+
+      const settingData: any = data;
+      const currentCount = settingData?.value || 0;
+
       // Increment
-      await updateStoreSetting('visitors_count', Number(currentCount) + 1, 'Total unique visitors');
+      await supabase
+        .from('store_settings' as any)
+        .upsert({
+          key: 'visitors_count',
+          value: Number(currentCount) + 1,
+          description: 'Total unique visitors',
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'key' });
 
       // Set cookie to prevent counting again for 1 day
       const res = NextResponse.json({ success: true, newVisitor: true });

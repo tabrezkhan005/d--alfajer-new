@@ -1,19 +1,28 @@
-import { getBlogBySlug } from "@/src/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
+import { createClient } from "@/src/lib/supabase/server";
 
 export const revalidate = 3600;
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const blog = await getBlogBySlug(slug);
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('blogs' as any)
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  const blog: any = data;
 
   if (!blog || !blog.is_published) {
     notFound();
   }
+
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

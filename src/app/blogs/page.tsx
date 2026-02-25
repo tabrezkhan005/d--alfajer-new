@@ -1,22 +1,28 @@
-import { getBlogs } from "@/src/lib/supabase/admin";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { Calendar } from "lucide-react";
+import { createClient } from "@/src/lib/supabase/server";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BlogsPage() {
-  let blogs = [];
+  let blogs: any[] = [];
   try {
-    blogs = await getBlogs();
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('blogs' as any)
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) blogs = data;
   } catch (e) {
     console.error("Failed to fetch blogs in page", e);
   }
 
   const publishedBlogs = Array.isArray(blogs) ? blogs.filter((b: any) => b.is_published) : [];
+
 
   return (
     <div className="container mx-auto px-4 py-8">
