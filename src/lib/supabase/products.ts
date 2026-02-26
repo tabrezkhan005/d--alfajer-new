@@ -59,10 +59,13 @@ export async function getProducts(options?: {
         query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
     }
 
+    console.log("[DEBUG] Executing getProducts query with options:", options);
     const { data, error } = await query;
+    console.log("[DEBUG] getProducts query completed. Data length:", data?.length, "Error:", error);
 
     if (error) {
-        console.error("Error fetching products:", error.message, error.details, error.hint);
+        console.error("[BRUTE FORCE ERROR] Error fetching products:", error);
+        console.error("Error details:", error.message, error.details, error.hint);
         return [];
     }
 
@@ -279,10 +282,13 @@ export async function searchProducts(
     }
 
     // Execute query
+    console.log("[DEBUG] Executing searchProducts query with params:", { query, filters });
     const { data, error } = await dbQuery;
+    console.log("[DEBUG] searchProducts query completed. Data length:", data?.length, "Error:", error);
 
     if (error) {
-        console.error("Error searching products:", error.message, error.details, error.hint);
+        console.error("[BRUTE FORCE ERROR] Error searching products:", error);
+        console.error("Error details:", error.message, error.details, error.hint);
         return [];
     }
 
