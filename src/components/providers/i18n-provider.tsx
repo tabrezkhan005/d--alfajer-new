@@ -151,7 +151,7 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       currency: 'INR',
       setLanguage: () => {},
       setCurrency: () => {},
-      t: (key: string) => key,
+      t: (key: string) => t(key, 'en'),
       formatCurrency: (amount: number) => {
         // Default to INR during hydration - no conversion needed
         return formatCurrency(amount, 'INR');

@@ -62,7 +62,7 @@ export async function getProducts(options?: {
     const { data, error } = await query;
 
     if (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products:", error.message, error.details, error.hint);
         return [];
     }
 
@@ -109,7 +109,7 @@ export async function getProductBySlug(slug: string): Promise<ProductWithVariant
         .single();
 
     if (error) {
-        console.error("Error fetching product:", error);
+        console.error("Error fetching product by slug:", error.message, error.details, error.hint);
         return null;
     }
 
@@ -151,7 +151,7 @@ export async function getProductById(id: string): Promise<ProductWithVariants | 
         .single();
 
     if (error) {
-        console.error("Error fetching product:", error);
+        console.error("Error fetching product by id:", error.message, error.details, error.hint);
         return null;
     }
 
@@ -282,7 +282,7 @@ export async function searchProducts(
     const { data, error } = await dbQuery;
 
     if (error) {
-        console.error("Error searching products:", error);
+        console.error("Error searching products:", error.message, error.details, error.hint);
         return [];
     }
 
@@ -373,7 +373,7 @@ export async function getFeaturedProducts(limit: number = 8): Promise<ProductWit
         .limit(limit);
 
     if (error) {
-        console.error("Error fetching featured products:", error);
+        console.error("Error fetching featured products:", error.message, error.details, error.hint);
         return [];
     }
 
@@ -396,7 +396,7 @@ export async function getSaleProducts(limit: number = 8): Promise<ProductWithVar
         .limit(limit);
 
     if (error) {
-        console.error("Error fetching sale products:", error);
+        console.error("Error fetching sale products:", error.message, error.details, error.hint);
         return [];
     }
 

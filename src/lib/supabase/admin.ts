@@ -385,10 +385,10 @@ export async function getDashboardStats() {
             `)
             .order('created_at', { ascending: false })
             .limit(5),
-        // Low stock products (less than 10) - use 'stock' column which is the actual DB column
+        // Low stock products (less than 10) - use 'stock_quantity' column which is the actual DB column
         supabase.from('product_variants')
-            .select('product_id, stock, products(id, name, slug)')
-            .lt('stock', 10)
+            .select('product_id, stock_quantity, products(id, name, slug)')
+            .lt('stock_quantity', 10)
             .limit(5)
     ]);
 
