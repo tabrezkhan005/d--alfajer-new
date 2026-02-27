@@ -2,6 +2,27 @@
 
 import { createClient } from "./client";
 import type { Database } from "./database.types";
+// Force Node to use the correct Cloudflare IP for Supabase
+// This bypasses local DNS hijacking (Jio NAT64)
+if (typeof window === "undefined") {
+  const dns = eval('require("node:dns")');
+  const originalLookup = dns.lookup;
+  // @ts-ignore - overriding built-in Node type
+  dns.lookup = (hostname: string, options: any, callback: any) => {
+    if (typeof options === "function") {
+      callback = options;
+      options = {};
+    }
+    // Intercept any Supabase domain resolution
+    if (hostname.includes("supabase.co")) {
+      if (options && options.all) {
+        return callback(null, [{ address: "104.18.38.10", family: 4 }]);
+      }
+      return callback(null, "104.18.38.10", 4);
+    }
+    return originalLookup(hostname, options, callback);
+  };
+}
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
 type ProductVariant = Database["public"]["Tables"]["product_variants"]["Row"];
@@ -66,7 +87,7 @@ export async function getProducts(options?: {
     if (error) {
         console.error("[BRUTE FORCE ERROR] Error fetching products:", error);
         console.error("Error details:", error.message, error.details, error.hint);
-        return [];
+        throw new Error(`Supabase Error: ${error.message}`);
     }
 
     const products = (data || []) as ProductWithVariants[];
@@ -289,7 +310,7 @@ export async function searchProducts(
     if (error) {
         console.error("[BRUTE FORCE ERROR] Error searching products:", error);
         console.error("Error details:", error.message, error.details, error.hint);
-        return [];
+        throw new Error(`Supabase Error: ${error.message}`);
     }
 
     let results = (data || []) as ProductWithVariants[];

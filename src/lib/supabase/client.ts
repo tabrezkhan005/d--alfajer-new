@@ -3,17 +3,37 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@/src/lib/supabase/database.types";
 
+// Force Node to use the correct Cloudflare IP for Supabase
+// This bypasses local DNS hijacking (Jio NAT64)
+if (typeof window === "undefined") {
+  const dns = eval('require("node:dns")');
+  const originalLookup = dns.lookup;
+  // @ts-ignore - overriding built-in Node type
+  dns.lookup = (hostname: string, options: any, callback: any) => {
+    if (typeof options === "function") {
+      callback = options;
+      options = {};
+    }
+    // Intercept any Supabase domain resolution
+    if (hostname.includes("supabase.co")) {
+      if (options && options.all) {
+        return callback(null, [{ address: "104.18.38.10", family: 4 }]);
+      }
+      return callback(null, "104.18.38.10", 4);
+    }
+    return originalLookup(hostname, options, callback);
+  };
+}
+
 export function createClient() {
+    const isBrowser = typeof window !== 'undefined';
+    const supabaseUrl = isBrowser
+        ? `${window.location.origin}/api/supabase`
+        : process.env.NEXT_PUBLIC_SUPABASE_URL!;
+
     return createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            global: {
-                fetch: (url, options) => {
-                    return fetch(url, { ...options, cache: 'no-store' });
-                }
-            }
-        }
+        supabaseUrl,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 }
 
