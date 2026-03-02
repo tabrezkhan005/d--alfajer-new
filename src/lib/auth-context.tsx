@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/src/lib/supabase/client";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import { createCustomer } from "@/src/app/actions";
+import { createCustomer, autoConfirmUser } from "@/src/app/actions";
 
 export interface User {
   id: string;
@@ -123,10 +123,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: error.message };
       }
 
-      // Create customer record
       if (data.user) {
-        // Use server action to bypass RLS
+        // Auto-confirm the user's email via admin API (server action)
+        await autoConfirmUser(data.user.id);
+
+        // Create customer record
         await createCustomer(data.user.id, email, name, country);
+
+        // Sign in the user immediately after confirmation
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          setIsLoading(false);
+          return { error: signInError.message };
+        }
       }
 
       setIsLoading(false);

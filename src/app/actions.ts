@@ -4,28 +4,20 @@ import { createAdminClient } from "@/src/lib/supabase/server";
 
 export async function createCustomer(customerId: string, email: string, name: string, country: string) {
   const supabase = createAdminClient();
-  const nameParts = name.split(" ");
 
-  // Try to insert with full_name first
   try {
-    // Check if full_name column exists by checking schema? No, just try insert
-    // We will assume keys based on previous knowledge
-    const payload: any = {
+    const payload = {
       id: customerId,
       email: email,
-      first_name: nameParts[0] || null,
-      last_name: nameParts.slice(1).join(" ") || null,
+      full_name: name,
       country: country,
-      full_name: name // Try to insert full_name as well
     };
 
-    const { error } = await supabase.from("customers").upsert(payload);
+    const { error } = await supabase.from("customers").upsert(payload, {
+      onConflict: 'id',
+    });
 
     if (error) {
-      // If full_name doesn't exist, it might error.
-      // But we can't easily retry with different schema in one go without potential delay.
-      // However, seeing admin page uses full_name, it's safer to include it.
-
       console.error("Error creating customer in server action:", error);
 
       // If it's unique constraint violation, user already exists, which is fine
@@ -38,6 +30,27 @@ export async function createCustomer(customerId: string, email: string, name: st
     return { success: true };
   } catch (err) {
     console.error("Server action exception:", err);
+    return { success: false, error: "Internal server error" };
+  }
+}
+
+// Auto-confirm a user's email after signup (bypasses email confirmation requirement)
+export async function autoConfirmUser(userId: string) {
+  const supabase = createAdminClient();
+
+  try {
+    const { error } = await supabase.auth.admin.updateUserById(userId, {
+      email_confirm: true,
+    });
+
+    if (error) {
+      console.error("Error auto-confirming user:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("Auto-confirm exception:", err);
     return { success: false, error: "Internal server error" };
   }
 }
