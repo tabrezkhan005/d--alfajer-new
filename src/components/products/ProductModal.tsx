@@ -405,7 +405,16 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 </div>
                 <span className="text-sm font-bold text-gray-900">{product.rating.toFixed(1)}</span>
                 <span className="text-sm text-gray-500">•</span>
-                <span className="text-sm text-gray-500">{product.reviews} verified reviews</span>
+                <button
+                  onClick={() => {
+                    onOpenChange(false);
+                    const slug = product.slug || product.id;
+                    router.push(`/products/${slug}#product-reviews`);
+                  }}
+                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium hover:underline underline-offset-2 cursor-pointer transition-colors"
+                >
+                  {product.reviews} verified reviews
+                </button>
               </div>
 
               {/* Certifications */}

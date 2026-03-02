@@ -169,7 +169,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                 fill
                 className="object-cover"
                 priority
-                unoptimized
               />
               {product.badge && (
                 <motion.div
@@ -202,7 +201,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                     alt={`${product.name || "Product"}-${idx}`}
                     fill
                     className="object-cover"
-                    unoptimized
                   />
                 </motion.button>
               ))}
@@ -235,7 +233,12 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                   <span className="font-semibold text-gray-900">{product.rating}</span>
                 </div>
                 <div className="w-px h-6 bg-gray-300"></div>
-                <p className="text-gray-600">{product.reviews} {t('product.reviews')}</p>
+                <button
+                  onClick={() => document.getElementById('product-reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="text-gray-600 hover:text-[#009744] transition-colors cursor-pointer underline-offset-2 hover:underline"
+                >
+                  {product.reviews} {t('product.reviews')}
+                </button>
               </div>
             </div>
 
@@ -577,7 +580,7 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
         </div>
 
         {/* Reviews Section - Below Tabs */}
-        <div className="border-t border-gray-200 mt-16 pt-16">
+        <div id="product-reviews" className="border-t border-gray-200 mt-16 pt-16 scroll-mt-24">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('product.customerReviews') || 'Customer Reviews'}</h2>
           <ProductReviews productId={product.id} />
         </div>
@@ -605,7 +608,6 @@ function ProductDetailContent({ productId, initialProduct, relatedProducts = [] 
                       alt={relatedProduct.name}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      unoptimized
                     />
                   </div>
                   <div className="p-4">
